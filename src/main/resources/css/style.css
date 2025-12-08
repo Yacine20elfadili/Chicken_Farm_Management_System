@@ -1,3 +1,7 @@
+/*=====================================================================================*/
+/*================================== LOGIN STYLE ==================================*/
+/*=====================================================================================*/
+
 /* style of the left pannel */
 .brand-panel {
     -fx-background-color: #1f2937;
@@ -129,4 +133,137 @@
 }
 .error-message {
     -fx-alignment: center;
+}
+
+/*=====================================================================================*/
+/*================================== SIDEBAR STYLE ==================================*/
+/*=====================================================================================*/
+
+/* Sidebar moduls Styling */
+
+.sidebar-header {
+    -fx-background-color:  #1f2937;
+}
+
+.sidebar-item {
+    -fx-background-color: transparent;
+}
+
+.sidebar-item:hover {
+    -fx-background-color: #f24e1e;
+}
+
+.sidebar-item-active {
+    -fx-background-color: #ff6900;
+}
+
+/* logout button style */
+
+.logout-button {
+    -fx-background-color: #f73526;
+}
+.logout-button:hover {
+    -fx-background-color: #f8493c;
+}
+
+.sidebar-collapsed {
+    -fx-pref-width: 50px;
+    -fx-min-width: 50px;
+    -fx-max-width: 50px;
+}
+
+.sidebar-collapsed .label {
+    visibility: hidden;
+}
+
+.sidebar-collapsed .scroll-pane .logout-button .sidebar-header{
+    -fx-pref-width: 50px;
+    -fx-min-width: 50px;
+    -fx-max-width: 50px;
+}
+
+.sidebar-collapsed .anchor-pane .logout-button .sidebar-header{
+    -fx-pref-width: 50px;
+}
+
+/*=====================================================================================*/
+/*================================== DASHBOARD STYLE ==================================*/
+/*=====================================================================================*/
+
+.main-content {
+    -fx-background-color: #f5f1e8;
+}
+
+.header {
+    -fx-padding: 5px 0px 0px 20px;
+}
+
+.header-title {
+    -fx-text-fill: #1e2939;
+    -fx-font-size: 26px;
+    -fx-font-weight: bold;
+    -fx-font-family: 'Segoe UI';
+}
+
+.header-subtitle {
+    -fx-text-fill: #4a5565;
+    -fx-font-size: 14px;
+    -fx-font-style: italic;
+}
+
+.metric-card, .chart-cards {
+     -fx-background-color: white;
+     -fx-background-radius: 10px;
+     -fx-padding: 20px;
+     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 5);
+}
+
+
+.metric-card:hover, .chart-cards:hover{
+    -fx-scale-x: 1.001;
+    -fx-scale-y: 1.001;
+    -fx-effect: dropshadow(gaussian, rgba(200,200,200), 10, 0, 0, 0);
+}
+
+.label-cards{
+    -fx-text-fill: #4a5565;
+    -fx-font-size: 16px;
+}
+
+.label-cards-stats{
+    -fx-text-fill: #1e2939;
+    -fx-font-size: 26px;
+    -fx-font-weight: 500;
+    -fx-font-family: 'Calibri';
+}
+
+.chickens-card {
+    -fx-background-color: linear-gradient(to right, white, rgba(225, 246, 255));
+}
+
+.alerts-card {
+    -fx-background-color: linear-gradient(to right, white, rgba(255, 215, 215));
+}
+
+.eggs-card {
+    -fx-background-color: linear-gradient(to right, white, rgba(255, 235, 212));
+}
+
+.chart-title {
+    -fx-text-fill: #1e2939;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-font-family: 'Calibri';
+}
+
+/* barchart-styles.css */
+.chart-bar {
+    -fx-background-color: transparent;
+    -fx-background-radius: 3 3 0 0;
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
+}
+
+.chart-plot-background {
+    -fx-background-color: transparent;
 }

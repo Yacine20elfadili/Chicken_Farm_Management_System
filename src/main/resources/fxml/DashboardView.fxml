@@ -1,22 +1,243 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.String?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.chart.BarChart?>
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.NumberAxis?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.text.Font?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
 
-<AnchorPane xmlns="http://javafx.com/javafx/25"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="ma.farm.controller.DashboardController"
-            prefHeight="700.0" prefWidth="950.0"
-            style="-fx-background-color: #ecf0f1;">
-
-    <!-- Centered Message -->
-    <Label text="This page is for Dashboard, wait for updates!!!"
-           style="-fx-text-fill: #2c3e50; -fx-font-size: 24px; -fx-font-weight: bold;"
-           layoutX="200.0" layoutY="320.0">
-        <font>
-            <Font size="24.0" />
-        </font>
-    </Label>
-
+<AnchorPane prefHeight="600.0" prefWidth="1000.0" styleClass="main-content" stylesheets="@../css/style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ma.farm.controller.DashboardController">
+    <children>
+        <VBox prefHeight="75.0" prefWidth="1000.0" styleClass="header" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+            <children>
+                <HBox prefHeight="33.0" prefWidth="999.0">
+                    <children>
+                        <Label styleClass="header-title" text="Tableau de bord" textAlignment="CENTER" />
+                    </children>
+                    <VBox.margin>
+                        <Insets top="10.0" />
+                    </VBox.margin>
+                </HBox>
+                <HBox prefHeight="100.0" prefWidth="200.0">
+                    <children>
+                        <Label prefHeight="30.0" prefWidth="273.0" styleClass="header-subtitle" text="Bienvenue ! Voici un aperçu de votre ferme." textAlignment="CENTER" />
+                    </children>
+                    <VBox.margin>
+                        <Insets />
+                    </VBox.margin>
+                </HBox>
+            </children>
+        </VBox>
+        <VBox prefHeight="200.0" prefWidth="100.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="80.0">
+            <children>
+                <ScrollPane fitToHeight="true" fitToWidth="true" prefHeight="716.0" prefWidth="1000.0" styleClass="main-content" VBox.vgrow="ALWAYS">
+                    <content>
+                        <VBox prefHeight="200.0" prefWidth="100.0" styleClass="main-content">
+                            <children>
+                                <HBox prefHeight="110.0" prefWidth="957.0">
+                                    <VBox.margin>
+                                        <Insets left="20.0" right="20.0" top="20.0" />
+                                    </VBox.margin>
+                                    <children>
+                                        <VBox prefHeight="200.0" prefWidth="100.0" HBox.hgrow="ALWAYS">
+                                            <children>
+                                                <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0">
+                                                    <children>
+                                                        <Label styleClass="label-cards" text="Effectif total">
+                                                            <HBox.margin>
+                                                                <Insets top="20.0" />
+                                                            </HBox.margin></Label>
+                                                    </children>
+                                                </HBox>
+                                                <HBox alignment="TOP_LEFT" prefHeight="100.0" prefWidth="200.0">
+                                                    <children>
+                                                        <Label fx:id="totalChickensLabel" styleClass="label-cards-stats" text="000">
+                                                            <HBox.margin>
+                                                                <Insets bottom="20.0" />
+                                                            </HBox.margin></Label>
+                                                    </children>
+                                                </HBox>
+                                            </children>
+                                        </VBox>
+                                        <VBox prefHeight="200.0" prefWidth="100.0" HBox.hgrow="ALWAYS">
+                                            <children>
+                                                <HBox alignment="CENTER" prefHeight="144.0" prefWidth="459.0">
+                                                    <children>
+                                                        <Region prefHeight="110.0" prefWidth="358.0" HBox.hgrow="ALWAYS">
+                                                            <opaqueInsets>
+                                                                <Insets />
+                                                            </opaqueInsets></Region>
+                                                        <ImageView fitHeight="60.0" fitWidth="60.0" pickOnBounds="true" preserveRatio="true" styleClass="card-icon">
+                                                            <HBox.margin>
+                                                                <Insets />
+                                                            </HBox.margin>
+                                                            <image>
+                                                                <Image url="@../images/icons/total-chicken.png" />
+                                                            </image></ImageView>
+                                                    </children>
+                                                    <VBox.margin>
+                                                        <Insets />
+                                                    </VBox.margin>
+                                                </HBox>
+                                            </children>
+                                        </VBox>
+                                    </children>
+                           <styleClass>
+                              <String fx:value="metric-card" />
+                              <String fx:value="chickens-card" />
+                           </styleClass>
+                                </HBox>
+                                <HBox prefHeight="110.0" prefWidth="957.0">
+                                    <children>
+                                        <VBox prefHeight="200.0" prefWidth="100.0" HBox.hgrow="ALWAYS">
+                                            <children>
+                                                <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0">
+                                                    <children>
+                                                        <Label styleClass="label-cards" text="Œufs du jour">
+                                                            <HBox.margin>
+                                                                <Insets top="20.0" />
+                                                            </HBox.margin>
+                                                        </Label>
+                                                    </children>
+                                                </HBox>
+                                                <HBox alignment="TOP_LEFT" prefHeight="100.0" prefWidth="200.0">
+                                                    <children>
+                                                        <Label fx:id="eggsTodayLabel" styleClass="label-cards-stats" text="000">
+                                                            <HBox.margin>
+                                                                <Insets bottom="20.0" />
+                                                            </HBox.margin>
+                                                        </Label>
+                                                    </children>
+                                                </HBox>
+                                            </children>
+                                        </VBox>
+                                        <VBox prefHeight="200.0" prefWidth="100.0" HBox.hgrow="ALWAYS">
+                                            <children>
+                                                <HBox alignment="CENTER" prefHeight="144.0" prefWidth="459.0">
+                                                    <children>
+                                                        <Region prefHeight="110.0" prefWidth="358.0" HBox.hgrow="ALWAYS">
+                                                            <opaqueInsets>
+                                                                <Insets />
+                                                            </opaqueInsets>
+                                                        </Region>
+                                                        <ImageView fitHeight="60.0" fitWidth="60.0" pickOnBounds="true" preserveRatio="true" styleClass="card-icon">
+                                                            <HBox.margin>
+                                                                <Insets />
+                                                            </HBox.margin>
+                                                            <image>
+                                                                <Image url="@../images/icons/total-eggs.png" />
+                                                            </image>
+                                                        </ImageView>
+                                                    </children>
+                                                    <VBox.margin>
+                                                        <Insets />
+                                                    </VBox.margin>
+                                                </HBox>
+                                            </children>
+                                        </VBox>
+                                    </children>
+                                    <VBox.margin>
+                                        <Insets left="20.0" right="20.0" top="20.0" />
+                                    </VBox.margin>
+                           <styleClass>
+                              <String fx:value="metric-card" />
+                              <String fx:value="eggs-card" />
+                           </styleClass>
+                                </HBox>
+                                <HBox prefHeight="110.0" prefWidth="957.0">
+                                    <children>
+                                        <VBox prefHeight="200.0" prefWidth="100.0" HBox.hgrow="ALWAYS">
+                                            <children>
+                                                <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0">
+                                                    <children>
+                                                        <Label styleClass="label-cards" text="Alertes en cours">
+                                                            <HBox.margin>
+                                                                <Insets top="20.0" />
+                                                            </HBox.margin>
+                                                        </Label>
+                                                    </children>
+                                                </HBox>
+                                                <HBox alignment="TOP_LEFT" prefHeight="100.0" prefWidth="200.0">
+                                                    <children>
+                                                        <Label fx:id="alertsCountLabel" styleClass="label-cards-stats" text="000">
+                                                            <HBox.margin>
+                                                                <Insets bottom="20.0" />
+                                                            </HBox.margin>
+                                                        </Label>
+                                                    </children>
+                                                </HBox>
+                                            </children>
+                                        </VBox>
+                                        <VBox prefHeight="200.0" prefWidth="100.0" HBox.hgrow="ALWAYS">
+                                            <children>
+                                                <HBox alignment="CENTER" prefHeight="144.0" prefWidth="459.0">
+                                                    <children>
+                                                        <Region prefHeight="110.0" prefWidth="358.0" HBox.hgrow="ALWAYS">
+                                                            <opaqueInsets>
+                                                                <Insets />
+                                                            </opaqueInsets>
+                                                        </Region>
+                                                        <ImageView fitHeight="60.0" fitWidth="60.0" pickOnBounds="true" preserveRatio="true" styleClass="card-icon">
+                                                            <HBox.margin>
+                                                                <Insets />
+                                                            </HBox.margin>
+                                                            <image>
+                                                                <Image url="@../images/icons/alerts.png" />
+                                                            </image>
+                                                        </ImageView>
+                                                    </children>
+                                                    <VBox.margin>
+                                                        <Insets />
+                                                    </VBox.margin>
+                                                </HBox>
+                                            </children>
+                                        </VBox>
+                                    </children>
+                                    <VBox.margin>
+                                        <Insets left="20.0" right="20.0" top="20.0" />
+                                    </VBox.margin>
+                           <styleClass>
+                              <String fx:value="metric-card" />
+                              <String fx:value="alerts-card" />
+                           </styleClass>
+                                </HBox>
+                                <HBox minHeight="300.0" prefWidth="944.0" styleClass="chart-cards">
+                                    <VBox prefHeight="200.0" prefWidth="100.0" spacing="10.0" HBox.hgrow="ALWAYS">
+                                    <VBox.margin>
+                                        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                                    </VBox.margin>
+                                    <children>
+                                    <Label styleClass="chart-title" text="Production d'Œufs (7 jours)" />
+                                        <BarChart fx:id="eggProductionChart" minHeight="200.0" HBox.hgrow="ALWAYS">
+                                            <xAxis>
+                                                <CategoryAxis label="Jours" side="BOTTOM" />
+                                            </xAxis>
+                                            <yAxis>
+                                                <NumberAxis animated="false" label="Œufs collectés" side="LEFT" />
+                                            </yAxis>
+                                        </BarChart>
+                                    </children>
+                                    </VBox>
+                           <VBox.margin>
+                              <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                           </VBox.margin>
+                                </HBox>
+                            </children>
+                        </VBox>
+                    </content>
+                    <VBox.margin>
+                        <Insets />
+                    </VBox.margin>
+                </ScrollPane>
+            </children>
+        </VBox>
+    </children>
 </AnchorPane>
