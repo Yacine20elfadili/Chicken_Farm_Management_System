@@ -31,6 +31,10 @@ public class DatabaseConnection {
         }
     }
 
+    public static String getDatabasePath() {
+        return URL.substring(12);
+    }
+
     private void initDatabase() {
         try {
             InputStream schemaStream = getClass().getClassLoader()
