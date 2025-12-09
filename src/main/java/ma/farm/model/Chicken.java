@@ -1,141 +1,81 @@
 package ma.farm.model;
 
 import java.time.LocalDate;
-import java.util.Objects;
 
-/**
- * Chicken model - Represents a chicken or batch of chickens
- * Used in: Chicken Bay page
- */
 public class Chicken {
+    private Integer id;
+    private Integer houseId;
+    private String batchNumber;
+    private Integer quantity;
+    private LocalDate arrivalDate;
+    private Integer ageInDays;
+    private String gender;
+    private String healthStatus;
+    private Double averageWeight;
+    private LocalDate nextTransferDate;
 
-    // Fields
-    private int id;
-    private int houseId;                    // Foreign key to House
-    private String batchNumber;             // Batch identifier
-    private int quantity;                   // Number of chickens in batch
-    private LocalDate arrivalDate;          // Date chickens arrived
-    private int ageInDays;                  // Current age
-    private String gender;                  // Male, Female, Mixed
-    private String healthStatus;            // Healthy, Sick, Quarantine
-    private double averageWeight;           // Average weight in kg
-    private LocalDate nextTransferDate;     // When to move to next house
+    // Constructors
+    public Chicken() {}
 
-    // Default constructor
-    public Chicken() {
-    }
-
-    // Constructor for new batch
-    public Chicken(int houseId, String batchNumber, int quantity, LocalDate arrivalDate, String gender) {
-    }
-
-    // Full constructor
-    public Chicken(int id, int houseId, String batchNumber, int quantity, LocalDate arrivalDate,
-                   int ageInDays, String gender, String healthStatus, double averageWeight,
-                   LocalDate nextTransferDate) {
+    public Chicken(Integer id, Integer houseId, String batchNumber, Integer quantity,
+                   LocalDate arrivalDate, Integer ageInDays, String gender,
+                   String healthStatus, Double averageWeight, LocalDate nextTransferDate) {
+        this.id = id;
+        this.houseId = houseId;
+        this.batchNumber = batchNumber;
+        this.quantity = quantity;
+        this.arrivalDate = arrivalDate;
+        this.ageInDays = ageInDays;
+        this.gender = gender;
+        this.healthStatus = healthStatus;
+        this.averageWeight = averageWeight;
+        this.nextTransferDate = nextTransferDate;
     }
 
     // Getters and Setters
-    public int getId() {
-        return 0;
-    }
+    public Integer getId() { return id; }
+    public void setId(Integer id) { this.id = id; }
 
-    public void setId(int id) {
-    }
+    public Integer getHouseId() { return houseId; }
+    public void setHouseId(Integer houseId) { this.houseId = houseId; }
 
-    public int getHouseId() {
-        return 0;
-    }
+    public String getBatchNumber() { return batchNumber; }
+    public void setBatchNumber(String batchNumber) { this.batchNumber = batchNumber; }
 
-    public void setHouseId(int houseId) {
-    }
+    public Integer getQuantity() { return quantity; }
+    public void setQuantity(Integer quantity) { this.quantity = quantity; }
 
-    public String getBatchNumber() {
-        return null;
-    }
+    public LocalDate getArrivalDate() { return arrivalDate; }
+    public void setArrivalDate(LocalDate arrivalDate) { this.arrivalDate = arrivalDate; }
 
-    public void setBatchNumber(String batchNumber) {
-    }
+    public Integer getAgeInDays() { return ageInDays; }
+    public void setAgeInDays(Integer ageInDays) { this.ageInDays = ageInDays; }
 
-    public int getQuantity() {
-        return 0;
-    }
+    public String getGender() { return gender; }
+    public void setGender(String gender) { this.gender = gender; }
 
-    public void setQuantity(int quantity) {
-    }
+    public String getHealthStatus() { return healthStatus; }
+    public void setHealthStatus(String healthStatus) { this.healthStatus = healthStatus; }
 
-    public LocalDate getArrivalDate() {
-        return null;
-    }
+    public Double getAverageWeight() { return averageWeight; }
+    public void setAverageWeight(Double averageWeight) { this.averageWeight = averageWeight; }
 
-    public void setArrivalDate(LocalDate arrivalDate) {
-    }
-
-    public int getAgeInDays() {
-        return 0;
-    }
-
-    public void setAgeInDays(int ageInDays) {
-    }
-
-    public String getGender() {
-        return null;
-    }
-
-    public void setGender(String gender) {
-    }
-
-    public String getHealthStatus() {
-        return null;
-    }
-
-    public void setHealthStatus(String healthStatus) {
-    }
-
-    public double getAverageWeight() {
-        return 0.0;
-    }
-
-    public void setAverageWeight(double averageWeight) {
-    }
-
-    public LocalDate getNextTransferDate() {
-        return null;
-    }
-
-    public void setNextTransferDate(LocalDate nextTransferDate) {
-    }
-
-    // Business methods
-
-    /**
-     * Calculate days until transfer to next house
-     * @return Number of days remaining
-     */
-    public int getDaysUntilTransfer() {
-        return 0;
-    }
-
-    /**
-     * Check if chickens are ready for transfer
-     * @return true if transfer date has passed
-     */
-    public boolean isReadyForTransfer() {
-        return false;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        return false;
-    }
-
-    @Override
-    public int hashCode() {
-        return 0;
-    }
+    public LocalDate getNextTransferDate() { return nextTransferDate; }
+    public void setNextTransferDate(LocalDate nextTransferDate) { this.nextTransferDate = nextTransferDate; }
 
     @Override
     public String toString() {
-        return null;
+        return "Chicken{" +
+                "id=" + id +
+                ", houseId=" + houseId +
+                ", batchNumber='" + batchNumber + '\'' +
+                ", quantity=" + quantity +
+                ", arrivalDate=" + arrivalDate +
+                ", ageInDays=" + ageInDays +
+                ", gender='" + gender + '\'' +
+                ", healthStatus='" + healthStatus + '\'' +
+                ", averageWeight=" + averageWeight +
+                ", nextTransferDate=" + nextTransferDate +
+                '}';
     }
 }

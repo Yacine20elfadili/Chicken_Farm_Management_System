@@ -1,125 +1,82 @@
+// Mortality.java
 package ma.farm.model;
 
 import java.time.LocalDate;
-import java.util.Objects;
 
-/**
- * Mortality model - Represents chicken death records
- * Used in: Chicken Bay page
- */
 public class Mortality {
+    private Integer id;
+    private Integer houseId;
+    private LocalDate deathDate;
+    private Integer count;
+    private String cause;
+    private String symptoms;
+    private Boolean isOutbreak;
+    private String recordedBy;
+    private String notes;
+    private String recordedAt;
 
-    // Fields
-    private int id;
-    private int houseId;                    // Foreign key to House
-    private LocalDate deathDate;            // Date of death
-    private int count;                      // Number of deaths
-    private String cause;                   // Disease, Age, Accident, Unknown
-    private String symptoms;                // Observed symptoms
-    private boolean isOutbreak;             // Flag for disease outbreak
-    private String recordedBy;              // Worker who recorded
-    private String notes;                   // Additional details
+    // Constructors
+    public Mortality() {}
 
-    // Default constructor
-    public Mortality() {
-    }
-
-    // Constructor for new mortality record
-    public Mortality(int houseId, LocalDate deathDate, int count, String cause) {
-    }
-
-    // Full constructor
-    public Mortality(int id, int houseId, LocalDate deathDate, int count, String cause,
-                     String symptoms, boolean isOutbreak, String recordedBy, String notes) {
+    public Mortality(Integer id, Integer houseId, LocalDate deathDate, Integer count,
+                     String cause, String symptoms, Boolean isOutbreak,
+                     String recordedBy, String notes, String recordedAt) {
+        this.id = id;
+        this.houseId = houseId;
+        this.deathDate = deathDate;
+        this.count = count;
+        this.cause = cause;
+        this.symptoms = symptoms;
+        this.isOutbreak = isOutbreak;
+        this.recordedBy = recordedBy;
+        this.notes = notes;
+        this.recordedAt = recordedAt;
     }
 
     // Getters and Setters
-    public int getId() {
-        return 0;
-    }
+    public Integer getId() { return id; }
+    public void setId(Integer id) { this.id = id; }
 
-    public void setId(int id) {
-    }
+    public Integer getHouseId() { return houseId; }
+    public void setHouseId(Integer houseId) { this.houseId = houseId; }
 
-    public int getHouseId() {
-        return 0;
-    }
+    public LocalDate getDeathDate() { return deathDate; }
+    public void setDeathDate(LocalDate deathDate) { this.deathDate = deathDate; }
 
-    public void setHouseId(int houseId) {
-    }
+    public Integer getCount() { return count; }
+    public void setCount(Integer count) { this.count = count; }
 
-    public LocalDate getDeathDate() {
-        return null;
-    }
+    public String getCause() { return cause; }
+    public void setCause(String cause) { this.cause = cause; }
 
-    public void setDeathDate(LocalDate deathDate) {
-    }
+    public String getSymptoms() { return symptoms; }
+    public void setSymptoms(String symptoms) { this.symptoms = symptoms; }
 
-    public int getCount() {
-        return 0;
-    }
+    public Boolean getIsOutbreak() { return isOutbreak; }
+    public void setIsOutbreak(Boolean outbreak) { isOutbreak = outbreak; }
 
-    public void setCount(int count) {
-    }
+    public String getRecordedBy() { return recordedBy; }
+    public void setRecordedBy(String recordedBy) { this.recordedBy = recordedBy; }
 
-    public String getCause() {
-        return null;
-    }
+    public String getNotes() { return notes; }
+    public void setNotes(String notes) { this.notes = notes; }
 
-    public void setCause(String cause) {
-    }
-
-    public String getSymptoms() {
-        return null;
-    }
-
-    public void setSymptoms(String symptoms) {
-    }
-
-    public boolean isOutbreak() {
-        return false;
-    }
-
-    public void setOutbreak(boolean outbreak) {
-    }
-
-    public String getRecordedBy() {
-        return null;
-    }
-
-    public void setRecordedBy(String recordedBy) {
-    }
-
-    public String getNotes() {
-        return null;
-    }
-
-    public void setNotes(String notes) {
-    }
-
-    // Business methods
-
-    /**
-     * Check if mortality rate is concerning
-     * @param totalChickens Total chickens in house
-     * @return true if deaths exceed 2% of population
-     */
-    public boolean isConcerningRate(int totalChickens) {
-        return false;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        return false;
-    }
-
-    @Override
-    public int hashCode() {
-        return 0;
-    }
+    public String getRecordedAt() { return recordedAt; }
+    public void setRecordedAt(String recordedAt) { this.recordedAt = recordedAt; }
 
     @Override
     public String toString() {
-        return null;
+        return "Mortality{" +
+                "id=" + id +
+                ", houseId=" + houseId +
+                ", deathDate=" + deathDate +
+                ", count=" + count +
+                ", cause='" + cause + '\'' +
+                ", symptoms='" + symptoms + '\'' +
+                ", isOutbreak=" + isOutbreak +
+                ", recordedBy='" + recordedBy + '\'' +
+                ", notes='" + notes + '\'' +
+                ", recordedAt='" + recordedAt + '\'' +
+                '}';
     }
 }
