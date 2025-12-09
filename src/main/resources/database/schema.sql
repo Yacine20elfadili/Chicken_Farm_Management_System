@@ -2,45 +2,53 @@
 Database Schema
     ===========================*/
 
+-- Enable foreign key constraints (must be set per connection in SQLite)
+DROP TABLE IF EXISTS houses;
+DROP TABLE IF EXISTS egg_production;
+DROP TABLE IF EXISTS chickens;
+DROP TABLE IF EXISTS mortality;
+
+
+PRAGMA foreign_keys = ON;
 
 CREATE TABLE IF NOT EXISTS jobTitles (
-     id INTEGER PRIMARY KEY AUTOINCREMENT,
-     name VARCHAR(50) NOT NULL UNIQUE
+                                         id INTEGER PRIMARY KEY AUTOINCREMENT,
+                                         name VARCHAR(50) NOT NULL UNIQUE
 );
 
 CREATE TABLE IF NOT EXISTS shifts (
-     id INTEGER PRIMARY KEY AUTOINCREMENT,
-     name VARCHAR(50) NOT NULL UNIQUE,
-     startTime TIME NOT NULL,
-     endTime TIME NOT NULL
+                                      id INTEGER PRIMARY KEY AUTOINCREMENT,
+                                      name VARCHAR(50) NOT NULL UNIQUE,
+                                      startTime TIME NOT NULL,
+                                      endTime TIME NOT NULL
 );
 
 
 
 
 CREATE TABLE IF NOT EXISTS users (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name VARCHAR(100) NOT NULL,
-    email VARCHAR(100) NOT NULL UNIQUE,
-    password VARCHAR(255) NOT NULL,
-    creationDate DATETIME DEFAULT CURRENT_TIMESTAMP
+                                     id INTEGER PRIMARY KEY AUTOINCREMENT,
+                                     name VARCHAR(100) NOT NULL,
+                                     email VARCHAR(100) NOT NULL UNIQUE,
+                                     password VARCHAR(255) NOT NULL,
+                                     creationDate DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS personnel (
-     id INTEGER PRIMARY KEY AUTOINCREMENT,
-     fullName VARCHAR(100) NOT NULL,
-     age INTEGER NOT NULL,
-     phone VARCHAR(20) NOT NULL,
-     email VARCHAR(100) NOT NULL UNIQUE,
-     jobTitle INTEGER NOT NULL,
-     hireDate DATE,
-     salary DECIMAL(10, 2) DEFAULT 0.00,
-     shift INTEGER NOT NULL,
-     isActive BOOLEAN DEFAULT 1,
-     address VARCHAR(255),
-     emergencyContact VARCHAR(100),
-     FOREIGN KEY (jobTitle) REFERENCES jobTitles(id),
-     FOREIGN KEY (shift) REFERENCES shifts(id)
+                                         id INTEGER PRIMARY KEY AUTOINCREMENT,
+                                         fullName VARCHAR(100) NOT NULL,
+                                         age INTEGER NOT NULL,
+                                         phone VARCHAR(20) NOT NULL,
+                                         email VARCHAR(100) NOT NULL UNIQUE,
+                                         jobTitle INTEGER NOT NULL,
+                                         hireDate DATE,
+                                         salary DECIMAL(10, 2) DEFAULT 0.00,
+                                         shift INTEGER NOT NULL,
+                                         isActive BOOLEAN DEFAULT 1,
+                                         address VARCHAR(255),
+                                         emergencyContact VARCHAR(100),
+                                         FOREIGN KEY (jobTitle) REFERENCES jobTitles(id),
+                                         FOREIGN KEY (shift) REFERENCES shifts(id)
 );
 
 
@@ -127,8 +135,6 @@ VALUES ('Valentina Esposito', 28, '0601234569', 'valentina.esposito@farm.ma', 2,
 -- Drop existing table if exists (for clean reinstall)
 DROP TABLE IF EXISTS houses;
 
--- Enable foreign key constraints (must be set per connection in SQLite)
-PRAGMA foreign_keys = ON;
 
 -- ============================================================
 -- Main Table: houses
@@ -139,35 +145,35 @@ PRAGMA foreign_keys = ON;
 
 CREATE TABLE IF NOT EXISTS houses (
     -- Primary Key (SQLite uses INTEGER for autoincrement)
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    
+                                      id INTEGER PRIMARY KEY AUTOINCREMENT,
+
     -- House identifier (e.g., H1, H2, H3, H4)
-    name VARCHAR(10) NOT NULL UNIQUE,
-    
+                                      name VARCHAR(10) NOT NULL UNIQUE,
+
     -- Type of houses
-    type VARCHAR(50) NOT NULL,
-    
+                                      type VARCHAR(50) NOT NULL,
+
     -- Current number of chickens in the house
-    chickenCount INTEGER DEFAULT 0 
-        CHECK (chickenCount >= 0),
-    
+                                      chickenCount INTEGER DEFAULT 0
+                                          CHECK (chickenCount >= 0),
+
     -- Maximum capacity for chickens
-    capacity INTEGER NOT NULL 
-        CHECK (capacity > 0),
-    
+                                      capacity INTEGER NOT NULL
+                                          CHECK (capacity > 0),
+
     -- Health status of the flock
-    healthStatus VARCHAR(50) DEFAULT 'Good'
-        CHECK (healthStatus IN ('Good', 'Fair', 'Poor')),
-    
+                                      healthStatus VARCHAR(50) DEFAULT 'Good'
+                                          CHECK (healthStatus IN ('Good', 'Fair', 'Poor')),
+
     -- Date of last cleaning
-    lastCleaningDate DATE,
-    
+                                      lastCleaningDate DATE,
+
     -- Creation date of the house record
-    creationDate DATE DEFAULT CURRENT_DATE,
-    
+                                      creationDate DATE DEFAULT CURRENT_DATE,
+
     -- Timestamps for tracking modifications
-    created_at TEXT DEFAULT CURRENT_TIMESTAMP,
-    updated_at TEXT DEFAULT CURRENT_TIMESTAMP
+                                      created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+                                      updated_at TEXT DEFAULT CURRENT_TIMESTAMP
 );
 
 -- ============================================================
@@ -175,11 +181,11 @@ CREATE TABLE IF NOT EXISTS houses (
 -- ============================================================
 
 -- Index on house type for filtering by type
-CREATE INDEX idx_houses_type 
+CREATE INDEX idx_houses_type
     ON houses(type);
 
 -- Index on health status for filtering by status
-CREATE INDEX idx_houses_health 
+CREATE INDEX idx_houses_health
     ON houses(healthStatus);
 
 -- ============================================================
@@ -188,11 +194,11 @@ CREATE INDEX idx_houses_health
 
 -- Trigger to update the updated_at timestamp on UPDATE
 CREATE TRIGGER trg_houses_updated_at
-AFTER UPDATE ON houses
-FOR EACH ROW
+    AFTER UPDATE ON houses
+    FOR EACH ROW
 BEGIN
-    UPDATE houses 
-    SET updated_at = CURRENT_TIMESTAMP 
+    UPDATE houses
+    SET updated_at = CURRENT_TIMESTAMP
     WHERE id = NEW.id;
 END;
 
@@ -201,7 +207,7 @@ END;
 -- ============================================================
 
 INSERT INTO houses (name, type, chickenCount, capacity, healthStatus, lastCleaningDate, creationDate)
-VALUES 
+VALUES
     ('H1', 'Day-old', 1200, 1200, 'Good', '2025-12-05', '2025-01-01'),
     ('H2', 'Egg Layer', 850, 1000, 'Good', '2025-12-04', '2025-02-15'),
     ('H3', 'Meat Female', 780, 1000, 'Good', '2025-12-03', '2025-02-20'),
@@ -227,47 +233,47 @@ DROP TABLE IF EXISTS egg_production;
 
 CREATE TABLE egg_production (
     -- Primary Key (SQLite uses INTEGER for autoincrement)
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    
+                                id INTEGER PRIMARY KEY AUTOINCREMENT,
+
     -- Foreign Key to houses table
-    houseId INTEGER NOT NULL,
-    
+                                houseId INTEGER NOT NULL,
+
     -- Production date (stored as TEXT in ISO format: YYYY-MM-DD)
-    productionDate TEXT NOT NULL,
-    
+                                productionDate TEXT NOT NULL,
+
     -- Egg metrics
-    eggsCollected INTEGER NOT NULL DEFAULT 0 
-        CHECK (eggsCollected >= 0),
-    crackedEggs INTEGER NOT NULL DEFAULT 0 
-        CHECK (crackedEggs >= 0),
-    goodEggs INTEGER NOT NULL DEFAULT 0 
-        CHECK (goodEggs >= 0),
-    
+                                eggsCollected INTEGER NOT NULL DEFAULT 0
+                                    CHECK (eggsCollected >= 0),
+                                crackedEggs INTEGER NOT NULL DEFAULT 0
+                                    CHECK (crackedEggs >= 0),
+                                goodEggs INTEGER NOT NULL DEFAULT 0
+                                    CHECK (goodEggs >= 0),
+
     -- Mortality tracking
-    deadChickens INTEGER NOT NULL DEFAULT 0 
-        CHECK (deadChickens >= 0),
-    
+                                deadChickens INTEGER NOT NULL DEFAULT 0
+                                    CHECK (deadChickens >= 0),
+
     -- Metadata
-    collectedBy TEXT,
-    notes TEXT,
-    
+                                collectedBy TEXT,
+                                notes TEXT,
+
     -- Timestamps (SQLite uses TEXT for datetime)
-    created_at TEXT DEFAULT CURRENT_TIMESTAMP,
-    updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
-    
+                                created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+                                updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
+
     -- Foreign Key Constraint
-    FOREIGN KEY (houseId) REFERENCES houses(id) 
-        ON DELETE CASCADE 
-        ON UPDATE CASCADE,
-    
+                                FOREIGN KEY (houseId) REFERENCES houses(id)
+                                    ON DELETE CASCADE
+                                    ON UPDATE CASCADE,
+
     -- Unique Constraint: One record per house per day
-    UNIQUE (houseId, productionDate),
-    
+                                UNIQUE (houseId, productionDate),
+
     -- Business Logic Constraint: Cracked eggs cannot exceed total collected
-    CHECK (crackedEggs <= eggsCollected),
-    
+                                CHECK (crackedEggs <= eggsCollected),
+
     -- Business Logic Constraint: Good eggs should equal collected minus cracked
-    CHECK (goodEggs = eggsCollected - crackedEggs)
+                                CHECK (goodEggs = eggsCollected - crackedEggs)
 );
 
 -- ============================================================
@@ -275,19 +281,19 @@ CREATE TABLE egg_production (
 -- ============================================================
 
 -- Index on houseId for filtering by house
-CREATE INDEX idx_egg_production_house 
+CREATE INDEX idx_egg_production_house
     ON egg_production(houseId);
 
 -- Index on productionDate for date-based queries
-CREATE INDEX idx_egg_production_date 
+CREATE INDEX idx_egg_production_date
     ON egg_production(productionDate);
 
 -- Composite index for house and date range queries
-CREATE INDEX idx_egg_production_house_date 
+CREATE INDEX idx_egg_production_house_date
     ON egg_production(houseId, productionDate);
 
 -- Index on collectedBy for worker performance tracking
-CREATE INDEX idx_egg_production_collector 
+CREATE INDEX idx_egg_production_collector
     ON egg_production(collectedBy);
 
 -- ============================================================
@@ -296,49 +302,49 @@ CREATE INDEX idx_egg_production_collector
 
 -- Trigger to update the updated_at timestamp on UPDATE
 CREATE TRIGGER trg_egg_production_updated_at
-AFTER UPDATE ON egg_production
-FOR EACH ROW
+    AFTER UPDATE ON egg_production
+    FOR EACH ROW
 BEGIN
-    UPDATE egg_production 
-    SET updated_at = CURRENT_TIMESTAMP 
+    UPDATE egg_production
+    SET updated_at = CURRENT_TIMESTAMP
     WHERE id = NEW.id;
 END;
 
 -- Trigger: Validate and auto-calculate before insert
 CREATE TRIGGER trg_egg_production_before_insert
-BEFORE INSERT ON egg_production
-FOR EACH ROW
+    BEFORE INSERT ON egg_production
+    FOR EACH ROW
 BEGIN
     -- Validate that cracked eggs don't exceed collected
     SELECT CASE
-        WHEN NEW.crackedEggs > NEW.eggsCollected THEN
-            RAISE(ABORT, 'Cracked eggs cannot exceed total eggs collected')
-        WHEN NEW.eggsCollected < 0 OR NEW.crackedEggs < 0 OR NEW.deadChickens < 0 THEN
-            RAISE(ABORT, 'Egg counts and deaths must be non-negative')
-    END;
+               WHEN NEW.crackedEggs > NEW.eggsCollected THEN
+                   RAISE(ABORT, 'Cracked eggs cannot exceed total eggs collected')
+               WHEN NEW.eggsCollected < 0 OR NEW.crackedEggs < 0 OR NEW.deadChickens < 0 THEN
+                   RAISE(ABORT, 'Egg counts and deaths must be non-negative')
+               END;
 END;
 
 -- Trigger: Validate before update
 CREATE TRIGGER trg_egg_production_before_update
-BEFORE UPDATE ON egg_production
-FOR EACH ROW
+    BEFORE UPDATE ON egg_production
+    FOR EACH ROW
 BEGIN
     -- Validate that cracked eggs don't exceed collected
     SELECT CASE
-        WHEN NEW.crackedEggs > NEW.eggsCollected THEN
-            RAISE(ABORT, 'Cracked eggs cannot exceed total eggs collected')
-        WHEN NEW.eggsCollected < 0 OR NEW.crackedEggs < 0 OR NEW.deadChickens < 0 THEN
-            RAISE(ABORT, 'Egg counts and deaths must be non-negative')
-    END;
+               WHEN NEW.crackedEggs > NEW.eggsCollected THEN
+                   RAISE(ABORT, 'Cracked eggs cannot exceed total eggs collected')
+               WHEN NEW.eggsCollected < 0 OR NEW.crackedEggs < 0 OR NEW.deadChickens < 0 THEN
+                   RAISE(ABORT, 'Egg counts and deaths must be non-negative')
+               END;
 END;
 
 -- ============================================================
 -- Sample Data (7 days for H2 and H3)
 -- ============================================================
 
-INSERT INTO egg_production 
-    (houseId, productionDate, eggsCollected, crackedEggs, goodEggs, 
-     deadChickens, collectedBy, notes) 
+INSERT INTO egg_production
+(houseId, productionDate, eggsCollected, crackedEggs, goodEggs,
+ deadChickens, collectedBy, notes)
 VALUES
     -- H2 (Layers) - 7 days of production
     (2, '2025-12-01', 4500, 120, 4380, 2, 'Ahmed', 'Normal production day'),
@@ -348,7 +354,7 @@ VALUES
     (2, '2025-12-05', 4590, 105, 4485, 2, 'Fatima', 'Normal operations'),
     (2, '2025-12-06', 4520, 125, 4395, 1, 'Ahmed', 'Weekend collection'),
     (2, '2025-12-07', 4470, 130, 4340, 2, 'Fatima', 'Rain affected collection time'),
-    
+
     -- H3 (Layers) - 7 days of production
     (3, '2025-12-01', 3200, 85, 3115, 1, 'Hassan', 'New batch starting production'),
     (3, '2025-12-02', 3350, 90, 3260, 0, 'Hassan', 'Production increasing'),
@@ -358,157 +364,170 @@ VALUES
     (3, '2025-12-06', 3390, 102, 3288, 3, 'Fatima', 'Higher mortality, monitor health'),
     (3, '2025-12-07', 3410, 92, 3318, 1, 'Hassan', 'Back to normal');
 
--- ============================================================
--- Useful Views
--- ============================================================
 
--- View: Daily production summary with calculated metrics
-CREATE VIEW v_daily_production_summary AS
-SELECT 
-    ep.id,
-    ep.houseId,
-    h.name AS house_name,
-    ep.productionDate,
-    ep.eggsCollected,
-    ep.crackedEggs,
-    ep.goodEggs,
-    ep.deadChickens,
-    ep.collectedBy,
-    -- Calculate efficiency rate
-    ROUND((CAST(ep.goodEggs AS REAL) * 100.0) / NULLIF(ep.eggsCollected, 0), 2) AS efficiency_rate,
-    -- Calculate cracked rate
-    ROUND((CAST(ep.crackedEggs AS REAL) * 100.0) / NULLIF(ep.eggsCollected, 0), 2) AS cracked_rate,
-    ep.notes
-FROM 
-    egg_production ep
-    INNER JOIN houses h ON ep.houseId = h.id
-ORDER BY 
-    ep.productionDate DESC, h.name;
-
--- View: Weekly production summary per house
-CREATE VIEW v_weekly_production_summary AS
-SELECT 
-    h.id AS house_id,
-    h.name AS house_name,
-    strftime('%Y', ep.productionDate) AS year,
-    strftime('%W', ep.productionDate) AS week,
-    COUNT(*) AS days_recorded,
-    SUM(ep.eggsCollected) AS total_collected,
-    SUM(ep.crackedEggs) AS total_cracked,
-    SUM(ep.goodEggs) AS total_good,
-    SUM(ep.deadChickens) AS total_deaths,
-    ROUND(AVG((CAST(ep.goodEggs AS REAL) * 100.0) / NULLIF(ep.eggsCollected, 0)), 2) AS avg_efficiency,
-    ROUND((CAST(SUM(ep.goodEggs) AS REAL) * 100.0) / NULLIF(SUM(ep.eggsCollected), 0), 2) AS week_efficiency
-FROM 
-    egg_production ep
-    INNER JOIN houses h ON ep.houseId = h.id
-GROUP BY 
-    h.id, h.name, strftime('%Y', ep.productionDate), strftime('%W', ep.productionDate)
-ORDER BY 
-    year DESC, week DESC, h.name;
-
--- View: Monthly production summary per house
-CREATE VIEW v_monthly_production_summary AS
-SELECT 
-    h.id AS house_id,
-    h.name AS house_name,
-    strftime('%Y', ep.productionDate) AS year,
-    strftime('%m', ep.productionDate) AS month,
-    COUNT(*) AS days_recorded,
-    SUM(ep.eggsCollected) AS total_collected,
-    SUM(ep.crackedEggs) AS total_cracked,
-    SUM(ep.goodEggs) AS total_good,
-    SUM(ep.deadChickens) AS total_deaths,
-    ROUND(AVG(ep.eggsCollected), 0) AS avg_daily_collection,
-    ROUND(AVG((CAST(ep.goodEggs AS REAL) * 100.0) / NULLIF(ep.eggsCollected, 0)), 2) AS avg_efficiency,
-    ROUND((CAST(SUM(ep.goodEggs) AS REAL) * 100.0) / NULLIF(SUM(ep.eggsCollected), 0), 2) AS month_efficiency
-FROM 
-    egg_production ep
-    INNER JOIN houses h ON ep.houseId = h.id
-GROUP BY 
-    h.id, h.name, strftime('%Y', ep.productionDate), strftime('%m', ep.productionDate)
-ORDER BY 
-    year DESC, month DESC, h.name;
-
--- View: Worker performance summary
-CREATE VIEW v_worker_performance AS
-SELECT 
-    ep.collectedBy AS worker_name,
-    COUNT(*) AS total_collections,
-    COUNT(DISTINCT ep.houseId) AS houses_worked,
-    SUM(ep.eggsCollected) AS total_eggs_collected,
-    SUM(ep.goodEggs) AS total_good_eggs,
-    ROUND(AVG((CAST(ep.goodEggs AS REAL) * 100.0) / NULLIF(ep.eggsCollected, 0)), 2) AS avg_efficiency,
-    MIN(ep.productionDate) AS first_collection,
-    MAX(ep.productionDate) AS last_collection
-FROM 
-    egg_production ep
-WHERE 
-    ep.collectedBy IS NOT NULL
-GROUP BY 
-    ep.collectedBy
-ORDER BY 
-    total_collections DESC;
 
 -- ============================================================
--- Common Queries (as comments for reference)
+-- Create chickens table
 -- ============================================================
+CREATE TABLE IF NOT EXISTS chickens (
+                                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                                        houseId INTEGER NOT NULL,
+                                        batchNumber TEXT NOT NULL,
+                                        quantity INTEGER NOT NULL,
+                                        arrivalDate TEXT NOT NULL,
+                                        ageInDays INTEGER NOT NULL,
+                                        gender TEXT NOT NULL,
+                                        healthStatus TEXT NOT NULL,
+                                        averageWeight REAL,
+                                        nextTransferDate TEXT,
+                                        created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+                                        FOREIGN KEY (houseId) REFERENCES houses(id) ON DELETE CASCADE
+);
 
-/*
--- Get today's production across all houses
-SELECT * FROM v_daily_production_summary 
-WHERE productionDate = date('now');
+-- ============================================================
+-- Create mortality table
+-- ============================================================
+CREATE TABLE IF NOT EXISTS mortality (
+                                         id INTEGER PRIMARY KEY AUTOINCREMENT,
+                                         houseId INTEGER NOT NULL,
+                                         deathDate TEXT NOT NULL,
+                                         count INTEGER NOT NULL,
+                                         cause TEXT NOT NULL,
+                                         symptoms TEXT,
+                                         isOutbreak INTEGER DEFAULT 0,
+                                         recordedBy TEXT NOT NULL,
+                                         notes TEXT,
+                                         recorded_at TEXT DEFAULT CURRENT_TIMESTAMP,
+                                         FOREIGN KEY (houseId) REFERENCES houses(id) ON DELETE CASCADE
+);
 
--- Get this week's summary for a specific house
-SELECT * FROM v_weekly_production_summary 
-WHERE house_id = 2 
-  AND year = strftime('%Y', 'now')
-  AND week = strftime('%W', 'now');
+-- ============================================================
+-- Indexes for Performance
+-- ============================================================
+-- Houses indexes
+CREATE INDEX IF NOT EXISTS idx_houses_type ON houses(type);
+CREATE INDEX IF NOT EXISTS idx_houses_health ON houses(healthStatus);
 
--- Get production trend for last 30 days
-SELECT 
-    productionDate,
-    SUM(eggsCollected) AS total_eggs,
-    ROUND(AVG((CAST(goodEggs AS REAL) * 100.0) / eggsCollected), 2) AS avg_efficiency
-FROM egg_production
-WHERE productionDate >= date('now', '-30 days')
-GROUP BY productionDate
-ORDER BY productionDate;
+-- Chickens indexes
+CREATE INDEX IF NOT EXISTS idx_chickens_house ON chickens(houseId);
+CREATE INDEX IF NOT EXISTS idx_chickens_arrival ON chickens(arrivalDate);
+CREATE INDEX IF NOT EXISTS idx_chickens_transfer ON chickens(nextTransferDate);
+CREATE INDEX IF NOT EXISTS idx_chickens_batch ON chickens(batchNumber);
 
--- Find days with efficiency below 90%
-SELECT * FROM v_daily_production_summary
-WHERE efficiency_rate < 90
-ORDER BY productionDate DESC;
+-- Mortality indexes
+CREATE INDEX IF NOT EXISTS idx_mortality_house_date ON mortality(houseId, deathDate);
+CREATE INDEX IF NOT EXISTS idx_mortality_date ON mortality(deathDate);
+CREATE INDEX IF NOT EXISTS idx_mortality_cause ON mortality(cause);
+CREATE INDEX IF NOT EXISTS idx_mortality_outbreak ON mortality(isOutbreak);
 
--- Get house statistics for date range
-SELECT 
-    houseId,
-    COUNT(*) AS days_recorded,
-    SUM(eggsCollected) AS total_collected,
-    SUM(crackedEggs) AS total_cracked,
-    SUM(goodEggs) AS total_good,
-    SUM(deadChickens) AS total_deaths,
-    ROUND(AVG(eggsCollected), 0) AS avg_daily_collection,
-    ROUND(AVG((CAST(goodEggs AS REAL) * 100.0) / NULLIF(eggsCollected, 0)), 2) AS avg_efficiency
-FROM egg_production
-WHERE houseId = 2 
-  AND productionDate BETWEEN '2025-12-01' AND '2025-12-31'
-GROUP BY houseId;
+-- ============================================================
+-- Triggers for SQLite
+-- ============================================================
+-- Trigger for houses updated_at
+CREATE TRIGGER IF NOT EXISTS trg_houses_updated_at
+    AFTER UPDATE ON houses
+    FOR EACH ROW
+BEGIN
+    UPDATE houses
+    SET updated_at = CURRENT_TIMESTAMP
+    WHERE id = NEW.id;
+END;
 
--- Get top 10 production days for a house
-SELECT 
-    productionDate,
-    eggsCollected,
-    goodEggs,
-    crackedEggs,
-    ROUND((CAST(goodEggs AS REAL) * 100.0) / NULLIF(eggsCollected, 0), 2) AS efficiency_rate,
-    collectedBy
-FROM egg_production
-WHERE houseId = 2
-ORDER BY eggsCollected DESC
-LIMIT 10;
-*/
+-- Trigger to update house chickenCount when chickens are added/deleted
+CREATE TRIGGER IF NOT EXISTS trg_chickens_after_insert
+    AFTER INSERT ON chickens
+    FOR EACH ROW
+BEGIN
+    UPDATE houses
+    SET chickenCount = chickenCount + NEW.quantity
+    WHERE id = NEW.houseId;
+END;
 
+CREATE TRIGGER IF NOT EXISTS trg_chickens_after_delete
+    AFTER DELETE ON chickens
+    FOR EACH ROW
+BEGIN
+    UPDATE houses
+    SET chickenCount = chickenCount - OLD.quantity
+    WHERE id = OLD.houseId;
+END;
+
+CREATE TRIGGER IF NOT EXISTS trg_chickens_after_update
+    AFTER UPDATE ON chickens
+    FOR EACH ROW
+BEGIN
+    UPDATE houses
+    SET chickenCount = chickenCount + (NEW.quantity - OLD.quantity)
+    WHERE id = NEW.houseId;
+END;
+
+-- Trigger to update house chickenCount when mortality is recorded
+CREATE TRIGGER IF NOT EXISTS trg_mortality_after_insert
+    AFTER INSERT ON mortality
+    FOR EACH ROW
+BEGIN
+    UPDATE houses
+    SET chickenCount = chickenCount - NEW.count
+    WHERE id = NEW.houseId;
+END;
+
+-- ============================================================
+-- Sample Data
+-- ============================================================
+-- Insert houses (using INSERT OR IGNORE to avoid duplicates)
+INSERT OR IGNORE INTO houses (name, type, chickenCount, capacity, healthStatus, lastCleaningDate, creationDate) VALUES
+                                                                                                                    ('H1', 'Day-old', 1200, 1200, 'Good', '2025-12-05', '2025-01-01'),
+                                                                                                                    ('H2', 'Egg Layer', 850, 1000, 'Good', '2025-12-04', '2025-02-15'),
+                                                                                                                    ('H3', 'Meat Female', 780, 1000, 'Good', '2025-12-03', '2025-02-20'),
+                                                                                                                    ('H4', 'Meat Male', 520, 600, 'Fair', '2025-12-02', '2025-03-10');
+
+-- Insert sample chicken batches
+INSERT OR IGNORE INTO chickens (houseId, batchNumber, quantity, arrivalDate, ageInDays, gender, healthStatus, averageWeight, nextTransferDate) VALUES
+-- House 1 (H1) - Day-old
+(1, 'BATCH-2023-001', 500, '2023-11-24', 45, 'Mixed', 'Healthy', 1.8, '2024-01-15'),
+(1, 'BATCH-2023-002', 300, '2023-12-09', 30, 'Female', 'Growing', 1.5, '2024-01-30'),
+(1, 'BATCH-2023-003', 450, '2023-10-15', 75, 'Male', 'Mature', 2.3, '2024-01-10'),
+
+-- House 2 (H2) - Egg Layer
+(2, 'BATCH-2023-004', 600, '2023-11-19', 50, 'Mixed', 'Healthy', 1.9, '2024-02-01'),
+(2, 'BATCH-2023-005', 350, '2023-12-14', 25, 'Female', 'Growing', 1.4, '2024-02-15'),
+(2, 'BATCH-2023-006', 400, '2023-10-04', 70, 'Male', 'Mature', 2.4, '2024-01-25'),
+
+-- House 3 (H3) - Meat Female
+(3, 'BATCH-2023-007', 550, '2023-11-14', 55, 'Mixed', 'Healthy', 2.0, '2024-02-10'),
+(3, 'BATCH-2023-008', 320, '2023-12-19', 20, 'Female', 'Growing', 1.3, '2024-02-28'),
+(3, 'BATCH-2023-009', 480, '2023-10-29', 65, 'Male', 'Mature', 2.2, '2024-01-20'),
+
+-- House 4 (H4) - Meat Male
+(4, 'BATCH-2023-010', 520, '2023-11-09', 60, 'Mixed', 'Healthy', 2.1, '2024-02-05'),
+(4, 'BATCH-2023-011', 280, '2023-12-24', 15, 'Female', 'Growing', 1.2, '2024-03-05'),
+(4, 'BATCH-2023-012', 420, '2023-11-29', 40, 'Male', 'Mature', 2.1, '2024-01-30');
+
+-- Insert sample mortality records
+INSERT OR IGNORE INTO mortality (houseId, deathDate, count, cause, symptoms, isOutbreak, recordedBy, notes) VALUES
+-- House 1
+(1, date('now'), 2, 'Natural Causes', 'No symptoms', 0, 'John Smith', 'Found in morning check'),
+(1, date('now', '-1 day'), 3, 'Disease', 'Lethargy, loss of appetite', 1, 'John Smith', 'Quarantine area affected'),
+(1, date('now', '-3 days'), 1, 'Natural Causes', 'No symptoms', 0, 'John Smith', NULL),
+(1, date('now', '-5 days'), 2, 'Accident', 'Entangled in wires', 0, 'John Smith', 'Clean up wiring'),
+(1, date('now', '-7 days'), 4, 'Disease', 'Neurological symptoms', 1, 'John Smith', 'Major outbreak, immediate action taken'),
+
+-- House 2
+(2, date('now'), 1, 'Injury', 'Broken wing', 0, 'Jane Doe', 'Predator attack'),
+(2, date('now', '-2 days'), 2, 'Accident', 'Crushed by equipment', 0, 'Jane Doe', 'Equipment maintenance needed'),
+(2, date('now', '-4 days'), 3, 'Disease', 'Diarrhea, dehydration', 1, 'Jane Doe', 'Water quality check needed'),
+(2, date('now', '-5 days'), 2, 'Disease', 'Swollen joints', 1, 'Jane Doe', 'Veterinary check scheduled'),
+(2, date('now', '-7 days'), 1, 'Natural Causes', 'No symptoms', 0, 'Jane Doe', NULL),
+
+-- House 3
+(3, date('now', '-1 day'), 1, 'Natural Causes', 'Old age', 0, 'Mike Brown', NULL),
+(3, date('now', '-3 days'), 2, 'Injury', 'Fighting injuries', 0, 'Mike Brown', 'Separate aggressive birds'),
+(3, date('now', '-6 days'), 1, 'Natural Causes', 'No symptoms', 0, 'Mike Brown', NULL),
+
+-- House 4
+(4, date('now', '-2 days'), 4, 'Disease', 'Respiratory issues', 1, 'Sarah Johnson', 'Outbreak suspected'),
+(4, date('now', '-4 days'), 1, 'Natural Causes', 'No symptoms', 0, 'Sarah Johnson', NULL),
+(4, date('now', '-6 days'), 3, 'Injury', 'Foot injuries', 0, 'Sarah Johnson', 'Check flooring conditions');
 -- ============================================================
 -- End of Schema
 -- ============================================================
