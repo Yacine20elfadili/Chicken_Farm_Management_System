@@ -221,7 +221,7 @@ public class HouseDAO {
     public boolean updateHealthStatus(int houseId, HealthStatus status) {
         String sql = "UPDATE houses SET healthStatus = ? WHERE id = ?";
         try (PreparedStatement stmt = dbConnection.getConnection().prepareStatement(sql)) {
-            stmt.setString(1, status.name());
+            stmt.setString(1, status.getDisplayName());
             stmt.setInt(2, houseId);
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
