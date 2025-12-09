@@ -1,22 +1,400 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.text.Font?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
 
-<AnchorPane xmlns="http://javafx.com/javafx/25"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="ma.farm.controller.ChickenBayController"
-            prefHeight="700.0" prefWidth="950.0"
-            style="-fx-background-color: #ecf0f1;">
-
-    <!-- Centered Message -->
-    <Label text="This page is for Chicken Bay, wait for updates!!!"
-           style="-fx-text-fill: #2c3e50; -fx-font-size: 24px; -fx-font-weight: bold;"
-           layoutX="200.0" layoutY="320.0">
-        <font>
-            <Font size="24.0" />
-        </font>
-    </Label>
-
+<AnchorPane prefHeight="600.0" prefWidth="1000.0" styleClass="main-content" stylesheets="@../css/style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ma.farm.controller.ChickenBayController">
+    <children>
+        <VBox prefHeight="75.0" prefWidth="1000.0" styleClass="header" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+            <children>
+                <HBox prefHeight="33.0" prefWidth="999.0">
+                    <children>
+                        <Label styleClass="header-title" text="Parc Avicole" textAlignment="CENTER" />
+                    </children>
+                    <VBox.margin>
+                        <Insets top="10.0" />
+                    </VBox.margin>
+                </HBox>
+                <HBox prefHeight="100.0" prefWidth="200.0">
+                    <children>
+                        <Label prefHeight="28.0" prefWidth="435.0" styleClass="header-subtitle" text="Suivez la population de poulets vivants par génération et emplacement" textAlignment="CENTER" />
+                    </children>
+                    <VBox.margin>
+                        <Insets />
+                    </VBox.margin>
+                </HBox>
+            </children>
+        </VBox>
+        <VBox prefHeight="200.0" prefWidth="100.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="80.0">
+            <children>
+                <ScrollPane fitToHeight="true" fitToWidth="true" prefHeight="716.0" prefWidth="1000.0" styleClass="main-content" VBox.vgrow="ALWAYS">
+                    <content>
+                        <VBox prefHeight="200.0" prefWidth="100.0" styleClass="main-content">
+                     <children>
+                        <GridPane hgap="20.0" vgap="20.0" VBox.vgrow="ALWAYS">
+                          <columnConstraints>
+                            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                          </columnConstraints>
+                          <rowConstraints>
+                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                          </rowConstraints>
+                           <children>
+                              <VBox fx:id="house1Card" prefHeight="200.0" prefWidth="100.0" styleClass="houses-card">
+                                 <children>
+                                    <HBox alignment="CENTER_LEFT" prefHeight="37.0" prefWidth="439.0" spacing="5.0" VBox.vgrow="ALWAYS">
+                                       <children>
+                                          <Label fx:id="h1NameLabel" styleClass="house-name" text="Bâtiment 1" />
+                                           <Region maxHeight="100.0" minWidth="0.0" prefHeight="0.0" prefWidth="0.0" HBox.hgrow="ALWAYS">
+                                               <opaqueInsets>
+                                                   <Insets />
+                                               </opaqueInsets></Region>
+                                          <Label fx:id="h1HealthLabel" styleClass="health-fair" text="Moyen">
+                                             <HBox.margin>
+                                                <Insets />
+                                             </HBox.margin>
+                                             <padding>
+                                                <Insets bottom="1.0" left="2.0" right="2.0" top="1.0" />
+                                             </padding></Label>
+                                       </children>
+                                    </HBox>
+                                    <HBox alignment="BOTTOM_LEFT" prefHeight="37.0" prefWidth="439.0" VBox.vgrow="ALWAYS">
+                                       <children>
+                                          <Label fx:id="h1TypeLabel" styleClass="house-info" text="Poussins Nouveau-nés" />
+                                       </children>
+                                       <padding>
+                                          <Insets left="10.0" />
+                                       </padding>
+                                    </HBox>
+                                    <HBox alignment="BOTTOM_LEFT" prefHeight="37.0" prefWidth="439.0" VBox.vgrow="ALWAYS">
+                                       <children>
+                                          <Label styleClass="house-info" text="Effectif :" />
+                                          <Region minWidth="0.0" prefHeight="0.0" prefWidth="0.0" HBox.hgrow="ALWAYS">
+                                             <opaqueInsets>
+                                                <Insets />
+                                             </opaqueInsets>
+                                          </Region>
+                                          <Label fx:id="h1CountLabel" styleClass="house-info-stats" text="128" />
+                                       </children>
+                                       <padding>
+                                          <Insets left="10.0" />
+                                       </padding>
+                                    </HBox>
+                                    <HBox alignment="BOTTOM_LEFT" prefHeight="37.0" prefWidth="439.0" VBox.vgrow="ALWAYS">
+                                       <children>
+                                          <Label styleClass="house-info" text="Âge :" />
+                                          <Region minWidth="0.0" prefHeight="0.0" prefWidth="0.0" HBox.hgrow="ALWAYS">
+                                             <opaqueInsets>
+                                                <Insets />
+                                             </opaqueInsets>
+                                          </Region>
+                                          <Label fx:id="h1AgeLabel" styleClass="house-info-stats" text="12 Jours" />
+                                       </children>
+                                       <padding>
+                                          <Insets left="10.0" />
+                                       </padding>
+                                    </HBox>
+                                    <HBox alignment="BOTTOM_LEFT" prefHeight="37.0" prefWidth="439.0" VBox.vgrow="ALWAYS">
+                                       <children>
+                                          <Label styleClass="house-info" text="Transfert dans :" />
+                                          <Region minWidth="0.0" prefHeight="0.0" prefWidth="0.0" HBox.hgrow="ALWAYS">
+                                             <opaqueInsets>
+                                                <Insets />
+                                             </opaqueInsets>
+                                          </Region>
+                                          <Label fx:id="h1TransferLabel" styleClass="house-info-stats" text="30 Jours" />
+                                       </children>
+                                       <padding>
+                                          <Insets left="10.0" />
+                                       </padding>
+                                    </HBox>
+                                 </children>
+                                 <GridPane.margin>
+                                    <Insets right="10.0" />
+                                 </GridPane.margin>
+                              </VBox>
+                              <VBox fx:id="house2Card" prefHeight="200.0" prefWidth="100.0" styleClass="houses-card" GridPane.columnIndex="1">
+                                 <children>
+                                    <HBox alignment="CENTER_LEFT" prefHeight="37.0" prefWidth="439.0" VBox.vgrow="ALWAYS">
+                                       <children>
+                                          <Label fx:id="h2NameLabel" styleClass="house-name" text="Bâtiment 2" />
+                                          <Region maxHeight="100.0" minWidth="0.0" prefHeight="0.0" prefWidth="0.0" HBox.hgrow="ALWAYS">
+                                             <opaqueInsets>
+                                                <Insets />
+                                             </opaqueInsets>
+                                          </Region>
+                                          <Label fx:id="h2HealthLabel" styleClass="health-good" text="Bon">
+                                             <HBox.margin>
+                                                <Insets />
+                                             </HBox.margin>
+                                             <padding>
+                                                <Insets bottom="1.0" left="2.0" right="2.0" top="1.0" />
+                                             </padding>
+                                          </Label>
+                                       </children>
+                                    </HBox>
+                                    <HBox alignment="BOTTOM_LEFT" prefHeight="37.0" prefWidth="439.0" VBox.vgrow="ALWAYS">
+                                       <children>
+                                          <Label fx:id="h2TypeLabel" styleClass="house-info" text="Poussins Nouveau-nés" />
+                                       </children>
+                                       <padding>
+                                          <Insets left="10.0" />
+                                       </padding>
+                                    </HBox>
+                                    <HBox alignment="BOTTOM_LEFT" prefHeight="37.0" prefWidth="439.0" VBox.vgrow="ALWAYS">
+                                       <children>
+                                          <Label styleClass="house-info" text="Effectif :" />
+                                          <Region minWidth="0.0" prefHeight="0.0" prefWidth="0.0" HBox.hgrow="ALWAYS">
+                                             <opaqueInsets>
+                                                <Insets />
+                                             </opaqueInsets>
+                                          </Region>
+                                          <Label fx:id="h2CountLabel" styleClass="house-info-stats" text="000" />
+                                       </children>
+                                       <padding>
+                                          <Insets left="10.0" />
+                                       </padding>
+                                    </HBox>
+                                    <HBox alignment="BOTTOM_LEFT" prefHeight="37.0" prefWidth="439.0" VBox.vgrow="ALWAYS">
+                                       <children>
+                                          <Label styleClass="house-info" text="Âge :" />
+                                          <Region minWidth="0.0" prefHeight="0.0" prefWidth="0.0" HBox.hgrow="ALWAYS">
+                                             <opaqueInsets>
+                                                <Insets />
+                                             </opaqueInsets>
+                                          </Region>
+                                          <Label fx:id="h2AgeLabel" styleClass="house-info-stats" text="000" />
+                                       </children>
+                                       <padding>
+                                          <Insets left="10.0" />
+                                       </padding>
+                                    </HBox>
+                                    <HBox alignment="BOTTOM_LEFT" prefHeight="37.0" prefWidth="439.0" VBox.vgrow="ALWAYS">
+                                       <children>
+                                          <Label styleClass="house-info" text="Transfert dans :" />
+                                          <Region minWidth="0.0" prefHeight="0.0" prefWidth="0.0" HBox.hgrow="ALWAYS">
+                                             <opaqueInsets>
+                                                <Insets />
+                                             </opaqueInsets>
+                                          </Region>
+                                          <Label fx:id="h2TransferLabel" styleClass="house-info-stats" text="000" />
+                                       </children>
+                                       <padding>
+                                          <Insets left="10.0" />
+                                       </padding>
+                                    </HBox>
+                                 </children>
+                                 <GridPane.margin>
+                                    <Insets left="10.0" />
+                                 </GridPane.margin>
+                              </VBox>
+                              <VBox fx:id="house3Card" prefHeight="200.0" prefWidth="100.0" styleClass="houses-card" GridPane.rowIndex="1">
+                                 <children>
+                                    <HBox alignment="CENTER_LEFT" prefHeight="37.0" prefWidth="439.0" VBox.vgrow="ALWAYS">
+                                       <children>
+                                          <Label fx:id="h3NameLabel" styleClass="house-name" text="Bâtiment 3" />
+                                          <Region maxHeight="100.0" minWidth="0.0" prefHeight="0.0" prefWidth="0.0" HBox.hgrow="ALWAYS">
+                                             <opaqueInsets>
+                                                <Insets />
+                                             </opaqueInsets>
+                                          </Region>
+                                          <Label fx:id="h3HealthLabel" styleClass="health-good" text="Bon">
+                                             <HBox.margin>
+                                                <Insets />
+                                             </HBox.margin>
+                                             <padding>
+                                                <Insets bottom="1.0" left="2.0" right="2.0" top="1.0" />
+                                             </padding>
+                                          </Label>
+                                       </children>
+                                    </HBox>
+                                    <HBox alignment="BOTTOM_LEFT" prefHeight="38.0" prefWidth="429.0" VBox.vgrow="ALWAYS">
+                                       <children>
+                                          <Label fx:id="h3TypeLabel" styleClass="house-info" text="Femelles à Viande" />
+                                       </children>
+                                       <padding>
+                                          <Insets left="10.0" />
+                                       </padding>
+                                    </HBox>
+                                    <HBox alignment="BOTTOM_LEFT" prefHeight="37.0" prefWidth="439.0" VBox.vgrow="ALWAYS">
+                                       <children>
+                                          <Label styleClass="house-info" text="Effectif :" />
+                                          <Region minWidth="0.0" prefHeight="0.0" prefWidth="0.0" HBox.hgrow="ALWAYS">
+                                             <opaqueInsets>
+                                                <Insets />
+                                             </opaqueInsets>
+                                          </Region>
+                                          <Label fx:id="h3CountLabel" styleClass="house-info-stats" text="000" />
+                                       </children>
+                                       <padding>
+                                          <Insets left="10.0" />
+                                       </padding>
+                                    </HBox>
+                                    <HBox alignment="BOTTOM_LEFT" prefHeight="37.0" prefWidth="439.0" VBox.vgrow="ALWAYS">
+                                       <children>
+                                          <Label styleClass="house-info" text="Âge :" />
+                                          <Region minWidth="0.0" prefHeight="0.0" prefWidth="0.0" HBox.hgrow="ALWAYS">
+                                             <opaqueInsets>
+                                                <Insets />
+                                             </opaqueInsets>
+                                          </Region>
+                                          <Label fx:id="h3AgeLabel" styleClass="house-info-stats" text="000" />
+                                       </children>
+                                       <padding>
+                                          <Insets left="10.0" />
+                                       </padding>
+                                    </HBox>
+                                    <HBox alignment="BOTTOM_LEFT" prefHeight="37.0" prefWidth="439.0" VBox.vgrow="ALWAYS">
+                                       <children>
+                                          <Label styleClass="house-info" text="Transfert dans :" />
+                                          <Region minWidth="0.0" prefHeight="0.0" prefWidth="0.0" HBox.hgrow="ALWAYS">
+                                             <opaqueInsets>
+                                                <Insets />
+                                             </opaqueInsets>
+                                          </Region>
+                                          <Label fx:id="h3TransferLabel" styleClass="house-info-stats" text="000" />
+                                       </children>
+                                       <padding>
+                                          <Insets left="10.0" />
+                                       </padding>
+                                    </HBox>
+                                 </children>
+                                 <GridPane.margin>
+                                    <Insets right="10.0" />
+                                 </GridPane.margin>
+                              </VBox>
+                              <VBox fx:id="house4Card" prefHeight="200.0" prefWidth="100.0" styleClass="houses-card" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                 <children>
+                                    <HBox alignment="CENTER_LEFT" prefHeight="37.0" prefWidth="439.0" VBox.vgrow="ALWAYS">
+                                       <children>
+                                          <Label fx:id="h4NameLabel" styleClass="house-name" text="Bâtiment 4" />
+                                          <Region maxHeight="100.0" minWidth="0.0" prefHeight="0.0" prefWidth="0.0" HBox.hgrow="ALWAYS">
+                                             <opaqueInsets>
+                                                <Insets />
+                                             </opaqueInsets>
+                                          </Region>
+                                          <Label fx:id="h4HealthLabel" styleClass="health-poor" text="Mauvais">
+                                             <HBox.margin>
+                                                <Insets />
+                                             </HBox.margin>
+                                             <padding>
+                                                <Insets bottom="1.0" left="2.0" right="2.0" top="1.0" />
+                                             </padding>
+                                          </Label>
+                                       </children>
+                                    </HBox>
+                                    <HBox alignment="BOTTOM_LEFT" prefHeight="37.0" prefWidth="439.0" VBox.vgrow="ALWAYS">
+                                       <children>
+                                          <Label fx:id="h4TypeLabel" styleClass="house-info" text="Mâles à Viande" />
+                                       </children>
+                                       <padding>
+                                          <Insets left="10.0" />
+                                       </padding>
+                                    </HBox>
+                                    <HBox alignment="BOTTOM_LEFT" prefHeight="37.0" prefWidth="439.0" VBox.vgrow="ALWAYS">
+                                       <children>
+                                          <Label styleClass="house-info" text="Effectif :" />
+                                          <Region minWidth="0.0" prefHeight="0.0" prefWidth="0.0" HBox.hgrow="ALWAYS">
+                                             <opaqueInsets>
+                                                <Insets />
+                                             </opaqueInsets>
+                                          </Region>
+                                          <Label fx:id="h4CountLabel" styleClass="house-info-stats" text="000" />
+                                       </children>
+                                       <padding>
+                                          <Insets left="10.0" />
+                                       </padding>
+                                    </HBox>
+                                    <HBox alignment="BOTTOM_LEFT" prefHeight="37.0" prefWidth="439.0" VBox.vgrow="ALWAYS">
+                                       <children>
+                                          <Label styleClass="house-info" text="Âge :" />
+                                          <Region minWidth="0.0" prefHeight="0.0" prefWidth="0.0" HBox.hgrow="ALWAYS">
+                                             <opaqueInsets>
+                                                <Insets />
+                                             </opaqueInsets>
+                                          </Region>
+                                          <Label fx:id="h4AgeLabel" styleClass="house-info-stats" text="000" />
+                                       </children>
+                                       <padding>
+                                          <Insets left="10.0" />
+                                       </padding>
+                                    </HBox>
+                                    <HBox alignment="BOTTOM_LEFT" prefHeight="37.0" prefWidth="439.0" VBox.vgrow="ALWAYS">
+                                       <children>
+                                          <Label styleClass="house-info" text="Transfert dans :" />
+                                          <Region minWidth="0.0" prefHeight="0.0" prefWidth="0.0" HBox.hgrow="ALWAYS">
+                                             <opaqueInsets>
+                                                <Insets />
+                                             </opaqueInsets>
+                                          </Region>
+                                          <Label fx:id="h4TransferLabel" styleClass="house-info-stats" text="000" />
+                                       </children>
+                                       <padding>
+                                          <Insets left="10.0" />
+                                       </padding>
+                                    </HBox>
+                                 </children>
+                                 <GridPane.margin>
+                                    <Insets left="10.0" />
+                                 </GridPane.margin>
+                              </VBox>
+                           </children>
+                           <VBox.margin>
+                              <Insets left="20.0" right="20.0" top="20.0" />
+                           </VBox.margin>
+                        </GridPane>
+                         <VBox prefHeight="169.0" prefWidth="957.0" spacing="20.0" styleClass="mortality-card">
+                           <VBox.margin>
+                              <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                           </VBox.margin>
+                           <children>
+                              <Label styleClass="mortality-card-title" text="Statistiques de mortalité" />
+                              <HBox prefHeight="89.0" prefWidth="917.0" VBox.vgrow="ALWAYS">
+                                 <children>
+                                    <VBox prefHeight="200.0" prefWidth="100.0" spacing="20.0">
+                                       <children>
+                                          <Label styleClass="mortality-card-info" text="Aujourd'hui" />
+                                          <Label fx:id="deathsTodayLabel" styleClass="this-day-deaths" text="000" />
+                                       </children>
+                                    </VBox>
+                                    <Region prefHeight="0.0" prefWidth="0.0" HBox.hgrow="ALWAYS" />
+                                    <VBox prefHeight="200.0" prefWidth="100.0" spacing="20.0">
+                                       <children>
+                                          <Label styleClass="mortality-card-info" text="Cette semaine" />
+                                          <Label fx:id="deathsWeekLabel" styleClass="this-week-deaths" text="234" />
+                                       </children>
+                                    </VBox>
+                                    <Region prefHeight="0.0" prefWidth="0.0" HBox.hgrow="ALWAYS" />
+                                    <VBox prefHeight="200.0" prefWidth="100.0" spacing="20.0">
+                                       <children>
+                                          <Label styleClass="mortality-card-info" text="Ce mois" />
+                                          <Label fx:id="deathsMonthLabel" styleClass="this-month-deaths" text="000" />
+                                       </children>
+                                    </VBox>
+                                 </children>
+                                 <padding>
+                                    <Insets left="10.0" right="200.0" />
+                                 </padding>
+                              </HBox>
+                           </children>
+                        </VBox>
+                     </children>
+                        </VBox>
+                    </content>
+                    <VBox.margin>
+                        <Insets />
+                    </VBox.margin>
+                </ScrollPane>
+            </children>
+        </VBox>
+    </children>
 </AnchorPane>

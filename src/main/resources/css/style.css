@@ -206,7 +206,7 @@
 }
 
 .header-subtitle {
-    -fx-text-fill: #4a5565;
+    -fx-text-fill: gray;
     -fx-font-size: 14px;
     -fx-font-style: italic;
 }
@@ -219,7 +219,7 @@
 }
 
 
-.metric-card:hover, .chart-cards:hover{
+.metric-card:hover, .chart-cards:hover, .houses-card:hover, .mortality-card:hover, .egg-production-card:hover {
     -fx-scale-x: 1.001;
     -fx-scale-y: 1.001;
     -fx-effect: dropshadow(gaussian, rgba(200,200,200), 10, 0, 0, 0);
@@ -266,4 +266,137 @@
 
 .chart-plot-background {
     -fx-background-color: transparent;
+}
+/*=====================================================================================*/
+/*================================== CHICKEN BAY STYLE ==================================*/
+/*=====================================================================================*/
+
+.houses-card, .mortality-card {
+    -fx-background-color: white;
+    -fx-background-radius: 10px;
+    -fx-padding: 20px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 5);
+}
+
+.house-name, .house-info-stats, .mortality-card-title {
+    -fx-text-fill: #1e2939;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-font-family: 'Calibri';
+}
+
+.house-info, .mortality-card-info {
+    -fx-text-fill: gray;
+    -fx-font-size: 12px;
+    -fx-font-family: 'Lucida Console';
+}
+
+.mortality-card {
+    -fx-background-color: white;
+}
+
+.this-day-deaths {
+    -fx-text-fill: #dc2626;
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-font-family: 'Calibri';
+}
+
+.this-week-deaths {
+    -fx-text-fill: #ea580c;
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-font-family: 'Calibri';
+}
+
+.this-month-deaths {
+    -fx-text-fill: #ca8a04;
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-font-family: 'Calibri';
+}
+
+/*--------------------------------------------------------------------------------------------------*/
+/*--------------------------------- Health Status style !!!! ---------------------------------------*/
+/*--------------------------------------------------------------------------------------------------*/
+
+.health-good {
+    -fx-background-radius: 5px;
+    -fx-background-color: #27ae60;
+    -fx-padding: 4px 6px;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+.health-poor {
+    -fx-background-radius: 5px;
+    -fx-background-color: #e74c3c;
+    -fx-padding: 4px 6px;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+.health-fair {
+    -fx-background-radius: 5px;
+    -fx-background-color: #f39c12;
+    -fx-padding: 4px 6px;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+/*--------------------------------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------------------------------*/
+
+/*=====================================================================================*/
+/*================================== EGGS BAY STYLE ==================================*/
+/*=====================================================================================*/
+
+.egg-production-card {
+     -fx-background-color: white;
+     -fx-background-radius: 10px;
+     -fx-padding: 20px;
+     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 5);
+}
+
+.date-label {
+    -fx-text-fill: #1e2939;
+    -fx-font-size: 16px;
+    -fx-font-style: italic;
+    -fx-font-family: 'Calibri';
+}
+
+.house-info-stats-production {
+    -fx-text-fill: #27ae60;
+}
+
+.house-info-stats-deaths {
+    -fx-text-fill: #e74c3c;
+}
+
+.storage-card {
+     -fx-background-color: linear-gradient(to right, #f8d423, #fca140);
+     -fx-background-radius: 10px;
+     -fx-padding: 20px;
+     -fx-effect: dropshadow(gaussian, rgb(254, 217, 179), 10, 0, 0, 5);
+}
+
+.storage-card:hover {
+    -fx-scale-x: 1.001;
+    -fx-scale-y: 1.001;
+    -fx-effect: dropshadow(gaussian, rgb(254, 217, 179), 10, 0, 0, 0);
+}
+
+.storage-title {
+    -fx-text-fill: white;
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-font-family: 'Calibri';
+}
+
+.storage-summary {
+    -fx-text-fill: white;
+    -fx-font-size: 50px;
+    -fx-font-weight: bold;
+    -fx-font-family: 'Lucida Console';
 }

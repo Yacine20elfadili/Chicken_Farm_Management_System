@@ -1,22 +1,190 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.String?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.text.Font?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
 
-<AnchorPane xmlns="http://javafx.com/javafx/25"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="ma.farm.controller.EggsBayController"
-            prefHeight="700.0" prefWidth="950.0"
-            style="-fx-background-color: #ecf0f1;">
+<AnchorPane prefHeight="700.0" prefWidth="950.0" styleClass="main-content" stylesheets="@../css/style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ma.farm.controller.EggsBayController">
 
-    <!-- Centered Message -->
-    <Label text="This page is for Eggs Bay, wait for updates!!!"
-           style="-fx-text-fill: #2c3e50; -fx-font-size: 24px; -fx-font-weight: bold;"
-           layoutX="200.0" layoutY="320.0">
-        <font>
-            <Font size="24.0" />
-        </font>
-    </Label>
-
+    <children>
+        <VBox prefHeight="75.0" prefWidth="950.0" styleClass="header" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+            <children>
+                <HBox prefHeight="33.0" prefWidth="999.0">
+                    <children>
+                        <Label styleClass="header-title" text="Espace Œufs" textAlignment="CENTER" />
+                    </children>
+                    <VBox.margin>
+                        <Insets top="10.0" />
+                    </VBox.margin>
+                </HBox>
+                <HBox prefHeight="100.0" prefWidth="200.0">
+                    <children>
+                        <Label prefHeight="28.0" prefWidth="325.0" styleClass="header-subtitle" text="Gérez la collecte, le stockage et la qualité des œufs" textAlignment="CENTER" />
+                    </children>
+                    <VBox.margin>
+                        <Insets />
+                    </VBox.margin>
+                </HBox>
+            </children>
+        </VBox>
+        <VBox prefHeight="200.0" prefWidth="100.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="80.0">
+            <children>
+                <ScrollPane fitToHeight="true" fitToWidth="true" prefHeight="716.0" prefWidth="1000.0" styleClass="main-content" VBox.vgrow="ALWAYS">
+                    <content>
+                        <VBox prefHeight="200.0" prefWidth="100.0" styleClass="main-content">
+                            <children>
+                                <HBox prefHeight="134.0" prefWidth="907.0">
+                                    <VBox.margin>
+                                        <Insets left="20.0" right="20.0" top="20.0" />
+                                    </VBox.margin>
+                           <children>
+                              <VBox fx:id="house2Card" prefHeight="200.0" prefWidth="100.0" styleClass="egg-production-card" HBox.hgrow="ALWAYS">
+                                 <HBox.margin>
+                                    <Insets right="20.0" />
+                                 </HBox.margin>
+                                 <children>
+                                    <Label fx:id="h2NameLabel" styleClass="house-name" text="Bâtiment 2 - Pondeuses" />
+                                    <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="394.0">
+                                       <children>
+                                          <Label styleClass="house-info" text="Œufs du jour :" />
+                                          <Region prefHeight="0.0" prefWidth="0.0" HBox.hgrow="ALWAYS" />
+                                          <Label fx:id="h2EggsCollectedLabel" text="000" textFill="#3eff51">
+                                             <styleClass>
+                                                <String fx:value="house-info-stats" />
+                                                <String fx:value="house-info-stats-production" />
+                                             </styleClass></Label>
+                                       </children>
+                                       <padding>
+                                          <Insets left="10.0" />
+                                       </padding>
+                                    </HBox>
+                                    <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0">
+                                       <children>
+                                          <Label styleClass="house-info" text="Mortalités :" />
+                                          <Region prefHeight="0.0" prefWidth="0.0" HBox.hgrow="ALWAYS" />
+                                          <Label fx:id="h2DeadChickensLabel" text="000">
+                                             <styleClass>
+                                                <String fx:value="house-info-stats-deaths" />
+                                                <String fx:value="house-info-stats" />
+                                             </styleClass></Label>
+                                       </children>
+                                       <padding>
+                                          <Insets left="10.0" />
+                                       </padding>
+                                    </HBox>
+                                    <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0">
+                                       <children>
+                                          <Label styleClass="house-info" text="Date :" />
+                                          <Region prefHeight="0.0" prefWidth="0.0" HBox.hgrow="ALWAYS" />
+                                          <Label fx:id="h2DateLabel" styleClass="date-label" text="dd/mm/yyyy" />
+                                       </children>
+                                       <padding>
+                                          <Insets left="10.0" />
+                                       </padding>
+                                    </HBox>
+                                 </children>
+                              </VBox>
+                              <VBox fx:id="house3Card" prefHeight="200.0" prefWidth="100.0" styleClass="egg-production-card" HBox.hgrow="ALWAYS">
+                                 <HBox.margin>
+                                    <Insets left="20.0" />
+                                 </HBox.margin>
+                                 <children>
+                                    <Label fx:id="h3NameLabel" styleClass="house-name" text="Bâtiment 3 - Femelles à Viande" />
+                                    <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0">
+                                       <children>
+                                          <Label styleClass="house-info" text="Œufs du jour :" />
+                                          <Region prefHeight="0.0" prefWidth="0.0" HBox.hgrow="ALWAYS" />
+                                          <Label fx:id="h3EggsCollectedLabel" text="000">
+                                             <styleClass>
+                                                <String fx:value="house-info-stats" />
+                                                <String fx:value="house-info-stats-production" />
+                                             </styleClass></Label>
+                                       </children>
+                                       <padding>
+                                          <Insets left="10.0" />
+                                       </padding>
+                                    </HBox>
+                                    <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0">
+                                       <children>
+                                          <Label styleClass="house-info" text="Mortalités :" />
+                                          <Region prefHeight="0.0" prefWidth="0.0" HBox.hgrow="ALWAYS" />
+                                          <Label fx:id="h3DeadChickensLabel" text="000">
+                                             <styleClass>
+                                                <String fx:value="house-info-stats-deaths" />
+                                                <String fx:value="house-info-stats" />
+                                             </styleClass></Label>
+                                       </children>
+                                       <padding>
+                                          <Insets left="10.0" />
+                                       </padding>
+                                    </HBox>
+                                    <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0">
+                                       <children>
+                                          <Label styleClass="house-info" text="Date :" />
+                                          <Region prefHeight="0.0" prefWidth="0.0" HBox.hgrow="ALWAYS" />
+                                          <Label fx:id="h3DateLabel" styleClass="date-label" text="dd/mm/yyyy" />
+                                       </children>
+                                       <padding>
+                                          <Insets left="10.0" />
+                                       </padding>
+                                    </HBox>
+                                 </children>
+                              </VBox>
+                           </children>
+                                </HBox>
+                        <HBox prefHeight="152.0" prefWidth="947.0">
+                           <VBox.margin>
+                              <Insets top="20.0" />
+                           </VBox.margin>
+                           <children>
+                              <VBox fx:id="storageCard" prefHeight="191.0" prefWidth="907.0" styleClass="storage-card" HBox.hgrow="ALWAYS">
+                                 <HBox.margin>
+                                    <Insets left="20.0" right="20.0" />
+                                 </HBox.margin>
+                                 <children>
+                                    <HBox alignment="CENTER_LEFT" prefHeight="40.0" prefWidth="867.0">
+                                       <children>
+                                          <Label styleClass="storage-title" text="Stock d'œufs" />
+                                          <Region prefHeight="0.0" prefWidth="0.0" HBox.hgrow="ALWAYS" />
+                                          <Label fx:id="storageStatusLabel" styleClass="health-good" text="Status">
+                                             <padding>
+                                                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                             </padding>
+                                          </Label>
+                                       </children>
+                                    </HBox>
+                                    <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" spacing="20.0">
+                                       <children>
+                                          <Label fx:id="totalEggsLabel" prefHeight="24.0" prefWidth="39.0" styleClass="storage-summary" text="000" />
+                                          <ImageView fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true">
+                                             <image>
+                                                <Image url="@../images/icons/egg.png" />
+                                             </image>
+                                          </ImageView>
+                                       </children>
+                                       <padding>
+                                          <Insets left="40.0" />
+                                       </padding>
+                                    </HBox>
+                                 </children>
+                              </VBox>
+                           </children>
+                        </HBox>
+                            </children>
+                        </VBox>
+                    </content>
+                    <VBox.margin>
+                        <Insets />
+                    </VBox.margin>
+                </ScrollPane>
+            </children>
+        </VBox>
+    </children>
 </AnchorPane>
