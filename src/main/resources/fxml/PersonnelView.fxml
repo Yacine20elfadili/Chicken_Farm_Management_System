@@ -1,22 +1,131 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.text.Font?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
 
-<AnchorPane xmlns="http://javafx.com/javafx/25"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="ma.farm.controller.PersonnelController"
-            prefHeight="700.0" prefWidth="950.0"
-            style="-fx-background-color: #ecf0f1;">
+<AnchorPane prefHeight="700.0" prefWidth="950.0" styleClass="main-content" stylesheets="@../css/style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ma.farm.controller.PersonnelController">
 
-    <!-- Centered Message -->
-    <Label text="This page is for Personnel, wait for updates!!!"
-           style="-fx-text-fill: #2c3e50; -fx-font-size: 24px; -fx-font-weight: bold;"
-           layoutX="200.0" layoutY="320.0">
-        <font>
-            <Font size="24.0" />
-        </font>
-    </Label>
+    <children>
+        <VBox prefHeight="75.0" prefWidth="950.0" styleClass="header" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+            <children>
+                <HBox prefHeight="33.0" prefWidth="999.0">
+                    <children>
+                        <Label styleClass="header-title" text="Gestion du Personnel" textAlignment="CENTER" />
+                    </children>
+                    <VBox.margin>
+                        <Insets top="10.0" />
+                    </VBox.margin>
+                </HBox>
+                <HBox prefHeight="100.0" prefWidth="200.0">
+                    <children>
+                        <Label prefHeight="28.0" prefWidth="368.0" styleClass="header-subtitle" text="Gérez vos employés" textAlignment="CENTER" />
+                    </children>
+                    <VBox.margin>
+                        <Insets />
+                    </VBox.margin>
+                </HBox>
+            </children>
+        </VBox>
+        <VBox prefHeight="200.0" prefWidth="100.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="80.0">
+            <children>
+                <ScrollPane fitToHeight="true" fitToWidth="true" prefHeight="716.0" prefWidth="1000.0" styleClass="main-content" VBox.vgrow="ALWAYS">
+                    <content>
+                        <VBox prefHeight="200.0" prefWidth="100.0" styleClass="main-content">
+                            <children>
+                                <HBox prefHeight="134.0" prefWidth="907.0" spacing="40.0">
+                                    <VBox.margin>
+                                        <Insets top="20.0" />
+                                    </VBox.margin>
+                                    <children>
+                                        <VBox alignment="CENTER" prefHeight="165.0" prefWidth="0.0" spacing="20.0" styleClass="personnel-card" HBox.hgrow="ALWAYS">
+                                            <children>
+                                                <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
+                                                    <children>
+                                                        <ImageView fitHeight="50.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true">
+                                                            <image>
+                                                                <Image url="@../images/icons/ceo.png" />
+                                                            </image>
+                                                        </ImageView>
+                                                        <Label styleClass="house-name" text="Total Employés" />
+                                                    </children>
+                                                </HBox>
+                                                <Label fx:id="totalWorkersLabel" styleClass="total-workers" text="000" />
+                                                <Label styleClass="personnal-cards-description" text="personnes" />
+                                            </children>
+                                 <HBox.margin>
+                                    <Insets left="20.0" />
+                                 </HBox.margin>
+                                        </VBox>
+                                        <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="20.0" styleClass="personnel-card" HBox.hgrow="ALWAYS">
+                                            <children>
+                                                <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
+                                                    <children>
+                                                        <ImageView fitHeight="50.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true">
+                                                            <image>
+                                                                <Image url="@../images/icons/data-report.png" />
+                                                            </image>
+                                                        </ImageView>
+                                                        <Label prefHeight="18.0" prefWidth="127.0" styleClass="house-name" text="Superviseurs" />
+                                                    </children>
+                                                </HBox>
+                                                <Label fx:id="totalTrackersLabel" styleClass="total-trackers" text="000" />
+                                                <Label styleClass="personnal-cards-description" text="nombre de superviseurs" />
+                                            </children>
+                                 <HBox.margin>
+                                    <Insets right="20.0" />
+                                 </HBox.margin>
+                                        </VBox>
+                                    </children>
+                                </HBox>
+                        <GridPane fx:id="personnelGrid" styleClass="personnel-grid" VBox.vgrow="ALWAYS">
+                          <columnConstraints>
+                            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                          </columnConstraints>
+                          <rowConstraints>
+                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                          </rowConstraints>
+                        </GridPane>
+                        <HBox alignment="CENTER" prefHeight="160.0" prefWidth="947.0">
+                           <VBox.margin>
+                              <Insets />
+                           </VBox.margin>
+                           <children>
+                              <Label text="this is an example of what the personnal card look like " textAlignment="CENTER" />
+                              <VBox prefHeight="160.0" prefWidth="386.0" styleClass="personnel-card">
+                                 <HBox.margin>
+                                    <Insets left="20.0" right="20.0" />
+                                 </HBox.margin>
+                                 <children>
+                                    <Label styleClass="worker-name" text="worker name(worker-name)" />
+                                    <Label styleClass="job-worker" text="type(job-tracker ; job-worker)" />
+                                    <Label styleClass="worker-info" text="age (worker-info): 19" />
+                                    <Label styleClass="worker-info" text="phone (worker-info): +212 12 34 56 78" />
+                                    <Label styleClass="worker-info" text="email (worker-info): anss@mail.com" />
+                                 </children>
+                              </VBox>
+                           </children>
+                        </HBox>
+                            </children>
+                        </VBox>
+                    </content>
+                    <VBox.margin>
+                        <Insets />
+                    </VBox.margin>
+                </ScrollPane>
+            </children>
+        </VBox>
+    </children>
 
 </AnchorPane>

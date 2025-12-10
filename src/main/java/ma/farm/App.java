@@ -32,7 +32,7 @@ public class App extends Application {
 
             // Set the scene and show
             primaryStage.setScene(scene);
-            primaryStage.setResizable(true); // Optional: prevent window resizing
+            primaryStage.setResizable(false); // Optional: prevent window resizing
             primaryStage.show();
 
             System.out.println("Application started successfully!");
