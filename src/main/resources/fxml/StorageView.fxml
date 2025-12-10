@@ -1,22 +1,124 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.text.Font?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
 
-<AnchorPane xmlns="http://javafx.com/javafx/25"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="ma.farm.controller.StorageController"
-            prefHeight="700.0" prefWidth="950.0"
-            style="-fx-background-color: #ecf0f1;">
+<AnchorPane prefHeight="700.0" prefWidth="950.0" styleClass="main-content" stylesheets="@../css/style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ma.farm.controller.StorageController">
 
-    <!-- Centered Message -->
-    <Label text="This page is for Storage, wait for updates!!!"
-           style="-fx-text-fill: #2c3e50; -fx-font-size: 24px; -fx-font-weight: bold;"
-           layoutX="200.0" layoutY="320.0">
-        <font>
-            <Font size="24.0" />
-        </font>
-    </Label>
+    <children>
+        <VBox prefHeight="75.0" prefWidth="1000.0" styleClass="header" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+            <children>
+                <HBox prefHeight="33.0" prefWidth="999.0">
+                    <children>
+                        <Label styleClass="header-title" text="Gestion du stockage" textAlignment="CENTER" />
+                    </children>
+                    <VBox.margin>
+                        <Insets top="10.0" />
+                    </VBox.margin>
+                </HBox>
+                <HBox prefHeight="100.0" prefWidth="200.0">
+                    <children>
+                        <Label prefHeight="30.0" prefWidth="273.0" styleClass="header-subtitle" text="Suivez tous vos équipements" textAlignment="CENTER" HBox.hgrow="ALWAYS" />
+                    </children>
+                    <VBox.margin>
+                        <Insets />
+                    </VBox.margin>
+                </HBox>
+            </children>
+        </VBox>
+        <VBox prefHeight="200.0" prefWidth="100.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="80.0">
+            <children>
+                <ScrollPane fitToHeight="true" fitToWidth="true" prefHeight="716.0" prefWidth="1000.0" styleClass="main-content" VBox.vgrow="ALWAYS">
+                    <content>
+                        <VBox prefHeight="200.0" prefWidth="100.0" styleClass="main-content">
+                     <children>
+                        <VBox maxHeight="329.0" minHeight="329.0" prefHeight="329.0" prefWidth="907.0" spacing="10.0" styleClass="storage-section">
+                           <VBox.margin>
+                              <Insets left="20.0" right="20.0" top="20.0" />
+                           </VBox.margin>
+                           <children>
+                              <Label styleClass="storage-section-title" text="Stock Aliments" />
+                               <ListView fx:id="feedListView" prefHeight="200.0" prefWidth="200.0" styleClass="feed-list-view">
+                               </ListView>
+                              <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0">
+                                 <children>
+                                    <Label styleClass="feed-list-summary" text="Total :" />
+                                    <Region prefHeight="0.0" prefWidth="0.0" HBox.hgrow="ALWAYS" />
+                                    <Label fx:id="totalFeedTypesLabel" styleClass="feed-list-summary-value" text="000" />
+                                 </children>
+                                 <padding>
+                                    <Insets left="10.0" right="10.0" />
+                                 </padding>
+                              </HBox>
+                           </children>
+                        </VBox>
+                        <VBox prefHeight="147.0" prefWidth="907.0" spacing="10.0" styleClass="storage-section">
+                           <VBox.margin>
+                              <Insets left="20.0" right="20.0" top="20.0" />
+                           </VBox.margin>
+                           <children>
+                              <Label styleClass="storage-section-title" text="Médicaments" />
+                              <HBox alignment="CENTER_LEFT" prefHeight="33.0" prefWidth="867.0">
+                                 <children>
+                                    <Label styleClass="house-info" text="Total :" />
+                                    <Region prefHeight="0.0" prefWidth="0.0" HBox.hgrow="ALWAYS" />
+                                    <Label fx:id="totalMedicationsLabel" styleClass="storage-medical-stats" text="000" />
+                                 </children>
+                                 <VBox.margin>
+                                    <Insets />
+                                 </VBox.margin>
+                                 <padding>
+                                    <Insets left="10.0" right="10.0" />
+                                 </padding>
+                              </HBox>
+                              <HBox alignment="CENTER_LEFT" prefHeight="33.0" prefWidth="867.0">
+                                 <children>
+                                    <Label styleClass="house-info" text="Stock faible :" />
+                                    <Region prefHeight="0.0" prefWidth="0.0" HBox.hgrow="ALWAYS" />
+                                    <Label fx:id="lowStockMedicationsLabel" styleClass="storage-medical-weak-stats" text="000" />
+                                 </children>
+                                 <padding>
+                                    <Insets left="10.0" right="10.0" />
+                                 </padding>
+                              </HBox>
+                           </children>
+                        </VBox>
+                        <VBox minHeight="401.0" prefHeight="401.0" prefWidth="894.0" spacing="10.0" styleClass="storage-section">
+                           <VBox.margin>
+                              <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                           </VBox.margin>
+                           <children>
+                              <Label styleClass="storage-section-title" text="Équipements" />
+                              <TableView fx:id="equipmentTable" prefHeight="320.0" prefWidth="854.0">
+                                <columns>
+                                  <TableColumn fx:id="equipmentNameColumn" maxWidth="500.0" minWidth="500.0" prefWidth="500.0" resizable="false" sortable="false" text="Équipement" />
+                                  <TableColumn fx:id="equipmentQuantityColumn" maxWidth="150.0" minWidth="150.0" prefWidth="150.0" resizable="false" styleClass="count-cell" text="Quantité" />
+                                    <TableColumn fx:id="equipmentStatusColumn" editable="false" maxWidth="350.0" minWidth="350.0" prefWidth="350.0" sortable="false" text="État" />
+                                </columns>
+                                 <columnResizePolicy>
+                                    <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                 </columnResizePolicy>
+                              </TableView>
+                           </children>
+                        </VBox>
+                     </children>
+                        </VBox>
+                    </content>
+                    <VBox.margin>
+                        <Insets />
+                    </VBox.margin>
+                </ScrollPane>
+            </children>
+        </VBox>
+    </children>
 
 </AnchorPane>
+
