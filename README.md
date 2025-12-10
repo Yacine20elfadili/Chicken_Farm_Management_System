@@ -475,6 +475,8 @@ Chicken_Farm_Management_System/
 │                       ├── ChickenDAOTest.java
 │                       ├── DatabaseConnectionTest.java
 │                       ├── EggProductionDAOTest.java
+│                       ├── HouseDAOTest.java
+│                       ├── MortalityDAOTest.java
 │                       ├── PersonnelDAOTest.java
 │                       ├── TaskDAOTest.java
 │                       ├── HouseDAOTest.java
