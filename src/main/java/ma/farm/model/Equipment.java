@@ -1,7 +1,6 @@
 package ma.farm.model;
 
 import java.time.LocalDate;
-import java.util.Objects;
 
 /**
  * Equipment model - Represents farm equipment inventory
@@ -28,90 +27,116 @@ public class Equipment {
 
     // Constructor for new equipment
     public Equipment(String name, String category, int quantity, String status) {
+        this.name = name;
+        this.category = category;
+        this.quantity = quantity;
+        this.status = status;
     }
 
     // Full constructor
     public Equipment(int id, String name, String category, int quantity, String status,
                      LocalDate purchaseDate, double purchasePrice, LocalDate lastMaintenanceDate,
                      LocalDate nextMaintenanceDate, String location, String notes) {
+        this.id = id;
+        this.name = name;
+        this.category = category;
+        this.quantity = quantity;
+        this.status = status;
+        this.purchaseDate = purchaseDate;
+        this.purchasePrice = purchasePrice;
+        this.lastMaintenanceDate = lastMaintenanceDate;
+        this.nextMaintenanceDate = nextMaintenanceDate;
+        this.location = location;
+        this.notes = notes;
     }
 
     // Getters and Setters
     public int getId() {
-        return 0;
+        return id;
     }
 
     public void setId(int id) {
+        this.id = id;
     }
 
     public String getName() {
-        return null;
+        return name;
     }
 
     public void setName(String name) {
+        this.name = name;
     }
 
     public String getCategory() {
-        return null;
+        return category;
     }
 
     public void setCategory(String category) {
+        this.category = category;
     }
 
     public int getQuantity() {
-        return 0;
+        return quantity;
     }
 
     public void setQuantity(int quantity) {
+        this.quantity = quantity;
     }
 
     public String getStatus() {
-        return null;
+        return status;
     }
 
     public void setStatus(String status) {
+        this.status = status;
     }
 
     public LocalDate getPurchaseDate() {
-        return null;
+        return purchaseDate;
     }
 
     public void setPurchaseDate(LocalDate purchaseDate) {
+        this.purchaseDate = purchaseDate;
     }
 
     public double getPurchasePrice() {
-        return 0.0;
+        return purchasePrice;
     }
 
     public void setPurchasePrice(double purchasePrice) {
+        this.purchasePrice = purchasePrice;
     }
 
     public LocalDate getLastMaintenanceDate() {
-        return null;
+        return lastMaintenanceDate;
     }
 
     public void setLastMaintenanceDate(LocalDate lastMaintenanceDate) {
+        this.lastMaintenanceDate = lastMaintenanceDate;
     }
 
     public LocalDate getNextMaintenanceDate() {
-        return null;
+        return nextMaintenanceDate;
     }
 
     public void setNextMaintenanceDate(LocalDate nextMaintenanceDate) {
+        this.nextMaintenanceDate = nextMaintenanceDate;
     }
 
     public String getLocation() {
-        return null;
+        return location;
     }
 
     public void setLocation(String location) {
+        this.location = location;
     }
 
     public String getNotes() {
-        return null;
+        return notes;
     }
 
     public void setNotes(String notes) {
+        this.notes = notes;
     }
 
     // Business methods
@@ -121,7 +146,10 @@ public class Equipment {
      * @return true if maintenance is due
      */
     public boolean needsMaintenance() {
-        return false;
+        if (nextMaintenanceDate == null) {
+            return false;
+        }
+        return nextMaintenanceDate.isBefore(LocalDate.now());
     }
 
     /**
@@ -129,7 +157,7 @@ public class Equipment {
      * @return true if status is "Broken"
      */
     public boolean isBroken() {
-        return false;
+        return "Broken".equals(status);
     }
 
     /**
@@ -137,21 +165,36 @@ public class Equipment {
      * @return true if status is "Good" or "Fair"
      */
     public boolean isOperational() {
-        return false;
+        return !isBroken();
     }
 
     @Override
     public boolean equals(Object o) {
-        return false;
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Equipment equipment = (Equipment) o;
+        return id == equipment.id;
     }
 
     @Override
     public int hashCode() {
-        return 0;
+        return Integer.hashCode(id);
     }
 
     @Override
     public String toString() {
-        return null;
+        return "Equipment{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", category='" + category + '\'' +
+                ", quantity=" + quantity +
+                ", status='" + status + '\'' +
+                ", purchaseDate=" + purchaseDate +
+                ", purchasePrice=" + purchasePrice +
+                ", lastMaintenanceDate=" + lastMaintenanceDate +
+                ", nextMaintenanceDate=" + nextMaintenanceDate +
+                ", location='" + location + '\'' +
+                ", notes='" + notes + '\'' +
+                '}';
     }
 }
