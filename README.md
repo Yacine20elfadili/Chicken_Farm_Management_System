@@ -22,11 +22,11 @@ This project was developed as part of a university Java course by the following 
 
 ### 👨‍🏫 Supervising Professors
 
-| Name | GitHub Profile |
-|----|----------------|
-| Youssef ES-SAADY | [@ProfessorGitHub1](#) |
-| Abderrahmane SADIQ   | [@ProfessorGitHub2](#) |
-| Professor 3 | [@ProfessorGitHub3](#) |
+| Name | GitHub Profile                  |
+|----|---------------------------------|
+| Youssef ES-SAADY | [https://github.com/essaady](#) |
+| Abderrahmane SADIQ   | [@ProfessorGitHub2](#)          |
+| Professor 3 | [@ProfessorGitHub3](#)          |
 
 ---
 
@@ -475,8 +475,13 @@ Chicken_Farm_Management_System/
 │                       ├── ChickenDAOTest.java
 │                       ├── DatabaseConnectionTest.java
 │                       ├── EggProductionDAOTest.java
+│                       ├── HouseDAOTest.java
+│                       ├── MortalityDAOTest.java
 │                       ├── PersonnelDAOTest.java
+│                       ├── HouseDAOTest.java
+│                       ├── MortalityDAOTest.java
 │                       ├── TaskDAOTest.java
+│                       ├── HouseDAOTest.java
 │                       └── UserDAOTest.java
 │
 ├── target/
@@ -1027,8 +1032,8 @@ Permission is granted to use, copy, modify, and distribute this software for any
 
 We would like to thank our professors for their guidance and support throughout this project:
 
-- Professor [Name 1]
-- Professor [Name 2]
+- Professor [Youssef ES-SAADY]
+- Professor [Abderrahmane SADIQ]
 - Professor [Name 3]
 
 ### Team Recognition
@@ -1044,4 +1049,4 @@ Special thanks to all team members for their dedication and hard work:
 
 ---
 
-**Built by the Farm Management Dev Team | University Java Project 2024**
+**Built by the Farm Management Dev Team | University Java Project 2025**
