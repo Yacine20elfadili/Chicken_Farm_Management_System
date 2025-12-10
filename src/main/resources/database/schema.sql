@@ -528,6 +528,223 @@ INSERT OR IGNORE INTO mortality (houseId, deathDate, count, cause, symptoms, isO
 (4, date('now', '-2 days'), 4, 'Disease', 'Respiratory issues', 1, 'Sarah Johnson', 'Outbreak suspected'),
 (4, date('now', '-4 days'), 1, 'Natural Causes', 'No symptoms', 0, 'Sarah Johnson', NULL),
 (4, date('now', '-6 days'), 3, 'Injury', 'Foot injuries', 0, 'Sarah Johnson', 'Check flooring conditions');
+
+-- ============================================================
+-- Feed Table
+-- ============================================================
+-- Stores feed inventory for different chicken types
+-- ============================================================
+
+DROP TABLE IF EXISTS feed;
+
+CREATE TABLE IF NOT EXISTS feed (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name VARCHAR(100) NOT NULL,
+    type VARCHAR(50) NOT NULL,
+    quantityKg REAL NOT NULL DEFAULT 0,
+    pricePerKg REAL NOT NULL DEFAULT 0,
+    supplier VARCHAR(100),
+    lastRestockDate DATE,
+    expiryDate DATE,
+    minStockLevel REAL NOT NULL DEFAULT 100,
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+    updated_at TEXT DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Index for feed queries
+CREATE INDEX IF NOT EXISTS idx_feed_type ON feed(type);
+CREATE INDEX IF NOT EXISTS idx_feed_expiry ON feed(expiryDate);
+
+-- Trigger to update the updated_at timestamp on UPDATE
+CREATE TRIGGER IF NOT EXISTS trg_feed_updated_at
+    AFTER UPDATE ON feed
+    FOR EACH ROW
+BEGIN
+    UPDATE feed
+    SET updated_at = CURRENT_TIMESTAMP
+    WHERE id = NEW.id;
+END;
+
+-- Sample Feed Data
+INSERT INTO feed (name, type, quantityKg, pricePerKg, supplier, lastRestockDate, expiryDate, minStockLevel) VALUES
+    ('Starter Crumbs', 'Day-old', 500.0, 12.50, 'AgriSupply Morocco', '2025-01-10', '2025-07-10', 200.0),
+    ('Chick Starter Mash', 'Day-old', 350.0, 11.00, 'FeedCorp International', '2025-01-08', '2025-06-08', 150.0),
+    ('Layer Pellets Premium', 'Layer', 800.0, 15.00, 'AgriSupply Morocco', '2025-01-12', '2025-08-12', 300.0),
+    ('Layer Mash Standard', 'Layer', 120.0, 13.50, 'Local Farm Supplies', '2024-12-20', '2025-05-20', 200.0),
+    ('Broiler Grower Feed', 'Meat Growth', 650.0, 14.00, 'FeedCorp International', '2025-01-05', '2025-06-05', 250.0),
+    ('Meat Finisher Pellets', 'Meat Growth', 450.0, 16.00, 'AgriSupply Morocco', '2025-01-11', '2025-07-11', 200.0),
+    ('Broiler Starter Crumbs', 'Meat Growth', 75.0, 13.00, 'Local Farm Supplies', '2024-12-15', '2025-03-15', 100.0),
+    ('Organic Layer Feed', 'Layer', 200.0, 22.00, 'Green Organic Feeds', '2025-01-09', '2025-04-09', 100.0);
+
+-- ============================================================
+-- Medications Table
+-- ============================================================
+-- Stores medication inventory for poultry health
+-- ============================================================
+
+DROP TABLE IF EXISTS medications;
+
+CREATE TABLE IF NOT EXISTS medications (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name VARCHAR(100) NOT NULL,
+    type VARCHAR(50) NOT NULL,
+    quantity INTEGER NOT NULL DEFAULT 0,
+    unit VARCHAR(20) NOT NULL,
+    pricePerUnit REAL NOT NULL DEFAULT 0,
+    supplier VARCHAR(100),
+    purchaseDate DATE,
+    expiryDate DATE,
+    minStockLevel INTEGER NOT NULL DEFAULT 10,
+    usage TEXT,
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+    updated_at TEXT DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Index for medication queries
+CREATE INDEX IF NOT EXISTS idx_medications_type ON medications(type);
+CREATE INDEX IF NOT EXISTS idx_medications_expiry ON medications(expiryDate);
+
+-- Trigger to update the updated_at timestamp on UPDATE
+CREATE TRIGGER IF NOT EXISTS trg_medications_updated_at
+    AFTER UPDATE ON medications
+    FOR EACH ROW
+BEGIN
+    UPDATE medications
+    SET updated_at = CURRENT_TIMESTAMP
+    WHERE id = NEW.id;
+END;
+
+-- Sample Medications Data
+INSERT INTO medications (name, type, quantity, unit, pricePerUnit, supplier, purchaseDate, expiryDate, minStockLevel, usage) VALUES
+    ('Newcastle Disease Vaccine', 'Vaccine', 500, 'doses', 2.50, 'VetPharma Morocco', '2025-01-05', '2026-01-05', 200, 'Administer to chicks at day 7 and day 21'),
+    ('Infectious Bronchitis Vaccine', 'Vaccine', 300, 'doses', 3.00, 'VetPharma Morocco', '2025-01-03', '2025-12-03', 150, 'Spray or drinking water at day 1'),
+    ('Gumboro Vaccine', 'Vaccine', 50, 'doses', 2.75, 'AgriVet Supplies', '2024-12-20', '2025-06-20', 100, 'Drinking water at day 14 and 21'),
+    ('Amoxicillin 10%', 'Antibiotic', 25, 'bottles', 45.00, 'VetPharma Morocco', '2025-01-08', '2026-06-08', 10, '1g per liter of drinking water for 5 days'),
+    ('Enrofloxacin', 'Antibiotic', 8, 'bottles', 55.00, 'MedVet International', '2024-11-15', '2025-11-15', 10, '0.5ml per liter for respiratory infections'),
+    ('Vitamin AD3E', 'Supplement', 40, 'bottles', 35.00, 'AgriVet Supplies', '2025-01-10', '2026-07-10', 15, '1ml per liter during stress periods'),
+    ('Electrolyte Powder', 'Supplement', 60, 'sachets', 8.00, 'Local Farm Supplies', '2025-01-12', '2026-01-12', 20, '1 sachet per 20 liters during heat stress'),
+    ('Ivermectin', 'Antiparasitic', 15, 'bottles', 65.00, 'VetPharma Morocco', '2024-12-28', '2025-12-28', 10, 'External parasite treatment, use as directed'),
+    ('Cocci-Stop', 'Antiparasitic', 5, 'bottles', 48.00, 'MedVet International', '2024-10-15', '2025-04-15', 10, 'Coccidiosis prevention, 1ml per 2 liters'),
+    ('Calcium Supplement', 'Supplement', 80, 'kg', 12.00, 'Local Farm Supplies', '2025-01-06', '2026-06-06', 25, 'Mix with feed at 2% for laying hens');
+
+-- ============================================================
+-- Equipment Table
+-- ============================================================
+-- Stores farm equipment inventory and maintenance records
+-- ============================================================
+
+DROP TABLE IF EXISTS equipment;
+
+CREATE TABLE IF NOT EXISTS equipment (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name VARCHAR(100) NOT NULL,
+    category VARCHAR(50) NOT NULL,
+    quantity INTEGER NOT NULL DEFAULT 1,
+    status VARCHAR(20) NOT NULL DEFAULT 'Good',
+    purchaseDate DATE,
+    purchasePrice REAL NOT NULL DEFAULT 0,
+    lastMaintenanceDate DATE,
+    nextMaintenanceDate DATE,
+    location VARCHAR(100),
+    notes TEXT,
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+    updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
+    CHECK (status IN ('Good', 'Fair', 'Broken'))
+);
+
+-- Index for equipment queries
+CREATE INDEX IF NOT EXISTS idx_equipment_status ON equipment(status);
+CREATE INDEX IF NOT EXISTS idx_equipment_category ON equipment(category);
+CREATE INDEX IF NOT EXISTS idx_equipment_maintenance ON equipment(nextMaintenanceDate);
+
+-- Trigger to update the updated_at timestamp on UPDATE
+CREATE TRIGGER IF NOT EXISTS trg_equipment_updated_at
+    AFTER UPDATE ON equipment
+    FOR EACH ROW
+BEGIN
+    UPDATE equipment
+    SET updated_at = CURRENT_TIMESTAMP
+    WHERE id = NEW.id;
+END;
+
+-- Sample Equipment Data
+INSERT INTO equipment (name, category, quantity, status, purchaseDate, purchasePrice, lastMaintenanceDate, nextMaintenanceDate, location, notes) VALUES
+    ('Automatic Feeder System', 'Feeding', 4, 'Good', '2024-03-15', 2500.00, '2025-01-05', '2025-04-05', 'House H1-H4', 'Programmable feeding schedule'),
+    ('Water Nipple Drinkers', 'Feeding', 200, 'Good', '2024-06-20', 1200.00, '2025-01-10', '2025-07-10', 'All Houses', 'Stainless steel, leak-proof'),
+    ('Feed Storage Bins', 'Feeding', 6, 'Fair', '2023-08-10', 800.00, '2024-12-15', '2025-03-15', 'Feed Storage Area', 'Some rust spots, schedule repainting'),
+    ('Egg Collection Belts', 'Collection', 2, 'Good', '2024-05-22', 3500.00, '2025-01-08', '2025-05-08', 'House H2, H3', 'Automatic egg conveyor system'),
+    ('Egg Grading Machine', 'Collection', 1, 'Good', '2024-07-18', 4200.00, '2025-01-02', '2025-04-02', 'Processing Room', 'Grades by weight and checks quality'),
+    ('Pressure Washer', 'Cleaning', 2, 'Fair', '2023-02-28', 650.00, '2024-11-20', '2025-02-20', 'Equipment Shed', 'One unit needs new hose'),
+    ('Ventilation Fans', 'Climate', 12, 'Good', '2024-01-10', 1800.00, '2025-01-12', '2025-07-12', 'All Houses', '48-inch industrial fans'),
+    ('Heating Lamps', 'Climate', 20, 'Good', '2024-09-05', 400.00, '2024-12-20', '2025-06-20', 'House H1', 'Infrared brooders for chicks'),
+    ('Generator', 'Other', 1, 'Broken', '2022-11-15', 5500.00, '2024-08-10', '2024-11-10', 'Power Room', 'Motor needs replacement, ordered parts'),
+    ('Digital Scale', 'Other', 3, 'Good', '2024-04-12', 250.00, '2025-01-01', '2025-07-01', 'Processing Room', 'Calibrated monthly'),
+    ('Vaccination Sprayer', 'Medical', 2, 'Good', '2024-08-25', 320.00, '2025-01-06', '2025-04-06', 'Medical Supply Room', 'Fine mist for vaccine delivery'),
+    ('Egg Washer', 'Cleaning', 1, 'Broken', '2023-05-14', 1800.00, '2024-10-05', '2025-01-05', 'Processing Room', 'Pump malfunction, repair scheduled'),
+    ('Manure Spreader', 'Cleaning', 1, 'Fair', '2022-07-20', 2200.00, '2024-09-15', '2025-03-15', 'Outside Storage', 'Tires need replacement soon');
+
+-- ============================================================
+-- Tasks Table
+-- ============================================================
+-- Stores daily tasks for farm workers
+-- ============================================================
+
+DROP TABLE IF EXISTS tasks;
+
+CREATE TABLE IF NOT EXISTS tasks (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    description TEXT NOT NULL,
+    status VARCHAR(20) NOT NULL DEFAULT 'Pending',
+    dueDate DATE,
+    completedAt TEXT,
+    assignedTo VARCHAR(100),
+    houseId INTEGER,
+    category VARCHAR(50),
+    crackedEggs INTEGER DEFAULT 0,
+    notes TEXT,
+    priority VARCHAR(20) DEFAULT 'Medium',
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+    updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
+    CHECK (status IN ('Done', 'Pending', 'Missed')),
+    CHECK (priority IN ('High', 'Medium', 'Low')),
+    FOREIGN KEY (houseId) REFERENCES houses(id) ON DELETE SET NULL
+);
+
+-- Index for task queries
+CREATE INDEX IF NOT EXISTS idx_tasks_status ON tasks(status);
+CREATE INDEX IF NOT EXISTS idx_tasks_dueDate ON tasks(dueDate);
+CREATE INDEX IF NOT EXISTS idx_tasks_assignedTo ON tasks(assignedTo);
+CREATE INDEX IF NOT EXISTS idx_tasks_category ON tasks(category);
+CREATE INDEX IF NOT EXISTS idx_tasks_priority ON tasks(priority);
+
+-- Trigger to update the updated_at timestamp on UPDATE
+CREATE TRIGGER IF NOT EXISTS trg_tasks_updated_at
+    AFTER UPDATE ON tasks
+    FOR EACH ROW
+BEGIN
+    UPDATE tasks
+    SET updated_at = CURRENT_TIMESTAMP
+    WHERE id = NEW.id;
+END;
+
+-- Sample Tasks Data
+INSERT INTO tasks (description, status, dueDate, completedAt, assignedTo, houseId, category, crackedEggs, notes, priority) VALUES
+    ('Morning egg collection - House H2', 'Done', date('now'), datetime('now', '-2 hours'), 'Ahmed', 2, 'Collection', 15, 'Normal collection, some soft shells noted', 'High'),
+    ('Morning egg collection - House H3', 'Done', date('now'), datetime('now', '-1 hours'), 'Fatima', 3, 'Collection', 8, 'Good quality eggs today', 'High'),
+    ('Clean water drinkers - All houses', 'Pending', date('now'), NULL, 'Hassan', NULL, 'Cleaning', 0, 'Weekly deep cleaning scheduled', 'Medium'),
+    ('Feed restocking - House H1', 'Pending', date('now'), NULL, 'John Doe', 1, 'Feeding', 0, 'Day-old starter feed running low', 'High'),
+    ('Vaccination - Newcastle booster H1', 'Pending', date('now', '+1 day'), NULL, 'Jane Smith', 1, 'Medical', 0, 'Day 21 booster for current batch', 'High'),
+    ('Equipment maintenance check', 'Pending', date('now', '+2 days'), NULL, 'Maria Garcia', NULL, 'Other', 0, 'Monthly maintenance inspection', 'Medium'),
+    ('Afternoon egg collection - House H2', 'Missed', date('now', '-1 day'), NULL, 'Ahmed', 2, 'Collection', 0, 'Worker was absent, needs rescheduling', 'High'),
+    ('Clean brooder area - House H1', 'Done', date('now', '-1 day'), datetime('now', '-1 day', '+8 hours'), 'Hassan', 1, 'Cleaning', 0, 'Full sanitization completed', 'Medium'),
+    ('Check ventilation fans', 'Done', date('now', '-2 days'), datetime('now', '-2 days', '+10 hours'), 'John Doe', NULL, 'Other', 0, 'All fans operational', 'Low'),
+    ('Feed inventory count', 'Done', date('now', '-3 days'), datetime('now', '-3 days', '+6 hours'), 'Jane Smith', NULL, 'Feeding', 0, 'Inventory updated in system', 'Medium'),
+    ('Repair broken egg washer', 'Pending', date('now', '+3 days'), NULL, 'External Technician', NULL, 'Other', 0, 'Parts ordered, technician scheduled', 'High'),
+    ('Morning health inspection - House H4', 'Missed', date('now', '-2 days'), NULL, 'Fatima', 4, 'Medical', 0, 'Rescheduled due to weather', 'High'),
+    ('Order new feed supplies', 'Done', date('now', '-4 days'), datetime('now', '-4 days', '+9 hours'), 'Maria Garcia', NULL, 'Feeding', 0, 'Order placed with AgriSupply', 'Medium'),
+    ('Update mortality records', 'Pending', date('now'), NULL, 'Hassan Ibrahim', NULL, 'Other', 0, 'Weekly mortality report due', 'Low'),
+    ('Evening feeding - All houses', 'Pending', date('now'), NULL, 'Sophia Laurent', NULL, 'Feeding', 0, 'Standard evening feed schedule', 'Medium');
+
 -- ============================================================
 -- End of Schema
 -- ============================================================
