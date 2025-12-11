@@ -134,58 +134,6 @@
 .error-message {
     -fx-alignment: center;
 }
-
-/*=====================================================================================*/
-/*================================== SIDEBAR STYLE ==================================*/
-/*=====================================================================================*/
-
-/* Sidebar moduls Styling */
-
-.sidebar-header {
-    -fx-background-color:  #1f2937;
-}
-
-.sidebar-item {
-    -fx-background-color: transparent;
-}
-
-.sidebar-item:hover {
-    -fx-background-color: #f24e1e;
-}
-
-.sidebar-item-active {
-    -fx-background-color: #ff6900;
-}
-
-/* logout button style */
-
-.logout-button {
-    -fx-background-color: #f73526;
-}
-.logout-button:hover {
-    -fx-background-color: #f8493c;
-}
-
-.sidebar-collapsed {
-    -fx-pref-width: 50px;
-    -fx-min-width: 50px;
-    -fx-max-width: 50px;
-}
-
-.sidebar-collapsed .label {
-    visibility: hidden;
-}
-
-.sidebar-collapsed .scroll-pane .logout-button .sidebar-header{
-    -fx-pref-width: 50px;
-    -fx-min-width: 50px;
-    -fx-max-width: 50px;
-}
-
-.sidebar-collapsed .anchor-pane .logout-button .sidebar-header{
-    -fx-pref-width: 50px;
-}
-
 /*=====================================================================================*/
 /*================================== DASHBOARD STYLE ==================================*/
 /*=====================================================================================*/
@@ -211,22 +159,25 @@
     -fx-font-style: italic;
 }
 
-.metric-card, .chart-cards {
+.metric-card{
      -fx-background-color: white;
      -fx-background-radius: 10px;
      -fx-padding: 20px;
-     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 5);
+     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 20, 0.2, 3, 3);
 }
 
 
-.metric-card:hover, .chart-cards:hover, .houses-card:hover, .mortality-card:hover, .egg-production-card:hover {
+.metric-card:hover{
     -fx-scale-x: 1.001;
     -fx-scale-y: 1.001;
-    -fx-effect: dropshadow(gaussian, rgba(200,200,200), 10, 0, 0, 0);
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 20, 0.2, -1, -1);
+}
+.card-icon {
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 20, 0.2, 3, 3);
 }
 
 .label-cards{
-    -fx-text-fill: #4a5565;
+    -fx-text-fill: gray;
     -fx-font-size: 16px;
 }
 
@@ -237,62 +188,81 @@
     -fx-font-family: 'Calibri';
 }
 
-.chickens-card {
-    -fx-background-color: linear-gradient(to right, white, rgba(225, 246, 255));
-}
-
-.alerts-card {
-    -fx-background-color: linear-gradient(to right, white, rgba(255, 215, 215));
-}
-
-.eggs-card {
-    -fx-background-color: linear-gradient(to right, white, rgba(255, 235, 212));
-}
-
-.chart-title {
+.cards-title {
     -fx-text-fill: #1e2939;
     -fx-font-size: 16px;
     -fx-font-weight: bold;
     -fx-font-family: 'Calibri';
 }
 
-/* barchart-styles.css */
+
+/* ============= CHART STYLES ============= */
 .chart-bar {
-    -fx-background-color: transparent;
-    -fx-background-radius: 3 3 0 0;
-    -fx-border-color: transparent;
-    -fx-border-width: 0;
+  -fx-background-color: #4e73df;  /* Changed from transparent to blue */
+  -fx-background-radius: 5 5 0 0;
+  -fx-border-color: transparent;
+  -fx-padding: 0 10px;
+}
+.chart-bar:hover {
+    -fx-bar-fill: #4e73df; /* keep the same color */
+    -fx-opacity: 0.9;
+    -fx-effect: dropshadow(gaussian, rgba(78,115,223,0.4), 15, 0, 0, 4);
+    -fx-background-insets: 0;
+}
+
+.default-color0.chart-bar {
+    -fx-background-color: #4e73df;  /* Primary blue color for bars */
+}
+
+.default-color1.chart-bar {
+    -fx-background-color: #1cc88a;  /* Alternative green if multiple series */
 }
 
 .chart-plot-background {
+    -fx-background-color: transparent;  /* Light gray background instead of transparent */
+}
+
+.chart {
+    -fx-padding: 20px;
     -fx-background-color: transparent;
+    -fx-alignment: CENTER;
+}
+
+.chart-content {
+    -fx-padding: 10px;
+}
+
+.axis {
+    -fx-tick-label-fill: #6c757d;
+    -fx-font-size: 12px;
+}
+
+.axis-label {
+    -fx-text-fill: #5a5c69;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+
+.chart-legend {
+    -fx-background-color: transparent;
+    -fx-text-fill: #6c757d;
+}
+
+.axis-tick-mark, .axis-minor-tick-mark {
+    -fx-stroke: #cccccc;
+}
+
+.chart-horizontal-grid-lines, .chart-vertical-grid-lines {
+    -fx-stroke: #e0e0e0;
 }
 /*=====================================================================================*/
 /*================================== CHICKEN BAY STYLE ==================================*/
 /*=====================================================================================*/
 
-.houses-card, .mortality-card {
-    -fx-background-color: white;
-    -fx-background-radius: 10px;
-    -fx-padding: 20px;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 5);
-}
-
-.house-name, .house-info-stats, .mortality-card-title {
-    -fx-text-fill: #1e2939;
-    -fx-font-size: 16px;
-    -fx-font-weight: bold;
-    -fx-font-family: 'Calibri';
-}
-
 .house-info, .mortality-card-info {
     -fx-text-fill: gray;
     -fx-font-size: 12px;
     -fx-font-family: 'Lucida Console';
-}
-
-.mortality-card {
-    -fx-background-color: white;
 }
 
 .this-day-deaths {
@@ -351,40 +321,35 @@
 /*=====================================================================================*/
 /*================================== EGGS BAY STYLE ==================================*/
 /*=====================================================================================*/
-
-.egg-production-card {
-     -fx-background-color: white;
-     -fx-background-radius: 10px;
-     -fx-padding: 20px;
-     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 5);
-}
-
 .date-label {
     -fx-text-fill: #1e2939;
-    -fx-font-size: 16px;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
     -fx-font-style: italic;
     -fx-font-family: 'Calibri';
 }
 
 .house-info-stats-production {
     -fx-text-fill: #27ae60;
+    -fx-font-size: 18px;
 }
 
 .house-info-stats-deaths {
     -fx-text-fill: #e74c3c;
+    -fx-font-size: 18px;
 }
 
 .storage-card {
      -fx-background-color: linear-gradient(to right, #f8d423, #fca140);
      -fx-background-radius: 10px;
-     -fx-padding: 20px;
-     -fx-effect: dropshadow(gaussian, rgb(254, 217, 179), 10, 0, 0, 5);
+     -fx-padding: 30px;
+     -fx-effect: dropshadow(gaussian, rgb(254, 217, 179), 20, 0.2, 3, 3);
 }
 
 .storage-card:hover {
     -fx-scale-x: 1.001;
     -fx-scale-y: 1.001;
-    -fx-effect: dropshadow(gaussian, rgb(254, 217, 179), 10, 0, 0, 0);
+    -fx-effect: dropshadow(gaussian, rgb(254, 217, 179), 20, 0.2, -1, -1);
 }
 
 .storage-title {
@@ -404,27 +369,6 @@
 /*=====================================================================================*/
 /*================================== STORAGE STYLE ==================================*/
 /*=====================================================================================*/
-
-.storage-section {
-    -fx-background-color: white;
-     -fx-background-radius: 10px;
-     -fx-padding: 20px;
-     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 5);
-}
-
-.storage-section:hover {
-    -fx-scale-x: 1.001;
-    -fx-scale-y: 1.001;
-    -fx-effect: dropshadow(gaussian, rgba(200,200,200), 10, 0, 0, 0);
-}
-
-.storage-section-title{
-    -fx-text-fill: #1e2939;
-    -fx-font-size: 16px;
-    -fx-font-weight: bold;
-    -fx-font-family: 'Calibri';
-}
-
 /*--------------------------------------------------------------------------------------------------*/
 /*---------------------------------------- List view style ----------------------------------------*/
 /*--------------------------------------------------------------------------------------------------*/
@@ -458,14 +402,6 @@
 /*--------------------------------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------------------------------*/
-
-.feed-list-summary{
-    -fx-font-size: 14px;
-    -fx-text-fill: #1e2939;
-    -fx-font-weight: bold;
-    -fx-font-family: "Calibri";
-}
-
 .feed-list-summary-value{
     -fx-text-fill: #1e2939;
     -fx-font-size: 18px;
@@ -605,20 +541,6 @@
 /*================================== TASK STYLE =======================================*/
 /*=====================================================================================*/
 
-
-.task-cards {
-    -fx-background-color: white;
-    -fx-background-radius: 10px;
-    -fx-padding: 20px;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 5);
-}
-
-.task-cards:hover, .personnel-card:hover {
-    -fx-scale-x: 1.001;
-    -fx-scale-y: 1.001;
-    -fx-effect: dropshadow(gaussian, rgba(200,200,200), 10, 0, 0, 0);
-}
-
 .task-stats {
     -fx-text-fill: #1e88e5;
     -fx-font-size: 26px;
@@ -636,7 +558,7 @@
     -fx-text-fill: #f39c12;
 }
 
-.task-cards-description, .personnal-cards-description {
+.task-cards-description, .personnel-cards-description {
     -fx-text-fill: gray;
     -fx-font-size: 12px;
     -fx-font-family: 'Lucida Console';
@@ -747,15 +669,20 @@
     -fx-background-color: white;
     -fx-background-radius: 10px;
     -fx-padding: 20px;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 5);
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 20, 0.2, 3, 3);
     -fx-alignment: center;
     -fx-spacing: 10px
 }
 
+.personnel-card:hover {
+    -fx-scale-x: 1.001;
+    -fx-scale-y: 1.001;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 20, 0.2, -2, -2);
+}
+
 .personnel-grid {
-    -fx-padding: 20;
-    -fx-hgap: 20;
-    -fx-vgap: 20;
+    -fx-hgap: 25;
+    -fx-vgap: 25;
 }
 
 .worker-name {
@@ -771,15 +698,15 @@
     -fx-padding: 2 8;
     -fx-font-weight: bold;
     -fx-background-radius: 8;
-    -fx-font-size: 10;
+    -fx-font-size: 12;
 }
 .job-worker {
-    -fx-background-color: #95a5a6;
+    -fx-background-color: #7f8c8d;
     -fx-text-fill: white;
     -fx-padding: 2 8;
     -fx-font-weight: bold;
     -fx-background-radius: 8;
-    -fx-font-size: 10;
+    -fx-font-size: 12;
 }
 
 .worker-info {
@@ -787,4 +714,3 @@
     -fx-font-size: 12px;
     -fx-font-family: 'Lucida Console';
 }
-

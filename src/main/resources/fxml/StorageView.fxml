@@ -14,7 +14,7 @@
 <AnchorPane prefHeight="700.0" prefWidth="950.0" styleClass="main-content" stylesheets="@../css/style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ma.farm.controller.StorageController">
 
     <children>
-        <VBox prefHeight="75.0" prefWidth="1000.0" styleClass="header" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+        <VBox prefHeight="75.0" prefWidth="1000.0" spacing="10.0" styleClass="header" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
             <children>
                 <HBox prefHeight="33.0" prefWidth="999.0">
                     <children>
@@ -38,19 +38,16 @@
             <children>
                 <ScrollPane fitToHeight="true" fitToWidth="true" prefHeight="716.0" prefWidth="1000.0" styleClass="main-content" VBox.vgrow="ALWAYS">
                     <content>
-                        <VBox prefHeight="200.0" prefWidth="100.0" styleClass="main-content">
+                        <VBox prefHeight="200.0" prefWidth="100.0" spacing="35.0" styleClass="main-content">
                      <children>
-                        <VBox maxHeight="329.0" minHeight="329.0" prefHeight="329.0" prefWidth="907.0" spacing="10.0" styleClass="storage-section">
-                           <VBox.margin>
-                              <Insets left="20.0" right="20.0" top="20.0" />
-                           </VBox.margin>
+                        <VBox minHeight="400.0" prefHeight="500.0" prefWidth="894.0" spacing="10.0" styleClass="metric-card">
                            <children>
-                              <Label styleClass="storage-section-title" text="Stock Aliments" />
-                               <ListView fx:id="feedListView" prefHeight="200.0" prefWidth="200.0" styleClass="feed-list-view">
+                              <Label styleClass="cards-title" text="Stock Aliments" />
+                               <ListView fx:id="feedListView" prefHeight="413.0" prefWidth="854.0" styleClass="feed-list-view">
                                </ListView>
                               <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0">
                                  <children>
-                                    <Label styleClass="feed-list-summary" text="Total :" />
+                                    <Label styleClass="cards-title" text="Total :" />
                                     <Region prefHeight="0.0" prefWidth="0.0" HBox.hgrow="ALWAYS" />
                                     <Label fx:id="totalFeedTypesLabel" styleClass="feed-list-summary-value" text="000" />
                                  </children>
@@ -60,12 +57,9 @@
                               </HBox>
                            </children>
                         </VBox>
-                        <VBox prefHeight="147.0" prefWidth="907.0" spacing="10.0" styleClass="storage-section">
-                           <VBox.margin>
-                              <Insets left="20.0" right="20.0" top="20.0" />
-                           </VBox.margin>
+                        <VBox prefHeight="200.0" prefWidth="907.0" spacing="10.0" styleClass="metric-card">
                            <children>
-                              <Label styleClass="storage-section-title" text="Médicaments" />
+                              <Label styleClass="cards-title" text="Médicaments" />
                               <HBox alignment="CENTER_LEFT" prefHeight="33.0" prefWidth="867.0">
                                  <children>
                                     <Label styleClass="house-info" text="Total :" />
@@ -91,12 +85,9 @@
                               </HBox>
                            </children>
                         </VBox>
-                        <VBox minHeight="401.0" prefHeight="401.0" prefWidth="894.0" spacing="10.0" styleClass="storage-section">
-                           <VBox.margin>
-                              <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
-                           </VBox.margin>
+                        <VBox minHeight="500.0" prefHeight="401.0" prefWidth="894.0" spacing="10.0" styleClass="metric-card">
                            <children>
-                              <Label styleClass="storage-section-title" text="Équipements" />
+                              <Label styleClass="cards-title" text="Équipements" />
                               <TableView fx:id="equipmentTable" prefHeight="320.0" prefWidth="854.0">
                                 <columns>
                                   <TableColumn fx:id="equipmentNameColumn" maxWidth="500.0" minWidth="500.0" prefWidth="500.0" resizable="false" sortable="false" text="Équipement" />
@@ -110,6 +101,9 @@
                            </children>
                         </VBox>
                      </children>
+                     <padding>
+                        <Insets bottom="20.0" left="30.0" right="20.0" top="30.0" />
+                     </padding>
                         </VBox>
                     </content>
                     <VBox.margin>
@@ -121,4 +115,3 @@
     </children>
 
 </AnchorPane>
-

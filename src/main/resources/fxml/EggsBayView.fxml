@@ -14,7 +14,7 @@
 <AnchorPane prefHeight="700.0" prefWidth="950.0" styleClass="main-content" stylesheets="@../css/style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ma.farm.controller.EggsBayController">
 
     <children>
-        <VBox prefHeight="75.0" prefWidth="950.0" styleClass="header" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+        <VBox prefHeight="75.0" prefWidth="950.0" spacing="10.0" styleClass="header" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
             <children>
                 <HBox prefHeight="33.0" prefWidth="999.0">
                     <children>
@@ -38,26 +38,20 @@
             <children>
                 <ScrollPane fitToHeight="true" fitToWidth="true" prefHeight="716.0" prefWidth="1000.0" styleClass="main-content" VBox.vgrow="ALWAYS">
                     <content>
-                        <VBox prefHeight="200.0" prefWidth="100.0" styleClass="main-content">
+                        <VBox prefHeight="200.0" prefWidth="100.0" spacing="40.0" styleClass="main-content">
                             <children>
-                                <HBox prefHeight="134.0" prefWidth="907.0">
-                                    <VBox.margin>
-                                        <Insets left="20.0" right="20.0" top="20.0" />
-                                    </VBox.margin>
+                                <HBox prefHeight="180.0" prefWidth="907.0" spacing="40.0">
                            <children>
-                              <VBox fx:id="house2Card" prefHeight="200.0" prefWidth="100.0" styleClass="egg-production-card" HBox.hgrow="ALWAYS">
-                                 <HBox.margin>
-                                    <Insets right="20.0" />
-                                 </HBox.margin>
+                              <VBox fx:id="house2Card" prefHeight="180.0" prefWidth="100.0" styleClass="metric-card" HBox.hgrow="ALWAYS">
                                  <children>
-                                    <Label fx:id="h2NameLabel" styleClass="house-name" text="Bâtiment 2 - Pondeuses" />
+                                    <Label fx:id="h2NameLabel" styleClass="cards-title" text="Bâtiment 2 - Pondeuses" />
                                     <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="394.0">
                                        <children>
                                           <Label styleClass="house-info" text="Œufs du jour :" />
                                           <Region prefHeight="0.0" prefWidth="0.0" HBox.hgrow="ALWAYS" />
                                           <Label fx:id="h2EggsCollectedLabel" text="000" textFill="#3eff51">
                                              <styleClass>
-                                                <String fx:value="house-info-stats" />
+                                                <String fx:value="cards-title" />
                                                 <String fx:value="house-info-stats-production" />
                                              </styleClass></Label>
                                        </children>
@@ -72,7 +66,7 @@
                                           <Label fx:id="h2DeadChickensLabel" text="000">
                                              <styleClass>
                                                 <String fx:value="house-info-stats-deaths" />
-                                                <String fx:value="house-info-stats" />
+                                                <String fx:value="cards-title" />
                                              </styleClass></Label>
                                        </children>
                                        <padding>
@@ -91,19 +85,16 @@
                                     </HBox>
                                  </children>
                               </VBox>
-                              <VBox fx:id="house3Card" prefHeight="200.0" prefWidth="100.0" styleClass="egg-production-card" HBox.hgrow="ALWAYS">
-                                 <HBox.margin>
-                                    <Insets left="20.0" />
-                                 </HBox.margin>
+                              <VBox fx:id="house3Card" prefHeight="180.0" prefWidth="100.0" styleClass="metric-card" HBox.hgrow="ALWAYS">
                                  <children>
-                                    <Label fx:id="h3NameLabel" styleClass="house-name" text="Bâtiment 3 - Femelles à Viande" />
+                                    <Label fx:id="h3NameLabel" styleClass="cards-title" text="Bâtiment 3 - Femelles à Viande" />
                                     <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0">
                                        <children>
                                           <Label styleClass="house-info" text="Œufs du jour :" />
                                           <Region prefHeight="0.0" prefWidth="0.0" HBox.hgrow="ALWAYS" />
                                           <Label fx:id="h3EggsCollectedLabel" text="000">
                                              <styleClass>
-                                                <String fx:value="house-info-stats" />
+                                                <String fx:value="cards-title" />
                                                 <String fx:value="house-info-stats-production" />
                                              </styleClass></Label>
                                        </children>
@@ -118,7 +109,7 @@
                                           <Label fx:id="h3DeadChickensLabel" text="000">
                                              <styleClass>
                                                 <String fx:value="house-info-stats-deaths" />
-                                                <String fx:value="house-info-stats" />
+                                                <String fx:value="cards-title" />
                                              </styleClass></Label>
                                        </children>
                                        <padding>
@@ -141,13 +132,10 @@
                                 </HBox>
                         <HBox prefHeight="152.0" prefWidth="947.0">
                            <VBox.margin>
-                              <Insets top="20.0" />
+                              <Insets />
                            </VBox.margin>
                            <children>
-                              <VBox fx:id="storageCard" prefHeight="191.0" prefWidth="907.0" styleClass="storage-card" HBox.hgrow="ALWAYS">
-                                 <HBox.margin>
-                                    <Insets left="20.0" right="20.0" />
-                                 </HBox.margin>
+                              <VBox fx:id="storageCard" prefHeight="177.0" prefWidth="907.0" styleClass="storage-card" HBox.hgrow="ALWAYS">
                                  <children>
                                     <HBox alignment="CENTER_LEFT" prefHeight="40.0" prefWidth="867.0">
                                        <children>
@@ -160,9 +148,9 @@
                                           </Label>
                                        </children>
                                     </HBox>
-                                    <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" spacing="20.0">
+                                    <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0">
                                        <children>
-                                          <Label fx:id="totalEggsLabel" prefHeight="24.0" prefWidth="39.0" styleClass="storage-summary" text="000" />
+                                          <Label fx:id="totalEggsLabel" prefHeight="54.0" prefWidth="185.0" styleClass="storage-summary" text="000000" />
                                           <ImageView fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true">
                                              <image>
                                                 <Image url="@../images/icons/egg.png" />
@@ -178,6 +166,9 @@
                            </children>
                         </HBox>
                             </children>
+                     <padding>
+                        <Insets bottom="30.0" left="20.0" right="20.0" top="30.0" />
+                     </padding>
                         </VBox>
                     </content>
                     <VBox.margin>
