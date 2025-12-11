@@ -15,7 +15,7 @@
 <AnchorPane prefHeight="700.0" prefWidth="950.0" styleClass="main-content" stylesheets="@../css/style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ma.farm.controller.PersonnelController">
 
     <children>
-        <VBox prefHeight="75.0" prefWidth="950.0" styleClass="header" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+        <VBox prefHeight="75.0" prefWidth="950.0" spacing="10.0" styleClass="header" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
             <children>
                 <HBox prefHeight="33.0" prefWidth="999.0">
                     <children>
@@ -39,54 +39,45 @@
             <children>
                 <ScrollPane fitToHeight="true" fitToWidth="true" prefHeight="716.0" prefWidth="1000.0" styleClass="main-content" VBox.vgrow="ALWAYS">
                     <content>
-                        <VBox prefHeight="200.0" prefWidth="100.0" styleClass="main-content">
+                        <VBox prefHeight="200.0" prefWidth="100.0" spacing="35.0" styleClass="main-content">
                             <children>
-                                <HBox prefHeight="134.0" prefWidth="907.0" spacing="40.0">
-                                    <VBox.margin>
-                                        <Insets top="20.0" />
-                                    </VBox.margin>
+                                <HBox prefHeight="180.0" prefWidth="907.0" spacing="40.0">
                                     <children>
-                                        <VBox alignment="CENTER" prefHeight="165.0" prefWidth="0.0" spacing="20.0" styleClass="personnel-card" HBox.hgrow="ALWAYS">
+                                        <VBox alignment="CENTER" prefHeight="165.0" prefWidth="0.0" spacing="20.0" styleClass="metric-card" HBox.hgrow="ALWAYS">
                                             <children>
                                                 <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
                                                     <children>
-                                                        <ImageView fitHeight="50.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true">
+                                                        <ImageView fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true" styleClass="card-icon">
                                                             <image>
-                                                                <Image url="@../images/icons/worker.png" />
+                                                                <Image url="@../images/icons/workers.png" />
                                                             </image>
                                                         </ImageView>
-                                                        <Label styleClass="house-name" text="Total Employés" />
+                                                        <Label styleClass="cards-title" text="Total Employés" />
                                                     </children>
                                                 </HBox>
                                                 <Label fx:id="totalWorkersLabel" styleClass="total-workers" text="000" />
-                                                <Label styleClass="personnal-cards-description" text="personnes" />
+                                                <Label styleClass="task-cards-description" text="personnes" />
                                             </children>
-                                 <HBox.margin>
-                                    <Insets left="20.0" />
-                                 </HBox.margin>
                                         </VBox>
-                                        <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="20.0" styleClass="personnel-card" HBox.hgrow="ALWAYS">
+                                        <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="20.0" styleClass="metric-card" HBox.hgrow="ALWAYS">
                                             <children>
                                                 <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
                                                     <children>
-                                                        <ImageView fitHeight="50.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true">
+                                                        <ImageView fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true" styleClass="card-icon">
                                                             <image>
                                                                 <Image url="@../images/icons/trackers.png" />
                                                             </image>
                                                         </ImageView>
-                                                        <Label prefHeight="18.0" prefWidth="127.0" styleClass="house-name" text="Superviseurs" />
+                                                        <Label prefHeight="18.0" prefWidth="127.0" styleClass="cards-title" text="Superviseurs" />
                                                     </children>
                                                 </HBox>
                                                 <Label fx:id="totalTrackersLabel" styleClass="total-trackers" text="000" />
-                                                <Label styleClass="personnal-cards-description" text="nombre de superviseurs" />
+                                                <Label styleClass="task-cards-description" text="nombre de superviseurs" />
                                             </children>
-                                 <HBox.margin>
-                                    <Insets right="20.0" />
-                                 </HBox.margin>
                                         </VBox>
                                     </children>
                                 </HBox>
-                        <GridPane fx:id="personnelGrid" styleClass="personnel-grid" VBox.vgrow="ALWAYS">
+                        <GridPane fx:id="personnelGrid" hgap="25.0" styleClass="personnel-grid" vgap="25.0" VBox.vgrow="ALWAYS">
                           <columnConstraints>
                             <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                             <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
@@ -118,6 +109,9 @@
                            </children>
                         </HBox>
                             </children>
+                     <padding>
+                        <Insets bottom="30.0" left="20.0" right="20.0" top="30.0" />
+                     </padding>
                         </VBox>
                     </content>
                     <VBox.margin>
@@ -129,4 +123,3 @@
     </children>
 
 </AnchorPane>
-
