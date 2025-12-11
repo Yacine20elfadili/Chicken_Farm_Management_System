@@ -3,16 +3,16 @@ package ma.farm.controller;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import ma.farm.dao.FeedDAO;
 import ma.farm.dao.MedicationDAO;
 import ma.farm.dao.EquipmentDAO;
 import ma.farm.model.Feed;
 import ma.farm.model.Medication;
 import ma.farm.model.Equipment;
+
+import java.util.List;
 
 /**
  * StorageController - Controls the Storage view
@@ -61,17 +61,26 @@ public class StorageController {
      */
     @FXML
     public void initialize() {
-        // TODO: Initialize DAOs
+        // Initialize DAOs
+        feedDAO = new FeedDAO();
+        medicationDAO = new MedicationDAO();
+        equipmentDAO = new EquipmentDAO();
 
-        // TODO: Setup table columns
+        // Setup table columns
+        setupTableColumns();
 
-        // TODO: Initialize observable lists
+        // Initialize observable lists
+        feedList = FXCollections.observableArrayList();
+        equipmentList = FXCollections.observableArrayList();
 
-        // TODO: Load feed data
+        // Load feed data
+        loadFeedData();
 
-        // TODO: Load medications data
+        // Load medications data
+        loadMedicationsData();
 
-        // TODO: Load equipment data
+        // Load equipment data
+        loadEquipmentData();
     }
 
     /**
@@ -79,60 +88,180 @@ public class StorageController {
      * Bind columns to Equipment model properties
      */
     private void setupTableColumns() {
-        // TODO: Bind equipmentNameColumn to name property
+        if (equipmentNameColumn != null) {
+            // Bind equipmentNameColumn to name property
+            equipmentNameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
+        }
 
-        // TODO: Bind equipmentQuantityColumn to quantity property
+        if (equipmentQuantityColumn != null) {
+            // Bind equipmentQuantityColumn to quantity property
+            equipmentQuantityColumn.setCellValueFactory(new PropertyValueFactory<>("quantity"));
+        }
 
-        // TODO: Bind equipmentStatusColumn to status property
+        if (equipmentStatusColumn != null) {
+            // Bind equipmentStatusColumn to status property
+            equipmentStatusColumn.setCellValueFactory(new PropertyValueFactory<>("status"));
 
-        // TODO: Add status badge cell factory (color coding)
+            // Add status badge cell factory (color coding)
+            equipmentStatusColumn.setCellFactory(column -> new TableCell<Equipment, String>() {
+                @Override
+                protected void updateItem(String status, boolean empty) {
+                    super.updateItem(status, empty);
+
+                    if (empty || status == null) {
+                        setText(null);
+                        setStyle("");
+                    } else {
+                        setText(status);
+
+                        // Apply color based on status
+                        switch (status.toLowerCase()) {
+                            case "good":
+                                setStyle("-fx-background-color: #d4edda; -fx-text-fill: #155724;");
+                                break;
+                            case "fair":
+                                setStyle("-fx-background-color: #fff3cd; -fx-text-fill: #856404;");
+                                break;
+                            case "broken":
+                                setStyle("-fx-background-color: #f8d7da; -fx-text-fill: #721c24;");
+                                break;
+                            default:
+                                setStyle("");
+                        }
+                    }
+                }
+            });
+        }
     }
 
     /**
      * Load and display feed inventory
      */
     private void loadFeedData() {
-        // TODO: Get all feed from FeedDAO
+        try {
+            // Get all feed from FeedDAO
+            List<Feed> feeds = feedDAO.getAllFeed();
 
-        // TODO: Format feed info (name, quantity, type)
+            // Clear list
+            feedList.clear();
 
-        // TODO: Add to feedList
+            // Format feed info (name, quantity, type)
+            for (Feed feed : feeds) {
+                String feedInfo = String.format("%s - %.1f kg (%s)",
+                        feed.getName(),
+                        feed.getQuantityKg(),
+                        feed.getType());
 
-        // TODO: Update feedListView
+                // Highlight low stock items
+                if (feed.isLowStock()) {
+                    feedInfo += " ⚠️ LOW STOCK";
+                }
 
-        // TODO: Update totalFeedTypesLabel
+                feedList.add(feedInfo);
+            }
 
-        // TODO: Highlight low stock items in red
+            // Update feedListView
+            if (feedListView != null) {
+                feedListView.setItems(feedList);
+
+                // Apply custom cell factory for low stock highlighting
+                feedListView.setCellFactory(param -> new ListCell<String>() {
+                    @Override
+                    protected void updateItem(String item, boolean empty) {
+                        super.updateItem(item, empty);
+
+                        if (empty || item == null) {
+                            setText(null);
+                            setStyle("");
+                        } else {
+                            setText(item);
+
+                            // Highlight low stock in red
+                            if (item.contains("LOW STOCK")) {
+                                setStyle("-fx-text-fill: #dc3545; -fx-font-weight: bold;");
+                            } else {
+                                setStyle("");
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Update totalFeedTypesLabel
+            if (totalFeedTypesLabel != null) {
+                totalFeedTypesLabel.setText(String.valueOf(feeds.size()));
+            }
+        } catch (Exception e) {
+            System.err.println("Error loading feed data: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     /**
      * Load and display medications data
      */
     private void loadMedicationsData() {
-        // TODO: Get all medications from MedicationDAO
+        try {
+            // Get all medications from MedicationDAO
+            List<Medication> medications = medicationDAO.getAllMedications();
 
-        // TODO: Count total medications
+            // Count total medications
+            int totalMedications = medications.size();
 
-        // TODO: Count low stock medications
+            // Count low stock medications
+            long lowStockCount = medications.stream()
+                    .filter(Medication::isLowStock)
+                    .count();
 
-        // TODO: Update totalMedicationsLabel
+            // Update totalMedicationsLabel
+            if (totalMedicationsLabel != null) {
+                totalMedicationsLabel.setText(String.valueOf(totalMedications));
+            }
 
-        // TODO: Update lowStockMedicationsLabel
+            // Update lowStockMedicationsLabel
+            if (lowStockMedicationsLabel != null) {
+                lowStockMedicationsLabel.setText(String.valueOf(lowStockCount));
 
-        // TODO: Apply warning badge if low stock > 0
+                // Apply warning badge if low stock > 0
+                if (lowStockCount > 0) {
+                    lowStockMedicationsLabel.setStyle("-fx-background-color: #dc3545; -fx-text-fill: white; -fx-padding: 5px 10px; -fx-background-radius: 5px;");
+                } else {
+                    lowStockMedicationsLabel.setStyle("-fx-background-color: #28a745; -fx-text-fill: white; -fx-padding: 5px 10px; -fx-background-radius: 5px;");
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Error loading medications data: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     /**
      * Load and display equipment table
      */
     private void loadEquipmentData() {
-        // TODO: Get all equipment from EquipmentDAO
+        try {
+            // Get all equipment from EquipmentDAO
+            List<Equipment> equipments = equipmentDAO.getAllEquipment();
 
-        // TODO: Add to equipmentList
+            // Sort by status (Broken first)
+            equipments.sort((e1, e2) -> {
+                if (e1.isBroken() && !e2.isBroken()) return -1;
+                if (!e1.isBroken() && e2.isBroken()) return 1;
+                return e1.getName().compareTo(e2.getName());
+            });
 
-        // TODO: Update equipmentTable
+            // Add to equipmentList
+            equipmentList.clear();
+            equipmentList.addAll(equipments);
 
-        // TODO: Sort by status (Broken first)
+            // Update equipmentTable
+            if (equipmentTable != null) {
+                equipmentTable.setItems(equipmentList);
+            }
+        } catch (Exception e) {
+            System.err.println("Error loading equipment data: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -142,18 +271,18 @@ public class StorageController {
     @FXML
     public void handleAddFeed() {
         // TODO: Open add/restock feed dialog
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Add Feed");
+        alert.setHeaderText("Add/Restock Feed Feature");
+        alert.setContentText("This feature will open a dialog to add new feed or restock existing.\n\nDialog implementation is pending.");
+        alert.showAndWait();
 
-        // TODO: Get feed details (name, type, quantity, price)
-
-        // TODO: Check if feed exists
-
-        // TODO: If exists, update quantity (restock)
-
-        // TODO: If new, create Feed record
-
-        // TODO: Save to database
-
-        // TODO: Refresh feed data
+        // After dialog implementation:
+        // - Get feed details (name, type, quantity, price)
+        // - Check if feed exists
+        // - If exists, update quantity (restock)
+        // - If new, create Feed record using feedDAO.addFeed()
+        // - Refresh feed data
     }
 
     /**
@@ -163,18 +292,18 @@ public class StorageController {
     @FXML
     public void handleUseFeed() {
         // TODO: Open use feed dialog
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Use Feed");
+        alert.setHeaderText("Use Feed Feature");
+        alert.setContentText("This feature will open a dialog to deduct feed from inventory.\n\nDialog implementation is pending.");
+        alert.showAndWait();
 
-        // TODO: Get feed selection
-
-        // TODO: Get quantity to use
-
-        // TODO: Validate available quantity
-
-        // TODO: Deduct from inventory
-
-        // TODO: Save to database
-
-        // TODO: Refresh feed data
+        // After dialog implementation:
+        // - Get feed selection
+        // - Get quantity to use
+        // - Validate available quantity
+        // - Deduct from inventory using feedDAO.updateQuantity()
+        // - Refresh feed data
     }
 
     /**
@@ -184,16 +313,17 @@ public class StorageController {
     @FXML
     public void handleAddMedication() {
         // TODO: Open add/restock medication dialog
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Add Medication");
+        alert.setHeaderText("Add/Restock Medication Feature");
+        alert.setContentText("This feature will open a dialog to add new medication or restock.\n\nDialog implementation is pending.");
+        alert.showAndWait();
 
-        // TODO: Get medication details
-
-        // TODO: Check if medication exists
-
-        // TODO: Update or create record
-
-        // TODO: Save to database
-
-        // TODO: Refresh medications data
+        // After dialog implementation:
+        // - Get medication details
+        // - Check if medication exists
+        // - Update or create record using medicationDAO.addMedication()
+        // - Refresh medications data
     }
 
     /**
@@ -203,18 +333,18 @@ public class StorageController {
     @FXML
     public void handleUseMedication() {
         // TODO: Open use medication dialog
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Use Medication");
+        alert.setHeaderText("Use Medication Feature");
+        alert.setContentText("This feature will open a dialog to deduct medication from inventory.\n\nDialog implementation is pending.");
+        alert.showAndWait();
 
-        // TODO: Get medication selection
-
-        // TODO: Get quantity to use
-
-        // TODO: Validate available quantity
-
-        // TODO: Deduct from inventory
-
-        // TODO: Save to database
-
-        // TODO: Refresh medications data
+        // After dialog implementation:
+        // - Get medication selection
+        // - Get quantity to use
+        // - Validate available quantity
+        // - Deduct from inventory using medicationDAO.updateQuantity()
+        // - Refresh medications data
     }
 
     /**
@@ -224,14 +354,16 @@ public class StorageController {
     @FXML
     public void handleAddEquipment() {
         // TODO: Open add equipment dialog
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Add Equipment");
+        alert.setHeaderText("Add Equipment Feature");
+        alert.setContentText("This feature will open a dialog to add new equipment.\n\nDialog implementation is pending.");
+        alert.showAndWait();
 
-        // TODO: Get equipment details
-
-        // TODO: Create Equipment record
-
-        // TODO: Save to database
-
-        // TODO: Refresh equipment table
+        // After dialog implementation:
+        // - Get equipment details
+        // - Create Equipment record using equipmentDAO.addEquipment()
+        // - Refresh equipment table
     }
 
     /**
@@ -240,19 +372,30 @@ public class StorageController {
      */
     @FXML
     public void handleUpdateEquipmentStatus() {
-        // TODO: Get selected equipment from table
+        // Get selected equipment from table
+        Equipment selectedEquipment = equipmentTable.getSelectionModel().getSelectedItem();
 
-        // TODO: If nothing selected, show error
+        // If nothing selected, show error
+        if (selectedEquipment == null) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("No Selection");
+            alert.setHeaderText("No Equipment Selected");
+            alert.setContentText("Please select equipment to update its status.");
+            alert.showAndWait();
+            return;
+        }
 
         // TODO: Open update status dialog
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Update Equipment Status");
+        alert.setHeaderText("Update Status Feature");
+        alert.setContentText("This feature will open a dialog to change equipment status.\n\nCurrent status: " + selectedEquipment.getStatus() + "\n\nDialog implementation is pending.");
+        alert.showAndWait();
 
-        // TODO: Get new status (Good/Fair/Broken)
-
-        // TODO: Update equipment record
-
-        // TODO: Save to database
-
-        // TODO: Refresh equipment table
+        // After dialog implementation:
+        // - Get new status (Good/Fair/Broken)
+        // - Update equipment record using equipmentDAO.updateStatus()
+        // - Refresh equipment table
     }
 
     /**
@@ -260,10 +403,13 @@ public class StorageController {
      */
     @FXML
     public void refreshData() {
-        // TODO: Reload feed data
+        // Reload feed data
+        loadFeedData();
 
-        // TODO: Reload medications data
+        // Reload medications data
+        loadMedicationsData();
 
-        // TODO: Reload equipment data
+        // Reload equipment data
+        loadEquipmentData();
     }
 }
