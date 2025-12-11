@@ -2,6 +2,8 @@ package ma.farm.controller;
 
 import javafx.fxml.FXML;
 import javafx.scene.chart.BarChart;
+import javafx.scene.chart.CategoryAxis;
+import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Label;
 import ma.farm.dao.HouseDAO;
@@ -42,7 +44,8 @@ public class DashboardController {
      */
     @FXML
     public void initialize() {
-        System.out.println("DashboardController: Initializing...");
+        System.out.println("=== DashboardController: Initializing ===");
+        System.out.println("Current date: " + LocalDate.now());
 
         try {
             // Initialize DAOs
@@ -51,13 +54,16 @@ public class DashboardController {
 
             System.out.println("DashboardController: DAOs initialized");
 
+            // Configure chart before loading data
+            configureChart();
+
             // Load all dashboard data
             loadTotalChickens();
             loadEggsToday();
             loadAlertsCount();
             load7DayChart();
 
-            System.out.println("DashboardController: All data loaded successfully");
+            System.out.println("=== DashboardController: All data loaded successfully ===\n");
 
         } catch (Exception e) {
             System.err.println("Error initializing dashboard: " + e.getMessage());
@@ -66,16 +72,67 @@ public class DashboardController {
     }
 
     /**
+     * Configure chart appearance and behavior
+     */
+    private void configureChart() {
+        if (eggProductionChart == null) {
+            System.err.println("✗ Error: eggProductionChart is null!");
+            return;
+        }
+
+        System.out.println("Configuring chart...");
+
+        // Set chart properties
+        eggProductionChart.setTitle("");
+        eggProductionChart.setLegendVisible(true);
+        eggProductionChart.setAnimated(true);
+
+        // Configure axes
+        CategoryAxis xAxis = (CategoryAxis) eggProductionChart.getXAxis();
+        if (xAxis != null) {
+            xAxis.setLabel("Jours");
+            xAxis.setAnimated(false);
+        }
+
+        NumberAxis yAxis = (NumberAxis) eggProductionChart.getYAxis();
+        if (yAxis != null) {
+            yAxis.setLabel("Œufs collectés");
+            yAxis.setAutoRanging(true);
+            yAxis.setForceZeroInRange(true);
+            yAxis.setAnimated(false);
+        }
+
+        // Set minimum height to ensure visibility
+        eggProductionChart.setMinHeight(300);
+        eggProductionChart.setPrefHeight(350);
+
+        // Apply inline styling to ensure visibility
+        eggProductionChart.setStyle(
+                "-fx-background-color: white;" +
+                        "-fx-border-color: #dee2e6;" +
+                        "-fx-border-width: 1px;" +
+                        "-fx-border-radius: 8px;" +
+                        "-fx-background-radius: 8px;"
+        );
+
+        System.out.println("✓ Chart configured");
+    }
+
+    /**
      * Load and display total chickens count across all houses
      */
     private void loadTotalChickens() {
         try {
             int totalChickens = houseDAO.getTotalChickenCount();
-            totalChickensLabel.setText(String.valueOf(totalChickens));
-            System.out.println("Total chickens loaded: " + totalChickens);
+            if (totalChickensLabel != null) {
+                totalChickensLabel.setText(String.valueOf(totalChickens));
+            }
+            System.out.println("✓ Total chickens loaded: " + totalChickens);
         } catch (Exception e) {
-            System.err.println("Error loading total chickens: " + e.getMessage());
-            totalChickensLabel.setText("Error");
+            System.err.println("✗ Error loading total chickens: " + e.getMessage());
+            if (totalChickensLabel != null) {
+                totalChickensLabel.setText("Error");
+            }
             e.printStackTrace();
         }
     }
@@ -85,28 +142,65 @@ public class DashboardController {
      */
     private void loadEggsToday() {
         try {
-            int eggsToday = eggProductionDAO.getEggsToday();
-            eggsTodayLabel.setText(String.valueOf(eggsToday));
-            System.out.println("Eggs today loaded: " + eggsToday);
+            LocalDate today = LocalDate.now();
+            System.out.println("Loading eggs for date: " + today);
+
+            // Get production for today
+            List<EggProduction> todayProduction = eggProductionDAO.getProductionByDate(today);
+
+            System.out.println("Found " + todayProduction.size() + " production records for today");
+
+            // Calculate total eggs
+            int eggsToday = 0;
+            for (EggProduction production : todayProduction) {
+                eggsToday += production.getGoodEggs();
+                System.out.println("  House " + production.getHouseId() + ": " + production.getGoodEggs() + " good eggs");
+            }
+
+            if (eggsTodayLabel != null) {
+                eggsTodayLabel.setText(String.valueOf(eggsToday));
+            }
+
+            if (eggsToday == 0) {
+                System.out.println("⚠ Warning: No egg production data found for today (" + today + ")");
+                System.out.println("  This might be because there's no data in the database for this date.");
+            } else {
+                System.out.println("✓ Eggs today loaded: " + eggsToday);
+            }
         } catch (Exception e) {
-            System.err.println("Error loading eggs today: " + e.getMessage());
-            eggsTodayLabel.setText("Error");
+            System.err.println("✗ Error loading eggs today: " + e.getMessage());
+            if (eggsTodayLabel != null) {
+                eggsTodayLabel.setText("Error");
+            }
             e.printStackTrace();
         }
     }
 
     /**
      * Load and display active alerts count
-     * MVP version: Placeholder - always shows 0
+     * MVP version: Calculates based on low stock and overdue tasks
      */
     private void loadAlertsCount() {
         try {
-            // MVP: Just show 0 for now
-            alertsCountLabel.setText("0");
-            System.out.println("Alerts count: 0 (MVP placeholder)");
+            // For MVP: Calculate alerts based on:
+            // 1. Low stock feed/medications
+            // 2. Overdue tasks
+            // 3. Houses needing cleaning
+
+            int alertCount = 0;
+
+            // TODO: Add actual alert logic when implemented
+            // For now, show 0
+
+            if (alertsCountLabel != null) {
+                alertsCountLabel.setText(String.valueOf(alertCount));
+            }
+            System.out.println("✓ Alerts count: " + alertCount + " (MVP - not yet implemented)");
         } catch (Exception e) {
-            System.err.println("Error loading alerts: " + e.getMessage());
-            alertsCountLabel.setText("Error");
+            System.err.println("✗ Error loading alerts: " + e.getMessage());
+            if (alertsCountLabel != null) {
+                alertsCountLabel.setText("Error");
+            }
         }
     }
 
@@ -116,7 +210,12 @@ public class DashboardController {
      */
     private void load7DayChart() {
         try {
-            System.out.println("Loading 7-day chart...");
+            System.out.println("\n--- Loading 7-day chart ---");
+
+            if (eggProductionChart == null) {
+                System.err.println("✗ Error: eggProductionChart is null!");
+                return;
+            }
 
             // Clear existing data
             eggProductionChart.getData().clear();
@@ -128,7 +227,11 @@ public class DashboardController {
             // Get last 7 days
             LocalDate[] last7Days = DateUtil.getLast7Days();
 
-            System.out.println("Processing last 7 days of data...");
+            System.out.println("Processing last 7 days of data:");
+            System.out.println("Date Range: " + last7Days[0] + " to " + last7Days[6]);
+
+            int totalDataPoints = 0;
+            int maxEggs = 0;
 
             // Loop through each day and get production data
             for (LocalDate date : last7Days) {
@@ -141,22 +244,51 @@ public class DashboardController {
                     totalEggs += production.getGoodEggs();
                 }
 
-                // Format date for display (e.g., "08/12")
-                String dateLabel = DateUtil.formatDate(date);
+                if (totalEggs > maxEggs) {
+                    maxEggs = totalEggs;
+                }
+
+                // Format date for display (dd/MM)
+                String dateLabel = DateUtil.formatShortDate(date);
+
+                // Create data point
+                XYChart.Data<String, Number> dataPoint = new XYChart.Data<>(dateLabel, totalEggs);
 
                 // Add data point to series
-                series.getData().add(new XYChart.Data<>(dateLabel, totalEggs));
+                series.getData().add(dataPoint);
 
-                System.out.println("  " + dateLabel + ": " + totalEggs + " eggs");
+                System.out.println("  " + date + " (" + dateLabel + "): " + totalEggs + " eggs (" + dayProduction.size() + " records)");
+
+                if (totalEggs > 0) {
+                    totalDataPoints++;
+                }
             }
 
             // Add series to chart
             eggProductionChart.getData().add(series);
 
-            System.out.println("7-day chart loaded successfully");
+            System.out.println("Series added with " + series.getData().size() + " data points");
+            System.out.println("Max eggs value: " + maxEggs);
+
+            // Force chart refresh
+            eggProductionChart.layout();
+            eggProductionChart.requestLayout();
+
+            if (totalDataPoints == 0) {
+                System.out.println("⚠ Warning: No egg production data found for the last 7 days!");
+                System.out.println("  Chart will be empty. Check if database has data for recent dates.");
+            } else {
+                System.out.println("✓ 7-day chart loaded successfully (" + totalDataPoints + " days with data)");
+            }
+
+            // Check if chart is visible
+            System.out.println("Chart visible: " + eggProductionChart.isVisible());
+            System.out.println("Chart managed: " + eggProductionChart.isManaged());
+            System.out.println("Chart width: " + eggProductionChart.getWidth());
+            System.out.println("Chart height: " + eggProductionChart.getHeight());
 
         } catch (Exception e) {
-            System.err.println("Error loading 7-day chart: " + e.getMessage());
+            System.err.println("✗ Error loading 7-day chart: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -167,7 +299,7 @@ public class DashboardController {
      */
     @FXML
     public void refreshDashboard() {
-        System.out.println("Refreshing dashboard...");
+        System.out.println("\n=== Refreshing dashboard ===");
 
         try {
             loadTotalChickens();
@@ -175,9 +307,9 @@ public class DashboardController {
             loadAlertsCount();
             load7DayChart();
 
-            System.out.println("Dashboard refreshed successfully");
+            System.out.println("=== Dashboard refreshed successfully ===\n");
         } catch (Exception e) {
-            System.err.println("Error refreshing dashboard: " + e.getMessage());
+            System.err.println("✗ Error refreshing dashboard: " + e.getMessage());
             e.printStackTrace();
         }
     }

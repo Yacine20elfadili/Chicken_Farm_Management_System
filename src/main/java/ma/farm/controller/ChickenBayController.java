@@ -1,119 +1,170 @@
 package ma.farm.controller;
 
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
-import ma.farm.dao.HouseDAO;
+import javafx.scene.layout.VBox;
 import ma.farm.dao.ChickenDAO;
+import ma.farm.dao.HouseDAO;
 import ma.farm.dao.MortalityDAO;
+import ma.farm.model.Chicken;
 import ma.farm.model.House;
+import ma.farm.util.DateUtil;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 /**
- * Controller for the Chicken Bay view
- * Manages the display and interaction of chicken house data
- *
- * @author ismailouchraa
- * @version 1.0
+ * ChickenBayController - Controls the Chicken Bay view
+ * Shows: 4 house cards (H1-H4), mortality statistics
  */
 public class ChickenBayController {
+
+    // FXML Components - House Cards
+    @FXML
+    private VBox house1Card;
+
+    @FXML
+    private VBox house2Card;
+
+    @FXML
+    private VBox house3Card;
+
+    @FXML
+    private VBox house4Card;
+
+    // House 1 Labels (Day-old chicks)
+    @FXML
+    private Label h1NameLabel;
+
+    @FXML
+    private Label h1TypeLabel;
+
+    @FXML
+    private Label h1CountLabel;
+
+    @FXML
+    private Label h1AgeLabel;
+
+    @FXML
+    private Label h1HealthLabel;
+
+    @FXML
+    private Label h1TransferLabel;
+
+    // House 2 Labels (Egg layers)
+    @FXML
+    private Label h2NameLabel;
+
+    @FXML
+    private Label h2TypeLabel;
+
+    @FXML
+    private Label h2CountLabel;
+
+    @FXML
+    private Label h2AgeLabel;
+
+    @FXML
+    private Label h2HealthLabel;
+
+    @FXML
+    private Label h2TransferLabel;
+
+    // House 3 Labels (Meat female)
+    @FXML
+    private Label h3NameLabel;
+
+    @FXML
+    private Label h3TypeLabel;
+
+    @FXML
+    private Label h3CountLabel;
+
+    @FXML
+    private Label h3AgeLabel;
+
+    @FXML
+    private Label h3HealthLabel;
+
+    @FXML
+    private Label h3TransferLabel;
+
+    // House 4 Labels (Meat male)
+    @FXML
+    private Label h4NameLabel;
+
+    @FXML
+    private Label h4TypeLabel;
+
+    @FXML
+    private Label h4CountLabel;
+
+    @FXML
+    private Label h4AgeLabel;
+
+    @FXML
+    private Label h4HealthLabel;
+
+    @FXML
+    private Label h4TransferLabel;
+
+    // Mortality Card Labels
+    @FXML
+    private Label deathsTodayLabel;
+
+    @FXML
+    private Label deathsWeekLabel;
+
+    @FXML
+    private Label deathsMonthLabel;
 
     // DAOs
     private HouseDAO houseDAO;
     private ChickenDAO chickenDAO;
     private MortalityDAO mortalityDAO;
 
-    // House 1 - Day-old
-    @FXML private Label h1NameLabel;
-    @FXML private Label h1TypeLabel;
-    @FXML private Label h1CountLabel;
-    @FXML private Label h1CapacityLabel;
-    @FXML private Label h1AvgAgeLabel;
-    @FXML private Label h1HealthBadge;
-    @FXML private Label h1LastCleaningLabel;
-
-    // House 2 - Egg Layer
-    @FXML private Label h2NameLabel;
-    @FXML private Label h2TypeLabel;
-    @FXML private Label h2CountLabel;
-    @FXML private Label h2CapacityLabel;
-    @FXML private Label h2AvgAgeLabel;
-    @FXML private Label h2HealthBadge;
-    @FXML private Label h2LastCleaningLabel;
-
-    // House 3 - Meat Female
-    @FXML private Label h3NameLabel;
-    @FXML private Label h3TypeLabel;
-    @FXML private Label h3CountLabel;
-    @FXML private Label h3CapacityLabel;
-    @FXML private Label h3AvgAgeLabel;
-    @FXML private Label h3HealthBadge;
-    @FXML private Label h3LastCleaningLabel;
-
-    // House 4 - Meat Male
-    @FXML private Label h4NameLabel;
-    @FXML private Label h4TypeLabel;
-    @FXML private Label h4CountLabel;
-    @FXML private Label h4CapacityLabel;
-    @FXML private Label h4AvgAgeLabel;
-    @FXML private Label h4HealthBadge;
-    @FXML private Label h4LastCleaningLabel;
-
-    // Mortality Statistics
-    @FXML private Label deathsTodayLabel;
-    @FXML private Label deathsWeekLabel;
-    @FXML private Label deathsMonthLabel;
-
-    // Date formatter
-    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-
     /**
-     * Initializes the controller
-     * Called automatically by JavaFX after FXML loading
+     * Initialize method - called automatically after FXML loads
      */
     @FXML
     public void initialize() {
-        try {
-            // Initialize DAOs
-            houseDAO = new HouseDAO();
-            chickenDAO = new ChickenDAO();
-            mortalityDAO = new MortalityDAO();
+        // Initialize DAOs
+        houseDAO = new HouseDAO();
+        chickenDAO = new ChickenDAO();
+        mortalityDAO = new MortalityDAO();
 
-            // Load all data
-            loadHouseData();
-            loadMortalityStats();
+        // Load all house data
+        loadHouseData();
 
-            System.out.println("ChickenBayController initialized successfully");
-        } catch (Exception e) {
-            System.err.println("Error initializing ChickenBayController: " + e.getMessage());
-            e.printStackTrace();
-        }
+        // Load mortality statistics
+        loadMortalityStats();
     }
 
     /**
-     * Loads data for all houses
-     * Loops through houses 1-4 and loads each
+     * Load and display data for all 4 houses
      */
     private void loadHouseData() {
-        try {
-            for (int i = 1; i <= 4; i++) {
-                loadHouseById(i);
-            }
-        } catch (Exception e) {
-            System.err.println("Error loading house data: " + e.getMessage());
-            e.printStackTrace();
-        }
+        // Load House 1 data
+        loadHouseById(1);
+
+        // Load House 2 data
+        loadHouseById(2);
+
+        // Load House 3 data
+        loadHouseById(3);
+
+        // Load House 4 data
+        loadHouseById(4);
     }
 
     /**
-     * Loads data for a specific house by ID
-     *
-     * @param houseId the house ID (1-4)
+     * Load and display data for a specific house
+     * @param houseId The house ID (1-4)
      */
     private void loadHouseById(int houseId) {
         try {
-            // Get house from database
+            // Get house from HouseDAO
             House house = houseDAO.getHouseById(houseId);
 
             if (house == null) {
@@ -121,59 +172,56 @@ public class ChickenBayController {
                 return;
             }
 
-            // Calculate average age (placeholder - will be implemented when ChickenDAO is ready)
-            double avgAge = 0.0;
-            try {
-                // TODO: Implement when ChickenDAO.getAverageAge() is available
-                // avgAge = chickenDAO.getAverageAge(houseId);
-                avgAge = 0.0; // Placeholder
-            } catch (Exception e) {
-                System.err.println("Error calculating average age for house " + houseId);
+            // Get chickens from ChickenDAO
+            List<Chicken> chickens = chickenDAO.getChickensByHouse(houseId);
+
+            // Calculate average age
+            int averageAge = 0;
+            if (!chickens.isEmpty()) {
+                int totalAge = 0;
+                for (Chicken chicken : chickens) {
+                    totalAge += chicken.getAgeInDays();
+                }
+                averageAge = totalAge / chickens.size();
             }
 
-            // Format last cleaning date
-            String lastCleaning = house.getLastCleaningDate() != null
-                    ? house.getLastCleaningDate().format(DATE_FORMATTER)
-                    : "Never";
+            // Calculate days until transfer (from first chicken batch)
+            int daysUntilTransfer = 0;
+            if (!chickens.isEmpty() && chickens.get(0).getNextTransferDate() != null) {
+                daysUntilTransfer = (int) DateUtil.daysUntil(chickens.get(0).getNextTransferDate());
+            }
 
-            // Update UI based on house ID
+            // Update corresponding labels based on house ID
             switch (houseId) {
                 case 1:
                     updateHouseLabels(
-                            h1NameLabel, h1TypeLabel, h1CountLabel, h1CapacityLabel,
-                            h1AvgAgeLabel, h1HealthBadge, h1LastCleaningLabel,
-                            house, avgAge, lastCleaning
+                            h1NameLabel, h1TypeLabel, h1CountLabel,
+                            h1AgeLabel, h1HealthLabel, h1TransferLabel,
+                            house, averageAge, daysUntilTransfer
                     );
                     break;
-
                 case 2:
                     updateHouseLabels(
-                            h2NameLabel, h2TypeLabel, h2CountLabel, h2CapacityLabel,
-                            h2AvgAgeLabel, h2HealthBadge, h2LastCleaningLabel,
-                            house, avgAge, lastCleaning
+                            h2NameLabel, h2TypeLabel, h2CountLabel,
+                            h2AgeLabel, h2HealthLabel, h2TransferLabel,
+                            house, averageAge, daysUntilTransfer
                     );
                     break;
-
                 case 3:
                     updateHouseLabels(
-                            h3NameLabel, h3TypeLabel, h3CountLabel, h3CapacityLabel,
-                            h3AvgAgeLabel, h3HealthBadge, h3LastCleaningLabel,
-                            house, avgAge, lastCleaning
+                            h3NameLabel, h3TypeLabel, h3CountLabel,
+                            h3AgeLabel, h3HealthLabel, h3TransferLabel,
+                            house, averageAge, daysUntilTransfer
                     );
                     break;
-
                 case 4:
                     updateHouseLabels(
-                            h4NameLabel, h4TypeLabel, h4CountLabel, h4CapacityLabel,
-                            h4AvgAgeLabel, h4HealthBadge, h4LastCleaningLabel,
-                            house, avgAge, lastCleaning
+                            h4NameLabel, h4TypeLabel, h4CountLabel,
+                            h4AgeLabel, h4HealthLabel, h4TransferLabel,
+                            house, averageAge, daysUntilTransfer
                     );
                     break;
-
-                default:
-                    System.err.println("Invalid house ID: " + houseId);
             }
-
         } catch (Exception e) {
             System.err.println("Error loading house " + houseId + ": " + e.getMessage());
             e.printStackTrace();
@@ -181,79 +229,52 @@ public class ChickenBayController {
     }
 
     /**
-     * Helper method to update all labels for a house
+     * Update house labels with data
      */
-    private void updateHouseLabels(
-            Label nameLabel, Label typeLabel, Label countLabel, Label capacityLabel,
-            Label avgAgeLabel, Label healthBadge, Label lastCleaningLabel,
-            House house, double avgAge, String lastCleaning) {
-
-        // Check for null labels
-        if (nameLabel == null || typeLabel == null || countLabel == null ||
-                capacityLabel == null || avgAgeLabel == null || healthBadge == null ||
-                lastCleaningLabel == null) {
-            System.err.println("One or more labels are null for house: " + house.getName());
-            return;
-        }
-
+    private void updateHouseLabels(Label nameLabel, Label typeLabel, Label countLabel,
+                                   Label ageLabel, Label healthLabel, Label transferLabel,
+                                   House house, int averageAge, int daysUntilTransfer) {
         // Update labels
-        nameLabel.setText(house.getName());
-        typeLabel.setText(house.getType() != null ? house.getType().getDisplayName() : "Unknown");
-        countLabel.setText(String.valueOf(house.getChickenCount()));
-        capacityLabel.setText(String.valueOf(house.getCapacity()));
-        avgAgeLabel.setText(String.format("%.1f days", avgAge));
-        lastCleaningLabel.setText(lastCleaning);
-
-        // Update health badge
-        String healthStatus = house.getHealthStatus() != null
-                ? house.getHealthStatus().name()
-                : "GOOD";
-        healthBadge.setText(healthStatus);
-        applyHealthBadge(healthBadge, healthStatus);
+        if (nameLabel != null) nameLabel.setText(house.getName());
+        if (typeLabel != null) typeLabel.setText(house.getType() != null ? house.getType().getDisplayName() : "Unknown");
+        if (countLabel != null) countLabel.setText(String.valueOf(house.getChickenCount()));
+        if (ageLabel != null) ageLabel.setText(averageAge + " days");
+        if (healthLabel != null) {
+            String healthStatus = house.getHealthStatus() != null ? house.getHealthStatus().getDisplayName() : "Unknown";
+            healthLabel.setText(healthStatus);
+            applyHealthBadge(healthLabel, healthStatus);
+        }
+        if (transferLabel != null) {
+            if (daysUntilTransfer > 0) {
+                transferLabel.setText(daysUntilTransfer + " days");
+            } else if (daysUntilTransfer == 0) {
+                transferLabel.setText("Today");
+            } else {
+                transferLabel.setText("Overdue");
+            }
+        }
     }
 
     /**
-     * Loads mortality statistics
-     * Gets deaths for today, this week, and this month
+     * Load and display mortality statistics
      */
     private void loadMortalityStats() {
         try {
-            // Get current date
-            LocalDate today = LocalDate.now();
-            LocalDate weekAgo = today.minusDays(7);
-            LocalDate monthAgo = today.minusMonths(1);
+            // Get deaths today from MortalityDAO
+            MortalityDAO.MortalityStatistics stats = mortalityDAO.getMortalityStatistics();
 
-            // Get mortality counts (placeholder - will be implemented when MortalityDAO is ready)
-            int deathsToday = 0;
-            int deathsWeek = 0;
-            int deathsMonth = 0;
-
-            try {
-                // TODO: Implement when MortalityDAO methods are available
-                // deathsToday = mortalityDAO.getDeathsToday();
-                // deathsWeek = mortalityDAO.getDeathsByDateRange(weekAgo, today);
-                // deathsMonth = mortalityDAO.getDeathsByDateRange(monthAgo, today);
-
-                // For now, we can use EggProductionDAO as it tracks deadChickens
-                // This is a temporary solution until MortalityDAO is implemented
-                deathsToday = 0; // Placeholder
-                deathsWeek = 0;  // Placeholder
-                deathsMonth = 0; // Placeholder
-            } catch (Exception e) {
-                System.err.println("Error calculating mortality stats");
-            }
-
-            // Update labels
+            // Update mortality labels
             if (deathsTodayLabel != null) {
-                deathsTodayLabel.setText(String.valueOf(deathsToday));
-            }
-            if (deathsWeekLabel != null) {
-                deathsWeekLabel.setText(String.valueOf(deathsWeek));
-            }
-            if (deathsMonthLabel != null) {
-                deathsMonthLabel.setText(String.valueOf(deathsMonth));
+                deathsTodayLabel.setText(String.valueOf(stats.getTodayDeaths()));
             }
 
+            if (deathsWeekLabel != null) {
+                deathsWeekLabel.setText(String.valueOf(stats.getThisWeekDeaths()));
+            }
+
+            if (deathsMonthLabel != null) {
+                deathsMonthLabel.setText(String.valueOf(stats.getThisMonthDeaths()));
+            }
         } catch (Exception e) {
             System.err.println("Error loading mortality stats: " + e.getMessage());
             e.printStackTrace();
@@ -261,87 +282,102 @@ public class ChickenBayController {
     }
 
     /**
-     * Applies color styling to health badge based on status
-     *
-     * @param label the health badge label
-     * @param status the health status (GOOD, FAIR, POOR)
+     * Handle add chickens button click
+     * Opens dialog to add new chickens to a house
+     */
+    @FXML
+    public void handleAddChickens() {
+        // TODO: Open add chickens dialog
+        // This would typically open a dialog window where the user can:
+        // 1. Select house (H1-H4)
+        // 2. Enter quantity
+        // 3. Enter arrival date
+        // 4. Enter batch number
+        // 5. Enter other details (gender, health status, etc.)
+
+        // For now, show placeholder alert
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Add Chickens");
+        alert.setHeaderText("Add Chickens Feature");
+        alert.setContentText("This feature will open a dialog to add new chickens to a house.\n\nDialog implementation is pending.");
+        alert.showAndWait();
+
+        // After dialog implementation, the code would be:
+        // - Create new Chicken record
+        // - Save to database using chickenDAO.createChickenBatch()
+        // - Update house chicken count using houseDAO.updateChickenCount()
+        // - Refresh house data
+    }
+
+    /**
+     * Handle record death button click
+     * Opens dialog to record chicken deaths
+     */
+    @FXML
+    public void handleRecordDeath() {
+        // TODO: Open record death dialog
+        // This would typically open a dialog window where the user can:
+        // 1. Select house (H1-H4)
+        // 2. Enter death count
+        // 3. Enter cause of death
+        // 4. Enter symptoms (optional)
+        // 5. Mark as outbreak if applicable
+
+        // For now, show placeholder alert
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Record Death");
+        alert.setHeaderText("Record Death Feature");
+        alert.setContentText("This feature will open a dialog to record chicken deaths.\n\nDialog implementation is pending.");
+        alert.showAndWait();
+
+        // After dialog implementation, the code would be:
+        // - Create Mortality record
+        // - Save to database using mortalityDAO.recordMortality()
+        // - Update house chicken count
+        // - Refresh data
+    }
+
+    /**
+     * Apply health status badge styling
+     * @param label The label to style
+     * @param status Health status (Good/Fair/Poor)
      */
     private void applyHealthBadge(Label label, String status) {
-        if (label == null) {
+        if (label == null || status == null) {
             return;
         }
 
-        // Remove all previous style classes
+        // Remove previous style classes
         label.getStyleClass().removeAll("health-good", "health-fair", "health-poor");
 
-        // Apply appropriate style class based on status
-        switch (status.toUpperCase()) {
-            case "GOOD":
+        // Apply color based on status
+        switch (status.toLowerCase()) {
+            case "good":
                 label.getStyleClass().add("health-good");
+                label.setStyle("-fx-background-color: #28a745; -fx-text-fill: white; -fx-padding: 5px 10px; -fx-background-radius: 5px;");
                 break;
-            case "FAIR":
+            case "fair":
                 label.getStyleClass().add("health-fair");
+                label.setStyle("-fx-background-color: #ffc107; -fx-text-fill: white; -fx-padding: 5px 10px; -fx-background-radius: 5px;");
                 break;
-            case "POOR":
+            case "poor":
                 label.getStyleClass().add("health-poor");
+                label.setStyle("-fx-background-color: #dc3545; -fx-text-fill: white; -fx-padding: 5px 10px; -fx-background-radius: 5px;");
                 break;
             default:
-                // Default to good if unknown status
-                label.getStyleClass().add("health-good");
-                System.err.println("Unknown health status: " + status);
+                label.setStyle("-fx-background-color: #6c757d; -fx-text-fill: white; -fx-padding: 5px 10px; -fx-background-radius: 5px;");
         }
     }
 
     /**
-     * Handles the "Add Chickens" button click
-     * Opens a dialog to add chickens to a house
+     * Refresh all chicken bay data
      */
     @FXML
-    private void handleAddChickens() {
-        try {
-            // TODO: Implement dialog to add chickens
-            // This will be implemented in a future iteration
-            System.out.println("Add Chickens feature - Coming soon");
-
-            // After adding chickens, refresh data
-            // refreshData();
-        } catch (Exception e) {
-            System.err.println("Error handling add chickens: " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * Handles the "Record Death" button click
-     * Opens a dialog to record chicken mortality
-     */
-    @FXML
-    private void handleRecordDeath() {
-        try {
-            // TODO: Implement dialog to record death
-            // This will be implemented in a future iteration
-            System.out.println("Record Death feature - Coming soon");
-
-            // After recording death, refresh data
-            // refreshData();
-        } catch (Exception e) {
-            System.err.println("Error handling record death: " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * Refreshes all data on the page
-     * Call this method after any data changes
-     */
     public void refreshData() {
-        try {
-            loadHouseData();
-            loadMortalityStats();
-            System.out.println("Chicken Bay data refreshed");
-        } catch (Exception e) {
-            System.err.println("Error refreshing data: " + e.getMessage());
-            e.printStackTrace();
-        }
+        // Reload house data
+        loadHouseData();
+
+        // Reload mortality stats
+        loadMortalityStats();
     }
 }
