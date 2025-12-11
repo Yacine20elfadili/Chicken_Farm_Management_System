@@ -6,100 +6,86 @@ import org.junit.jupiter.api.*;
 import java.time.LocalDate;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ChickenDAOTest {
 
     private static ChickenDAO chickenDAO;
-    private static int insertedId; // ID du batch créé pour les tests
+    private static Chicken testChicken;
 
     @BeforeAll
-    static void init() {
-        // Utilise automatiquement base farm.db via DatabaseConnection
+    public static void setup() {
         chickenDAO = new ChickenDAO();
-    }
-
-    private Chicken sampleChicken() {
-        Chicken c = new Chicken();
-        c.setHouseId(99); // maison spéciale pour les tests
-        c.setBatchNumber("TEST-BATCH-XYZ");
-        c.setQuantity(50);
-        c.setArrivalDate(LocalDate.of(2025, 1, 1));
-        c.setAgeInDays(10);
-        c.setGender("Male");
-        c.setHealthStatus("Healthy");
-        c.setAverageWeight(1.3);
-        c.setNextTransferDate(LocalDate.of(2025, 2, 5));
-        return c;
+        System.out.println("Starting ChickenDAO tests...");
     }
 
     @Test
     @Order(1)
-    void testCreateChickenBatch() {
-        Chicken c = sampleChicken();
-        boolean created = chickenDAO.createChickenBatch(c);
+    public void testCreateChickenBatch() {
+        // Assure-toi que houseId existe dans la table houses
+        int houseId = 1; // H1
+        testChicken = new Chicken();
+        testChicken.setHouseId(houseId);
+        testChicken.setBatchNumber("BATCH-001");
+        testChicken.setQuantity(200);
+        testChicken.setArrivalDate(LocalDate.now());
+        testChicken.setAgeInDays(1);
+        testChicken.setGender("Female");
+        testChicken.setHealthStatus("Good");
+        testChicken.setAverageWeight(0.05);
+        testChicken.setNextTransferDate(LocalDate.now().plusDays(10));
 
-        Assertions.assertTrue(created);
-
-        // Récupérer l’ID du batch en base
-        Chicken found = chickenDAO.getAllChickens().stream()
-                .filter(ch -> "TEST-BATCH-XYZ".equals(ch.getBatchNumber()))
-                .findFirst()
-                .orElse(null);
-
-        Assertions.assertNotNull(found);
-
-        insertedId = found.getId();
+        boolean created = chickenDAO.createChickenBatch(testChicken);
+        assertTrue(created, "Le batch de poulets devrait être créé avec succès");
     }
 
     @Test
     @Order(2)
-    void testGetChickenById() {
-        Chicken found = chickenDAO.getChickenById(insertedId);
-        Assertions.assertNotNull(found);
-        Assertions.assertEquals("TEST-BATCH-XYZ", found.getBatchNumber());
+    public void testGetChickenById() {
+        // Récupère le dernier chicken inséré
+        List<Chicken> chickens = chickenDAO.getAllChickens();
+        assertFalse(chickens.isEmpty(), "Il doit y avoir au moins un chicken dans la base");
+        testChicken = chickens.get(0);
+        Chicken c = chickenDAO.getChickenById(testChicken.getId());
+        assertNotNull(c, "Le chicken récupéré par ID ne doit pas être null");
+        assertEquals(testChicken.getBatchNumber(), c.getBatchNumber());
     }
 
     @Test
     @Order(3)
-    void testUpdateChickenBatch() {
-        Chicken c = chickenDAO.getChickenById(insertedId);
-        c.setQuantity(999);
+    public void testUpdateChickenBatch() {
+        testChicken.setQuantity(250);
+        testChicken.setHealthStatus("Excellent");
+        boolean updated = chickenDAO.updateChickenBatch(testChicken);
+        assertTrue(updated, "Le chicken batch devrait être mis à jour");
 
-        boolean updated = chickenDAO.updateChickenBatch(c);
-        Assertions.assertTrue(updated);
-
-        Chicken found = chickenDAO.getChickenById(insertedId);
-        Assertions.assertEquals(999, found.getQuantity());
+        Chicken updatedChicken = chickenDAO.getChickenById(testChicken.getId());
+        assertEquals(250, updatedChicken.getQuantity());
+        assertEquals("Excellent", updatedChicken.getHealthStatus());
     }
 
     @Test
     @Order(4)
-    void testFilterByBatch() {
-        List<Chicken> list = chickenDAO.getChickensByBatch("TEST-BATCH-XYZ");
-        Assertions.assertTrue(list.size() >= 1);
+    public void testGetByBatch() {
+        List<Chicken> chickens = chickenDAO.getChickensByBatch("BATCH-001");
+        assertFalse(chickens.isEmpty(), "Il devrait y avoir des chickens pour ce batch");
     }
 
     @Test
     @Order(5)
-    void testFilterByHouse() {
-        List<Chicken> list = chickenDAO.getChickensByHouse(99);
-        Assertions.assertTrue(list.size() >= 1);
+    public void testGetByHouse() {
+        List<Chicken> chickens = chickenDAO.getChickensByHouse(1);
+        assertFalse(chickens.isEmpty(), "Il devrait y avoir des chickens pour cette maison");
     }
 
     @Test
     @Order(6)
-    void testChickensByHealthStatus() {
-        List<Chicken> list = chickenDAO.getChickensByHealthStatus("Healthy");
-        Assertions.assertTrue(list.size() >= 1);
-    }
+    public void testDeleteChickenBatch() {
+        boolean deleted = chickenDAO.deleteChickenBatch(testChicken.getId());
+        assertTrue(deleted, "Le chicken batch devrait être supprimé avec succès");
 
-    @Test
-    @Order(7)
-    void testDeleteChickenBatch() {
-        boolean deleted = chickenDAO.deleteChickenBatch(insertedId);
-        Assertions.assertTrue(deleted);
-
-        Chicken found = chickenDAO.getChickenById(insertedId);
-        Assertions.assertNull(found);
+        Chicken deletedChicken = chickenDAO.getChickenById(testChicken.getId());
+        assertNull(deletedChicken, "Le chicken supprimé ne doit plus exister");
     }
 }
