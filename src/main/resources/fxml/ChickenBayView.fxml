@@ -10,17 +10,24 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.Button?>
+
 
 <AnchorPane prefHeight="600.0" prefWidth="1000.0" styleClass="main-content" stylesheets="@../css/style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ma.farm.controller.ChickenBayController">
     <children>
-        <VBox prefHeight="75.0" prefWidth="1000.0" spacing="10.0" styleClass="header" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+        <VBox prefHeight="100.0" prefWidth="1000.0" spacing="10.0" styleClass="header" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
             <children>
-                <HBox prefHeight="33.0" prefWidth="999.0">
+                <HBox prefHeight="33.0" prefWidth="999.0" alignment="CENTER_LEFT" spacing="10.0">
                     <children>
                         <Label styleClass="header-title" text="Parc Avicole" textAlignment="CENTER" />
+                        <Region HBox.hgrow="ALWAYS" />
+                        <javafx.scene.control.Button text="+ Add House" onAction="#handleAddHouse"
+                            style="-fx-background-color: #28a745; -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold; -fx-cursor: hand; -fx-padding: 8 15 8 15; -fx-background-radius: 5;" />
+                        <javafx.scene.control.Button text="⚠ Record Death" onAction="#handleRecordDeath"
+                            style="-fx-background-color: #dc3545; -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold; -fx-cursor: hand; -fx-padding: 8 15 8 15; -fx-background-radius: 5;" />
                     </children>
                     <VBox.margin>
-                        <Insets top="10.0" />
+                        <Insets top="10.0" left="20.0" right="20.0" />
                     </VBox.margin>
                 </HBox>
                 <HBox prefHeight="100.0" prefWidth="200.0">
@@ -28,12 +35,12 @@
                         <Label prefHeight="28.0" prefWidth="435.0" styleClass="header-subtitle" text="Suivez la population de poulets vivants par génération et emplacement" textAlignment="CENTER" />
                     </children>
                     <VBox.margin>
-                        <Insets />
+                        <Insets left="20.0"/>
                     </VBox.margin>
                 </HBox>
             </children>
         </VBox>
-        <VBox prefHeight="200.0" prefWidth="100.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="80.0">
+        <VBox prefHeight="200.0" prefWidth="100.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="100.0">
             <children>
                 <ScrollPane fitToHeight="true" fitToWidth="true" prefHeight="716.0" prefWidth="1000.0" styleClass="main-content" VBox.vgrow="ALWAYS">
                     <content>
@@ -85,6 +92,14 @@
                                                     <Insets />
                                                 </opaqueInsets>
                                             </Region>
+                                            <Button text="✏" onAction="#handleEditHouse" userData="1"
+                                             style="-fx-background-color: #007bff; -fx-text-fill: white; -fx-font-size: 12px; -fx-cursor: hand; -fx-padding: 3 8 3 8; -fx-background-radius: 3;">
+                                             <HBox.margin><Insets right="5.0" /></HBox.margin>
+                                            </Button>
+                                            <Button text="🗑" onAction="#handleDeleteHouse" userData="1"
+                                                style="-fx-background-color: #dc3545; -fx-text-fill: white; -fx-font-size: 12px; -fx-cursor: hand; -fx-padding: 3 8 3 8; -fx-background-radius: 3;">
+                                                <HBox.margin><Insets right="5.0" /></HBox.margin>
+                                            </Button>
                                             <Label fx:id="h1CountLabel" styleClass="cards-title" text="00" />
                                         </children>
                                         <padding>
@@ -126,9 +141,17 @@
                             </VBox>
                             <VBox fx:id="house2Card" prefHeight="200.0" prefWidth="100.0" styleClass="metric-card" GridPane.columnIndex="1">
                                 <children>
-                                    <HBox alignment="CENTER_LEFT" prefHeight="37.0" prefWidth="439.0" VBox.vgrow="ALWAYS">
+                                    <HBox alignment="CENTER_LEFT" prefHeight="37.0" prefWidth="439.0" spacing="5.0" VBox.vgrow="ALWAYS">
                                         <children>
-                                            <Label fx:id="h2NameLabel" styleClass="cards-title" text="Bâtiment 2 - Non configuré" />
+                                            <Button text="✏" onAction="#handleEditHouse" userData="2"
+                                             style="-fx-background-color: #007bff; -fx-text-fill: white; -fx-font-size: 12px; -fx-cursor: hand; -fx-padding: 3 8 3 8; -fx-background-radius: 3;">
+                                             <HBox.margin><Insets right="5.0" /></HBox.margin>
+                                            </Button>
+                                            <Button text="🗑" onAction="#handleDeleteHouse" userData="2"
+                                                style="-fx-background-color: #dc3545; -fx-text-fill: white; -fx-font-size: 12px; -fx-cursor: hand; -fx-padding: 3 8 3 8; -fx-background-radius: 3;">
+                                                <HBox.margin><Insets right="5.0" /></HBox.margin>
+                                            </Button>
+                                            <Label fx:id="h2HealthLabel" styleClass="health-fair" text="Moyen">
                                             <Region maxHeight="100.0" minWidth="0.0" prefHeight="0.0" prefWidth="0.0" HBox.hgrow="ALWAYS">
                                                 <opaqueInsets>
                                                     <Insets />
@@ -201,7 +224,7 @@
                             </VBox>
                             <VBox fx:id="house3Card" prefHeight="200.0" prefWidth="100.0" styleClass="metric-card" GridPane.rowIndex="1">
                                 <children>
-                                    <HBox alignment="CENTER_LEFT" prefHeight="37.0" prefWidth="439.0" VBox.vgrow="ALWAYS">
+                                    <HBox alignment="CENTER_LEFT" prefHeight="37.0" prefWidth="439.0" spacing="5.0" VBox.vgrow="ALWAYS">
                                         <children>
                                             <Label fx:id="h3NameLabel" styleClass="cards-title" text="Bâtiment 3 - Non configuré" />
                                             <Region maxHeight="100.0" minWidth="0.0" prefHeight="0.0" prefWidth="0.0" HBox.hgrow="ALWAYS">
@@ -209,7 +232,15 @@
                                                     <Insets />
                                                 </opaqueInsets>
                                             </Region>
-                                            <Label fx:id="h3HealthLabel" styleClass="health-unknown" text="N/A">
+                                            <Button text="✏" onAction="#handleEditHouse" userData="3"
+                                             style="-fx-background-color: #007bff; -fx-text-fill: white; -fx-font-size: 12px; -fx-cursor: hand; -fx-padding: 3 8 3 8; -fx-background-radius: 3;">
+                                             <HBox.margin><Insets right="5.0" /></HBox.margin>
+                                          </Button>
+                                          <Button text="🗑" onAction="#handleDeleteHouse" userData="3"
+                                             style="-fx-background-color: #dc3545; -fx-text-fill: white; -fx-font-size: 12px; -fx-cursor: hand; -fx-padding: 3 8 3 8; -fx-background-radius: 3;">
+                                             <HBox.margin><Insets right="5.0" /></HBox.margin>
+                                          </Button>
+                                          <Label fx:id="h3HealthLabel" styleClass="health-fair" text="Moyen">
                                                 <HBox.margin>
                                                     <Insets />
                                                 </HBox.margin>
@@ -276,7 +307,7 @@
                             </VBox>
                             <VBox fx:id="house4Card" prefHeight="200.0" prefWidth="100.0" styleClass="metric-card" GridPane.columnIndex="1" GridPane.rowIndex="1">
                                 <children>
-                                    <HBox alignment="CENTER_LEFT" prefHeight="37.0" prefWidth="439.0" VBox.vgrow="ALWAYS">
+                                    <HBox alignment="CENTER_LEFT" prefHeight="37.0" prefWidth="439.0" spacing="5.0" VBox.vgrow="ALWAYS">
                                         <children>
                                             <Label fx:id="h4NameLabel" styleClass="cards-title" text="Bâtiment 4 - Non configuré" />
                                             <Region maxHeight="100.0" minWidth="0.0" prefHeight="0.0" prefWidth="0.0" HBox.hgrow="ALWAYS">
@@ -284,7 +315,15 @@
                                                     <Insets />
                                                 </opaqueInsets>
                                             </Region>
-                                            <Label fx:id="h4HealthLabel" styleClass="health-unknown" text="N/A">
+                                            <Button text="✏" onAction="#handleEditHouse" userData="4"
+                                             style="-fx-background-color: #007bff; -fx-text-fill: white; -fx-font-size: 12px; -fx-cursor: hand; -fx-padding: 3 8 3 8; -fx-background-radius: 3;">
+                                             <HBox.margin><Insets right="5.0" /></HBox.margin>
+                                            </Button>
+                                            <Button text="🗑" onAction="#handleDeleteHouse" userData="4"
+                                                style="-fx-background-color: #dc3545; -fx-text-fill: white; -fx-font-size: 12px; -fx-cursor: hand; -fx-padding: 3 8 3 8; -fx-background-radius: 3;">
+                                                <HBox.margin><Insets right="5.0" /></HBox.margin>
+                                            </Button>
+                                            <Label fx:id="h4HealthLabel" styleClass="health-fair" text="Moyen">
                                                 <HBox.margin>
                                                     <Insets />
                                                 </HBox.margin>

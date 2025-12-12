@@ -1,9 +1,18 @@
 package ma.farm.controller;
 
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import ma.farm.controller.dialogs.AddHouseDialogController;
+import ma.farm.controller.dialogs.EditHouseDialogController;
+import ma.farm.controller.dialogs.RecordMortalityDialogController;
 import ma.farm.dao.ChickenDAO;
 import ma.farm.dao.HouseDAO;
 import ma.farm.dao.MortalityDAO;
@@ -13,10 +22,11 @@ import ma.farm.util.DateUtil;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 /**
- * ChickenBayController - Controls the Chicken Bay view
- * Shows: 4 house cards (H1-H4), mortality statistics
+ * Handle add house button click
+ * Opens dialog to add a new house
  */
 public class ChickenBayController {
 
@@ -286,57 +296,131 @@ public class ChickenBayController {
      * Opens dialog to add new chickens to a house
      */
     @FXML
-    public void handleAddChickens() {
-        // TODO: Open add chickens dialog
-        // This would typically open a dialog window where the user can:
-        // 1. Select house (H1-H4)
-        // 2. Enter quantity
-        // 3. Enter arrival date
-        // 4. Enter batch number
-        // 5. Enter other details (gender, health status, etc.)
+    public void handleAddHouse() {
+        try {
+            // Load Add House Dialog FXML
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/dialogs/AddHouseDialog.fxml"));
+            Parent root = loader.load();
 
-        // For now, show placeholder alert
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Add Chickens");
-        alert.setHeaderText("Add Chickens Feature");
-        alert.setContentText("This feature will open a dialog to add new chickens to a house.\n\nDialog implementation is pending.");
-        alert.showAndWait();
+            // Get controller
+            AddHouseDialogController controller = loader.getController();
 
-        // After dialog implementation, the code would be:
-        // - Create new Chicken record
-        // - Save to database using chickenDAO.createChickenBatch()
-        // - Update house chicken count using houseDAO.updateChickenCount()
-        // - Refresh house data
+            // Create stage for dialog
+            Stage dialogStage = new Stage();
+            dialogStage.setTitle("Add New House");
+            dialogStage.initModality(Modality.APPLICATION_MODAL);
+            dialogStage.setScene(new Scene(root));
+            dialogStage.setResizable(false);
+
+            // Show dialog and wait
+            dialogStage.showAndWait();
+
+            // If saved successfully, refresh data
+            if (controller.isSaved()) {
+                refreshData();
+                showSuccessAlert("House added successfully!");
+            }
+        } catch (Exception e) {
+            System.err.println("Error opening Add House dialog: " + e.getMessage());
+            e.printStackTrace();
+            showErrorAlert("Failed to open Add House dialog.");
+        }
     }
 
     /**
-     * Handle record death button click
-     * Opens dialog to record chicken deaths
+     * Handle edit house button click
+     * Opens dialog to edit selected house
      */
     @FXML
-    public void handleRecordDeath() {
-        // TODO: Open record death dialog
-        // This would typically open a dialog window where the user can:
-        // 1. Select house (H1-H4)
-        // 2. Enter death count
-        // 3. Enter cause of death
-        // 4. Enter symptoms (optional)
-        // 5. Mark as outbreak if applicable
+    public void handleEditHouse(javafx.event.ActionEvent event) {
+        // Get house ID from button's userData
+        javafx.scene.control.Button button = (javafx.scene.control.Button) event.getSource();
+        int houseId = Integer.parseInt(button.getUserData().toString());
+        try {
+            // Get house from database
+            House house = houseDAO.getHouseById(houseId);
+            if (house == null) {
+                showErrorAlert("House not found.");
+                return;
+            }
 
-        // For now, show placeholder alert
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Record Death");
-        alert.setHeaderText("Record Death Feature");
-        alert.setContentText("This feature will open a dialog to record chicken deaths.\n\nDialog implementation is pending.");
-        alert.showAndWait();
+            // Load Edit House Dialog FXML
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/dialogs/EditHouseDialo.fxml"));
+            Parent root = loader.load();
 
-        // After dialog implementation, the code would be:
-        // - Create Mortality record
-        // - Save to database using mortalityDAO.recordMortality()
-        // - Update house chicken count
-        // - Refresh data
+            // Get controller and set house data
+            EditHouseDialogController controller = loader.getController();
+            controller.setHouse(house);
+
+            // Create stage for dialog
+            Stage dialogStage = new Stage();
+            dialogStage.setTitle("Edit House - " + house.getName());
+            dialogStage.initModality(Modality.APPLICATION_MODAL);
+            dialogStage.setScene(new Scene(root));
+            dialogStage.setResizable(false);
+
+            // Show dialog and wait
+            dialogStage.showAndWait();
+
+            // If saved successfully, refresh data
+            if (controller.isSaved()) {
+                refreshData();
+                showSuccessAlert("House updated successfully!");
+            }
+        } catch (Exception e) {
+            System.err.println("Error opening Edit House dialog: " + e.getMessage());
+            e.printStackTrace();
+            showErrorAlert("Failed to open Edit House dialog.");
+        }
     }
 
+    /**
+     * Handle delete house button click
+     * Confirms and deletes selected house
+     */
+    @FXML
+    public void handleDeleteHouse(javafx.event.ActionEvent event) {
+        // Get house ID from button's userData
+        javafx.scene.control.Button button = (javafx.scene.control.Button) event.getSource();
+        int houseId = Integer.parseInt(button.getUserData().toString());
+        try {
+            // Get house from database
+            House house = houseDAO.getHouseById(houseId);
+            if (house == null) {
+                showErrorAlert("House not found.");
+                return;
+            }
+
+            // Show confirmation dialog
+            Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
+            confirmAlert.setTitle("Confirm Deletion");
+            confirmAlert.setHeaderText("Delete House: " + house.getName());
+            confirmAlert.setContentText("Are you sure you want to delete this house?\n\n" +
+                    "This action cannot be undone and will also delete:\n" +
+                    "- All chicken records in this house\n" +
+                    "- All egg production records\n" +
+                    "- All mortality records\n\n" +
+                    "Current chicken count: " + house.getChickenCount());
+
+            Optional<ButtonType> result = confirmAlert.showAndWait();
+            if (result.isPresent() && result.get() == ButtonType.OK) {
+                // Delete from database
+                boolean success = houseDAO.deleteHouse(houseId);
+
+                if (success) {
+                    refreshData();
+                    showSuccessAlert("House deleted successfully!");
+                } else {
+                    showErrorAlert("Failed to delete house. Please try again.");
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Error deleting house: " + e.getMessage());
+            e.printStackTrace();
+            showErrorAlert("Error deleting house: " + e.getMessage());
+        }
+
+        
     /**
      * Apply health status badge styling
      * @param label The label to style
@@ -369,6 +453,39 @@ public class ChickenBayController {
         }
     }
 
+    @FXML
+    public void handleRecordDeath() {
+        try {
+            // Load Record Mortality Dialog FXML
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/dialogs/RecordMortalityDialog.fxml"));
+            Parent root = loader.load();
+
+            // Get controller
+            RecordMortalityDialogController controller = loader.getController();
+
+            // Create stage for dialog
+            Stage dialogStage = new Stage();
+            dialogStage.setTitle("Record Mortality");
+            dialogStage.initModality(Modality.APPLICATION_MODAL);
+            dialogStage.setScene(new Scene(root));
+            dialogStage.setResizable(false);
+
+            // Show dialog and wait
+            dialogStage.showAndWait();
+
+            // If saved successfully, refresh data
+            if (controller.isSaved()) {
+                refreshData();
+                showSuccessAlert("Mortality recorded successfully!");
+            }
+        } catch (Exception e) {
+            System.err.println("Error opening Record Mortality dialog: " + e.getMessage());
+            e.printStackTrace();
+            showErrorAlert("Failed to open Record Mortality dialog.");
+        }
+    }
+
+
     /**
      * Refresh all chicken bay data
      */
@@ -379,5 +496,27 @@ public class ChickenBayController {
 
         // Reload mortality stats
         loadMortalityStats();
+    }
+
+    /**
+     * Show success alert
+     */
+    private void showSuccessAlert(String message) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Success");
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+
+    /**
+     * Show error alert
+     */
+    private void showErrorAlert(String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Error");
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 }

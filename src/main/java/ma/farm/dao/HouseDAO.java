@@ -34,28 +34,63 @@ public class HouseDAO {
      * @return true if successful, false otherwise
      */
     public boolean addHouse(House house) {
-        String sql = "INSERT INTO houses (name, type, chickenCount, capacity, healthStatus, " +
-                "lastCleaningDate, creationDate) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        // Check if house has pre-set ID (for specific slots 1-4)
+        boolean hasPresetId = house.getId() > 0;
+        String sql;
+
+        if (hasPresetId) {
+            System.out.println("Using pre-set ID: " + house.getId());
+            sql = "INSERT INTO houses (id, name, type, chickenCount, capacity, healthStatus, " +
+                    "lastCleaningDate, creationDate) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        } else {
+            System.out.println("Auto-generating ID");
+            sql = "INSERT INTO houses (name, type, chickenCount, capacity, healthStatus, " +
+                    "lastCleaningDate, creationDate) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        }
 
         try (PreparedStatement stmt = dbConnection.getConnection().prepareStatement(sql)) {
-            stmt.setString(1, house.getName());
-            stmt.setString(2, house.getTypeAsString());  // Using helper method
-            stmt.setInt(3, house.getChickenCount());
-            stmt.setInt(4, house.getCapacity());
-            stmt.setString(5, house.getHealthStatusAsString());  // Using helper method
-            stmt.setString(6, house.getLastCleaningDate() != null ?
+            int paramIndex = 1;
+
+            // Set ID if pre-set
+            if (hasPresetId) {
+                stmt.setInt(paramIndex++, house.getId());
+                System.out.println("Set id: " + house.getId());
+            }
+
+            stmt.setString(paramIndex++, house.getName());
+            System.out.println("Set name: " + house.getName());
+
+            stmt.setString(paramIndex++, house.getTypeAsString());  // Using helper method
+            System.out.println("Set type: " + house.getTypeAsString());
+
+            stmt.setInt(paramIndex++, house.getChickenCount());
+            System.out.println("Set chickenCount: " + house.getChickenCount());
+
+            stmt.setInt(paramIndex++, house.getCapacity());
+            System.out.println("Set capacity: " + house.getCapacity());
+
+            stmt.setString(paramIndex++, house.getHealthStatusAsString());  // Using helper method
+            System.out.println("Set healthStatus: " + house.getHealthStatusAsString());
+
+            stmt.setString(paramIndex++, house.getLastCleaningDate() != null ?
                     house.getLastCleaningDate().toString() : null);
-            stmt.setString(7, house.getCreationDate() != null ?
+            System.out.println("Set lastCleaningDate: " + house.getLastCleaningDate());
+
+            stmt.setString(paramIndex++, house.getCreationDate() != null ?
                     house.getCreationDate().toString() : null);
 
             int rows = stmt.executeUpdate();
             if (rows == 0) return false;
 
-            // Get generated ID
-            try (Statement idStmt = dbConnection.getConnection().createStatement();
-                 ResultSet rs = idStmt.executeQuery("SELECT last_insert_rowid() AS id")) {
-                if (rs.next()) {
-                    house.setId(rs.getInt("id"));
+            // Get generated ID only if not pre-set
+            if (!hasPresetId) {
+                try (Statement idStmt = dbConnection.getConnection().createStatement();
+                     ResultSet rs = idStmt.executeQuery("SELECT last_insert_rowid() AS id")) {
+                    if (rs.next()) {
+                        int generatedId = rs.getInt("id");
+                        house.setId(generatedId);
+                        System.out.println("Generated ID: " + generatedId);
+                    }
                 }
             }
 
