@@ -29,10 +29,10 @@ public class StorageController {
 
     // FXML Components - Medications Card
     @FXML
-    private Label totalMedicationsLabel;
+    private ListView<String> medicationListView;
 
     @FXML
-    private Label lowStockMedicationsLabel;
+    private Label totalMedicationsLabel;
 
     // FXML Components - Equipment Table
     @FXML
@@ -54,6 +54,7 @@ public class StorageController {
 
     // Observable lists for UI
     private ObservableList<String> feedList;
+    private ObservableList<String> medicationList;
     private ObservableList<Equipment> equipmentList;
 
     /**
@@ -71,6 +72,7 @@ public class StorageController {
 
         // Initialize observable lists
         feedList = FXCollections.observableArrayList();
+        medicationList = FXCollections.observableArrayList();
         equipmentList = FXCollections.observableArrayList();
 
         // Load feed data
@@ -110,27 +112,39 @@ public class StorageController {
 
                     if (empty || status == null) {
                         setText(null);
+                        setGraphic(null);
                         setStyle("");
                     } else {
-                        setText(status);
+                        // Clear text, we'll use a Label as graphic
+                        setText(null);
 
-                        // Apply color based on status
+                        // Create a Label for the status badge
+                        Label statusLabel = new Label(status);
+                        statusLabel.setStyle("-fx-padding: 6px 12px; -fx-background-radius: 6px; -fx-font-weight: bold; -fx-font-size: 12px;");
+
+                        // Apply color to the label badge based on status
                         switch (status.toLowerCase()) {
                             case "good":
-                                setStyle("-fx-background-color: #d4edda; -fx-text-fill: #155724;");
+                                statusLabel.setStyle(statusLabel.getStyle() + " -fx-background-color: #d1fae5; -fx-text-fill: #065f46;");
                                 break;
                             case "fair":
-                                setStyle("-fx-background-color: #fff3cd; -fx-text-fill: #856404;");
+                                statusLabel.setStyle(statusLabel.getStyle() + " -fx-background-color: #fef3c7; -fx-text-fill: #92400e;");
                                 break;
                             case "broken":
-                                setStyle("-fx-background-color: #f8d7da; -fx-text-fill: #721c24;");
+                                statusLabel.setStyle(statusLabel.getStyle() + " -fx-background-color: #fee2e2; -fx-text-fill: #991b1b;");
                                 break;
                             default:
-                                setStyle("");
+                                statusLabel.setStyle(statusLabel.getStyle() + " -fx-background-color: #e5e7eb; -fx-text-fill: #374151;");
                         }
+
+                        // Set the badge as the graphic (not background of the whole cell!)
+                        setGraphic(statusLabel);
+                        setStyle("-fx-alignment: CENTER_LEFT;");
                     }
                 }
             });
+
+
         }
     }
 
@@ -198,36 +212,91 @@ public class StorageController {
     }
 
     /**
-     * Load and display medications data
+     * Load and display medications inventory
      */
     private void loadMedicationsData() {
         try {
             // Get all medications from MedicationDAO
             List<Medication> medications = medicationDAO.getAllMedications();
 
-            // Count total medications
-            int totalMedications = medications.size();
+            // Clear list
+            medicationList.clear();
 
-            // Count low stock medications
-            long lowStockCount = medications.stream()
-                    .filter(Medication::isLowStock)
-                    .count();
+            // Format medication info - DIFFERENT FROM FEED!
+            // Show: Name, Type, Expiry Date, Supplier
+            for (Medication medication : medications) {
+                String medicationInfo;
+
+                // Build medication info string with expiry and supplier
+                if (medication.getExpiryDate() != null && medication.getSupplier() != null) {
+                    medicationInfo = String.format("%s (%s) - %d %s\nExpire: %s | Fournisseur: %s",
+                            medication.getName(),
+                            medication.getType(),
+                            medication.getQuantity(),
+                            medication.getUnit(),
+                            medication.getExpiryDate().toString(),
+                            medication.getSupplier());
+                } else if (medication.getExpiryDate() != null) {
+                    medicationInfo = String.format("%s (%s) - %d %s\nExpire: %s",
+                            medication.getName(),
+                            medication.getType(),
+                            medication.getQuantity(),
+                            medication.getUnit(),
+                            medication.getExpiryDate().toString());
+                } else {
+                    medicationInfo = String.format("%s (%s) - %d %s",
+                            medication.getName(),
+                            medication.getType(),
+                            medication.getQuantity(),
+                            medication.getUnit());
+                }
+
+                // Highlight EXPIRED items first (more critical!)
+                if (medication.isExpired()) {
+                    medicationInfo = "🚫 EXPIRÉ - " + medicationInfo;
+                }
+                // Then highlight low stock items
+                else if (medication.isLowStock()) {
+                    medicationInfo = "⚠️ STOCK BAS - " + medicationInfo;
+                }
+
+                medicationList.add(medicationInfo);
+            }
+
+            // Update medicationListView
+            if (medicationListView != null) {
+                medicationListView.setItems(medicationList);
+
+                // Apply custom cell factory for expired and low stock highlighting
+                medicationListView.setCellFactory(param -> new ListCell<String>() {
+                    @Override
+                    protected void updateItem(String item, boolean empty) {
+                        super.updateItem(item, empty);
+
+                        if (empty || item == null) {
+                            setText(null);
+                            setStyle("");
+                        } else {
+                            setText(item);
+
+                            // Highlight EXPIRED in dark red (more critical)
+                            if (item.contains("EXPIRÉ")) {
+                                setStyle("-fx-text-fill: #b91c1c; -fx-font-weight: bold; -fx-background-color: #fee2e2;");
+                            }
+                            // Highlight low stock in orange
+                            else if (item.contains("STOCK BAS")) {
+                                setStyle("-fx-text-fill: #ea580c; -fx-font-weight: bold; -fx-background-color: #ffedd5;");
+                            } else {
+                                setStyle("");
+                            }
+                        }
+                    }
+                });
+            }
 
             // Update totalMedicationsLabel
             if (totalMedicationsLabel != null) {
-                totalMedicationsLabel.setText(String.valueOf(totalMedications));
-            }
-
-            // Update lowStockMedicationsLabel
-            if (lowStockMedicationsLabel != null) {
-                lowStockMedicationsLabel.setText(String.valueOf(lowStockCount));
-
-                // Apply warning badge if low stock > 0
-                if (lowStockCount > 0) {
-                    lowStockMedicationsLabel.setStyle("-fx-background-color: #dc3545; -fx-text-fill: white; -fx-padding: 5px 10px; -fx-background-radius: 5px;");
-                } else {
-                    lowStockMedicationsLabel.setStyle("-fx-background-color: #28a745; -fx-text-fill: white; -fx-padding: 5px 10px; -fx-background-radius: 5px;");
-                }
+                totalMedicationsLabel.setText(String.valueOf(medications.size()));
             }
         } catch (Exception e) {
             System.err.println("Error loading medications data: " + e.getMessage());

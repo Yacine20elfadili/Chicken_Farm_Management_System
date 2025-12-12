@@ -2,6 +2,38 @@
 /*================================== LOGIN STYLE ==================================*/
 /*=====================================================================================*/
 
+/* No Data State Styling */
+.no-data-card {
+    -fx-background-color: #f8f9fa;
+    -fx-border-color: #dee2e6;
+    -fx-border-width: 2px;
+    -fx-border-style: dashed;
+}
+
+.no-data-title {
+    -fx-text-fill: #6c757d;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-font-family: 'Segoe UI';
+}
+
+.no-data-subtitle {
+    -fx-text-fill: #868e96;
+    -fx-font-size: 13px;
+    -fx-text-alignment: center;
+    -fx-wrap-text: true;
+    -fx-font-family: 'Segoe UI';
+}
+
+
+.health-unknown {
+    -fx-background-radius: 5px;
+    -fx-background-color: #6c757d;
+    -fx-padding: 4px 6px;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
 /* style of the left pannel */
 .brand-panel {
     -fx-background-color: #1f2937;
@@ -342,14 +374,31 @@
 .storage-card {
      -fx-background-color: linear-gradient(to right, #f8d423, #fca140);
      -fx-background-radius: 10px;
-     -fx-padding: 30px;
-     -fx-effect: dropshadow(gaussian, rgb(254, 217, 179), 20, 0.2, 3, 3);
+     -fx-padding: 20px;
+     -fx-effect: dropshadow(gaussian, rgb(254, 217, 179), 10, 0, 0, 5);
 }
 
 .storage-card:hover {
     -fx-scale-x: 1.001;
     -fx-scale-y: 1.001;
-    -fx-effect: dropshadow(gaussian, rgb(254, 217, 179), 20, 0.2, -1, -1);
+    -fx-effect: dropshadow(gaussian, rgb(254, 217, 179), 10, 0, 0, 0);
+}
+
+/* NEW CLEAN STORAGE CARD STYLE - NO ORANGE! */
+.storage-clean-card {
+    -fx-background-color: white;
+    -fx-background-radius: 10px;
+    -fx-padding: 20px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 5);
+    -fx-border-color: #e5e7eb;
+    -fx-border-width: 1px;
+    -fx-border-radius: 10px;
+}
+
+.storage-clean-card:hover {
+    -fx-scale-x: 1.001;
+    -fx-scale-y: 1.001;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 15, 0, 0, 5);
 }
 
 .storage-title {
@@ -366,12 +415,74 @@
     -fx-font-family: 'Lucida Console';
 }
 
+.storage-count-label {
+    -fx-text-fill: #6b7280;
+    -fx-font-size: 11px;
+    -fx-font-weight: normal;
+    -fx-font-family: 'Segoe UI';
+}
+
+.storage-count-value {
+    -fx-text-fill: #1e293b;
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-font-family: 'Segoe UI';
+}
+
 /*=====================================================================================*/
 /*================================== STORAGE STYLE ==================================*/
 /*=====================================================================================*/
+
+.storage-section {
+    -fx-background-color: white;
+     -fx-background-radius: 10px;
+     -fx-padding: 20px;
+     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 5);
+}
+
+.storage-section:hover {
+    -fx-scale-x: 1.001;
+    -fx-scale-y: 1.001;
+    -fx-effect: dropshadow(gaussian, rgba(200,200,200), 10, 0, 0, 0);
+}
+
+.storage-section-title{
+    -fx-text-fill: #1e2939;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-font-family: 'Segoe UI';
+}
+
 /*--------------------------------------------------------------------------------------------------*/
 /*---------------------------------------- List view style ----------------------------------------*/
 /*--------------------------------------------------------------------------------------------------*/
+
+.storage-list-view {
+    -fx-background-color: #fafafa;
+    -fx-border-color: #e5e7eb;
+    -fx-border-width: 1px;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+}
+
+.storage-list-view .list-cell {
+    -fx-background-color: transparent;
+    -fx-padding: 12px 15px;
+    -fx-border-color: #e5e7eb;
+    -fx-border-width: 0 0 1px 0;
+    -fx-text-fill: #1e293b;
+    -fx-font-size: 13px;
+    -fx-font-family: "Segoe UI", sans-serif;
+}
+
+.storage-list-view .list-cell:hover {
+    -fx-background-color: #f3f4f6;
+}
+
+.storage-list-view .list-cell:selected {
+    -fx-background-color: #dbeafe;
+    -fx-text-fill: #1e40af;
+}
 
 .feed-list-view {
     -fx-background-color: transparent;
@@ -402,6 +513,14 @@
 /*--------------------------------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------------------------------*/
+
+.feed-list-summary{
+    -fx-font-size: 14px;
+    -fx-text-fill: #1e2939;
+    -fx-font-weight: bold;
+    -fx-font-family: "Calibri";
+}
+
 .feed-list-summary-value{
     -fx-text-fill: #1e2939;
     -fx-font-size: 18px;
@@ -431,6 +550,14 @@
 /*--------------------------------------------------------------------------------------------------*/
 /*---------------------------------------- Table view style ----------------------------------------*/
 /*--------------------------------------------------------------------------------------------------*/
+
+.storage-table {
+    -fx-background-color: #fafafa;
+    -fx-border-color: #e5e7eb;
+    -fx-border-width: 1px;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+}
 
 .table-view {
     -fx-focus-color: transparent;
@@ -467,11 +594,11 @@
 
 .table-view .column-header .label {
     -fx-text-fill: #4a5565;
-    -fx-font-size: 14px;
-    -fx-font-weight: 500;
+    -fx-font-size: 13px;
+    -fx-font-weight: 600;
     -fx-padding: 10 0 10 13;
     -fx-alignment: CENTER_LEFT;
-    -fx-font-family: "Arial";
+    -fx-font-family: "Segoe UI";
 }
 
 .table-row-cell {
@@ -482,24 +609,23 @@
 
 .table-cell {
     -fx-border-color: transparent;
-    -fx-font-size: 14px;
+    -fx-font-size: 13px;
     -fx-text-fill: #1e293b;
-    -fx-padding: 10px 15px;
-    -fx-font-family: "Comic Sans MS";
+    -fx-padding: 12px 15px;
+    -fx-font-family: "Segoe UI", sans-serif;
 }
 
 .table-row-cell:hover {
-    -fx-background-color: #f5f5f5;
+    -fx-background-color: #f3f4f6;
 }
 
 .table-cell:selected, .table-row-cell:selected {
-    -fx-background-color: #e8f5e9;
-    -fx-text-fill: #1b5e20;
+    -fx-background-color: #dbeafe;
+    -fx-text-fill: #1e40af;
 }
 
 .table-view .count-cell {
     -fx-font-weight: bold;
-    -fx-text-fill: #0f172a;
 }
 
 /*--------------------------------------------------------------------------------------------------*/
