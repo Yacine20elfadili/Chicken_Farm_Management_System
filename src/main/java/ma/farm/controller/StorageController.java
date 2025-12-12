@@ -104,7 +104,7 @@ public class StorageController {
             // Bind equipmentStatusColumn to status property
             equipmentStatusColumn.setCellValueFactory(new PropertyValueFactory<>("status"));
 
-            // Add status badge cell factory (color coding)
+                        // Add status badge cell factory (color coding)
             equipmentStatusColumn.setCellFactory(column -> new TableCell<Equipment, String>() {
                 @Override
                 protected void updateItem(String status, boolean empty) {
@@ -117,11 +117,11 @@ public class StorageController {
                     } else {
                         // Clear text, we'll use a Label as graphic
                         setText(null);
-
+                        
                         // Create a Label for the status badge
                         Label statusLabel = new Label(status);
                         statusLabel.setStyle("-fx-padding: 6px 12px; -fx-background-radius: 6px; -fx-font-weight: bold; -fx-font-size: 12px;");
-
+                        
                         // Apply color to the label badge based on status
                         switch (status.toLowerCase()) {
                             case "good":
@@ -136,14 +136,13 @@ public class StorageController {
                             default:
                                 statusLabel.setStyle(statusLabel.getStyle() + " -fx-background-color: #e5e7eb; -fx-text-fill: #374151;");
                         }
-
+                        
                         // Set the badge as the graphic (not background of the whole cell!)
                         setGraphic(statusLabel);
                         setStyle("-fx-alignment: CENTER_LEFT;");
                     }
                 }
             });
-
 
         }
     }
@@ -226,7 +225,7 @@ public class StorageController {
             // Show: Name, Type, Expiry Date, Supplier
             for (Medication medication : medications) {
                 String medicationInfo;
-
+                
                 // Build medication info string with expiry and supplier
                 if (medication.getExpiryDate() != null && medication.getSupplier() != null) {
                     medicationInfo = String.format("%s (%s) - %d %s\nExpire: %s | Fournisseur: %s",
@@ -303,6 +302,7 @@ public class StorageController {
             e.printStackTrace();
         }
     }
+
 
     /**
      * Load and display equipment table

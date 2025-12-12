@@ -2,6 +2,15 @@
 /*================================== LOGIN STYLE ==================================*/
 /*=====================================================================================*/
 
+.health-unknown {
+    -fx-background-radius: 5px;
+    -fx-background-color: #6c757d;
+    -fx-padding: 4px 6px;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+
 /* No Data State Styling */
 .no-data-card {
     -fx-background-color: #f8f9fa;
@@ -166,6 +175,94 @@
 .error-message {
     -fx-alignment: center;
 }
+
+/*=====================================================================================*/
+/*================================== SIDEBAR STYLE ==================================*/
+/*=====================================================================================*/
+
+/* Sidebar moduls Styling */
+
+.sidebar {
+    -fx-background-color:  #1f2937;
+}
+
+.sidebar-item {
+    -fx-background-color: transparent;
+}
+
+.sidebar-item:hover {
+    -fx-background-color: #f24e1e;
+}
+
+.sidebar-item-active {
+    -fx-background-color: #ff6900;
+}
+
+/* logout button style */
+
+.logout-button {
+    -fx-background-color: #f73526;
+}
+.logout-button:hover {
+    -fx-background-color: #f8493c;
+}
+
+.sidebar-collapsed {
+    -fx-pref-width: 50px;
+    -fx-min-width: 50px;
+    -fx-max-width: 50px;
+}
+
+.sidebar-collapsed .label {
+    visibility: hidden;
+}
+
+.sidebar-collapsed .scroll-pane .logout-button .sidebar-header{
+    -fx-pref-width: 50px;
+    -fx-min-width: 50px;
+    -fx-max-width: 50px;
+}
+
+.sidebar-collapsed .anchor-pane .logout-button .sidebar-header{
+    -fx-pref-width: 50px;
+}
+
+.scroll-pane .viewport {
+    -fx-background-color: transparent;
+}
+
+.scroll-pane .corner {
+    -fx-background-color: transparent;
+}
+
+.scroll-pane .scroll-bar:horizontal {
+    -fx-opacity: 0;
+    -fx-pref-height: 0;
+}
+
+
+.menu-button {
+    -fx-background-color: #ff781a;
+    -fx-text-fill: white;
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-effect: dropshadow(gaussian, rgba(255,168,0,0.4), 10, 0, 0, 4);
+    -fx-cursor: hand;
+    -fx-border-radius: 100px;
+    -fx-background-radius: 100px;
+    -fx-font-family: 'Verdana';
+    -fx-text-alignment: center;
+}
+
+.menu-button:hover {
+    -fx-background-color: #ff6900;
+    -fx-effect: dropshadow(gaussian, rgba(255,168,0,0.4), 15, 0, 0, 6);
+}
+
+.menu-button:pressed {
+    -fx-background-color: #ff6900;
+    -fx-effect: dropshadow(gaussian, rgba(255,168,0,0.2), 5, 0, 0, 2);
+}
 /*=====================================================================================*/
 /*================================== DASHBOARD STYLE ==================================*/
 /*=====================================================================================*/
@@ -205,7 +302,7 @@
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 20, 0.2, -1, -1);
 }
 .card-icon {
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 20, 0.2, 3, 3);
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 20, 0.2, 5, 5);
 }
 
 .label-cards{
@@ -839,4 +936,25 @@
     -fx-text-fill: gray;
     -fx-font-size: 12px;
     -fx-font-family: 'Lucida Console';
+}
+
+.mortality-card {
+    -fx-background-color: white;
+    -fx-background-radius: 10px;
+    -fx-padding: 20px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 5);
+    -fx-border-color: #e5e7eb;
+    -fx-border-width: 1px;
+    -fx-border-radius: 10px;
+}
+
+.mortality-card:hover {
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 15, 0, 0, 5);
+}
+
+.mortality-card-title {
+    -fx-text-fill: #1e2939;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-font-family: 'Calibri';
 }

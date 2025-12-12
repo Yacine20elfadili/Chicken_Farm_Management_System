@@ -34,6 +34,9 @@ public class HouseDAO {
      * @return true if successful, false otherwise
      */
     public boolean addHouse(House house) {
+        System.out.println("=== HouseDAO.addHouse() called ===");
+        System.out.println("House to add: " + house);
+
         // Check if house has pre-set ID (for specific slots 1-4)
         boolean hasPresetId = house.getId() > 0;
         String sql;
@@ -49,6 +52,8 @@ public class HouseDAO {
         }
 
         try (PreparedStatement stmt = dbConnection.getConnection().prepareStatement(sql)) {
+            System.out.println("Database connection obtained: " + (dbConnection.getConnection() != null));
+
             int paramIndex = 1;
 
             // Set ID if pre-set
@@ -78,9 +83,16 @@ public class HouseDAO {
 
             stmt.setString(paramIndex++, house.getCreationDate() != null ?
                     house.getCreationDate().toString() : null);
+            System.out.println("Set creationDate: " + house.getCreationDate());
 
+            System.out.println("Executing SQL: " + sql);
             int rows = stmt.executeUpdate();
-            if (rows == 0) return false;
+            System.out.println("Rows inserted: " + rows);
+
+            if (rows == 0) {
+                System.out.println("No rows inserted!");
+                return false;
+            }
 
             // Get generated ID only if not pre-set
             if (!hasPresetId) {
@@ -94,9 +106,14 @@ public class HouseDAO {
                 }
             }
 
+            System.out.println("House added successfully with ID: " + house.getId());
             return true;
         } catch (SQLException e) {
-            System.err.println("Error adding house: " + e.getMessage());
+            System.err.println("=== SQL ERROR in addHouse ===");
+            System.err.println("Error message: " + e.getMessage());
+            System.err.println("SQL State: " + e.getSQLState());
+            System.err.println("Error Code: " + e.getErrorCode());
+            e.printStackTrace();
             return false;
         }
     }

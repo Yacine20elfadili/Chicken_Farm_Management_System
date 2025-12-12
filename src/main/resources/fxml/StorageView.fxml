@@ -60,7 +60,7 @@
                                                 <!-- Feed Header -->
                                                 <HBox alignment="CENTER_LEFT" spacing="10.0">
                                                     <children>
-                                                        <ImageView fitHeight="35.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true">
+                                                        <ImageView fitHeight="35.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true" styleClass="card-icon">
                                                             <image>
                                                                 <Image url="@../images/icons/feed-icon.png" />
                                                             </image>
@@ -78,7 +78,7 @@
                                                         <Insets bottom="15.0" />
                                                     </VBox.margin>
                                                 </HBox>
-
+                                                
                                                 <!-- Feed ListView -->
                                                 <ListView fx:id="feedListView" prefHeight="250.0" styleClass="storage-list-view" VBox.vgrow="ALWAYS">
                                                 </ListView>
@@ -94,7 +94,7 @@
                                                 <!-- Medications Header -->
                                                 <HBox alignment="CENTER_LEFT" spacing="10.0">
                                                     <children>
-                                                        <ImageView fitHeight="35.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true">
+                                                        <ImageView fitHeight="35.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true" styleClass="card-icon">
                                                             <image>
                                                                 <Image url="@../images/icons/medication-icon.png" />
                                                             </image>
@@ -112,7 +112,7 @@
                                                         <Insets bottom="15.0" />
                                                     </VBox.margin>
                                                 </HBox>
-
+                                                
                                                 <!-- Medications ListView -->
                                                 <ListView fx:id="medicationListView" prefHeight="250.0" styleClass="storage-list-view" VBox.vgrow="ALWAYS">
                                                 </ListView>
@@ -130,7 +130,7 @@
                                         <!-- Equipment Header -->
                                         <HBox alignment="CENTER_LEFT" spacing="10.0">
                                             <children>
-                                                <ImageView fitHeight="35.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true">
+                                                <ImageView fitHeight="35.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true" styleClass="card-icon">
                                                     <image>
                                                         <Image url="@../images/icons/equipment-icon.png" />
                                                     </image>
@@ -141,7 +141,7 @@
                                                 <Insets bottom="10.0" />
                                             </VBox.margin>
                                         </HBox>
-
+                                        
                                         <!-- Equipment Table -->
                                         <TableView fx:id="equipmentTable" prefHeight="350.0" styleClass="storage-table" VBox.vgrow="ALWAYS">
                                             <columns>

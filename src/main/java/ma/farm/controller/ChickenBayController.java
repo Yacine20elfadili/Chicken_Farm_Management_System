@@ -25,8 +25,8 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Handle add house button click
- * Opens dialog to add a new house
+ * ChickenBayController - Controls the Chicken Bay view
+ * Shows: 4 house cards (H1-H4), mortality statistics
  */
 public class ChickenBayController {
 
@@ -292,18 +292,22 @@ public class ChickenBayController {
     }
 
     /**
-     * Handle add chickens button click
-     * Opens dialog to add new chickens to a house
+     * Handle add house button click
+     * Opens dialog to add a new house
      */
     @FXML
     public void handleAddHouse() {
+        System.out.println("=== CHICKEN BAY: handleAddHouse() called ===");
         try {
             // Load Add House Dialog FXML
+            System.out.println("CHICKEN BAY: Loading FXML from /dialogs/AddHouseDialog.fxml");
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/dialogs/AddHouseDialog.fxml"));
             Parent root = loader.load();
+            System.out.println("CHICKEN BAY: FXML loaded successfully");
 
             // Get controller
             AddHouseDialogController controller = loader.getController();
+            System.out.println("CHICKEN BAY: Controller obtained: " + (controller != null));
 
             // Create stage for dialog
             Stage dialogStage = new Stage();
@@ -313,17 +317,24 @@ public class ChickenBayController {
             dialogStage.setResizable(false);
 
             // Show dialog and wait
+            System.out.println("CHICKEN BAY: Showing dialog...");
             dialogStage.showAndWait();
+            System.out.println("CHICKEN BAY: Dialog closed");
 
             // If saved successfully, refresh data
+            System.out.println("CHICKEN BAY: Checking if saved: " + controller.isSaved());
             if (controller.isSaved()) {
+                System.out.println("CHICKEN BAY: House was saved, refreshing data...");
                 refreshData();
                 showSuccessAlert("House added successfully!");
+            } else {
+                System.out.println("CHICKEN BAY: House was NOT saved (user cancelled or error)");
             }
         } catch (Exception e) {
-            System.err.println("Error opening Add House dialog: " + e.getMessage());
+            System.err.println("=== ERROR opening Add House dialog ===");
+            System.err.println("Error message: " + e.getMessage());
             e.printStackTrace();
-            showErrorAlert("Failed to open Add House dialog.");
+            showErrorAlert("Failed to open Add House dialog: " + e.getMessage());
         }
     }
 
@@ -333,24 +344,31 @@ public class ChickenBayController {
      */
     @FXML
     public void handleEditHouse(javafx.event.ActionEvent event) {
+        System.out.println("=== CHICKEN BAY: handleEditHouse() called ===");
         // Get house ID from button's userData
         javafx.scene.control.Button button = (javafx.scene.control.Button) event.getSource();
         int houseId = Integer.parseInt(button.getUserData().toString());
+        System.out.println("CHICKEN BAY: Editing house ID: " + houseId);
         try {
             // Get house from database
             House house = houseDAO.getHouseById(houseId);
             if (house == null) {
+                System.out.println("CHICKEN BAY: House not found for ID: " + houseId);
                 showErrorAlert("House not found.");
                 return;
             }
+            System.out.println("CHICKEN BAY: House found: " + house);
 
             // Load Edit House Dialog FXML
+            System.out.println("CHICKEN BAY: Loading FXML from /dialogs/EditHouseDialo.fxml");
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/dialogs/EditHouseDialo.fxml"));
             Parent root = loader.load();
+            System.out.println("CHICKEN BAY: FXML loaded successfully");
 
             // Get controller and set house data
             EditHouseDialogController controller = loader.getController();
             controller.setHouse(house);
+            System.out.println("CHICKEN BAY: House data set in controller");
 
             // Create stage for dialog
             Stage dialogStage = new Stage();
@@ -360,17 +378,22 @@ public class ChickenBayController {
             dialogStage.setResizable(false);
 
             // Show dialog and wait
+            System.out.println("CHICKEN BAY: Showing dialog...");
             dialogStage.showAndWait();
+            System.out.println("CHICKEN BAY: Dialog closed");
 
             // If saved successfully, refresh data
+            System.out.println("CHICKEN BAY: Checking if saved: " + controller.isSaved());
             if (controller.isSaved()) {
+                System.out.println("CHICKEN BAY: House was updated, refreshing data...");
                 refreshData();
                 showSuccessAlert("House updated successfully!");
             }
         } catch (Exception e) {
-            System.err.println("Error opening Edit House dialog: " + e.getMessage());
+            System.err.println("=== ERROR opening Edit House dialog ===");
+            System.err.println("Error message: " + e.getMessage());
             e.printStackTrace();
-            showErrorAlert("Failed to open Edit House dialog.");
+            showErrorAlert("Failed to open Edit House dialog: " + e.getMessage());
         }
     }
 
@@ -419,8 +442,53 @@ public class ChickenBayController {
             e.printStackTrace();
             showErrorAlert("Error deleting house: " + e.getMessage());
         }
+    }
 
-        
+    /**
+     * Handle record death button click
+     * Opens dialog to record chicken deaths
+     */
+    @FXML
+    public void handleRecordDeath() {
+        System.out.println("=== CHICKEN BAY: handleRecordDeath() called ===");
+        try {
+            // Load Record Mortality Dialog FXML
+            System.out.println("CHICKEN BAY: Loading FXML from /dialogs/RecordMortalityDialog.fxml");
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/dialogs/RecordMortalityDialog.fxml"));
+            Parent root = loader.load();
+            System.out.println("CHICKEN BAY: FXML loaded successfully");
+
+            // Get controller
+            RecordMortalityDialogController controller = loader.getController();
+            System.out.println("CHICKEN BAY: Controller obtained: " + (controller != null));
+
+            // Create stage for dialog
+            Stage dialogStage = new Stage();
+            dialogStage.setTitle("Record Mortality");
+            dialogStage.initModality(Modality.APPLICATION_MODAL);
+            dialogStage.setScene(new Scene(root));
+            dialogStage.setResizable(false);
+
+            // Show dialog and wait
+            System.out.println("CHICKEN BAY: Showing dialog...");
+            dialogStage.showAndWait();
+            System.out.println("CHICKEN BAY: Dialog closed");
+
+            // If saved successfully, refresh data
+            System.out.println("CHICKEN BAY: Checking if saved: " + controller.isSaved());
+            if (controller.isSaved()) {
+                System.out.println("CHICKEN BAY: Mortality was recorded, refreshing data...");
+                refreshData();
+                showSuccessAlert("Mortality recorded successfully!");
+            }
+        } catch (Exception e) {
+            System.err.println("=== ERROR opening Record Mortality dialog ===");
+            System.err.println("Error message: " + e.getMessage());
+            e.printStackTrace();
+            showErrorAlert("Failed to open Record Mortality dialog: " + e.getMessage());
+        }
+    }
+
     /**
      * Apply health status badge styling
      * @param label The label to style
@@ -452,39 +520,6 @@ public class ChickenBayController {
                 label.setStyle("-fx-background-color: #6c757d; -fx-text-fill: white; -fx-padding: 5px 10px; -fx-background-radius: 5px;");
         }
     }
-
-    @FXML
-    public void handleRecordDeath() {
-        try {
-            // Load Record Mortality Dialog FXML
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/dialogs/RecordMortalityDialog.fxml"));
-            Parent root = loader.load();
-
-            // Get controller
-            RecordMortalityDialogController controller = loader.getController();
-
-            // Create stage for dialog
-            Stage dialogStage = new Stage();
-            dialogStage.setTitle("Record Mortality");
-            dialogStage.initModality(Modality.APPLICATION_MODAL);
-            dialogStage.setScene(new Scene(root));
-            dialogStage.setResizable(false);
-
-            // Show dialog and wait
-            dialogStage.showAndWait();
-
-            // If saved successfully, refresh data
-            if (controller.isSaved()) {
-                refreshData();
-                showSuccessAlert("Mortality recorded successfully!");
-            }
-        } catch (Exception e) {
-            System.err.println("Error opening Record Mortality dialog: " + e.getMessage());
-            e.printStackTrace();
-            showErrorAlert("Failed to open Record Mortality dialog.");
-        }
-    }
-
 
     /**
      * Refresh all chicken bay data

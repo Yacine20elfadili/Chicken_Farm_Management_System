@@ -79,14 +79,19 @@ public class AddHouseDialogController {
      */
     @FXML
     public void handleSave() {
+        System.out.println("=== ADD HOUSE: handleSave() called ===");
+
         // Hide previous error
         errorLabel.setVisible(false);
         errorLabel.setManaged(false);
 
         // Validate inputs
         if (!validateInputs()) {
+            System.out.println("ADD HOUSE: Validation failed");
             return;
         }
+
+        System.out.println("ADD HOUSE: Validation passed");
 
         try {
             // Find available house ID (1-4)
@@ -110,18 +115,27 @@ public class AddHouseDialogController {
             house.setCreationDate(LocalDate.now());
             house.setLastCleaningDate(LocalDate.now());
 
+            System.out.println("ADD HOUSE: House object created: " + house);
+            System.out.println("ADD HOUSE: Calling houseDAO.addHouse()...");
+
             // Save to database
             boolean success = houseDAO.addHouse(house);
 
+            System.out.println("ADD HOUSE: DAO result = " + success);
+
             if (success) {
                 saved = true;
+                System.out.println("ADD HOUSE: House saved successfully with ID: " + house.getId());
                 closeDialog();
             } else {
+                System.out.println("ADD HOUSE: Failed to save house");
                 showError("Failed to add house. Please try again.");
             }
         } catch (NumberFormatException e) {
+            System.out.println("ADD HOUSE: NumberFormatException: " + e.getMessage());
             showError("Please enter valid numbers for capacity and chicken count.");
         } catch (Exception e) {
+            System.out.println("ADD HOUSE: Exception: " + e.getMessage());
             showError("Error adding house: " + e.getMessage());
             e.printStackTrace();
         }
