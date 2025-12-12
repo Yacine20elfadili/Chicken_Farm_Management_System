@@ -2,6 +2,38 @@
 /*================================== LOGIN STYLE ==================================*/
 /*=====================================================================================*/
 
+/* No Data State Styling */
+.no-data-card {
+    -fx-background-color: #f8f9fa;
+    -fx-border-color: #dee2e6;
+    -fx-border-width: 2px;
+    -fx-border-style: dashed;
+}
+
+.no-data-title {
+    -fx-text-fill: #6c757d;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-font-family: 'Segoe UI';
+}
+
+.no-data-subtitle {
+    -fx-text-fill: #868e96;
+    -fx-font-size: 13px;
+    -fx-text-alignment: center;
+    -fx-wrap-text: true;
+    -fx-font-family: 'Segoe UI';
+}
+
+
+.health-unknown {
+    -fx-background-radius: 5px;
+    -fx-background-color: #6c757d;
+    -fx-padding: 4px 6px;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
 /* style of the left pannel */
 .brand-panel {
     -fx-background-color: #1f2937;

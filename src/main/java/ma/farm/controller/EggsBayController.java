@@ -3,9 +3,13 @@ package ma.farm.controller;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import ma.farm.dao.EggProductionDAO;
+import ma.farm.dao.HouseDAO;
 import ma.farm.model.EggProduction;
+import ma.farm.model.House;
+import ma.farm.model.HouseType;
 import ma.farm.util.DateUtil;
 
 import java.time.LocalDate;
@@ -14,11 +18,15 @@ import java.util.stream.Collectors;
 
 /**
  * EggsBayController - Controls the Eggs Bay view
- * Shows: H2 and H3 egg production, total eggs in storage
+ * Shows: Houses that can lay eggs (EGG_LAYER and MEAT_FEMALE), total eggs in storage
  */
 public class EggsBayController {
 
-    // FXML Components - House 2 Card (Egg layers)
+    // FXML Components - House Cards Container
+    @FXML
+    private HBox houseCardsContainer;
+
+    // FXML Components - House 2 Card
     @FXML
     private VBox house2Card;
 
@@ -34,7 +42,7 @@ public class EggsBayController {
     @FXML
     private Label h2DateLabel;
 
-    // FXML Components - House 3 Card (Meat female)
+    // FXML Components - House 3 Card
     @FXML
     private VBox house3Card;
 
@@ -50,6 +58,10 @@ public class EggsBayController {
     @FXML
     private Label h3DateLabel;
 
+    // FXML Components - No Egg Houses Message
+    @FXML
+    private VBox noEggHousesMessage;
+
     // FXML Components - Storage Card
     @FXML
     private VBox storageCard;
@@ -60,8 +72,9 @@ public class EggsBayController {
     @FXML
     private Label storageStatusLabel;
 
-    // DAO
+    // DAOs
     private EggProductionDAO eggProductionDAO;
+    private HouseDAO houseDAO;
 
     // Constants
     private static final int MAX_STORAGE_CAPACITY = 10000; // Example capacity
@@ -71,116 +84,153 @@ public class EggsBayController {
      */
     @FXML
     public void initialize() {
-        // Initialize DAO
+        // Initialize DAOs
         eggProductionDAO = new EggProductionDAO();
+        houseDAO = new HouseDAO();
 
-        // Load egg production data
-        loadHouse2Production();
-        loadHouse3Production();
+        // Check if there are any egg-laying houses first
+        checkAndDisplayEggLayingHouses();
 
         // Load storage data
         loadStorageData();
-
-        // Set today's date labels
-        LocalDate today = LocalDate.now();
-        if (h2DateLabel != null) {
-            h2DateLabel.setText(DateUtil.formatDate(today));
-        }
-        if (h3DateLabel != null) {
-            h3DateLabel.setText(DateUtil.formatDate(today));
-        }
     }
 
     /**
-     * Load and display House 2 egg production (Egg layers)
+     * Check if there are egg-laying houses and display accordingly
      */
-    private void loadHouse2Production() {
+    private void checkAndDisplayEggLayingHouses() {
         try {
-            // Get today's production for House 2
-            LocalDate today = LocalDate.now();
-            List<EggProduction> allProductionsToday = eggProductionDAO.getProductionByDate(today);
-
-            // Filter for House 2
-            List<EggProduction> h2Productions = allProductionsToday.stream()
-                    .filter(p -> p.getHouseId() == 2)
+            // Get all houses from database
+            List<House> allHouses = houseDAO.getAllHouses();
+            
+            // Filter houses that can lay eggs (EGG_LAYER and MEAT_FEMALE)
+            List<House> eggLayingHouses = allHouses.stream()
+                    .filter(house -> house.getType() == HouseType.EGG_LAYER || house.getType() == HouseType.MEAT_FEMALE)
                     .collect(Collectors.toList());
 
-            // Update labels
-            if (!h2Productions.isEmpty()) {
-                EggProduction production = h2Productions.get(0);
-
-                if (h2NameLabel != null) {
-                    h2NameLabel.setText("House 2 - Egg Layers");
-                }
-
-                if (h2EggsCollectedLabel != null) {
-                    h2EggsCollectedLabel.setText(String.valueOf(production.getEggsCollected()));
-                }
-
-                if (h2DeadChickensLabel != null) {
-                    h2DeadChickensLabel.setText(String.valueOf(production.getDeadChickens()));
-                }
+            if (eggLayingHouses.isEmpty()) {
+                // No egg-laying houses found - show message
+                showNoEggHousesMessage();
             } else {
-                // No production recorded today
-                if (h2NameLabel != null) {
-                    h2NameLabel.setText("House 2 - Egg Layers");
-                }
-                if (h2EggsCollectedLabel != null) {
-                    h2EggsCollectedLabel.setText("0");
-                }
-                if (h2DeadChickensLabel != null) {
-                    h2DeadChickensLabel.setText("0");
-                }
+                // Egg-laying houses found - show cards and load data
+                showHouseCards();
+                loadEggLayingHousesData(eggLayingHouses);
             }
+
         } catch (Exception e) {
-            System.err.println("Error loading House 2 production: " + e.getMessage());
+            System.err.println("Error checking egg-laying houses: " + e.getMessage());
             e.printStackTrace();
+            // On error, show the house cards with default "non configuré" values
+            showHouseCards();
         }
     }
 
     /**
-     * Load and display House 3 egg production (Meat female)
+     * Show the "No egg laying houses" message and hide house cards
      */
-    private void loadHouse3Production() {
+    private void showNoEggHousesMessage() {
+        // Hide house cards
+        if (houseCardsContainer != null) {
+            houseCardsContainer.setVisible(false);
+            houseCardsContainer.setManaged(false);
+        }
+
+        // Show no data message
+        if (noEggHousesMessage != null) {
+            noEggHousesMessage.setVisible(true);
+            noEggHousesMessage.setManaged(true);
+        }
+
+        System.out.println("No egg-laying houses configured - showing message");
+    }
+
+    /**
+     * Show house cards and hide the "No egg laying houses" message
+     */
+    private void showHouseCards() {
+        // Show house cards
+        if (houseCardsContainer != null) {
+            houseCardsContainer.setVisible(true);
+            houseCardsContainer.setManaged(true);
+        }
+
+        // Hide no data message
+        if (noEggHousesMessage != null) {
+            noEggHousesMessage.setVisible(false);
+            noEggHousesMessage.setManaged(false);
+        }
+    }
+
+    /**
+     * Load data for egg-laying houses
+     */
+    private void loadEggLayingHousesData(List<House> eggLayingHouses) {
+        // Set today's date
+        LocalDate today = LocalDate.now();
+        String todayFormatted = DateUtil.formatDate(today);
+
+        // Check each house and load data if it exists
+        for (House house : eggLayingHouses) {
+            if (house.getId() == 2) {
+                loadHouseProductionData(house, h2NameLabel, h2EggsCollectedLabel, h2DeadChickensLabel, h2DateLabel, todayFormatted);
+            } else if (house.getId() == 3) {
+                loadHouseProductionData(house, h3NameLabel, h3EggsCollectedLabel, h3DeadChickensLabel, h3DateLabel, todayFormatted);
+            }
+            // Add more house IDs as needed
+        }
+
+        // For houses that don't exist, keep the "Non configuré" defaults
+        // This is already set in the FXML, so no action needed
+    }
+
+    /**
+     * Load production data for a specific house
+     */
+    private void loadHouseProductionData(House house, Label nameLabel, Label eggsLabel, Label mortalityLabel, Label dateLabel, String todayFormatted) {
         try {
-            // Get today's production for House 3
+            // Update house name label
+            if (nameLabel != null) {
+                String houseName = String.format("Bâtiment %d - %s", house.getId(), house.getType().getDisplayName());
+                nameLabel.setText(houseName);
+            }
+
+            // Get today's production for this house
             LocalDate today = LocalDate.now();
             List<EggProduction> allProductionsToday = eggProductionDAO.getProductionByDate(today);
 
-            // Filter for House 3
-            List<EggProduction> h3Productions = allProductionsToday.stream()
-                    .filter(p -> p.getHouseId() == 3)
+            // Filter for this specific house
+            List<EggProduction> houseProductions = allProductionsToday.stream()
+                    .filter(p -> p.getHouseId() == house.getId())
                     .collect(Collectors.toList());
 
-            // Update labels
-            if (!h3Productions.isEmpty()) {
-                EggProduction production = h3Productions.get(0);
+            // Update production labels
+            if (!houseProductions.isEmpty()) {
+                EggProduction production = houseProductions.get(0);
 
-                if (h3NameLabel != null) {
-                    h3NameLabel.setText("House 3 - Meat Female");
+                if (eggsLabel != null) {
+                    eggsLabel.setText(String.valueOf(production.getEggsCollected()));
                 }
 
-                if (h3EggsCollectedLabel != null) {
-                    h3EggsCollectedLabel.setText(String.valueOf(production.getEggsCollected()));
-                }
-
-                if (h3DeadChickensLabel != null) {
-                    h3DeadChickensLabel.setText(String.valueOf(production.getDeadChickens()));
+                if (mortalityLabel != null) {
+                    mortalityLabel.setText(String.valueOf(production.getDeadChickens()));
                 }
             } else {
-                // No production recorded today
-                if (h3NameLabel != null) {
-                    h3NameLabel.setText("House 3 - Meat Female");
+                // No production data for today - show 0
+                if (eggsLabel != null) {
+                    eggsLabel.setText("0");
                 }
-                if (h3EggsCollectedLabel != null) {
-                    h3EggsCollectedLabel.setText("0");
-                }
-                if (h3DeadChickensLabel != null) {
-                    h3DeadChickensLabel.setText("0");
+                if (mortalityLabel != null) {
+                    mortalityLabel.setText("0");
                 }
             }
+
+            // Update date label
+            if (dateLabel != null) {
+                dateLabel.setText(todayFormatted);
+            }
+
         } catch (Exception e) {
-            System.err.println("Error loading House 3 production: " + e.getMessage());
+            System.err.println("Error loading production data for house " + house.getId() + ": " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -191,7 +241,6 @@ public class EggsBayController {
     private void loadStorageData() {
         try {
             // Get total good eggs from all time (or use a date range)
-            // Since there's no getTotalGoodEggs() method, we'll get all production records and sum them
             List<EggProduction> allProductions = eggProductionDAO.getAllProduction();
 
             int totalEggs = allProductions.stream()
@@ -221,26 +270,11 @@ public class EggsBayController {
     @FXML
     public void handleRecordCollection() {
         // TODO: Open record collection dialog
-        // This would typically open a dialog window where the user can:
-        // 1. Select house (H2 or H3)
-        // 2. Enter eggs collected
-        // 3. Enter cracked eggs
-        // 4. Enter dead chickens count
-        // 5. Enter collector name (optional)
-        // 6. Enter notes (optional)
-
-        // For now, show placeholder alert
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Record Collection");
         alert.setHeaderText("Record Egg Collection Feature");
         alert.setContentText("This feature will open a dialog to record today's egg collection.\n\nDialog implementation is pending.");
         alert.showAndWait();
-
-        // After dialog implementation, the code would be:
-        // - Create EggProduction record
-        // - Calculate good eggs automatically
-        // - Save to database using eggProductionDAO.addProduction()
-        // - Refresh data
     }
 
     /**
@@ -250,22 +284,11 @@ public class EggsBayController {
     @FXML
     public void handleRemoveEggs() {
         // TODO: Open remove eggs dialog
-        // This would typically open a dialog window where the user can:
-        // 1. Enter quantity to remove
-        // 2. Select reason (sold/used/damaged)
-        // 3. Enter notes
-
-        // For now, show placeholder alert
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Remove Eggs");
         alert.setHeaderText("Remove Eggs from Storage Feature");
         alert.setContentText("This feature will open a dialog to remove eggs from storage.\n\nDialog implementation is pending.");
         alert.showAndWait();
-
-        // After dialog implementation, the code would be:
-        // - Validate available quantity
-        // - Update storage (this might need a separate table/mechanism)
-        // - Refresh data
     }
 
     /**
@@ -274,11 +297,7 @@ public class EggsBayController {
      * @return Percentage of capacity used
      */
     private double calculateStoragePercentage(int currentEggs) {
-        // Define max storage capacity
-        int maxCapacity = MAX_STORAGE_CAPACITY;
-
-        // Calculate percentage
-        return (double) currentEggs / maxCapacity * 100.0;
+        return (double) currentEggs / MAX_STORAGE_CAPACITY * 100.0;
     }
 
     /**
@@ -314,11 +333,8 @@ public class EggsBayController {
      */
     @FXML
     public void refreshData() {
-        // Reload House 2 production
-        loadHouse2Production();
-
-        // Reload House 3 production
-        loadHouse3Production();
+        // Re-check egg laying houses and reload data
+        checkAndDisplayEggLayingHouses();
 
         // Reload storage data
         loadStorageData();
