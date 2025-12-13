@@ -361,7 +361,7 @@ public class ChickenBayController {
 
             // Load Edit House Dialog FXML
             System.out.println("CHICKEN BAY: Loading FXML from /dialogs/EditHouseDialo.fxml");
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/dialogs/EditHouseDialo.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/dialogs/EditHouseDialog.fxml"));
             Parent root = loader.load();
             System.out.println("CHICKEN BAY: FXML loaded successfully");
 

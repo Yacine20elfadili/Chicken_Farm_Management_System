@@ -62,15 +62,14 @@
         <TextField fx:id="capacityField" promptText="Maximum number of chickens"
                    GridPane.columnIndex="1" GridPane.rowIndex="2"/>
 
-        <!-- Current Chicken Count (Read-only) -->
+        <!-- Current Chicken Count (Now editable) -->
         <Label text="Current Count:" GridPane.columnIndex="0" GridPane.rowIndex="3">
             <font>
                 <Font name="System Bold" size="13.0"/>
             </font>
         </Label>
         <TextField fx:id="chickenCountField" promptText="Current number of chickens"
-                   GridPane.columnIndex="1" GridPane.rowIndex="3"
-                   editable="false" style="-fx-background-color: #f0f0f0;"/>
+                   GridPane.columnIndex="1" GridPane.rowIndex="3"/>
 
         <!-- Health Status -->
         <Label text="Health Status:" GridPane.columnIndex="0" GridPane.rowIndex="4">
