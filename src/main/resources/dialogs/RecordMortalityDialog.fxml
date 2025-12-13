@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="ma.farm.controller.dialogs.RecordMortalityDialogController"
+      prefWidth="550.0"
+      spacing="15"
+      style="-fx-background-color: white; -fx-padding: 20;">
+
+    <!-- Dialog Title -->
+    <Label text="Record Mortality" styleClass="dialog-title">
+        <font>
+            <Font name="System Bold" size="20.0"/>
+        </font>
+        <padding>
+            <Insets bottom="10.0"/>
+        </padding>
+    </Label>
+
+    <Separator/>
+
+    <!-- Form Content -->
+    <GridPane hgap="15" vgap="15">
+        <columnConstraints>
+            <ColumnConstraints minWidth="140" prefWidth="140"/>
+            <ColumnConstraints hgrow="ALWAYS" minWidth="200"/>
+        </columnConstraints>
+
+        <!-- House Selection -->
+        <Label text="House:" GridPane.columnIndex="0" GridPane.rowIndex="0">
+            <font>
+                <Font name="System Bold" size="13.0"/>
+            </font>
+        </Label>
+        <ComboBox fx:id="houseComboBox" promptText="Select house"
+                  GridPane.columnIndex="1" GridPane.rowIndex="0"
+                  maxWidth="Infinity"/>
+
+        <!-- Death Date -->
+        <Label text="Death Date:" GridPane.columnIndex="0" GridPane.rowIndex="1">
+            <font>
+                <Font name="System Bold" size="13.0"/>
+            </font>
+        </Label>
+        <DatePicker fx:id="deathDatePicker"
+                    GridPane.columnIndex="1" GridPane.rowIndex="1"
+                    maxWidth="Infinity"/>
+
+        <!-- Death Count -->
+        <Label text="Number of Deaths:" GridPane.columnIndex="0" GridPane.rowIndex="2">
+            <font>
+                <Font name="System Bold" size="13.0"/>
+            </font>
+        </Label>
+        <TextField fx:id="deathCountField" promptText="e.g., 5"
+                   GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+
+        <!-- Cause of Death -->
+        <Label text="Cause of Death:" GridPane.columnIndex="0" GridPane.rowIndex="3">
+            <font>
+                <Font name="System Bold" size="13.0"/>
+            </font>
+        </Label>
+        <ComboBox fx:id="causeComboBox" promptText="Select or type cause"
+                  GridPane.columnIndex="1" GridPane.rowIndex="3"
+                  editable="true"
+                  maxWidth="Infinity"/>
+
+        <!-- Symptoms -->
+        <Label text="Symptoms:" GridPane.columnIndex="0" GridPane.rowIndex="4">
+            <font>
+                <Font name="System Bold" size="13.0"/>
+            </font>
+        </Label>
+        <TextArea fx:id="symptomsArea" promptText="Describe symptoms (optional)"
+                  GridPane.columnIndex="1" GridPane.rowIndex="4"
+                  prefRowCount="3"
+                  wrapText="true"/>
+
+        <!-- Outbreak Status -->
+        <Label text="Outbreak:" GridPane.columnIndex="0" GridPane.rowIndex="5">
+            <font>
+                <Font name="System Bold" size="13.0"/>
+            </font>
+        </Label>
+        <CheckBox fx:id="isOutbreakCheckBox" text="Mark as outbreak"
+                  GridPane.columnIndex="1" GridPane.rowIndex="5"/>
+
+        <!-- Recorded By -->
+        <Label text="Recorded By:" GridPane.columnIndex="0" GridPane.rowIndex="6">
+            <font>
+                <Font name="System Bold" size="13.0"/>
+            </font>
+        </Label>
+        <TextField fx:id="recordedByField" promptText="Worker name"
+                   GridPane.columnIndex="1" GridPane.rowIndex="6"/>
+
+        <!-- Notes -->
+        <Label text="Notes:" GridPane.columnIndex="0" GridPane.rowIndex="7">
+            <font>
+                <Font name="System Bold" size="13.0"/>
+            </font>
+        </Label>
+        <TextArea fx:id="notesArea" promptText="Additional notes (optional)"
+                  GridPane.columnIndex="1" GridPane.rowIndex="7"
+                  prefRowCount="2"
+                  wrapText="true"/>
+    </GridPane>
+
+    <!-- Warning Label -->
+    <HBox spacing="10" style="-fx-background-color: #fff3cd; -fx-padding: 10; -fx-background-radius: 5;">
+        <Label text="⚠" style="-fx-font-size: 16px; -fx-text-fill: #856404;"/>
+        <Label text="Recording mortality will automatically decrease the chicken count in the selected house."
+               wrapText="true" style="-fx-text-fill: #856404;"
+               HBox.hgrow="ALWAYS"/>
+    </HBox>
+
+    <!-- Error Label -->
+    <Label fx:id="errorLabel" textFill="red" wrapText="true" visible="false" managed="false"/>
+
+    <Separator/>
+
+    <!-- Button Bar -->
+    <HBox spacing="10" alignment="CENTER_RIGHT">
+        <padding>
+            <Insets top="10.0"/>
+        </padding>
+        <Button text="Cancel" onAction="#handleCancel" prefWidth="100"
+                style="-fx-background-color: #6c757d; -fx-text-fill: white; -fx-font-size: 13px; -fx-cursor: hand;"/>
+        <Button text="Record Deaths" onAction="#handleSave" prefWidth="130"
+                style="-fx-background-color: #dc3545; -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold; -fx-cursor: hand;"/>
+    </HBox>
+</VBox>

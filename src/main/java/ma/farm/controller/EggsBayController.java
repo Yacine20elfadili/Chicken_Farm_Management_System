@@ -1,10 +1,17 @@
 package ma.farm.controller;
 
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import ma.farm.controller.dialogs.RecordEggCollectionDialogController;
 import ma.farm.dao.EggProductionDAO;
 import ma.farm.dao.HouseDAO;
 import ma.farm.model.EggProduction;
@@ -12,13 +19,17 @@ import ma.farm.model.House;
 import ma.farm.model.HouseType;
 import ma.farm.util.DateUtil;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
 /**
  * EggsBayController - Controls the Eggs Bay view
- * Shows: Houses that can lay eggs (EGG_LAYER and MEAT_FEMALE), total eggs in storage
+ * Shows: All houses that lay eggs (EGG_LAYER and MEAT_FEMALE)
+ * Statistics: Production and cracked eggs (Today, Week, Month)
+ * Storage: Total eggs in inventory
+ * CRUD: Record daily egg collection
  */
 public class EggsBayController {
 
@@ -26,37 +37,30 @@ public class EggsBayController {
     @FXML
     private HBox houseCardsContainer;
 
-    // FXML Components - House 2 Card
+    // FXML Components - Statistics Cards
     @FXML
-    private VBox house2Card;
+    private VBox productionStatsCard;
 
     @FXML
-    private Label h2NameLabel;
+    private Label productionTodayLabel;
 
     @FXML
-    private Label h2EggsCollectedLabel;
+    private Label productionWeekLabel;
 
     @FXML
-    private Label h2DeadChickensLabel;
+    private Label productionMonthLabel;
 
     @FXML
-    private Label h2DateLabel;
-
-    // FXML Components - House 3 Card
-    @FXML
-    private VBox house3Card;
+    private VBox crackedStatsCard;
 
     @FXML
-    private Label h3NameLabel;
+    private Label crackedTodayLabel;
 
     @FXML
-    private Label h3EggsCollectedLabel;
+    private Label crackedWeekLabel;
 
     @FXML
-    private Label h3DeadChickensLabel;
-
-    @FXML
-    private Label h3DateLabel;
+    private Label crackedMonthLabel;
 
     // FXML Components - No Egg Houses Message
     @FXML
@@ -84,12 +88,17 @@ public class EggsBayController {
      */
     @FXML
     public void initialize() {
+        System.out.println("=== EggsBayController: Initializing ===");
+        
         // Initialize DAOs
         eggProductionDAO = new EggProductionDAO();
         houseDAO = new HouseDAO();
 
         // Check if there are any egg-laying houses first
         checkAndDisplayEggLayingHouses();
+
+        // Load statistics
+        loadStatistics();
 
         // Load storage data
         loadStorageData();
@@ -105,8 +114,11 @@ public class EggsBayController {
             
             // Filter houses that can lay eggs (EGG_LAYER and MEAT_FEMALE)
             List<House> eggLayingHouses = allHouses.stream()
-                    .filter(house -> house.getType() == HouseType.EGG_LAYER || house.getType() == HouseType.MEAT_FEMALE)
+                    .filter(house -> house.getType() == HouseType.EGG_LAYER || 
+                                   house.getType() == HouseType.MEAT_FEMALE)
                     .collect(Collectors.toList());
+
+            System.out.println("Found " + eggLayingHouses.size() + " egg-laying houses");
 
             if (eggLayingHouses.isEmpty()) {
                 // No egg-laying houses found - show message
@@ -120,8 +132,6 @@ public class EggsBayController {
         } catch (Exception e) {
             System.err.println("Error checking egg-laying houses: " + e.getMessage());
             e.printStackTrace();
-            // On error, show the house cards with default "non configuré" values
-            showHouseCards();
         }
     }
 
@@ -163,74 +173,156 @@ public class EggsBayController {
 
     /**
      * Load data for egg-laying houses
+     * Dynamically creates cards for ALL egg-laying houses (not limited to H2/H3)
      */
     private void loadEggLayingHousesData(List<House> eggLayingHouses) {
+        // Clear previous cards
+        if (houseCardsContainer != null) {
+            houseCardsContainer.getChildren().clear();
+        }
+
         // Set today's date
         LocalDate today = LocalDate.now();
         String todayFormatted = DateUtil.formatDate(today);
 
-        // Check each house and load data if it exists
+        // Create a card for each egg-laying house
         for (House house : eggLayingHouses) {
-            if (house.getId() == 2) {
-                loadHouseProductionData(house, h2NameLabel, h2EggsCollectedLabel, h2DeadChickensLabel, h2DateLabel, todayFormatted);
-            } else if (house.getId() == 3) {
-                loadHouseProductionData(house, h3NameLabel, h3EggsCollectedLabel, h3DeadChickensLabel, h3DateLabel, todayFormatted);
-            }
-            // Add more house IDs as needed
+            VBox houseCard = createHouseCard(house, todayFormatted);
+            houseCardsContainer.getChildren().add(houseCard);
         }
 
-        // For houses that don't exist, keep the "Non configuré" defaults
-        // This is already set in the FXML, so no action needed
+        System.out.println("Created " + eggLayingHouses.size() + " house cards");
     }
 
     /**
-     * Load production data for a specific house
+     * Create a house card dynamically for a given house
+     * @param house the house to create a card for
+     * @param todayFormatted today's date formatted
+     * @return a VBox containing the house card
      */
-    private void loadHouseProductionData(House house, Label nameLabel, Label eggsLabel, Label mortalityLabel, Label dateLabel, String todayFormatted) {
+    private VBox createHouseCard(House house, String todayFormatted) {
+        VBox card = new VBox();
+        card.setStyle("-fx-border-color: #ddd; -fx-border-radius: 8; -fx-padding: 15; -fx-spacing: 10;");
+        card.setPrefWidth(300);
+        card.getStyleClass().add("metric-card");
+
+        // House name label - FIXED: Use house.getName() instead of house.getId()
+        Label nameLabel = new Label(house.getName() + " - " + house.getType().getDisplayName());
+        nameLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
+
+        // Eggs collected today
+        HBox eggsBox = new HBox();
+        eggsBox.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+        eggsBox.setSpacing(10);
+        Label eggsLabel = new Label("Œufs du jour :");
+        Label eggsValueLabel = new Label("0");
+        eggsValueLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #3eff51;");
+        eggsBox.getChildren().addAll(eggsLabel, new javafx.scene.layout.Region(), eggsValueLabel);
+
+        // Cracked eggs today
+        HBox crackedBox = new HBox();
+        crackedBox.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+        crackedBox.setSpacing(10);
+        Label crackedLabel = new Label("Cracked :");
+        Label crackedValueLabel = new Label("0");
+        crackedValueLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #ff6b6b;");
+        crackedBox.getChildren().addAll(crackedLabel, new javafx.scene.layout.Region(), crackedValueLabel);
+
+        // Date
+        HBox dateBox = new HBox();
+        dateBox.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+        dateBox.setSpacing(10);
+        Label dateLabel = new Label("Date :");
+        Label dateValueLabel = new Label(todayFormatted);
+        dateValueLabel.setStyle("-fx-font-size: 12px;");
+        dateBox.getChildren().addAll(dateLabel, new javafx.scene.layout.Region(), dateValueLabel);
+
+        card.getChildren().addAll(nameLabel, eggsBox, crackedBox, dateBox);
+
+        // Load production data for this house
         try {
-            // Update house name label
-            if (nameLabel != null) {
-                String houseName = String.format("Bâtiment %d - %s", house.getId(), house.getType().getDisplayName());
-                nameLabel.setText(houseName);
-            }
-
-            // Get today's production for this house
             LocalDate today = LocalDate.now();
-            List<EggProduction> allProductionsToday = eggProductionDAO.getProductionByDate(today);
-
-            // Filter for this specific house
-            List<EggProduction> houseProductions = allProductionsToday.stream()
-                    .filter(p -> p.getHouseId() == house.getId())
-                    .collect(Collectors.toList());
-
-            // Update production labels
-            if (!houseProductions.isEmpty()) {
-                EggProduction production = houseProductions.get(0);
-
-                if (eggsLabel != null) {
-                    eggsLabel.setText(String.valueOf(production.getEggsCollected()));
-                }
-
-                if (mortalityLabel != null) {
-                    mortalityLabel.setText(String.valueOf(production.getDeadChickens()));
-                }
-            } else {
-                // No production data for today - show 0
-                if (eggsLabel != null) {
-                    eggsLabel.setText("0");
-                }
-                if (mortalityLabel != null) {
-                    mortalityLabel.setText("0");
+            List<EggProduction> productions = eggProductionDAO.getProductionByDate(today);
+            
+            for (EggProduction prod : productions) {
+                if (prod.getHouseId() == house.getId()) {
+                    eggsValueLabel.setText(String.valueOf(prod.getEggsCollected()));
+                    crackedValueLabel.setText(String.valueOf(prod.getCrackedEggs()));
+                    break;
                 }
             }
-
-            // Update date label
-            if (dateLabel != null) {
-                dateLabel.setText(todayFormatted);
-            }
-
         } catch (Exception e) {
             System.err.println("Error loading production data for house " + house.getId() + ": " + e.getMessage());
+        }
+
+        HBox.setHgrow(card, javafx.scene.layout.Priority.ALWAYS);
+        return card;
+    }
+
+    /**
+     * Load and display production and cracked statistics
+     */
+    private void loadStatistics() {
+        try {
+            LocalDate today = LocalDate.now();
+            LocalDate weekAgo = today.minusDays(7);
+            LocalDate monthAgo = today.minusDays(30);
+
+            // Today's statistics
+            int eggsTodayProduced = 0;
+            int eggsTodayCracked = 0;
+
+            List<EggProduction> todayProductions = eggProductionDAO.getProductionByDate(today);
+            for (EggProduction prod : todayProductions) {
+                eggsTodayProduced += prod.getEggsCollected();
+                eggsTodayCracked += prod.getCrackedEggs();
+            }
+
+            // Week statistics
+            int eggsWeekProduced = eggProductionDAO.getTotalEggsByDateRange(weekAgo, today);
+            int eggsWeekCracked = 0;
+            List<EggProduction> weekProductions = eggProductionDAO.getLast7Days();
+            for (EggProduction prod : weekProductions) {
+                eggsWeekCracked += prod.getCrackedEggs();
+            }
+
+            // Month statistics
+            int eggsMonthProduced = eggProductionDAO.getTotalEggsByDateRange(monthAgo, today);
+            int eggsMonthCracked = 0;
+            List<EggProduction> monthProductions = eggProductionDAO.getAllProduction();
+            for (EggProduction prod : monthProductions) {
+                if (!prod.getProductionDate().isBefore(monthAgo) && 
+                    !prod.getProductionDate().isAfter(today)) {
+                    eggsMonthCracked += prod.getCrackedEggs();
+                }
+            }
+
+            // Update UI
+            if (productionTodayLabel != null) {
+                productionTodayLabel.setText(String.format("%,d", eggsTodayProduced));
+            }
+            if (productionWeekLabel != null) {
+                productionWeekLabel.setText(String.format("%,d", eggsWeekProduced));
+            }
+            if (productionMonthLabel != null) {
+                productionMonthLabel.setText(String.format("%,d", eggsMonthProduced));
+            }
+
+            if (crackedTodayLabel != null) {
+                crackedTodayLabel.setText(String.format("%,d", eggsTodayCracked));
+            }
+            if (crackedWeekLabel != null) {
+                crackedWeekLabel.setText(String.format("%,d", eggsWeekCracked));
+            }
+            if (crackedMonthLabel != null) {
+                crackedMonthLabel.setText(String.format("%,d", eggsMonthCracked));
+            }
+
+            System.out.println("Statistics loaded - Today: " + eggsTodayProduced + " eggs, " + 
+                             eggsTodayCracked + " cracked");
+
+        } catch (Exception e) {
+            System.err.println("Error loading statistics: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -240,7 +332,7 @@ public class EggsBayController {
      */
     private void loadStorageData() {
         try {
-            // Get total good eggs from all time (or use a date range)
+            // Get total good eggs from all time
             List<EggProduction> allProductions = eggProductionDAO.getAllProduction();
 
             int totalEggs = allProductions.stream()
@@ -249,7 +341,7 @@ public class EggsBayController {
 
             // Update totalEggsLabel
             if (totalEggsLabel != null) {
-                totalEggsLabel.setText(String.valueOf(totalEggs));
+                totalEggsLabel.setText(String.format("%,d", totalEggs));
             }
 
             // Calculate storage percentage
@@ -257,6 +349,10 @@ public class EggsBayController {
 
             // Apply storage status badge
             applyStorageStatusBadge(percentage);
+
+            System.out.println("Storage loaded - Total eggs: " + totalEggs + 
+                             " (" + String.format("%.1f", percentage) + "%)");
+
         } catch (Exception e) {
             System.err.println("Error loading storage data: " + e.getMessage());
             e.printStackTrace();
@@ -269,25 +365,57 @@ public class EggsBayController {
      */
     @FXML
     public void handleRecordCollection() {
-        // TODO: Open record collection dialog
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Record Collection");
-        alert.setHeaderText("Record Egg Collection Feature");
-        alert.setContentText("This feature will open a dialog to record today's egg collection.\n\nDialog implementation is pending.");
-        alert.showAndWait();
+        try {
+            // Load the dialog FXML
+            FXMLLoader loader = new FXMLLoader(
+                getClass().getResource("/dialogs/RecordEggCollectionDialog.fxml")
+            );
+            Parent dialogContent = loader.load();
+            RecordEggCollectionDialogController dialogController = loader.getController();
+
+            // Create and show the dialog
+            Stage dialogStage = new Stage();
+            dialogStage.setTitle("Enregistrer la Collecte d'Œufs");
+            dialogStage.initModality(Modality.APPLICATION_MODAL);
+            dialogStage.setScene(new Scene(dialogContent, 500, 400));
+            dialogStage.showAndWait();
+
+            // Check if save was clicked
+            if (dialogController.isSaved()) {
+                System.out.println("Egg collection recorded successfully");
+                // Refresh data
+                refreshData();
+                
+                // Show success message
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Succès");
+                alert.setHeaderText("Collecte Enregistrée");
+                alert.setContentText("La collecte d'œufs a été enregistrée avec succès.");
+                alert.showAndWait();
+            }
+
+        } catch (IOException e) {
+            System.err.println("Error opening record collection dialog: " + e.getMessage());
+            e.printStackTrace();
+            
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Erreur");
+            alert.setHeaderText("Erreur");
+            alert.setContentText("Impossible d'ouvrir le formulaire de collecte.");
+            alert.showAndWait();
+        }
     }
 
     /**
      * Handle remove eggs button click
-     * Opens dialog to remove eggs from storage (sold/used)
+     * TODO: Implement egg removal/sales tracking
      */
     @FXML
     public void handleRemoveEggs() {
-        // TODO: Open remove eggs dialog
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Remove Eggs");
-        alert.setHeaderText("Remove Eggs from Storage Feature");
-        alert.setContentText("This feature will open a dialog to remove eggs from storage.\n\nDialog implementation is pending.");
+        alert.setTitle("Retirer des Œufs");
+        alert.setHeaderText("Fonctionnalité en Développement");
+        alert.setContentText("Cette fonctionnalité sera disponible dans une prochaine version.");
         alert.showAndWait();
     }
 
@@ -315,15 +443,15 @@ public class EggsBayController {
         // Update label text and styling based on percentage
         if (percentage < 50) {
             // Green if < 50%
-            storageStatusLabel.setText("Storage OK (" + String.format("%.1f", percentage) + "%)");
+            storageStatusLabel.setText("Stock OK (" + String.format("%.1f", percentage) + "%)");
             storageStatusLabel.setStyle("-fx-background-color: #28a745; -fx-text-fill: white; -fx-padding: 5px 10px; -fx-background-radius: 5px;");
         } else if (percentage < 80) {
             // Yellow if 50-80%
-            storageStatusLabel.setText("Storage Filling (" + String.format("%.1f", percentage) + "%)");
+            storageStatusLabel.setText("Stock Remplissage (" + String.format("%.1f", percentage) + "%)");
             storageStatusLabel.setStyle("-fx-background-color: #ffc107; -fx-text-fill: white; -fx-padding: 5px 10px; -fx-background-radius: 5px;");
         } else {
             // Red if > 80%
-            storageStatusLabel.setText("Storage Full (" + String.format("%.1f", percentage) + "%)");
+            storageStatusLabel.setText("Stock Complet (" + String.format("%.1f", percentage) + "%)");
             storageStatusLabel.setStyle("-fx-background-color: #dc3545; -fx-text-fill: white; -fx-padding: 5px 10px; -fx-background-radius: 5px;");
         }
     }
@@ -333,8 +461,13 @@ public class EggsBayController {
      */
     @FXML
     public void refreshData() {
+        System.out.println("Refreshing EggsBay data...");
+        
         // Re-check egg laying houses and reload data
         checkAndDisplayEggLayingHouses();
+
+        // Reload statistics
+        loadStatistics();
 
         // Reload storage data
         loadStorageData();

@@ -76,32 +76,30 @@ public class EggProductionDAO {
     }
 
     /**
-     * Updates an existing egg production record
-     *
-     * @param production the EggProduction object with updated values (must have id set)
-     * @return true if the update was successful, false otherwise
+     * Update an existing egg production record
+     * @param production the production to update
+     * @return true if update successful
      */
     public boolean updateProduction(EggProduction production) {
-        String sql = "UPDATE egg_production SET houseId = ?, productionDate = ?, eggsCollected = ?, " +
-                "crackedEggs = ?, goodEggs = ?, deadChickens = ?, collectedBy = ?, notes = ? WHERE id = ?";
-
+        String sql = "UPDATE egg_production SET eggsCollected = ?, crackedEggs = ?, " +
+                     "goodEggs = ?, notes = ?, collectedBy = ? WHERE id = ?";
+        
         try (PreparedStatement stmt = dbConnection.getConnection().prepareStatement(sql)) {
-            stmt.setInt(1, production.getHouseId());
-            // Convert LocalDate to String for SQLite
-            stmt.setString(2, production.getProductionDate().toString());
-            stmt.setInt(3, production.getEggsCollected());
-            stmt.setInt(4, production.getCrackedEggs());
-            stmt.setInt(5, production.getGoodEggs());
-            stmt.setInt(6, production.getDeadChickens());
-            stmt.setString(7, production.getCollectedBy());
-            stmt.setString(8, production.getNotes());
-            stmt.setInt(9, production.getId());
-
-            return stmt.executeUpdate() > 0;
+            stmt.setInt(1, production.getEggsCollected());
+            stmt.setInt(2, production.getCrackedEggs());
+            stmt.setInt(3, production.getGoodEggs());
+            stmt.setString(4, production.getNotes());
+            stmt.setString(5, production.getCollectedBy());
+            stmt.setInt(6, production.getId());
+            
+            int rowsAffected = stmt.executeUpdate();
+            System.out.println("Production record updated: " + rowsAffected + " rows");
+            return rowsAffected > 0;
         } catch (SQLException e) {
-            System.err.println("Error updating egg production: " + e.getMessage());
+            System.err.println("Error updating production: " + e.getMessage());
+            e.printStackTrace();
+            return false;
         }
-        return false;
     }
 
     /**

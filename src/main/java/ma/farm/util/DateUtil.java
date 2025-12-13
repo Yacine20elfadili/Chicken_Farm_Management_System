@@ -3,340 +3,345 @@ package ma.farm.util;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.List;
 
-/**
- * DateUtil - Utility class for date operations
- * Used across: Dashboard, Chicken Bay, Eggs Bay, Storage, Tasks, Personnel pages
- */
 public class DateUtil {
 
     // Date formatters
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-    private static final DateTimeFormatter SHORT_DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM");
+    private static final DateTimeFormatter MONTH_FORMATTER = DateTimeFormatter.ofPattern("MMM yyyy");
+    private static final DateTimeFormatter ISO_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE;
 
     /**
-     * Format LocalDate to string (dd/MM/yyyy)
+     * Formats a LocalDate to "dd/MM/yyyy" format
      *
-     * @param date The date to format
-     * @return Formatted date string (e.g., "08/12/2025")
+     * @param date the date to format
+     * @return formatted date string
      */
     public static String formatDate(LocalDate date) {
-        if (date == null) {
-            return "";
-        }
+        if (date == null) return "";
         return date.format(DATE_FORMATTER);
     }
 
     /**
-     * Format LocalDate to short string (dd/MM)
-     * Useful for chart labels
+     * Formats a LocalDate to "MMM yyyy" format (e.g., "Dec 2025")
      *
-     * @param date The date to format
-     * @return Formatted short date string (e.g., "08/12")
+     * @param date the date to format
+     * @return formatted month-year string
      */
-    public static String formatShortDate(LocalDate date) {
-        if (date == null) {
-            return "";
+    public static String formatMonthYear(LocalDate date) {
+        if (date == null) return "";
+        return date.format(MONTH_FORMATTER);
+    }
+
+    /**
+     * Parses a date string in "dd/MM/yyyy" format to LocalDate
+     *
+     * @param dateStr the date string to parse
+     * @return LocalDate or null if parsing fails
+     */
+    public static LocalDate parseDate(String dateStr) {
+        if (dateStr == null || dateStr.isEmpty()) return null;
+        try {
+            return LocalDate.parse(dateStr, DATE_FORMATTER);
+        } catch (Exception e) {
+            System.err.println("Error parsing date: " + dateStr);
+            return null;
         }
-        return date.format(SHORT_DATE_FORMATTER);
     }
 
     /**
-     * Get current date
+     * Calculates the number of days between a past date and today
      *
-     * @return Today's date
+     * @param pastDate the past date
+     * @return number of days since that date (0 if date is today)
      */
-    public static LocalDate getCurrentDate() {
-        return LocalDate.now();
+    public static long daysSince(LocalDate pastDate) {
+        if (pastDate == null) return 0;
+        return ChronoUnit.DAYS.between(pastDate, LocalDate.now());
     }
 
     /**
-     * Calculate days between two dates
+     * Calculates the number of days between today and a future date
      *
-     * @param startDate Start date
-     * @param endDate End date
-     * @return Number of days between dates
+     * @param futureDate the future date
+     * @return number of days until that date (0 if date is today, negative if date is in past)
+     */
+    public static long daysUntil(LocalDate futureDate) {
+        if (futureDate == null) return 0;
+        return ChronoUnit.DAYS.between(LocalDate.now(), futureDate);
+    }
+
+    /**
+     * Calculates the number of days between two dates
+     *
+     * @param startDate the start date
+     * @param endDate   the end date
+     * @return number of days between dates
      */
     public static long daysBetween(LocalDate startDate, LocalDate endDate) {
-        if (startDate == null || endDate == null) {
-            return 0;
-        }
+        if (startDate == null || endDate == null) return 0;
         return ChronoUnit.DAYS.between(startDate, endDate);
     }
 
     /**
-     * Calculate days since a date
+     * Checks if a given date is today
      *
-     * @param date The past date
-     * @return Number of days since that date
+     * @param date the date to check
+     * @return true if date is today
      */
-    public static long daysSince(LocalDate date) {
-        if (date == null) {
-            return 0;
-        }
-        return ChronoUnit.DAYS.between(date, LocalDate.now());
+    public static boolean isToday(LocalDate date) {
+        if (date == null) return false;
+        return date.equals(LocalDate.now());
     }
 
     /**
-     * Calculate days until a date
+     * Checks if a given date is in the past
      *
-     * @param date The future date
-     * @return Number of days until that date
+     * @param date the date to check
+     * @return true if date is before today
      */
-    public static long daysUntil(LocalDate date) {
-        if (date == null) {
-            return 0;
-        }
-        return ChronoUnit.DAYS.between(LocalDate.now(), date);
+    public static boolean isPast(LocalDate date) {
+        if (date == null) return false;
+        return date.isBefore(LocalDate.now());
     }
 
     /**
-     * Get last 7 days as a list (for charts/reports)
-     * Used in: Dashboard (7-day egg production chart)
+     * Checks if a given date is in the future
      *
-     * Returns dates in chronological order (oldest to newest)
-     * Index 0 = 6 days ago, Index 6 = today
+     * @param date the date to check
+     * @return true if date is after today
+     */
+    public static boolean isFuture(LocalDate date) {
+        if (date == null) return false;
+        return date.isAfter(LocalDate.now());
+    }
+
+    /**
+     * Checks if a given date is today or in the future
      *
-     * @return Array of last 7 dates including today
+     * @param date the date to check
+     * @return true if date is today or later
+     */
+    public static boolean isTodayOrFuture(LocalDate date) {
+        if (date == null) return false;
+        return !date.isBefore(LocalDate.now());
+    }
+
+    /**
+     * Checks if a given date is today or in the past
+     *
+     * @param date the date to check
+     * @return true if date is today or earlier
+     */
+    public static boolean isTodayOrPast(LocalDate date) {
+        if (date == null) return false;
+        return !date.isAfter(LocalDate.now());
+    }
+
+    /**
+     * Gets the last 7 days including today
+     * Returns array in descending order (today is index 0)
+     *
+     * @return array of 7 LocalDate objects
      */
     public static LocalDate[] getLast7Days() {
         LocalDate[] dates = new LocalDate[7];
         LocalDate today = LocalDate.now();
 
-        // Start from 6 days ago up to today
         for (int i = 0; i < 7; i++) {
-            dates[i] = today.minusDays(6 - i);
+            dates[i] = today.minusDays(i);
         }
 
         return dates;
     }
 
     /**
-     * Get last N days as a list
+     * Gets the last N days including today
      *
-     * @param days Number of days
-     * @return Array of last N dates including today
+     * @param days number of days to retrieve
+     * @return List of LocalDate objects in descending order (today is first)
      */
-    public static LocalDate[] getLastNDays(int days) {
-        if (days <= 0) {
-            return new LocalDate[0];
-        }
-
-        LocalDate[] dates = new LocalDate[days];
+    public static List<LocalDate> getLastNDays(int days) {
+        List<LocalDate> dateList = new ArrayList<>();
         LocalDate today = LocalDate.now();
 
         for (int i = 0; i < days; i++) {
-            dates[i] = today.minusDays(days - 1 - i);
+            dateList.add(today.minusDays(i));
         }
 
-        return dates;
+        return dateList;
     }
 
     /**
-     * Check if date is today
+     * Gets all dates in a date range (inclusive)
      *
-     * @param date Date to check
-     * @return true if date is today
+     * @param startDate the start date
+     * @param endDate   the end date
+     * @return List of all dates between (and including) start and end
      */
-    public static boolean isToday(LocalDate date) {
-        if (date == null) {
-            return false;
+    public static List<LocalDate> getDateRange(LocalDate startDate, LocalDate endDate) {
+        List<LocalDate> dateList = new ArrayList<>();
+        LocalDate current = startDate;
+
+        while (!current.isAfter(endDate)) {
+            dateList.add(current);
+            current = current.plusDays(1);
         }
-        return date.equals(LocalDate.now());
+
+        return dateList;
     }
 
     /**
-     * Check if date is in the past
+     * Gets the age in days for a given birth date
      *
-     * @param date Date to check
-     * @return true if date is before today
+     * @param birthDate the birth date
+     * @return age in days
      */
-    public static boolean isPast(LocalDate date) {
-        if (date == null) {
-            return false;
-        }
-        return date.isBefore(LocalDate.now());
+    public static long getAgeInDays(LocalDate birthDate) {
+        if (birthDate == null) return 0;
+        return daysSince(birthDate);
     }
 
     /**
-     * Check if date is in the future
+     * Checks if a date is within a given range
      *
-     * @param date Date to check
-     * @return true if date is after today
+     * @param date      the date to check
+     * @param startDate the range start
+     * @param endDate   the range end
+     * @return true if date is between start and end (inclusive)
      */
-    public static boolean isFuture(LocalDate date) {
-        if (date == null) {
-            return false;
-        }
-        return date.isAfter(LocalDate.now());
-    }
-
-    /**
-     * Add days to a date
-     *
-     * @param date The starting date
-     * @param days Number of days to add
-     * @return New date after adding days
-     */
-    public static LocalDate addDays(LocalDate date, int days) {
-        if (date == null) {
-            return null;
-        }
-        return date.plusDays(days);
-    }
-
-    /**
-     * Subtract days from a date
-     *
-     * @param date The starting date
-     * @param days Number of days to subtract
-     * @return New date after subtracting days
-     */
-    public static LocalDate subtractDays(LocalDate date, int days) {
-        if (date == null) {
-            return null;
-        }
-        return date.minusDays(days);
-    }
-
-    /**
-     * Parse string to LocalDate (dd/MM/yyyy)
-     *
-     * @param dateString The date string to parse
-     * @return LocalDate object or null if parsing fails
-     */
-    public static LocalDate parseDate(String dateString) {
-        if (dateString == null || dateString.trim().isEmpty()) {
-            return null;
-        }
-
-        try {
-            return LocalDate.parse(dateString, DATE_FORMATTER);
-        } catch (Exception e) {
-            System.err.println("Error parsing date: " + dateString);
-            return null;
-        }
-    }
-
-    /**
-     * Get date N days ago
-     *
-     * @param days Number of days back
-     * @return Date N days in the past
-     */
-    public static LocalDate getDaysAgo(int days) {
-        return LocalDate.now().minusDays(days);
-    }
-
-    /**
-     * Format date for display in UI (human readable)
-     * Example: "Today", "Yesterday", "3 days ago", or "15/01/2024"
-     *
-     * @param date Date to format
-     * @return Human-readable date string
-     */
-    public static String formatForDisplay(LocalDate date) {
-        if (date == null) {
-            return "";
-        }
-
-        LocalDate today = LocalDate.now();
-        long daysDiff = ChronoUnit.DAYS.between(date, today);
-
-        if (daysDiff == 0) {
-            return "Today";
-        } else if (daysDiff == 1) {
-            return "Yesterday";
-        } else if (daysDiff > 1 && daysDiff <= 7) {
-            return daysDiff + " days ago";
-        } else {
-            return formatDate(date);
-        }
-    }
-
-    /**
-     * Calculate age in days from arrival date
-     * Used in: Chicken Bay (chicken age calculation)
-     *
-     * @param arrivalDate Date chicken arrived
-     * @return Age in days
-     */
-    public static int calculateAgeInDays(LocalDate arrivalDate) {
-        if (arrivalDate == null) {
-            return 0;
-        }
-        return (int) ChronoUnit.DAYS.between(arrivalDate, LocalDate.now());
-    }
-
-    /**
-     * Check if date is within a range
-     *
-     * @param date Date to check
-     * @param startDate Range start
-     * @param endDate Range end
-     * @return true if date is within range (inclusive)
-     */
-    public static boolean isWithinRange(LocalDate date, LocalDate startDate, LocalDate endDate) {
-        if (date == null || startDate == null || endDate == null) {
-            return false;
-        }
+    public static boolean isBetween(LocalDate date, LocalDate startDate, LocalDate endDate) {
+        if (date == null || startDate == null || endDate == null) return false;
         return !date.isBefore(startDate) && !date.isAfter(endDate);
     }
 
     /**
-     * Validate date string format (dd/MM/yyyy)
+     * Gets the start of the current week (Monday)
      *
-     * @param dateString String to validate
-     * @return true if valid format
-     */
-    public static boolean isValidDateFormat(String dateString) {
-        if (dateString == null || dateString.trim().isEmpty()) {
-            return false;
-        }
-
-        try {
-            LocalDate.parse(dateString, DATE_FORMATTER);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    /**
-     * Get start of current week (Monday)
-     *
-     * @return Date of Monday of current week
+     * @return LocalDate for Monday of the current week
      */
     public static LocalDate getStartOfWeek() {
-        return LocalDate.now().with(java.time.DayOfWeek.MONDAY);
+        LocalDate today = LocalDate.now();
+        int dayOfWeek = today.getDayOfWeek().getValue(); // 1=Monday, 7=Sunday
+        return today.minusDays(dayOfWeek - 1);
     }
 
     /**
-     * Get end of current week (Sunday)
+     * Gets the end of the current week (Sunday)
      *
-     * @return Date of Sunday of current week
+     * @return LocalDate for Sunday of the current week
      */
     public static LocalDate getEndOfWeek() {
-        return LocalDate.now().with(java.time.DayOfWeek.SUNDAY);
+        LocalDate today = LocalDate.now();
+        int dayOfWeek = today.getDayOfWeek().getValue(); // 1=Monday, 7=Sunday
+        return today.plusDays(7 - dayOfWeek);
     }
 
     /**
-     * Get start of current month
+     * Gets the start of the current month
      *
-     * @return First day of current month
+     * @return LocalDate for the first day of the current month
      */
     public static LocalDate getStartOfMonth() {
         return LocalDate.now().withDayOfMonth(1);
     }
 
     /**
-     * Get end of current month
+     * Gets the end of the current month
      *
-     * @return Last day of current month
+     * @return LocalDate for the last day of the current month
      */
     public static LocalDate getEndOfMonth() {
-        return LocalDate.now().withDayOfMonth(
-                LocalDate.now().lengthOfMonth()
-        );
+        LocalDate today = LocalDate.now();
+        return today.withDayOfMonth(today.lengthOfMonth());
+    }
+
+    /**
+     * Gets the start of the current year
+     *
+     * @return LocalDate for January 1st of the current year
+     */
+    public static LocalDate getStartOfYear() {
+        return LocalDate.now().withDayOfYear(1);
+    }
+
+    /**
+     * Gets the end of the current year
+     *
+     * @return LocalDate for December 31st of the current year
+     */
+    public static LocalDate getEndOfYear() {
+        LocalDate today = LocalDate.now();
+        return today.withDayOfYear(today.lengthOfYear());
+    }
+
+    /**
+     * Converts an ISO date string (yyyy-MM-dd) to formatted date
+     *
+     * @param isoDateStr ISO format date string
+     * @return formatted date string (dd/MM/yyyy)
+     */
+    public static String convertFromISO(String isoDateStr) {
+        if (isoDateStr == null || isoDateStr.isEmpty()) return "";
+        try {
+            LocalDate date = LocalDate.parse(isoDateStr, ISO_FORMATTER);
+            return formatDate(date);
+        } catch (Exception e) {
+            System.err.println("Error converting ISO date: " + isoDateStr);
+            return "";
+        }
+    }
+
+    /**
+     * Converts a formatted date string to ISO format
+     *
+     * @param formattedDateStr formatted date string (dd/MM/yyyy)
+     * @return ISO format date string (yyyy-MM-dd)
+     */
+    public static String convertToISO(String formattedDateStr) {
+        if (formattedDateStr == null || formattedDateStr.isEmpty()) return "";
+        try {
+            LocalDate date = parseDate(formattedDateStr);
+            return date.format(ISO_FORMATTER);
+        } catch (Exception e) {
+            System.err.println("Error converting to ISO format: " + formattedDateStr);
+            return "";
+        }
+    }
+
+    /**
+     * Gets a human-readable relative date string
+     * Examples: "Today", "Yesterday", "2 days ago", "Tomorrow", "In 3 days"
+     *
+     * @param date the date to format
+     * @return human-readable relative date
+     */
+    public static String getRelativeDate(LocalDate date) {
+        if (date == null) return "";
+
+        long daysFromNow = daysUntil(date);
+
+        if (daysFromNow == 0) return "Today";
+        if (daysFromNow == 1) return "Tomorrow";
+        if (daysFromNow == -1) return "Yesterday";
+        if (daysFromNow > 1) return "In " + daysFromNow + " days";
+        if (daysFromNow < -1) return Math.abs(daysFromNow) + " days ago";
+
+        return formatDate(date);
+    }
+
+    /**
+     * Formats a LocalDate to short date format "dd/MM"
+     * Used for chart labels and compact date displays
+     *
+     * @param date the date to format
+     * @return formatted short date string (dd/MM)
+     */
+    public static String formatShortDate(LocalDate date) {
+        if (date == null) return "";
+        DateTimeFormatter shortFormatter = DateTimeFormatter.ofPattern("dd/MM");
+        return date.format(shortFormatter);
     }
 }
