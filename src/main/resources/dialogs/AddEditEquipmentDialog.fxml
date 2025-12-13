@@ -2,13 +2,102 @@
 
 <?import java.lang.*?>
 <?import java.util.*?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="CONTROLLER_NAME"
-            prefHeight="400.0" prefWidth="600.0">
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="ma.farm.controller.dialogs.AddEditEquipmentDialogController"
+      prefHeight="700.0" prefWidth="600.0" spacing="15.0" styleClass="dialog-container">
+    <padding>
+        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+    </padding>
 
-</AnchorPane>
+    <!-- Dialog Title -->
+    <Label fx:id="dialogTitle" styleClass="dialog-title" text="Ajouter Équipement" />
+
+    <!-- Form Content -->
+    <ScrollPane fitToHeight="true" fitToWidth="true" styleClass="form-scroll">
+        <content>
+            <VBox spacing="15.0">
+                <padding>
+                    <Insets bottom="10.0" right="10.0" />
+                </padding>
+
+                <!-- Name -->
+                <VBox spacing="5.0">
+                    <Label styleClass="form-label" text="Nom de l'Équipement *" />
+                    <TextField fx:id="nameField" promptText="Ex: Pompe à Eau" styleClass="form-input" />
+                    <Label fx:id="nameErrorLabel" styleClass="error-label" text="" />
+                </VBox>
+
+                <!-- Category -->
+                <VBox spacing="5.0">
+                    <Label styleClass="form-label" text="Catégorie *" />
+                    <ComboBox fx:id="categoryComboBox" prefWidth="200.0" promptText="Sélectionner la catégorie" styleClass="form-input" />
+                    <Label fx:id="categoryErrorLabel" styleClass="error-label" text="" />
+                </VBox>
+
+                <!-- Quantity -->
+                <VBox spacing="5.0">
+                    <Label styleClass="form-label" text="Quantité *" />
+                    <TextField fx:id="quantityField" promptText="Ex: 2" styleClass="form-input" />
+                    <Label fx:id="quantityErrorLabel" styleClass="error-label" text="" />
+                </VBox>
+
+                <!-- Status -->
+                <VBox spacing="5.0">
+                    <Label styleClass="form-label" text="État *" />
+                    <ComboBox fx:id="statusComboBox" prefWidth="200.0" promptText="Sélectionner l'état" styleClass="form-input" />
+                    <Label fx:id="statusErrorLabel" styleClass="error-label" text="" />
+                </VBox>
+
+                <!-- Purchase Date -->
+                <VBox spacing="5.0">
+                    <Label styleClass="form-label" text="Date d'Achat" />
+                    <DatePicker fx:id="purchaseDatePicker" styleClass="form-input" />
+                </VBox>
+
+                <!-- Purchase Price -->
+                <VBox spacing="5.0">
+                    <Label styleClass="form-label" text="Prix d'Achat ($)" />
+                    <TextField fx:id="purchasePriceField" promptText="Ex: 450.00" styleClass="form-input" />
+                    <Label fx:id="priceErrorLabel" styleClass="error-label" text="" />
+                </VBox>
+
+                <!-- Last Maintenance Date -->
+                <VBox spacing="5.0">
+                    <Label styleClass="form-label" text="Dernière Maintenance" />
+                    <DatePicker fx:id="lastMaintenanceDatePicker" styleClass="form-input" />
+                </VBox>
+
+                <!-- Next Maintenance Date -->
+                <VBox spacing="5.0">
+                    <Label styleClass="form-label" text="Prochaine Maintenance" />
+                    <DatePicker fx:id="nextMaintenanceDatePicker" styleClass="form-input" />
+                </VBox>
+
+                <!-- Location -->
+                <VBox spacing="5.0">
+                    <Label styleClass="form-label" text="Localisation" />
+                    <TextField fx:id="locationField" promptText="Ex: Hangar Principal" styleClass="form-input" />
+                </VBox>
+
+                <!-- Notes -->
+                <VBox spacing="5.0">
+                    <Label styleClass="form-label" text="Notes" />
+                    <TextArea fx:id="notesTextArea" prefRowCount="3" promptText="Informations supplémentaires..." styleClass="form-input" wrapText="true" />
+                </VBox>
+            </VBox>
+        </content>
+    </ScrollPane>
+
+    <!-- Buttons -->
+    <HBox alignment="CENTER_RIGHT" spacing="10.0">
+        <Button onAction="#handleCancel" styleClass="btn-secondary" text="Annuler" />
+        <Button onAction="#handleSave" styleClass="btn-primary" text="Enregistrer" />
+    </HBox>
+</VBox>

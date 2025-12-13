@@ -27,12 +27,24 @@ public class StorageController {
     @FXML
     private Label totalFeedTypesLabel;
 
+    @FXML
+    private Button addFeedButton;
+
+    @FXML
+    private Button useFeedButton;
+
     // FXML Components - Medications Card
     @FXML
     private ListView<String> medicationListView;
 
     @FXML
     private Label totalMedicationsLabel;
+
+    @FXML
+    private Button addMedicationButton;
+
+    @FXML
+    private Button useMedicationButton;
 
     // FXML Components - Equipment Table
     @FXML
@@ -46,6 +58,12 @@ public class StorageController {
 
     @FXML
     private TableColumn<Equipment, String> equipmentStatusColumn;
+
+    @FXML
+    private Button addEquipmentButton;
+
+    @FXML
+    private Button updateEquipmentStatusButton;
 
     // DAOs
     private FeedDAO feedDAO;

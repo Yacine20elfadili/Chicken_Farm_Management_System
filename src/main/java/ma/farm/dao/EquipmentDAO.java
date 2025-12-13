@@ -40,779 +40,345 @@ public class EquipmentDAO {
      * @return an Equipment object populated with data from the ResultSet
      * @throws SQLException if a database access error occurs
      */
-    private Equipment mapResultSetToEquipment(ResultSet rs)
-        throws SQLException {
+    private Equipment mapResultSetToEquipment(ResultSet rs) throws SQLException {
         Equipment equipment = new Equipment();
         equipment.setId(rs.getInt("id"));
         equipment.setName(rs.getString("name"));
         equipment.setCategory(rs.getString("category"));
         equipment.setQuantity(rs.getInt("quantity"));
         equipment.setStatus(rs.getString("status"));
-
-        String purchaseDateStr = rs.getString("purchaseDate");
-        if (purchaseDateStr != null && !purchaseDateStr.isEmpty()) {
+        
+        String purchaseDateStr = rs.getString("purchase_date");
+        if (purchaseDateStr != null) {
             equipment.setPurchaseDate(LocalDate.parse(purchaseDateStr));
         }
-
-        equipment.setPurchasePrice(rs.getDouble("purchasePrice"));
-
-        String lastMaintenanceStr = rs.getString("lastMaintenanceDate");
-        if (lastMaintenanceStr != null && !lastMaintenanceStr.isEmpty()) {
-            equipment.setLastMaintenanceDate(
-                LocalDate.parse(lastMaintenanceStr)
-            );
+        
+        equipment.setPurchasePrice(rs.getDouble("purchase_price"));
+        
+        String lastMaintenanceDateStr = rs.getString("last_maintenance_date");
+        if (lastMaintenanceDateStr != null) {
+            equipment.setLastMaintenanceDate(LocalDate.parse(lastMaintenanceDateStr));
         }
-
-        String nextMaintenanceStr = rs.getString("nextMaintenanceDate");
-        if (nextMaintenanceStr != null && !nextMaintenanceStr.isEmpty()) {
-            equipment.setNextMaintenanceDate(
-                LocalDate.parse(nextMaintenanceStr)
-            );
+        
+        String nextMaintenanceDateStr = rs.getString("next_maintenance_date");
+        if (nextMaintenanceDateStr != null) {
+            equipment.setNextMaintenanceDate(LocalDate.parse(nextMaintenanceDateStr));
         }
-
+        
         equipment.setLocation(rs.getString("location"));
         equipment.setNotes(rs.getString("notes"));
-
+        
         return equipment;
     }
 
     /**
-     * Retrieves all equipment from the database
+     * Add new equipment to the database
      *
-     * @return List of all Equipment objects, or empty list if none found
+     * @param equipment the Equipment object to add
+     * @return true if successful, false otherwise
+     */
+    public boolean addEquipment(Equipment equipment) {
+        String sql = "INSERT INTO equipment (name, category, quantity, status, purchase_date, purchase_price, last_maintenance_date, next_maintenance_date, location, notes) " +
+                     "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        
+        try (PreparedStatement stmt = dbConnection.getConnection().prepareStatement(sql)) {
+            stmt.setString(1, equipment.getName());
+            stmt.setString(2, equipment.getCategory());
+            stmt.setInt(3, equipment.getQuantity());
+            stmt.setString(4, equipment.getStatus());
+            stmt.setString(5, equipment.getPurchaseDate() != null ? equipment.getPurchaseDate().toString() : null);
+            stmt.setDouble(6, equipment.getPurchasePrice());
+            stmt.setString(7, equipment.getLastMaintenanceDate() != null ? equipment.getLastMaintenanceDate().toString() : null);
+            stmt.setString(8, equipment.getNextMaintenanceDate() != null ? equipment.getNextMaintenanceDate().toString() : null);
+            stmt.setString(9, equipment.getLocation());
+            stmt.setString(10, equipment.getNotes());
+            
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            System.err.println("Error adding equipment: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
+     * Get all equipment from the database
+     *
+     * @return a list of all Equipment objects
      */
     public List<Equipment> getAllEquipment() {
         List<Equipment> equipmentList = new ArrayList<>();
-        String query = "SELECT * FROM equipment ORDER BY name";
-
-        try (
-            PreparedStatement stmt = dbConnection
-                .getConnection()
-                .prepareStatement(query);
-            ResultSet rs = stmt.executeQuery()
-        ) {
+        String sql = "SELECT * FROM equipment ORDER BY name";
+        
+        try (Statement stmt = dbConnection.getConnection().createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            
             while (rs.next()) {
                 equipmentList.add(mapResultSetToEquipment(rs));
             }
         } catch (SQLException e) {
-            System.err.println(
-                "Error retrieving all equipment: " + e.getMessage()
-            );
+            System.err.println("Error retrieving all equipment: " + e.getMessage());
             e.printStackTrace();
         }
-
+        
         return equipmentList;
     }
 
     /**
-     * Retrieves equipment by ID
+     * Get equipment by ID
      *
      * @param id the equipment ID
-     * @return Equipment object if found, null otherwise
+     * @return the Equipment object, or null if not found
      */
     public Equipment getEquipmentById(int id) {
-        String query = "SELECT * FROM equipment WHERE id = ?";
-
-        try (
-            PreparedStatement stmt = dbConnection
-                .getConnection()
-                .prepareStatement(query)
-        ) {
+        String sql = "SELECT * FROM equipment WHERE id = ?";
+        
+        try (PreparedStatement stmt = dbConnection.getConnection().prepareStatement(sql)) {
             stmt.setInt(1, id);
-
+            
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     return mapResultSetToEquipment(rs);
                 }
             }
         } catch (SQLException e) {
-            System.err.println(
-                "Error retrieving equipment by ID: " + e.getMessage()
-            );
+            System.err.println("Error retrieving equipment by ID: " + e.getMessage());
             e.printStackTrace();
         }
-
+        
         return null;
     }
 
     /**
-     * Retrieves equipment filtered by status
+     * Get equipment by category
      *
-     * @param status the equipment status to filter by (e.g., "Good", "Fair", "Broken")
-     * @return List of Equipment objects matching the status, or empty list if none found
+     * @param category the equipment category
+     * @return a list of Equipment objects matching the category
      */
-    public List<Equipment> getByStatus(String status) {
+    public List<Equipment> getEquipmentByCategory(String category) {
         List<Equipment> equipmentList = new ArrayList<>();
-        String query = "SELECT * FROM equipment WHERE status = ? ORDER BY name";
-
-        try (
-            PreparedStatement stmt = dbConnection
-                .getConnection()
-                .prepareStatement(query)
-        ) {
-            stmt.setString(1, status);
-
-            try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    equipmentList.add(mapResultSetToEquipment(rs));
-                }
-            }
-        } catch (SQLException e) {
-            System.err.println(
-                "Error retrieving equipment by status: " + e.getMessage()
-            );
-            e.printStackTrace();
-        }
-
-        return equipmentList;
-    }
-
-    /**
-     * Retrieves equipment filtered by category
-     *
-     * @param category the equipment category to filter by (e.g., "Feeding", "Cleaning", "Medical")
-     * @return List of Equipment objects matching the category, or empty list if none found
-     */
-    public List<Equipment> getByCategory(String category) {
-        List<Equipment> equipmentList = new ArrayList<>();
-        String query =
-            "SELECT * FROM equipment WHERE category = ? ORDER BY name";
-
-        try (
-            PreparedStatement stmt = dbConnection
-                .getConnection()
-                .prepareStatement(query)
-        ) {
+        String sql = "SELECT * FROM equipment WHERE category = ? ORDER BY name";
+        
+        try (PreparedStatement stmt = dbConnection.getConnection().prepareStatement(sql)) {
             stmt.setString(1, category);
-
+            
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     equipmentList.add(mapResultSetToEquipment(rs));
                 }
             }
         } catch (SQLException e) {
-            System.err.println(
-                "Error retrieving equipment by category: " + e.getMessage()
-            );
+            System.err.println("Error retrieving equipment by category: " + e.getMessage());
             e.printStackTrace();
         }
-
+        
         return equipmentList;
     }
 
     /**
-     * Retrieves all equipment that needs maintenance (nextMaintenanceDate has passed)
+     * Get equipment by status
      *
-     * @return List of Equipment objects needing maintenance, or empty list if none found
+     * @param status the equipment status (Good, Fair, Broken)
+     * @return a list of Equipment objects with the specified status
      */
-    public List<Equipment> getEquipmentNeedingMaintenance() {
+    public List<Equipment> getEquipmentByStatus(String status) {
         List<Equipment> equipmentList = new ArrayList<>();
-        String query =
-            "SELECT * FROM equipment WHERE nextMaintenanceDate IS NOT NULL AND nextMaintenanceDate <= date('now') ORDER BY nextMaintenanceDate";
+        String sql = "SELECT * FROM equipment WHERE status = ? ORDER BY name";
+        
+        try (PreparedStatement stmt = dbConnection.getConnection().prepareStatement(sql)) {
+            stmt.setString(1, status);
+            
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    equipmentList.add(mapResultSetToEquipment(rs));
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error retrieving equipment by status: " + e.getMessage());
+            e.printStackTrace();
+        }
+        
+        return equipmentList;
+    }
 
-        try (
-            PreparedStatement stmt = dbConnection
-                .getConnection()
-                .prepareStatement(query);
-            ResultSet rs = stmt.executeQuery()
-        ) {
+    /**
+     * Get broken equipment
+     *
+     * @return a list of broken Equipment objects
+     */
+    public List<Equipment> getBrokenEquipment() {
+        return getEquipmentByStatus("Broken");
+    }
+
+    /**
+     * Get equipment due for maintenance
+     *
+     * @return a list of Equipment objects due for maintenance soon
+     */
+    public List<Equipment> getEquipmentDueForMaintenance() {
+        List<Equipment> equipmentList = new ArrayList<>();
+        String sql = "SELECT * FROM equipment WHERE next_maintenance_date IS NOT NULL " +
+                     "AND next_maintenance_date <= date('now', '+7 days') " +
+                     "AND next_maintenance_date >= date('now') " +
+                     "ORDER BY next_maintenance_date";
+        
+        try (Statement stmt = dbConnection.getConnection().createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            
             while (rs.next()) {
                 equipmentList.add(mapResultSetToEquipment(rs));
             }
         } catch (SQLException e) {
-            System.err.println(
-                "Error retrieving equipment needing maintenance: " +
-                    e.getMessage()
-            );
+            System.err.println("Error retrieving equipment due for maintenance: " + e.getMessage());
             e.printStackTrace();
         }
-
+        
         return equipmentList;
     }
 
     /**
-     * Gets the count of broken equipment
+     * Update equipment information
      *
-     * @return count of broken equipment items
-     */
-    public int getBrokenEquipmentCount() {
-        String query =
-            "SELECT COUNT(*) as count FROM equipment WHERE status = 'Broken'";
-
-        try (
-            PreparedStatement stmt = dbConnection
-                .getConnection()
-                .prepareStatement(query);
-            ResultSet rs = stmt.executeQuery()
-        ) {
-            if (rs.next()) {
-                return rs.getInt("count");
-            }
-        } catch (SQLException e) {
-            System.err.println(
-                "Error counting broken equipment: " + e.getMessage()
-            );
-            e.printStackTrace();
-        }
-
-        return 0;
-    }
-
-    /**
-     * Adds a new equipment item to the database
-     *
-     * @param equipment the Equipment object to insert
-     * @return true if insertion was successful, false otherwise
-     */
-    public boolean addEquipment(Equipment equipment) {
-        String query =
-            "INSERT INTO equipment (name, category, quantity, status, purchaseDate, purchasePrice, lastMaintenanceDate, nextMaintenanceDate, location, notes) " +
-            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-
-        try (
-            PreparedStatement stmt = dbConnection
-                .getConnection()
-                .prepareStatement(query)
-        ) {
-            stmt.setString(1, equipment.getName());
-            stmt.setString(2, equipment.getCategory());
-            stmt.setInt(3, equipment.getQuantity());
-            stmt.setString(4, equipment.getStatus());
-            stmt.setString(
-                5,
-                equipment.getPurchaseDate() != null
-                    ? equipment.getPurchaseDate().toString()
-                    : null
-            );
-            stmt.setDouble(6, equipment.getPurchasePrice());
-            stmt.setString(
-                7,
-                equipment.getLastMaintenanceDate() != null
-                    ? equipment.getLastMaintenanceDate().toString()
-                    : null
-            );
-            stmt.setString(
-                8,
-                equipment.getNextMaintenanceDate() != null
-                    ? equipment.getNextMaintenanceDate().toString()
-                    : null
-            );
-            stmt.setString(9, equipment.getLocation());
-            stmt.setString(10, equipment.getNotes());
-
-            int rowsAffected = stmt.executeUpdate();
-
-            if (rowsAffected > 0) {
-                // SQLite: use last_insert_rowid() to get the generated ID
-                try (
-                    Statement idStmt = dbConnection
-                        .getConnection()
-                        .createStatement();
-                    ResultSet rs = idStmt.executeQuery(
-                        "SELECT last_insert_rowid()"
-                    )
-                ) {
-                    if (rs.next()) {
-                        equipment.setId(rs.getInt(1));
-                    }
-                }
-                return true;
-            }
-        } catch (SQLException e) {
-            System.err.println("Error adding equipment: " + e.getMessage());
-            e.printStackTrace();
-        }
-
-        return false;
-    }
-
-    /**
-     * Updates the status of a specific equipment item
-     *
-     * @param id the equipment ID
-     * @param status the new status (e.g., "Good", "Fair", "Broken")
-     * @return true if update was successful, false otherwise
-     */
-    public boolean updateStatus(int id, String status) {
-        String query = "UPDATE equipment SET status = ? WHERE id = ?";
-
-        try (
-            PreparedStatement stmt = dbConnection
-                .getConnection()
-                .prepareStatement(query)
-        ) {
-            stmt.setString(1, status);
-            stmt.setInt(2, id);
-
-            int rowsAffected = stmt.executeUpdate();
-            return rowsAffected > 0;
-        } catch (SQLException e) {
-            System.err.println(
-                "Error updating equipment status: " + e.getMessage()
-            );
-            e.printStackTrace();
-        }
-
-        return false;
-    }
-
-    /**
-     * Updates an existing equipment item
-     *
-     * @param equipment the Equipment object with updated values
-     * @return true if update was successful, false otherwise
+     * @param equipment the Equipment object with updated data
+     * @return true if successful, false otherwise
      */
     public boolean updateEquipment(Equipment equipment) {
-        String query =
-            "UPDATE equipment SET name = ?, category = ?, quantity = ?, status = ?, purchaseDate = ?, " +
-            "purchasePrice = ?, lastMaintenanceDate = ?, nextMaintenanceDate = ?, location = ?, notes = ? WHERE id = ?";
-
-        try (
-            PreparedStatement stmt = dbConnection
-                .getConnection()
-                .prepareStatement(query)
-        ) {
+        String sql = "UPDATE equipment SET name = ?, category = ?, quantity = ?, status = ?, " +
+                     "purchase_date = ?, purchase_price = ?, last_maintenance_date = ?, " +
+                     "next_maintenance_date = ?, location = ?, notes = ? " +
+                     "WHERE id = ?";
+        
+        try (PreparedStatement stmt = dbConnection.getConnection().prepareStatement(sql)) {
             stmt.setString(1, equipment.getName());
             stmt.setString(2, equipment.getCategory());
             stmt.setInt(3, equipment.getQuantity());
             stmt.setString(4, equipment.getStatus());
-            stmt.setString(
-                5,
-                equipment.getPurchaseDate() != null
-                    ? equipment.getPurchaseDate().toString()
-                    : null
-            );
+            stmt.setString(5, equipment.getPurchaseDate() != null ? equipment.getPurchaseDate().toString() : null);
             stmt.setDouble(6, equipment.getPurchasePrice());
-            stmt.setString(
-                7,
-                equipment.getLastMaintenanceDate() != null
-                    ? equipment.getLastMaintenanceDate().toString()
-                    : null
-            );
-            stmt.setString(
-                8,
-                equipment.getNextMaintenanceDate() != null
-                    ? equipment.getNextMaintenanceDate().toString()
-                    : null
-            );
+            stmt.setString(7, equipment.getLastMaintenanceDate() != null ? equipment.getLastMaintenanceDate().toString() : null);
+            stmt.setString(8, equipment.getNextMaintenanceDate() != null ? equipment.getNextMaintenanceDate().toString() : null);
             stmt.setString(9, equipment.getLocation());
             stmt.setString(10, equipment.getNotes());
             stmt.setInt(11, equipment.getId());
-
+            
             int rowsAffected = stmt.executeUpdate();
             return rowsAffected > 0;
         } catch (SQLException e) {
             System.err.println("Error updating equipment: " + e.getMessage());
             e.printStackTrace();
+            return false;
         }
-
-        return false;
     }
 
     /**
-     * Records maintenance for an equipment item
+     * Update equipment status only
      *
-     * @param id the equipment ID
-     * @param nextMaintenanceDate the next scheduled maintenance date
-     * @return true if update was successful, false otherwise
+     * @param equipmentId the equipment ID
+     * @param newStatus the new status
+     * @return true if successful, false otherwise
      */
-    public boolean recordMaintenance(int id, LocalDate nextMaintenanceDate) {
-        String query =
-            "UPDATE equipment SET lastMaintenanceDate = date('now'), nextMaintenanceDate = ?, status = 'Good' WHERE id = ?";
-
-        try (
-            PreparedStatement stmt = dbConnection
-                .getConnection()
-                .prepareStatement(query)
-        ) {
-            stmt.setString(
-                1,
-                nextMaintenanceDate != null
-                    ? nextMaintenanceDate.toString()
-                    : null
-            );
-            stmt.setInt(2, id);
-
+    public boolean updateEquipmentStatus(int equipmentId, String newStatus) {
+        String sql = "UPDATE equipment SET status = ? WHERE id = ?";
+        
+        try (PreparedStatement stmt = dbConnection.getConnection().prepareStatement(sql)) {
+            stmt.setString(1, newStatus);
+            stmt.setInt(2, equipmentId);
+            
             int rowsAffected = stmt.executeUpdate();
             return rowsAffected > 0;
         } catch (SQLException e) {
-            System.err.println(
-                "Error recording maintenance: " + e.getMessage()
-            );
+            System.err.println("Error updating equipment status: " + e.getMessage());
             e.printStackTrace();
+            return false;
         }
-
-        return false;
     }
 
     /**
-     * Deletes an equipment item from the database
+     * Update equipment last maintenance date
      *
-     * @param id the equipment ID to delete
-     * @return true if deletion was successful, false otherwise
+     * @param equipmentId the equipment ID
+     * @param maintenanceDate the maintenance date
+     * @return true if successful, false otherwise
      */
-    public boolean deleteEquipment(int id) {
-        String query = "DELETE FROM equipment WHERE id = ?";
+    public boolean updateLastMaintenanceDate(int equipmentId, LocalDate maintenanceDate) {
+        String sql = "UPDATE equipment SET last_maintenance_date = ? WHERE id = ?";
+        
+        try (PreparedStatement stmt = dbConnection.getConnection().prepareStatement(sql)) {
+            stmt.setString(1, maintenanceDate != null ? maintenanceDate.toString() : null);
+            stmt.setInt(2, equipmentId);
+            
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            System.err.println("Error updating equipment maintenance date: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
 
-        try (
-            PreparedStatement stmt = dbConnection
-                .getConnection()
-                .prepareStatement(query)
-        ) {
-            stmt.setInt(1, id);
-
+    /**
+     * Delete equipment from the database
+     *
+     * @param equipmentId the equipment ID
+     * @return true if successful, false otherwise
+     */
+    public boolean deleteEquipment(int equipmentId) {
+        String sql = "DELETE FROM equipment WHERE id = ?";
+        
+        try (PreparedStatement stmt = dbConnection.getConnection().prepareStatement(sql)) {
+            stmt.setInt(1, equipmentId);
+            
             int rowsAffected = stmt.executeUpdate();
             return rowsAffected > 0;
         } catch (SQLException e) {
             System.err.println("Error deleting equipment: " + e.getMessage());
             e.printStackTrace();
+            return false;
         }
-
-        return false;
     }
 
     /**
-     * Gets the total count of equipment items
+     * Get total value of all equipment
      *
-     * @return total number of equipment items in the database
-     */
-    public int getTotalEquipmentCount() {
-        String query = "SELECT COUNT(*) as count FROM equipment";
-
-        try (
-            PreparedStatement stmt = dbConnection
-                .getConnection()
-                .prepareStatement(query);
-            ResultSet rs = stmt.executeQuery()
-        ) {
-            if (rs.next()) {
-                return rs.getInt("count");
-            }
-        } catch (SQLException e) {
-            System.err.println("Error counting equipment: " + e.getMessage());
-            e.printStackTrace();
-        }
-
-        return 0;
-    }
-
-    /**
-     * Gets the total value of all equipment inventory
-     *
-     * @return total value of equipment inventory
+     * @return the total value in currency
      */
     public double getTotalEquipmentValue() {
-        String query =
-            "SELECT SUM(quantity * purchasePrice) as totalValue FROM equipment";
-
-        try (
-            PreparedStatement stmt = dbConnection
-                .getConnection()
-                .prepareStatement(query);
-            ResultSet rs = stmt.executeQuery()
-        ) {
+        String sql = "SELECT SUM(purchase_price * quantity) as total FROM equipment";
+        
+        try (Statement stmt = dbConnection.getConnection().createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            
             if (rs.next()) {
-                return rs.getDouble("totalValue");
+                return rs.getDouble("total");
             }
         } catch (SQLException e) {
-            System.err.println(
-                "Error calculating total equipment value: " + e.getMessage()
-            );
+            System.err.println("Error calculating total equipment value: " + e.getMessage());
             e.printStackTrace();
         }
-
+        
         return 0.0;
     }
 
     /**
-     * Searches equipment by name
+     * Get count of broken equipment
      *
-     * @param searchTerm the search term to match against equipment names
-     * @return List of Equipment objects matching the search term
+     * @return the number of broken equipment items
      */
-    public List<Equipment> searchByName(String searchTerm) {
-        List<Equipment> equipmentList = new ArrayList<>();
-        String query =
-            "SELECT * FROM equipment WHERE name LIKE ? ORDER BY name";
-
-        try (
-            PreparedStatement stmt = dbConnection
-                .getConnection()
-                .prepareStatement(query)
-        ) {
-            stmt.setString(1, "%" + searchTerm + "%");
-
-            try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    equipmentList.add(mapResultSetToEquipment(rs));
-                }
+    public int getBrokenEquipmentCount() {
+        String sql = "SELECT COUNT(*) as count FROM equipment WHERE status = 'Broken'";
+        
+        try (Statement stmt = dbConnection.getConnection().createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            
+            if (rs.next()) {
+                return rs.getInt("count");
             }
         } catch (SQLException e) {
-            System.err.println("Error searching equipment: " + e.getMessage());
+            System.err.println("Error counting broken equipment: " + e.getMessage());
             e.printStackTrace();
         }
-
-        return equipmentList;
-    }
-
-    /**
-     * Gets equipment by location
-     *
-     * @param location the location to filter by
-     * @return List of Equipment objects at the specified location
-     */
-    public List<Equipment> getByLocation(String location) {
-        List<Equipment> equipmentList = new ArrayList<>();
-        String query =
-            "SELECT * FROM equipment WHERE location = ? ORDER BY name";
-
-        try (
-            PreparedStatement stmt = dbConnection
-                .getConnection()
-                .prepareStatement(query)
-        ) {
-            stmt.setString(1, location);
-
-            try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    equipmentList.add(mapResultSetToEquipment(rs));
-                }
-            }
-        } catch (SQLException e) {
-            System.err.println(
-                "Error retrieving equipment by location: " + e.getMessage()
-            );
-            e.printStackTrace();
-        }
-
-        return equipmentList;
-    }
-
-    /**
-     * Main method to test all CRUD operations for EquipmentDAO
-     */
-    public static void main(String[] args) {
-        System.out.println("=== EquipmentDAO CRUD Operations Test ===\n");
-
-        EquipmentDAO equipmentDAO = new EquipmentDAO();
-
-        // ==================== CREATE ====================
-        System.out.println("--- CREATE: Adding new equipment ---");
-        Equipment newEquip = new Equipment();
-        newEquip.setName("Test Water Pump");
-        newEquip.setCategory("Feeding");
-        newEquip.setQuantity(2);
-        newEquip.setStatus("Good");
-        newEquip.setPurchaseDate(LocalDate.now());
-        newEquip.setPurchasePrice(450.00);
-        newEquip.setLastMaintenanceDate(LocalDate.now());
-        newEquip.setNextMaintenanceDate(LocalDate.now().plusMonths(3));
-        newEquip.setLocation("Pump House");
-        newEquip.setNotes("Test equipment for CRUD operations");
-
-        boolean created = equipmentDAO.addEquipment(newEquip);
-        if (created) {
-            System.out.println(
-                "✓ Equipment created successfully with ID: " + newEquip.getId()
-            );
-            System.out.println("  " + newEquip);
-        } else {
-            System.out.println("✗ Failed to create equipment");
-        }
-
-        // ==================== READ ====================
-        System.out.println("\n--- READ: Get all equipment ---");
-        List<Equipment> allEquip = equipmentDAO.getAllEquipment();
-        System.out.println("Total equipment items: " + allEquip.size());
-        for (Equipment equip : allEquip) {
-            System.out.println(
-                "  - " +
-                    equip.getName() +
-                    " (" +
-                    equip.getCategory() +
-                    "): " +
-                    equip.getStatus()
-            );
-        }
-
-        System.out.println("\n--- READ: Get equipment by ID ---");
-        if (newEquip.getId() > 0) {
-            Equipment fetchedEquip = equipmentDAO.getEquipmentById(
-                newEquip.getId()
-            );
-            if (fetchedEquip != null) {
-                System.out.println(
-                    "✓ Found equipment: " + fetchedEquip.getName()
-                );
-            } else {
-                System.out.println("✗ Equipment not found");
-            }
-        }
-
-        System.out.println("\n--- READ: Get equipment by status (Good) ---");
-        List<Equipment> goodEquip = equipmentDAO.getByStatus("Good");
-        System.out.println("Good status equipment: " + goodEquip.size());
-        for (Equipment equip : goodEquip) {
-            System.out.println("  - " + equip.getName());
-        }
-
-        System.out.println("\n--- READ: Get equipment by status (Broken) ---");
-        List<Equipment> brokenEquip = equipmentDAO.getByStatus("Broken");
-        System.out.println("Broken equipment: " + brokenEquip.size());
-        for (Equipment equip : brokenEquip) {
-            System.out.println(
-                "  - " + equip.getName() + ": " + equip.getNotes()
-            );
-        }
-
-        System.out.println(
-            "\n--- READ: Get equipment by category (Feeding) ---"
-        );
-        List<Equipment> feedingEquip = equipmentDAO.getByCategory("Feeding");
-        System.out.println("Feeding equipment: " + feedingEquip.size());
-        for (Equipment equip : feedingEquip) {
-            System.out.println("  - " + equip.getName());
-        }
-
-        System.out.println("\n--- READ: Get equipment needing maintenance ---");
-        List<Equipment> needsMaint =
-            equipmentDAO.getEquipmentNeedingMaintenance();
-        System.out.println(
-            "Equipment needing maintenance: " + needsMaint.size()
-        );
-        for (Equipment equip : needsMaint) {
-            System.out.println(
-                "  - " +
-                    equip.getName() +
-                    " (due: " +
-                    equip.getNextMaintenanceDate() +
-                    ")"
-            );
-        }
-
-        System.out.println("\n--- READ: Get broken equipment count ---");
-        int brokenCount = equipmentDAO.getBrokenEquipmentCount();
-        System.out.println("Broken equipment count: " + brokenCount);
-
-        System.out.println("\n--- READ: Get total equipment value ---");
-        double totalValue = equipmentDAO.getTotalEquipmentValue();
-        System.out.println(
-            "Total equipment value: $" + String.format("%.2f", totalValue)
-        );
-
-        System.out.println("\n--- READ: Search by name ('Feeder') ---");
-        List<Equipment> searchResults = equipmentDAO.searchByName("Feeder");
-        System.out.println("Search results: " + searchResults.size());
-        for (Equipment equip : searchResults) {
-            System.out.println("  - " + equip.getName());
-        }
-
-        // ==================== UPDATE ====================
-        System.out.println("\n--- UPDATE: Update status ---");
-        if (newEquip.getId() > 0) {
-            boolean statusUpdated = equipmentDAO.updateStatus(
-                newEquip.getId(),
-                "Fair"
-            );
-            if (statusUpdated) {
-                Equipment updatedEquip = equipmentDAO.getEquipmentById(
-                    newEquip.getId()
-                );
-                System.out.println(
-                    "✓ Status updated to: " + updatedEquip.getStatus()
-                );
-            } else {
-                System.out.println("✗ Failed to update status");
-            }
-        }
-
-        System.out.println("\n--- UPDATE: Update full equipment record ---");
-        if (newEquip.getId() > 0) {
-            newEquip.setName("Updated Water Pump Pro");
-            newEquip.setPurchasePrice(550.00);
-            newEquip.setQuantity(3);
-            newEquip.setStatus("Good");
-            boolean updated = equipmentDAO.updateEquipment(newEquip);
-            if (updated) {
-                Equipment updatedEquip = equipmentDAO.getEquipmentById(
-                    newEquip.getId()
-                );
-                System.out.println(
-                    "✓ Equipment updated: " +
-                        updatedEquip.getName() +
-                        " - $" +
-                        updatedEquip.getPurchasePrice()
-                );
-            } else {
-                System.out.println("✗ Failed to update equipment");
-            }
-        }
-
-        System.out.println("\n--- UPDATE: Record maintenance ---");
-        if (newEquip.getId() > 0) {
-            boolean maintRecorded = equipmentDAO.recordMaintenance(
-                newEquip.getId(),
-                LocalDate.now().plusMonths(6)
-            );
-            if (maintRecorded) {
-                Equipment updatedEquip = equipmentDAO.getEquipmentById(
-                    newEquip.getId()
-                );
-                System.out.println(
-                    "✓ Maintenance recorded. Next maintenance: " +
-                        updatedEquip.getNextMaintenanceDate()
-                );
-            } else {
-                System.out.println("✗ Failed to record maintenance");
-            }
-        }
-
-        // ==================== DELETE ====================
-        System.out.println("\n--- DELETE: Remove test equipment ---");
-        if (newEquip.getId() > 0) {
-            boolean deleted = equipmentDAO.deleteEquipment(newEquip.getId());
-            if (deleted) {
-                System.out.println("✓ Equipment deleted successfully");
-                Equipment deletedEquip = equipmentDAO.getEquipmentById(
-                    newEquip.getId()
-                );
-                if (deletedEquip == null) {
-                    System.out.println(
-                        "✓ Confirmed: Equipment no longer exists in database"
-                    );
-                }
-            } else {
-                System.out.println("✗ Failed to delete equipment");
-            }
-        }
-
-        // ==================== BUSINESS LOGIC TESTS ====================
-        System.out.println(
-            "\n--- BUSINESS LOGIC: Test Equipment model methods ---"
-        );
-        Equipment testEquip = new Equipment();
-        testEquip.setStatus("Broken");
-        testEquip.setNextMaintenanceDate(LocalDate.now().minusDays(10));
-
-        System.out.println(
-            "isBroken() [status='Broken']: " + testEquip.isBroken()
-        );
-        System.out.println(
-            "isOperational() [status='Broken']: " + testEquip.isOperational()
-        );
-        System.out.println(
-            "needsMaintenance() [overdue by 10 days]: " +
-                testEquip.needsMaintenance()
-        );
-
-        testEquip.setStatus("Good");
-        System.out.println(
-            "isBroken() [status='Good']: " + testEquip.isBroken()
-        );
-        System.out.println(
-            "isOperational() [status='Good']: " + testEquip.isOperational()
-        );
-
-        System.out.println("\n=== EquipmentDAO Test Complete ===");
+        
+        return 0;
     }
 }

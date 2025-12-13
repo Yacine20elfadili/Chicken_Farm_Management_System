@@ -154,10 +154,18 @@ public class Medication {
      * @return true if past expiry date
      */
     public boolean isExpired() {
-        if (expiryDate == null) {
-            return false;
-        }
+        if (expiryDate == null) return false;
         return expiryDate.isBefore(LocalDate.now());
+    }
+
+    /**
+     * Check if medication is expiring soon (within 30 days)
+     * @return true if expiring soon
+     */
+    public boolean isExpiringSoon() {
+        if (expiryDate == null) return false;
+        LocalDate thirtyDaysFromNow = LocalDate.now().plusDays(30);
+        return expiryDate.isBefore(thirtyDaysFromNow) && !isExpired();
     }
 
     /**

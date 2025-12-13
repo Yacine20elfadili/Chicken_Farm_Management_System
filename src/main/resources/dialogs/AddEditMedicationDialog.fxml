@@ -1,14 +1,101 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="CONTROLLER_NAME"
-            prefHeight="400.0" prefWidth="600.0">
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="ma.farm.controller.dialogs.AddEditMedicationDialogController"
+      prefHeight="650.0" prefWidth="600.0" spacing="15.0" styleClass="dialog-container">
+    <padding>
+        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+    </padding>
 
-</AnchorPane>
+    <!-- Dialog Title -->
+    <Label fx:id="dialogTitle" styleClass="dialog-title" text="Ajouter Médicament" />
+
+    <!-- Form Content -->
+    <ScrollPane fitToHeight="true" fitToWidth="true" styleClass="form-scroll">
+        <content>
+            <VBox spacing="15.0">
+                <padding>
+                    <Insets bottom="10.0" right="10.0" />
+                </padding>
+
+                <!-- Name -->
+                <VBox spacing="5.0">
+                    <Label styleClass="form-label" text="Nom du Médicament *" />
+                    <TextField fx:id="nameField" promptText="Ex: Vitamine Complexe" styleClass="form-input" />
+                    <Label fx:id="nameErrorLabel" styleClass="error-label" text="" />
+                </VBox>
+
+                <!-- Type -->
+                <VBox spacing="5.0">
+                    <Label styleClass="form-label" text="Type *" />
+                    <ComboBox fx:id="typeComboBox" prefWidth="200.0" promptText="Sélectionner le type" styleClass="form-input" />
+                    <Label fx:id="typeErrorLabel" styleClass="error-label" text="" />
+                </VBox>
+
+                <!-- Quantity -->
+                <VBox spacing="5.0">
+                    <Label styleClass="form-label" text="Quantité *" />
+                    <TextField fx:id="quantityField" promptText="Ex: 100" styleClass="form-input" />
+                    <Label fx:id="quantityErrorLabel" styleClass="error-label" text="" />
+                </VBox>
+
+                <!-- Unit -->
+                <VBox spacing="5.0">
+                    <Label styleClass="form-label" text="Unité *" />
+                    <ComboBox fx:id="unitComboBox" prefWidth="200.0" promptText="Sélectionner l'unité" styleClass="form-input" />
+                    <Label fx:id="unitErrorLabel" styleClass="error-label" text="" />
+                </VBox>
+
+                <!-- Price Per Unit -->
+                <VBox spacing="5.0">
+                    <Label styleClass="form-label" text="Prix par Unité ($) *" />
+                    <TextField fx:id="pricePerUnitField" promptText="Ex: 5.50" styleClass="form-input" />
+                    <Label fx:id="priceErrorLabel" styleClass="error-label" text="" />
+                </VBox>
+
+                <!-- Supplier -->
+                <VBox spacing="5.0">
+                    <Label styleClass="form-label" text="Fournisseur" />
+                    <TextField fx:id="supplierField" promptText="Nom du fournisseur" styleClass="form-input" />
+                </VBox>
+
+                <!-- Purchase Date -->
+                <VBox spacing="5.0">
+                    <Label styleClass="form-label" text="Date d'Achat" />
+                    <DatePicker fx:id="purchaseDatePicker" styleClass="form-input" />
+                </VBox>
+
+                <!-- Expiry Date -->
+                <VBox spacing="5.0">
+                    <Label styleClass="form-label" text="Date d'Expiration" />
+                    <DatePicker fx:id="expiryDatePicker" styleClass="form-input" />
+                </VBox>
+
+                <!-- Min Stock Level -->
+                <VBox spacing="5.0">
+                    <Label styleClass="form-label" text="Stock Minimum" />
+                    <TextField fx:id="minStockField" promptText="Ex: 20" styleClass="form-input" />
+                    <Label fx:id="minStockErrorLabel" styleClass="error-label" text="" />
+                </VBox>
+
+                <!-- Usage Instructions -->
+                <VBox spacing="5.0">
+                    <Label styleClass="form-label" text="Instructions d'Utilisation" />
+                    <TextArea fx:id="usageTextArea" prefRowCount="3" promptText="Ex: 1 comprimé par 10 oiseaux par jour" styleClass="form-input" wrapText="true" />
+                </VBox>
+            </VBox>
+        </content>
+    </ScrollPane>
+
+    <!-- Buttons -->
+    <HBox alignment="CENTER_RIGHT" spacing="10.0">
+        <Button onAction="#handleCancel" styleClass="btn-secondary" text="Annuler" />
+        <Button onAction="#handleSave" styleClass="btn-primary" text="Enregistrer" />
+    </HBox>
+</VBox>
