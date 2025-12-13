@@ -36,7 +36,7 @@ public class SidebarController {
     private final List<AnchorPane> modules = new ArrayList<>();
     private boolean isCollapsed = false;
     public final double expandedWidth = 180.0;
-    public final double collapsedWidth = 60.0;
+    public final double collapsedWidth = 50.0;
 
     // MAIN width controller
     private final DoubleProperty sidebarWidth = new SimpleDoubleProperty(expandedWidth);

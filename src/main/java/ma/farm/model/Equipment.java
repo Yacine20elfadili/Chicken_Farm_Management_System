@@ -154,10 +154,32 @@ public class Equipment {
 
     /**
      * Check if equipment is broken
-     * @return true if status is "Broken"
      */
     public boolean isBroken() {
-        return "Broken".equals(status);
+        return "Broken".equalsIgnoreCase(status);
+    }
+
+    /**
+     * Check if equipment is in fair condition
+     */
+    public boolean isFair() {
+        return "Fair".equalsIgnoreCase(status);
+    }
+
+    /**
+     * Check if equipment is in good condition
+     */
+    public boolean isGood() {
+        return "Good".equalsIgnoreCase(status);
+    }
+
+    /**
+     * Check if equipment is due for maintenance
+     */
+    public boolean isDueForMaintenance() {
+        if (nextMaintenanceDate == null) return false;
+        return nextMaintenanceDate.isBefore(LocalDate.now().plusDays(7)) && 
+               nextMaintenanceDate.isAfter(LocalDate.now().minusDays(1));
     }
 
     /**

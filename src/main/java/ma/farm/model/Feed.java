@@ -130,15 +130,20 @@ public class Feed {
     }
 
     /**
-     * Check if feed is expired or near expiry
-     * @return true if expired or expires within 7 days
+     * Check if feed is expired
      */
-    public boolean isExpiredOrNearExpiry() {
-        if (expiryDate == null) {
-            return false;
-        }
-        LocalDate today = LocalDate.now();
-        return expiryDate.isBefore(today) || expiryDate.isBefore(today.plusDays(7));
+    public boolean isExpired() {
+        if (expiryDate == null) return false;
+        return expiryDate.isBefore(LocalDate.now());
+    }
+
+    /**
+     * Check if feed is expiring soon (within 30 days)
+     */
+    public boolean isExpiringSoon() {
+        if (expiryDate == null) return false;
+        LocalDate thirtyDaysFromNow = LocalDate.now().plusDays(30);
+        return expiryDate.isBefore(thirtyDaysFromNow) && !isExpired();
     }
 
     /**
