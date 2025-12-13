@@ -103,6 +103,32 @@ public class RecordEggCollectionDialogController {
             houseSelector.getItems().addAll(eggLayingHouses);
             houseSelector.getSelectionModel().selectFirst();
 
+            // FIX #1: Set custom cell factory to display house name instead of toString()
+            houseSelector.setCellFactory(param -> new ListCell<House>() {
+                @Override
+                protected void updateItem(House house, boolean empty) {
+                    super.updateItem(house, empty);
+                    if (empty || house == null) {
+                        setText(null);
+                    } else {
+                        setText(house.getName() + " - " + house.getType().getDisplayName());
+                    }
+                }
+            });
+
+            // Also set the button cell to display house name
+            houseSelector.setButtonCell(new ListCell<House>() {
+                @Override
+                protected void updateItem(House house, boolean empty) {
+                    super.updateItem(house, empty);
+                    if (empty || house == null) {
+                        setText(null);
+                    } else {
+                        setText(house.getName() + " - " + house.getType().getDisplayName());
+                    }
+                }
+            });
+
             System.out.println("Loaded " + eggLayingHouses.size() + " egg-laying houses");
 
         } catch (Exception e) {
@@ -162,22 +188,71 @@ public class RecordEggCollectionDialogController {
                 return;
             }
 
-            // Create EggProduction object
-            EggProduction production = new EggProduction(
-                    selectedHouse.getId(),
-                    collectionDate,
-                    eggsCollected,
-                    crackedEggs,
-                    0  // Dead chickens (not used in eggs bay)
-            );
-            production.setCollectedBy(System.getProperty("user.name")); // Get current user
-            production.setNotes(notes);
-            production.calculateGoodEggs();
+            // FIX: Check if a record already exists for this house on this date
+            boolean recordExists = false;
+            EggProduction existingProduction = null;
+            
+            try {
+                List<EggProduction> existingRecords = eggProductionDAO.getProductionByDate(collectionDate);
+                for (EggProduction prod : existingRecords) {
+                    if (prod.getHouseId() == selectedHouse.getId()) {
+                        recordExists = true;
+                        existingProduction = prod;
+                        break;
+                    }
+                }
+            } catch (Exception e) {
+                System.err.println("Error checking existing records: " + e.getMessage());
+            }
 
-            // Save to database
-            boolean success = eggProductionDAO.addProduction(production);
+            boolean success;
+
+            if (recordExists && existingProduction != null) {
+                // UPDATE existing record - ADD eggs to what was already collected
+                System.out.println("Record exists for this house on this date - UPDATING");
+                
+                int newEggsCollected = existingProduction.getEggsCollected() + eggsCollected;
+                int newCrackedEggs = existingProduction.getCrackedEggs() + crackedEggs;
+                
+                existingProduction.setEggsCollected(newEggsCollected);
+                existingProduction.setCrackedEggs(newCrackedEggs);
+                existingProduction.calculateGoodEggs();
+                
+                // Update notes if provided
+                if (!notes.isEmpty()) {
+                    String existingNotes = existingProduction.getNotes();
+                    if (existingNotes != null && !existingNotes.isEmpty()) {
+                        existingProduction.setNotes(existingNotes + "\n" + notes);
+                    } else {
+                        existingProduction.setNotes(notes);
+                    }
+                }
+                
+                // Call UPDATE method in DAO
+                success = eggProductionDAO.updateProduction(existingProduction);
+                System.out.println("Updated production: " + newEggsCollected + " eggs, " + newCrackedEggs + " cracked");
+                
+            } else {
+                // CREATE new record
+                System.out.println("No existing record - CREATING new");
+                
+                EggProduction production = new EggProduction(
+                        selectedHouse.getId(),
+                        collectionDate,
+                        eggsCollected,
+                        crackedEggs,
+                        0  // Dead chickens (not used in eggs bay)
+                );
+                production.setCollectedBy(System.getProperty("user.name"));
+                production.setNotes(notes);
+                production.calculateGoodEggs();
+
+                success = eggProductionDAO.addProduction(production);
+                System.out.println("Created new production: " + eggsCollected + " eggs, " + crackedEggs + " cracked");
+            }
+
             if (success) {
-                System.out.println("Egg collection recorded successfully");
+                System.out.println("Egg collection recorded successfully for house: " + selectedHouse.getName());
                 saved = true;
                 closeDialog();
             } else {

@@ -263,6 +263,7 @@
     -fx-background-color: #ff6900;
     -fx-effect: dropshadow(gaussian, rgba(255,168,0,0.2), 5, 0, 0, 2);
 }
+
 /*=====================================================================================*/
 /*================================== DASHBOARD STYLE ==================================*/
 /*=====================================================================================*/
@@ -450,6 +451,138 @@
 /*=====================================================================================*/
 /*================================== EGGS BAY STYLE ==================================*/
 /*=====================================================================================*/
+
+/* ============= ACTION BUTTONS STYLE ============= */
+.action-button {
+    -fx-padding: 8px 16px;
+    -fx-background-radius: 8px;
+    -fx-border-radius: 8px;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+    -fx-cursor: hand;
+    -fx-font-family: 'Segoe UI';
+}
+
+/* Record Collection Button */
+#recordCollectionButton {
+    -fx-background-color: #ff781a;
+    -fx-effect: dropshadow(gaussian, rgba(255,168,0,0.3), 8, 0, 0, 2);
+}
+
+#recordCollectionButton:hover {
+    -fx-background-color: #ff6900;
+    -fx-effect: dropshadow(gaussian, rgba(255,168,0,0.4), 12, 0, 0, 4);
+}
+
+#recordCollectionButton:pressed {
+    -fx-background-color: #e55a00;
+    -fx-effect: dropshadow(gaussian, rgba(255,168,0,0.2), 5, 0, 0, 1);
+}
+
+/* Refresh Button */
+#refreshButton {
+    -fx-background-color: #4e73df;
+    -fx-effect: dropshadow(gaussian, rgba(78,115,223,0.3), 8, 0, 0, 2);
+}
+
+#refreshButton:hover {
+    -fx-background-color: #3d5fc9;
+    -fx-effect: dropshadow(gaussian, rgba(78,115,223,0.4), 12, 0, 0, 4);
+}
+
+#refreshButton:pressed {
+    -fx-background-color: #2c48b3;
+    -fx-effect: dropshadow(gaussian, rgba(78,115,223,0.2), 5, 0, 0, 1);
+}
+
+/* ============= STATISTICS CARDS STYLE ============= */
+.production-stats-card {
+    -fx-background-color: #f0f9ff;
+    -fx-background-radius: 10px;
+    -fx-border-color: #b3d9f2;
+    -fx-border-width: 1px;
+    -fx-border-radius: 10px;
+    -fx-padding: 15px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 2);
+}
+
+.production-stats-card:hover {
+    -fx-effect: dropshadow(gaussian, rgba(78,115,223,0.2), 12, 0, 0, 4);
+}
+
+.cracked-stats-card {
+    -fx-background-color: #fef2f2;
+    -fx-background-radius: 10px;
+    -fx-border-color: #fecaca;
+    -fx-border-width: 1px;
+    -fx-border-radius: 10px;
+    -fx-padding: 15px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 2);
+}
+
+.cracked-stats-card:hover {
+    -fx-effect: dropshadow(gaussian, rgba(220,38,38,0.2), 12, 0, 0, 4);
+}
+
+/* ============= PRODUCTION STATS SPECIFIC ============= */
+.production-today {
+    -fx-text-fill: #3eff51;
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-font-family: 'Calibri';
+}
+
+.production-week {
+    -fx-text-fill: #3eff51;
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-font-family: 'Calibri';
+}
+
+.production-month {
+    -fx-text-fill: #3eff51;
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-font-family: 'Calibri';
+}
+
+/* ============= CRACKED STATS SPECIFIC ============= */
+.cracked-today {
+    -fx-text-fill: #ff6b6b;
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-font-family: 'Calibri';
+}
+
+.cracked-week {
+    -fx-text-fill: #ff6b6b;
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-font-family: 'Calibri';
+}
+
+.cracked-month {
+    -fx-text-fill: #ff6b6b;
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-font-family: 'Calibri';
+}
+
+/* ============= STATS LABEL STYLING ============= */
+.stats-period-label {
+    -fx-text-fill: #666666;
+    -fx-font-size: 11px;
+    -fx-font-family: 'Segoe UI';
+}
+
+.stats-title {
+    -fx-text-fill: #1e2939;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-font-family: 'Calibri';
+}
+
 .date-label {
     -fx-text-fill: #1e2939;
     -fx-font-size: 18px;
