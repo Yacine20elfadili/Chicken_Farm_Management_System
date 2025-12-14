@@ -1,4 +1,3 @@
-
 PRAGMA foreign_keys = ON;
 
 CREATE TABLE IF NOT EXISTS jobTitles (
@@ -525,60 +524,219 @@ END;
 
 
 -- ============================================================
--- Equipment Table
+-- Equipment Categories and Items Database Schema for SQLite
 -- ============================================================
--- Stores farm equipment inventory and maintenance records
+-- This replaces the old single equipment table with two tables:
+-- 1. equipment_categories: Types of equipment (e.g., "Shovels")
+-- 2. equipment_items: Individual items within each category
 -- ============================================================
 
+-- ============================================================
+-- DROP OLD TABLE
+-- ============================================================
+DROP TABLE IF EXISTS equipment;
 
-CREATE TABLE IF NOT EXISTS equipment (
+-- ============================================================
+-- Main Table: equipment_categories
+-- ============================================================
+-- Stores equipment category information
+-- Each category represents a type of equipment (e.g., Shovels, Feeders)
+-- ============================================================
+
+CREATE TABLE IF NOT EXISTS equipment_categories (
+    -- Primary Key (SQLite uses INTEGER for autoincrement)
     id INTEGER PRIMARY KEY AUTOINCREMENT,
+    
+    -- Category name (e.g., "Shovels", "Water Pumps")
     name VARCHAR(100) NOT NULL,
-    category VARCHAR(50) NOT NULL,
-    quantity INTEGER NOT NULL DEFAULT 0,
-    status VARCHAR(20) NOT NULL DEFAULT 'Good',
-    purchaseDate DATE,
-    purchasePrice REAL NOT NULL DEFAULT 0,
-    lastMaintenanceDate DATE,
-    nextMaintenanceDate DATE,
+    
+    -- Category type (Feeding, Cleaning, Medical, Other)
+    category VARCHAR(50) NOT NULL
+        CHECK (category IN ('Feeding', 'Cleaning', 'Medical', 'Other')),
+    
+    -- Where this equipment type is typically stored/used
     location VARCHAR(100),
+    
+    -- Additional notes about this equipment type
     notes TEXT,
+    
+    -- Timestamps for tracking modifications
     created_at TEXT DEFAULT CURRENT_TIMESTAMP,
     updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
-    CHECK (status IN ('Good', 'Fair', 'Broken'))
+    
+    -- Unique constraint: No duplicate category names
+    UNIQUE (name)
 );
 
--- Index for equipment queries
-CREATE INDEX IF NOT EXISTS idx_equipment_status ON equipment(status);
-CREATE INDEX IF NOT EXISTS idx_equipment_category ON equipment(category);
-CREATE INDEX IF NOT EXISTS idx_equipment_maintenance ON equipment(nextMaintenanceDate);
+-- ============================================================
+-- Main Table: equipment_items
+-- ============================================================
+-- Stores individual equipment items
+-- Each item belongs to a category and has its own status/maintenance info
+-- ============================================================
 
--- Trigger to update the updated_at timestamp on UPDATE
-CREATE TRIGGER IF NOT EXISTS trg_equipment_updated_at
-    AFTER UPDATE ON equipment
+CREATE TABLE IF NOT EXISTS equipment_items (
+    -- Primary Key (SQLite uses INTEGER for autoincrement)
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    
+    -- Foreign Key to equipment_categories
+    categoryId INTEGER NOT NULL,
+    
+    -- Status of this specific item
+    status VARCHAR(20) NOT NULL DEFAULT 'Good'
+        CHECK (status IN ('Good', 'Fair', 'Broken')),
+    
+    -- Purchase information
+    purchaseDate DATE,
+    purchasePrice REAL NOT NULL DEFAULT 0.00
+        CHECK (purchasePrice >= 0),
+    
+    -- Maintenance tracking
+    lastMaintenanceDate DATE,
+    nextMaintenanceDate DATE,
+    
+    -- Timestamps for tracking modifications
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+    updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
+    
+    -- Foreign Key Constraint
+    FOREIGN KEY (categoryId) REFERENCES equipment_categories(id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
+
+-- ============================================================
+-- Indexes for Performance
+-- ============================================================
+
+-- Index on category type for filtering
+CREATE INDEX IF NOT EXISTS idx_equipment_categories_category 
+    ON equipment_categories(category);
+
+-- Index on location for filtering
+CREATE INDEX IF NOT EXISTS idx_equipment_categories_location 
+    ON equipment_categories(location);
+
+-- Index on categoryId for joining items to categories
+CREATE INDEX IF NOT EXISTS idx_equipment_items_category 
+    ON equipment_items(categoryId);
+
+-- Index on status for filtering broken items
+CREATE INDEX IF NOT EXISTS idx_equipment_items_status 
+    ON equipment_items(status);
+
+-- Index on nextMaintenanceDate for maintenance scheduling
+CREATE INDEX IF NOT EXISTS idx_equipment_items_maintenance 
+    ON equipment_items(nextMaintenanceDate);
+
+-- Composite index for category and status queries
+CREATE INDEX IF NOT EXISTS idx_equipment_items_category_status 
+    ON equipment_items(categoryId, status);
+
+-- ============================================================
+-- Triggers for SQLite
+-- ============================================================
+
+-- Trigger to update updated_at timestamp on equipment_categories UPDATE
+CREATE TRIGGER IF NOT EXISTS trg_equipment_categories_updated_at
+    AFTER UPDATE ON equipment_categories
     FOR EACH ROW
 BEGIN
-    UPDATE equipment
+    UPDATE equipment_categories
     SET updated_at = CURRENT_TIMESTAMP
     WHERE id = NEW.id;
 END;
 
--- -- Sample Equipment Data
--- INSERT INTO equipment (name, category, quantity, status, purchaseDate, purchasePrice, lastMaintenanceDate, nextMaintenanceDate, location, notes) VALUES
---     ('Automatic Feeder System', 'Feeding', 4, 'Good', '2024-03-15', 2500.00, '2025-01-05', '2025-04-05', 'House H1-H4', 'Programmable feeding schedule'),
---     ('Water Nipple Drinkers', 'Feeding', 200, 'Good', '2024-06-20', 1200.00, '2025-01-10', '2025-07-10', 'All Houses', 'Stainless steel, leak-proof'),
---     ('Feed Storage Bins', 'Feeding', 6, 'Fair', '2023-08-10', 800.00, '2024-12-15', '2025-03-15', 'Feed Storage Area', 'Some rust spots, schedule repainting'),
---     ('Egg Collection Belts', 'Collection', 2, 'Good', '2024-05-22', 3500.00, '2025-01-08', '2025-05-08', 'House H2, H3', 'Automatic egg conveyor system'),
---     ('Egg Grading Machine', 'Collection', 1, 'Good', '2024-07-18', 4200.00, '2025-01-02', '2025-04-02', 'Processing Room', 'Grades by weight and checks quality'),
---     ('Pressure Washer', 'Cleaning', 2, 'Fair', '2023-02-28', 650.00, '2024-11-20', '2025-02-20', 'Equipment Shed', 'One unit needs new hose'),
---     ('Ventilation Fans', 'Climate', 12, 'Good', '2024-01-10', 1800.00, '2025-01-12', '2025-07-12', 'All Houses', '48-inch industrial fans'),
---     ('Heating Lamps', 'Climate', 20, 'Good', '2024-09-05', 400.00, '2024-12-20', '2025-06-20', 'House H1', 'Infrared brooders for chicks'),
---     ('Generator', 'Other', 1, 'Broken', '2022-11-15', 5500.00, '2024-08-10', '2024-11-10', 'Power Room', 'Motor needs replacement, ordered parts'),
---     ('Digital Scale', 'Other', 3, 'Good', '2024-04-12', 250.00, '2025-01-01', '2025-07-01', 'Processing Room', 'Calibrated monthly'),
---     ('Vaccination Sprayer', 'Medical', 2, 'Good', '2024-08-25', 320.00, '2025-01-06', '2025-04-06', 'Medical Supply Room', 'Fine mist for vaccine delivery'),
---     ('Egg Washer', 'Cleaning', 1, 'Broken', '2023-05-14', 1800.00, '2024-10-05', '2025-01-05', 'Processing Room', 'Pump malfunction, repair scheduled'),
---     ('Manure Spreader', 'Cleaning', 1, 'Fair', '2022-07-20', 2200.00, '2024-09-15', '2025-03-15', 'Outside Storage', 'Tires need replacement soon');
+-- Trigger to update updated_at timestamp on equipment_items UPDATE
+CREATE TRIGGER IF NOT EXISTS trg_equipment_items_updated_at
+    AFTER UPDATE ON equipment_items
+    FOR EACH ROW
+BEGIN
+    UPDATE equipment_items
+    SET updated_at = CURRENT_TIMESTAMP
+    WHERE id = NEW.id;
+END;
 
+-- Trigger to validate maintenance dates
+CREATE TRIGGER IF NOT EXISTS trg_equipment_items_validate_dates
+    BEFORE INSERT ON equipment_items
+    FOR EACH ROW
+BEGIN
+    SELECT CASE
+        WHEN NEW.nextMaintenanceDate IS NOT NULL 
+             AND NEW.lastMaintenanceDate IS NOT NULL 
+             AND NEW.nextMaintenanceDate < NEW.lastMaintenanceDate THEN
+            RAISE(ABORT, 'Next maintenance date cannot be before last maintenance date')
+        WHEN NEW.purchasePrice < 0 THEN
+            RAISE(ABORT, 'Purchase price cannot be negative')
+    END;
+END;
+
+-- ============================================================
+-- Sample Data (Optional - for testing)
+-- ============================================================
+
+-- Sample Equipment Categories
+-- INSERT INTO equipment_categories (name, category, location, notes) VALUES
+--     ('Shovels', 'Cleaning', 'Equipment Shed', 'Standard garden shovels for cleaning'),
+--     ('Automatic Feeders', 'Feeding', 'All Houses', 'Programmable feeding systems'),
+--     ('Water Pumps', 'Feeding', 'Water Room', 'Electric water pumps for drinking systems'),
+--     ('Vaccination Sprayers', 'Medical', 'Medical Supply Room', 'Fine mist sprayers'),
+--     ('Pressure Washers', 'Cleaning', 'Equipment Shed', 'High-pressure cleaning equipment');
+
+-- Sample Equipment Items (for testing)
+-- Shovels (categoryId = 1)
+-- INSERT INTO equipment_items (categoryId, status, purchaseDate, purchasePrice, lastMaintenanceDate, nextMaintenanceDate) VALUES
+--     (1, 'Good', '2024-01-15', 25.00, '2025-01-10', '2025-07-10'),
+--     (1, 'Good', '2024-01-15', 25.00, '2025-01-10', '2025-07-10'),
+--     (1, 'Fair', '2023-06-20', 22.00, '2024-12-05', '2025-06-05'),
+--     (1, 'Broken', '2023-06-20', 22.00, '2024-11-15', NULL);
+
+-- Automatic Feeders (categoryId = 2)
+-- INSERT INTO equipment_items (categoryId, status, purchaseDate, purchasePrice, lastMaintenanceDate, nextMaintenanceDate) VALUES
+--     (2, 'Good', '2024-03-15', 2500.00, '2025-01-05', '2025-04-05'),
+--     (2, 'Good', '2024-03-15', 2500.00, '2025-01-05', '2025-04-05'),
+--     (2, 'Good', '2024-03-15', 2500.00, '2025-01-05', '2025-04-05'),
+--     (2, 'Good', '2024-03-15', 2500.00, '2025-01-05', '2025-04-05');
+
+-- ============================================================
+-- Views for Easy Querying
+-- ============================================================
+
+-- View: Equipment summary with counts
+CREATE VIEW IF NOT EXISTS v_equipment_summary AS
+SELECT 
+    ec.id,
+    ec.name,
+    ec.category,
+    ec.location,
+    COUNT(ei.id) as totalItems,
+    SUM(CASE WHEN ei.status = 'Good' THEN 1 ELSE 0 END) as goodItems,
+    SUM(CASE WHEN ei.status = 'Fair' THEN 1 ELSE 0 END) as fairItems,
+    SUM(CASE WHEN ei.status = 'Broken' THEN 1 ELSE 0 END) as brokenItems,
+    SUM(ei.purchasePrice) as totalValue
+FROM equipment_categories ec
+LEFT JOIN equipment_items ei ON ec.id = ei.categoryId
+GROUP BY ec.id, ec.name, ec.category, ec.location;
+
+-- View: Items needing maintenance soon (within 7 days)
+CREATE VIEW IF NOT EXISTS v_maintenance_due AS
+SELECT 
+    ec.name as categoryName,
+    ei.id as itemId,
+    ei.status,
+    ei.nextMaintenanceDate,
+    CAST((julianday(ei.nextMaintenanceDate) - julianday('now')) AS INTEGER) as daysUntilMaintenance
+FROM equipment_items ei
+JOIN equipment_categories ec ON ei.categoryId = ec.id
+WHERE ei.nextMaintenanceDate IS NOT NULL
+    AND ei.nextMaintenanceDate <= date('now', '+7 days')
+    AND ei.nextMaintenanceDate >= date('now')
+ORDER BY ei.nextMaintenanceDate;
+
+-- ============================================================
+-- End of Equipment Schema
+-- ============================================================
 
 -- ============================================================
 -- Tasks Table

@@ -1,6 +1,5 @@
 package ma.farm.dao;
 
-import ma.farm.model.Equipment;
 import org.junit.jupiter.api.*;
 
 import java.time.LocalDate;
