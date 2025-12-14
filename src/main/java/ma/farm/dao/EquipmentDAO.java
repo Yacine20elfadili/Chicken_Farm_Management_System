@@ -11,35 +11,15 @@ import ma.farm.model.Equipment;
 
 /**
  * EquipmentDAO - Data Access Object for Equipment inventory management
- *
- * Provides database operations for the Equipment model including:
- * - CRUD operations (Create, Read, Update, Delete)
- * - Filtering by status and category
- * - Maintenance tracking
- *
- * All database operations use prepared statements to prevent SQL injection.
- *
- * @author Chicken Farm Management System
- * @version 1.0
  */
 public class EquipmentDAO {
 
     private final DatabaseConnection dbConnection;
 
-    /**
-     * Constructor - Initializes the DAO with a database connection instance
-     */
     public EquipmentDAO() {
         this.dbConnection = DatabaseConnection.getInstance();
     }
 
-    /**
-     * Maps a ResultSet row to an Equipment object
-     *
-     * @param rs the ResultSet positioned at the current row
-     * @return an Equipment object populated with data from the ResultSet
-     * @throws SQLException if a database access error occurs
-     */
     private Equipment mapResultSetToEquipment(ResultSet rs) throws SQLException {
         Equipment equipment = new Equipment();
         equipment.setId(rs.getInt("id"));
@@ -48,19 +28,19 @@ public class EquipmentDAO {
         equipment.setQuantity(rs.getInt("quantity"));
         equipment.setStatus(rs.getString("status"));
         
-        String purchaseDateStr = rs.getString("purchase_date");
+        String purchaseDateStr = rs.getString("purchaseDate");
         if (purchaseDateStr != null) {
             equipment.setPurchaseDate(LocalDate.parse(purchaseDateStr));
         }
         
-        equipment.setPurchasePrice(rs.getDouble("purchase_price"));
+        equipment.setPurchasePrice(rs.getDouble("purchasePrice"));
         
-        String lastMaintenanceDateStr = rs.getString("last_maintenance_date");
+        String lastMaintenanceDateStr = rs.getString("lastMaintenanceDate");
         if (lastMaintenanceDateStr != null) {
             equipment.setLastMaintenanceDate(LocalDate.parse(lastMaintenanceDateStr));
         }
         
-        String nextMaintenanceDateStr = rs.getString("next_maintenance_date");
+        String nextMaintenanceDateStr = rs.getString("nextMaintenanceDate");
         if (nextMaintenanceDateStr != null) {
             equipment.setNextMaintenanceDate(LocalDate.parse(nextMaintenanceDateStr));
         }
@@ -73,14 +53,10 @@ public class EquipmentDAO {
 
     /**
      * Add new equipment to the database
-     *
-     * @param equipment the Equipment object to add
-     * @return true if successful, false otherwise
      */
     public boolean addEquipment(Equipment equipment) {
-        String sql = "INSERT INTO equipment (name, category, quantity, status, purchase_date, purchase_price, last_maintenance_date, next_maintenance_date, location, notes) " +
-                     "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        
+        String sql = "INSERT INTO equipment (name, category, quantity, status, purchaseDate, purchasePrice, lastMaintenanceDate, nextMaintenanceDate, location, notes) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
         try (PreparedStatement stmt = dbConnection.getConnection().prepareStatement(sql)) {
             stmt.setString(1, equipment.getName());
             stmt.setString(2, equipment.getCategory());
@@ -94,6 +70,7 @@ public class EquipmentDAO {
             stmt.setString(10, equipment.getNotes());
             
             int rowsAffected = stmt.executeUpdate();
+            System.out.println("Equipment insert: " + rowsAffected + " rows affected");
             return rowsAffected > 0;
         } catch (SQLException e) {
             System.err.println("Error adding equipment: " + e.getMessage());
@@ -104,8 +81,6 @@ public class EquipmentDAO {
 
     /**
      * Get all equipment from the database
-     *
-     * @return a list of all Equipment objects
      */
     public List<Equipment> getAllEquipment() {
         List<Equipment> equipmentList = new ArrayList<>();
@@ -127,9 +102,6 @@ public class EquipmentDAO {
 
     /**
      * Get equipment by ID
-     *
-     * @param id the equipment ID
-     * @return the Equipment object, or null if not found
      */
     public Equipment getEquipmentById(int id) {
         String sql = "SELECT * FROM equipment WHERE id = ?";
@@ -152,9 +124,6 @@ public class EquipmentDAO {
 
     /**
      * Get equipment by category
-     *
-     * @param category the equipment category
-     * @return a list of Equipment objects matching the category
      */
     public List<Equipment> getEquipmentByCategory(String category) {
         List<Equipment> equipmentList = new ArrayList<>();
@@ -178,9 +147,6 @@ public class EquipmentDAO {
 
     /**
      * Get equipment by status
-     *
-     * @param status the equipment status (Good, Fair, Broken)
-     * @return a list of Equipment objects with the specified status
      */
     public List<Equipment> getEquipmentByStatus(String status) {
         List<Equipment> equipmentList = new ArrayList<>();
@@ -204,8 +170,6 @@ public class EquipmentDAO {
 
     /**
      * Get broken equipment
-     *
-     * @return a list of broken Equipment objects
      */
     public List<Equipment> getBrokenEquipment() {
         return getEquipmentByStatus("Broken");
@@ -213,15 +177,13 @@ public class EquipmentDAO {
 
     /**
      * Get equipment due for maintenance
-     *
-     * @return a list of Equipment objects due for maintenance soon
      */
     public List<Equipment> getEquipmentDueForMaintenance() {
         List<Equipment> equipmentList = new ArrayList<>();
-        String sql = "SELECT * FROM equipment WHERE next_maintenance_date IS NOT NULL " +
-                     "AND next_maintenance_date <= date('now', '+7 days') " +
-                     "AND next_maintenance_date >= date('now') " +
-                     "ORDER BY next_maintenance_date";
+        String sql = "SELECT * FROM equipment WHERE nextMaintenanceDate IS NOT NULL " +
+                     "AND nextMaintenanceDate <= date('now', '+7 days') " +
+                     "AND nextMaintenanceDate >= date('now') " +
+                     "ORDER BY nextMaintenanceDate";
         
         try (Statement stmt = dbConnection.getConnection().createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
@@ -239,14 +201,11 @@ public class EquipmentDAO {
 
     /**
      * Update equipment information
-     *
-     * @param equipment the Equipment object with updated data
-     * @return true if successful, false otherwise
      */
     public boolean updateEquipment(Equipment equipment) {
         String sql = "UPDATE equipment SET name = ?, category = ?, quantity = ?, status = ?, " +
-                     "purchase_date = ?, purchase_price = ?, last_maintenance_date = ?, " +
-                     "next_maintenance_date = ?, location = ?, notes = ? " +
+                     "purchaseDate = ?, purchasePrice = ?, lastMaintenanceDate = ?, " +
+                     "nextMaintenanceDate = ?, location = ?, notes = ? " +
                      "WHERE id = ?";
         
         try (PreparedStatement stmt = dbConnection.getConnection().prepareStatement(sql)) {
@@ -273,10 +232,6 @@ public class EquipmentDAO {
 
     /**
      * Update equipment status only
-     *
-     * @param equipmentId the equipment ID
-     * @param newStatus the new status
-     * @return true if successful, false otherwise
      */
     public boolean updateEquipmentStatus(int equipmentId, String newStatus) {
         String sql = "UPDATE equipment SET status = ? WHERE id = ?";
@@ -296,13 +251,9 @@ public class EquipmentDAO {
 
     /**
      * Update equipment last maintenance date
-     *
-     * @param equipmentId the equipment ID
-     * @param maintenanceDate the maintenance date
-     * @return true if successful, false otherwise
      */
     public boolean updateLastMaintenanceDate(int equipmentId, LocalDate maintenanceDate) {
-        String sql = "UPDATE equipment SET last_maintenance_date = ? WHERE id = ?";
+        String sql = "UPDATE equipment SET lastMaintenanceDate = ? WHERE id = ?";
         
         try (PreparedStatement stmt = dbConnection.getConnection().prepareStatement(sql)) {
             stmt.setString(1, maintenanceDate != null ? maintenanceDate.toString() : null);
@@ -319,9 +270,6 @@ public class EquipmentDAO {
 
     /**
      * Delete equipment from the database
-     *
-     * @param equipmentId the equipment ID
-     * @return true if successful, false otherwise
      */
     public boolean deleteEquipment(int equipmentId) {
         String sql = "DELETE FROM equipment WHERE id = ?";
@@ -340,11 +288,9 @@ public class EquipmentDAO {
 
     /**
      * Get total value of all equipment
-     *
-     * @return the total value in currency
      */
     public double getTotalEquipmentValue() {
-        String sql = "SELECT SUM(purchase_price * quantity) as total FROM equipment";
+        String sql = "SELECT SUM(purchasePrice * quantity) as total FROM equipment";
         
         try (Statement stmt = dbConnection.getConnection().createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
@@ -362,8 +308,6 @@ public class EquipmentDAO {
 
     /**
      * Get count of broken equipment
-     *
-     * @return the number of broken equipment items
      */
     public int getBrokenEquipmentCount() {
         String sql = "SELECT COUNT(*) as count FROM equipment WHERE status = 'Broken'";

@@ -3,8 +3,16 @@ package ma.farm.controller;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import ma.farm.controller.dialogs.AddEditEquipmentDialogController;
+import ma.farm.controller.dialogs.AddEditFeedDialogController;
+import ma.farm.controller.dialogs.AddEditMedicationDialogController;
 import ma.farm.dao.FeedDAO;
 import ma.farm.dao.MedicationDAO;
 import ma.farm.dao.EquipmentDAO;
@@ -12,7 +20,9 @@ import ma.farm.model.Feed;
 import ma.farm.model.Medication;
 import ma.farm.model.Equipment;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * StorageController - Controls the Storage view
@@ -109,20 +119,17 @@ public class StorageController {
      */
     private void setupTableColumns() {
         if (equipmentNameColumn != null) {
-            // Bind equipmentNameColumn to name property
             equipmentNameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
         }
 
         if (equipmentQuantityColumn != null) {
-            // Bind equipmentQuantityColumn to quantity property
             equipmentQuantityColumn.setCellValueFactory(new PropertyValueFactory<>("quantity"));
         }
 
         if (equipmentStatusColumn != null) {
-            // Bind equipmentStatusColumn to status property
             equipmentStatusColumn.setCellValueFactory(new PropertyValueFactory<>("status"));
 
-                        // Add status badge cell factory (color coding)
+            // Add status badge cell factory (color coding)
             equipmentStatusColumn.setCellFactory(column -> new TableCell<Equipment, String>() {
                 @Override
                 protected void updateItem(String status, boolean empty) {
@@ -133,14 +140,11 @@ public class StorageController {
                         setGraphic(null);
                         setStyle("");
                     } else {
-                        // Clear text, we'll use a Label as graphic
                         setText(null);
                         
-                        // Create a Label for the status badge
                         Label statusLabel = new Label(status);
                         statusLabel.setStyle("-fx-padding: 6px 12px; -fx-background-radius: 6px; -fx-font-weight: bold; -fx-font-size: 12px;");
                         
-                        // Apply color to the label badge based on status
                         switch (status.toLowerCase()) {
                             case "good":
                                 statusLabel.setStyle(statusLabel.getStyle() + " -fx-background-color: #d1fae5; -fx-text-fill: #065f46;");
@@ -155,13 +159,11 @@ public class StorageController {
                                 statusLabel.setStyle(statusLabel.getStyle() + " -fx-background-color: #e5e7eb; -fx-text-fill: #374151;");
                         }
                         
-                        // Set the badge as the graphic (not background of the whole cell!)
                         setGraphic(statusLabel);
                         setStyle("-fx-alignment: CENTER_LEFT;");
                     }
                 }
             });
-
         }
     }
 
@@ -170,20 +172,16 @@ public class StorageController {
      */
     private void loadFeedData() {
         try {
-            // Get all feed from FeedDAO
             List<Feed> feeds = feedDAO.getAllFeed();
 
-            // Clear list
             feedList.clear();
 
-            // Format feed info (name, quantity, type)
             for (Feed feed : feeds) {
                 String feedInfo = String.format("%s - %.1f kg (%s)",
                         feed.getName(),
                         feed.getQuantityKg(),
                         feed.getType());
 
-                // Highlight low stock items
                 if (feed.isLowStock()) {
                     feedInfo += " ⚠️ LOW STOCK";
                 }
@@ -191,11 +189,9 @@ public class StorageController {
                 feedList.add(feedInfo);
             }
 
-            // Update feedListView
             if (feedListView != null) {
                 feedListView.setItems(feedList);
 
-                // Apply custom cell factory for low stock highlighting
                 feedListView.setCellFactory(param -> new ListCell<String>() {
                     @Override
                     protected void updateItem(String item, boolean empty) {
@@ -207,7 +203,6 @@ public class StorageController {
                         } else {
                             setText(item);
 
-                            // Highlight low stock in red
                             if (item.contains("LOW STOCK")) {
                                 setStyle("-fx-text-fill: #dc3545; -fx-font-weight: bold;");
                             } else {
@@ -218,7 +213,6 @@ public class StorageController {
                 });
             }
 
-            // Update totalFeedTypesLabel
             if (totalFeedTypesLabel != null) {
                 totalFeedTypesLabel.setText(String.valueOf(feeds.size()));
             }
@@ -233,18 +227,13 @@ public class StorageController {
      */
     private void loadMedicationsData() {
         try {
-            // Get all medications from MedicationDAO
             List<Medication> medications = medicationDAO.getAllMedications();
 
-            // Clear list
             medicationList.clear();
 
-            // Format medication info - DIFFERENT FROM FEED!
-            // Show: Name, Type, Expiry Date, Supplier
             for (Medication medication : medications) {
                 String medicationInfo;
                 
-                // Build medication info string with expiry and supplier
                 if (medication.getExpiryDate() != null && medication.getSupplier() != null) {
                     medicationInfo = String.format("%s (%s) - %d %s\nExpire: %s | Fournisseur: %s",
                             medication.getName(),
@@ -268,23 +257,18 @@ public class StorageController {
                             medication.getUnit());
                 }
 
-                // Highlight EXPIRED items first (more critical!)
                 if (medication.isExpired()) {
                     medicationInfo = "🚫 EXPIRÉ - " + medicationInfo;
-                }
-                // Then highlight low stock items
-                else if (medication.isLowStock()) {
+                } else if (medication.isLowStock()) {
                     medicationInfo = "⚠️ STOCK BAS - " + medicationInfo;
                 }
 
                 medicationList.add(medicationInfo);
             }
 
-            // Update medicationListView
             if (medicationListView != null) {
                 medicationListView.setItems(medicationList);
 
-                // Apply custom cell factory for expired and low stock highlighting
                 medicationListView.setCellFactory(param -> new ListCell<String>() {
                     @Override
                     protected void updateItem(String item, boolean empty) {
@@ -296,12 +280,9 @@ public class StorageController {
                         } else {
                             setText(item);
 
-                            // Highlight EXPIRED in dark red (more critical)
                             if (item.contains("EXPIRÉ")) {
                                 setStyle("-fx-text-fill: #b91c1c; -fx-font-weight: bold; -fx-background-color: #fee2e2;");
-                            }
-                            // Highlight low stock in orange
-                            else if (item.contains("STOCK BAS")) {
+                            } else if (item.contains("STOCK BAS")) {
                                 setStyle("-fx-text-fill: #ea580c; -fx-font-weight: bold; -fx-background-color: #ffedd5;");
                             } else {
                                 setStyle("");
@@ -311,7 +292,6 @@ public class StorageController {
                 });
             }
 
-            // Update totalMedicationsLabel
             if (totalMedicationsLabel != null) {
                 totalMedicationsLabel.setText(String.valueOf(medications.size()));
             }
@@ -321,27 +301,22 @@ public class StorageController {
         }
     }
 
-
     /**
      * Load and display equipment table
      */
     private void loadEquipmentData() {
         try {
-            // Get all equipment from EquipmentDAO
             List<Equipment> equipments = equipmentDAO.getAllEquipment();
 
-            // Sort by status (Broken first)
             equipments.sort((e1, e2) -> {
                 if (e1.isBroken() && !e2.isBroken()) return -1;
                 if (!e1.isBroken() && e2.isBroken()) return 1;
                 return e1.getName().compareTo(e2.getName());
             });
 
-            // Add to equipmentList
             equipmentList.clear();
             equipmentList.addAll(equipments);
 
-            // Update equipmentTable
             if (equipmentTable != null) {
                 equipmentTable.setItems(equipmentList);
             }
@@ -357,19 +332,35 @@ public class StorageController {
      */
     @FXML
     public void handleAddFeed() {
-        // TODO: Open add/restock feed dialog
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Add Feed");
-        alert.setHeaderText("Add/Restock Feed Feature");
-        alert.setContentText("This feature will open a dialog to add new feed or restock existing.\n\nDialog implementation is pending.");
-        alert.showAndWait();
+        try {
+            // Load FXML for Add/Edit Feed Dialog
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/dialogs/AddEditFeedDialog.fxml"));
+            Parent root = loader.load();
 
-        // After dialog implementation:
-        // - Get feed details (name, type, quantity, price)
-        // - Check if feed exists
-        // - If exists, update quantity (restock)
-        // - If new, create Feed record using feedDAO.addFeed()
-        // - Refresh feed data
+            // Get controller
+            AddEditFeedDialogController controller = loader.getController();
+
+            // Create dialog stage
+            Stage dialogStage = new Stage();
+            dialogStage.setTitle("Ajouter Aliment");
+            dialogStage.initModality(Modality.WINDOW_MODAL);
+            dialogStage.initOwner(addFeedButton.getScene().getWindow());
+            dialogStage.setScene(new Scene(root));
+            
+            // Set controller reference to stage
+            controller.setDialogStage(dialogStage);
+
+            // Show dialog and wait
+            dialogStage.showAndWait();
+
+            // Refresh feed data after dialog closes
+            loadFeedData();
+
+        } catch (IOException e) {
+            System.err.println("Error opening Add Feed dialog: " + e.getMessage());
+            e.printStackTrace();
+            showError("Erreur lors de l'ouverture du dialogue");
+        }
     }
 
     /**
@@ -378,19 +369,65 @@ public class StorageController {
      */
     @FXML
     public void handleUseFeed() {
-        // TODO: Open use feed dialog
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Use Feed");
-        alert.setHeaderText("Use Feed Feature");
-        alert.setContentText("This feature will open a dialog to deduct feed from inventory.\n\nDialog implementation is pending.");
-        alert.showAndWait();
+        // Get selected feed from list
+        String selectedFeedStr = feedListView.getSelectionModel().getSelectedItem();
+        
+        if (selectedFeedStr == null) {
+            showWarning("Aucune sélection", "Veuillez sélectionner un aliment à utiliser");
+            return;
+        }
 
-        // After dialog implementation:
-        // - Get feed selection
-        // - Get quantity to use
-        // - Validate available quantity
-        // - Deduct from inventory using feedDAO.updateQuantity()
-        // - Refresh feed data
+        // Extract feed name from the string
+        String feedName = selectedFeedStr.split(" - ")[0].trim();
+        
+        // Find the feed object
+        List<Feed> feeds = feedDAO.getAllFeed();
+        Feed selectedFeed = feeds.stream()
+                .filter(f -> f.getName().equals(feedName))
+                .findFirst()
+                .orElse(null);
+
+        if (selectedFeed == null) {
+            showError("Aliment introuvable");
+            return;
+        }
+
+        // Create input dialog for quantity
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle("Utiliser Aliment");
+        dialog.setHeaderText("Utiliser: " + selectedFeed.getName());
+        dialog.setContentText("Quantité à utiliser (kg):");
+
+        Optional<String> result = dialog.showAndWait();
+        result.ifPresent(quantityStr -> {
+            try {
+                double quantity = Double.parseDouble(quantityStr);
+                
+                if (quantity <= 0) {
+                    showError("La quantité doit être supérieure à 0");
+                    return;
+                }
+                
+                if (quantity > selectedFeed.getQuantityKg()) {
+                    showError("Quantité insuffisante en stock (" + selectedFeed.getQuantityKg() + " kg disponible)");
+                    return;
+                }
+
+                // Update quantity
+                double newQuantity = selectedFeed.getQuantityKg() - quantity;
+                boolean success = feedDAO.updateQuantity(selectedFeed.getId(), newQuantity);
+
+                if (success) {
+                    showSuccess("Aliment utilisé avec succès");
+                    loadFeedData();
+                } else {
+                    showError("Erreur lors de l'utilisation de l'aliment");
+                }
+
+            } catch (NumberFormatException e) {
+                showError("Veuillez entrer un nombre valide");
+            }
+        });
     }
 
     /**
@@ -399,18 +436,29 @@ public class StorageController {
      */
     @FXML
     public void handleAddMedication() {
-        // TODO: Open add/restock medication dialog
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Add Medication");
-        alert.setHeaderText("Add/Restock Medication Feature");
-        alert.setContentText("This feature will open a dialog to add new medication or restock.\n\nDialog implementation is pending.");
-        alert.showAndWait();
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/dialogs/AddEditMedicationDialog.fxml"));
+            Parent root = loader.load();
 
-        // After dialog implementation:
-        // - Get medication details
-        // - Check if medication exists
-        // - Update or create record using medicationDAO.addMedication()
-        // - Refresh medications data
+            AddEditMedicationDialogController controller = loader.getController();
+
+            Stage dialogStage = new Stage();
+            dialogStage.setTitle("Ajouter Médicament");
+            dialogStage.initModality(Modality.WINDOW_MODAL);
+            dialogStage.initOwner(addMedicationButton.getScene().getWindow());
+            dialogStage.setScene(new Scene(root));
+            
+            controller.setDialogStage(dialogStage);
+
+            dialogStage.showAndWait();
+
+            loadMedicationsData();
+
+        } catch (IOException e) {
+            System.err.println("Error opening Add Medication dialog: " + e.getMessage());
+            e.printStackTrace();
+            showError("Erreur lors de l'ouverture du dialogue");
+        }
     }
 
     /**
@@ -419,19 +467,72 @@ public class StorageController {
      */
     @FXML
     public void handleUseMedication() {
-        // TODO: Open use medication dialog
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Use Medication");
-        alert.setHeaderText("Use Medication Feature");
-        alert.setContentText("This feature will open a dialog to deduct medication from inventory.\n\nDialog implementation is pending.");
-        alert.showAndWait();
+        String selectedMedStr = medicationListView.getSelectionModel().getSelectedItem();
+        
+        if (selectedMedStr == null) {
+            showWarning("Aucune sélection", "Veuillez sélectionner un médicament à utiliser");
+            return;
+        }
 
-        // After dialog implementation:
-        // - Get medication selection
-        // - Get quantity to use
-        // - Validate available quantity
-        // - Deduct from inventory using medicationDAO.updateQuantity()
-        // - Refresh medications data
+        // Extract medication name
+        String medName = selectedMedStr;
+        if (medName.contains("EXPIRÉ")) {
+            medName = medName.replace("🚫 EXPIRÉ - ", "");
+        } else if (medName.contains("STOCK BAS")) {
+            medName = medName.replace("⚠️ STOCK BAS - ", "");
+        }
+        medName = medName.split(" \\(")[0].trim();
+        final String MedName = medName;
+        List<Medication> medications = medicationDAO.getAllMedications();
+        Medication selectedMed = medications.stream()
+                .filter(m -> m.getName().equals(MedName))
+                .findFirst()
+                .orElse(null);
+
+        if (selectedMed == null) {
+            showError("Médicament introuvable");
+            return;
+        }
+
+        if (selectedMed.isExpired()) {
+            showWarning("Médicament expiré", "Ce médicament est expiré et ne devrait pas être utilisé");
+            return;
+        }
+
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle("Utiliser Médicament");
+        dialog.setHeaderText("Utiliser: " + selectedMed.getName());
+        dialog.setContentText("Quantité à utiliser (" + selectedMed.getUnit() + "):");
+
+        Optional<String> result = dialog.showAndWait();
+        result.ifPresent(quantityStr -> {
+            try {
+                int quantity = Integer.parseInt(quantityStr);
+                
+                if (quantity <= 0) {
+                    showError("La quantité doit être supérieure à 0");
+                    return;
+                }
+                
+                if (quantity > selectedMed.getQuantity()) {
+                    showError("Quantité insuffisante en stock (" + selectedMed.getQuantity() + " " + selectedMed.getUnit() + " disponible)");
+                    return;
+                }
+
+                double newQuantity = selectedMed.getQuantity() - quantity;
+                boolean success = medicationDAO.updateQuantity(selectedMed.getId(), newQuantity);
+
+                if (success) {
+                    showSuccess("Médicament utilisé avec succès");
+                    loadMedicationsData();
+                } else {
+                    showError("Erreur lors de l'utilisation du médicament");
+                }
+
+            } catch (NumberFormatException e) {
+                showError("Veuillez entrer un nombre entier valide");
+            }
+        });
     }
 
     /**
@@ -440,17 +541,29 @@ public class StorageController {
      */
     @FXML
     public void handleAddEquipment() {
-        // TODO: Open add equipment dialog
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Add Equipment");
-        alert.setHeaderText("Add Equipment Feature");
-        alert.setContentText("This feature will open a dialog to add new equipment.\n\nDialog implementation is pending.");
-        alert.showAndWait();
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/dialogs/AddEditEquipmentDialog.fxml"));
+            Parent root = loader.load();
 
-        // After dialog implementation:
-        // - Get equipment details
-        // - Create Equipment record using equipmentDAO.addEquipment()
-        // - Refresh equipment table
+            AddEditEquipmentDialogController controller = loader.getController();
+
+            Stage dialogStage = new Stage();
+            dialogStage.setTitle("Ajouter Équipement");
+            dialogStage.initModality(Modality.WINDOW_MODAL);
+            dialogStage.initOwner(addEquipmentButton.getScene().getWindow());
+            dialogStage.setScene(new Scene(root));
+            
+            controller.setDialogStage(dialogStage);
+
+            dialogStage.showAndWait();
+
+            loadEquipmentData();
+
+        } catch (IOException e) {
+            System.err.println("Error opening Add Equipment dialog: " + e.getMessage());
+            e.printStackTrace();
+            showError("Erreur lors de l'ouverture du dialogue");
+        }
     }
 
     /**
@@ -459,30 +572,39 @@ public class StorageController {
      */
     @FXML
     public void handleUpdateEquipmentStatus() {
-        // Get selected equipment from table
         Equipment selectedEquipment = equipmentTable.getSelectionModel().getSelectedItem();
 
-        // If nothing selected, show error
         if (selectedEquipment == null) {
-            Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle("No Selection");
-            alert.setHeaderText("No Equipment Selected");
-            alert.setContentText("Please select equipment to update its status.");
-            alert.showAndWait();
+            showWarning("Aucune sélection", "Veuillez sélectionner un équipement à modifier");
             return;
         }
 
-        // TODO: Open update status dialog
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Update Equipment Status");
-        alert.setHeaderText("Update Status Feature");
-        alert.setContentText("This feature will open a dialog to change equipment status.\n\nCurrent status: " + selectedEquipment.getStatus() + "\n\nDialog implementation is pending.");
-        alert.showAndWait();
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/dialogs/AddEditEquipmentDialog.fxml"));
+            Parent root = loader.load();
 
-        // After dialog implementation:
-        // - Get new status (Good/Fair/Broken)
-        // - Update equipment record using equipmentDAO.updateStatus()
-        // - Refresh equipment table
+            AddEditEquipmentDialogController controller = loader.getController();
+
+            // Set equipment for editing
+            controller.setEquipment(selectedEquipment);
+
+            Stage dialogStage = new Stage();
+            dialogStage.setTitle("Modifier Équipement");
+            dialogStage.initModality(Modality.WINDOW_MODAL);
+            dialogStage.initOwner(updateEquipmentStatusButton.getScene().getWindow());
+            dialogStage.setScene(new Scene(root));
+            
+            controller.setDialogStage(dialogStage);
+
+            dialogStage.showAndWait();
+
+            loadEquipmentData();
+
+        } catch (IOException e) {
+            System.err.println("Error opening Edit Equipment dialog: " + e.getMessage());
+            e.printStackTrace();
+            showError("Erreur lors de l'ouverture du dialogue");
+        }
     }
 
     /**
@@ -490,13 +612,34 @@ public class StorageController {
      */
     @FXML
     public void refreshData() {
-        // Reload feed data
         loadFeedData();
-
-        // Reload medications data
         loadMedicationsData();
-
-        // Reload equipment data
         loadEquipmentData();
+    }
+
+    // Helper methods for showing alerts
+
+    private void showError(String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Erreur");
+        alert.setHeaderText("Une erreur s'est produite");
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+
+    private void showSuccess(String message) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Succès");
+        alert.setHeaderText("Opération réussie");
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+
+    private void showWarning(String header, String message) {
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setTitle("Attention");
+        alert.setHeaderText(header);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 }

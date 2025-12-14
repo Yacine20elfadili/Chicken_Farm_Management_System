@@ -300,8 +300,8 @@ public class ChickenBayController {
         System.out.println("=== CHICKEN BAY: handleAddHouse() called ===");
         try {
             // Load Add House Dialog FXML
-            System.out.println("CHICKEN BAY: Loading FXML from /dialogs/AddHouseDialog.fxml");
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/dialogs/AddHouseDialog.fxml"));
+            System.out.println("CHICKEN BAY: Loading FXML from /fxml/dialogs/AddHouseDialog.fxml");
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/dialogs/AddHouseDialog.fxml"));
             Parent root = loader.load();
             System.out.println("CHICKEN BAY: FXML loaded successfully");
 
@@ -360,8 +360,8 @@ public class ChickenBayController {
             System.out.println("CHICKEN BAY: House found: " + house);
 
             // Load Edit House Dialog FXML
-            System.out.println("CHICKEN BAY: Loading FXML from /dialogs/EditHouseDialo.fxml");
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/dialogs/EditHouseDialog.fxml"));
+            System.out.println("CHICKEN BAY: Loading FXML from /fxml/dialogs/EditHouseDialo.fxml");
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/dialogs/EditHouseDialog.fxml"));
             Parent root = loader.load();
             System.out.println("CHICKEN BAY: FXML loaded successfully");
 
@@ -453,8 +453,8 @@ public class ChickenBayController {
         System.out.println("=== CHICKEN BAY: handleRecordDeath() called ===");
         try {
             // Load Record Mortality Dialog FXML
-            System.out.println("CHICKEN BAY: Loading FXML from /dialogs/RecordMortalityDialog.fxml");
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/dialogs/RecordMortalityDialog.fxml"));
+            System.out.println("CHICKEN BAY: Loading FXML from /fxml/dialogs/RecordMortalityDialog.fxml");
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/dialogs/RecordMortalityDialog.fxml"));
             Parent root = loader.load();
             System.out.println("CHICKEN BAY: FXML loaded successfully");
 

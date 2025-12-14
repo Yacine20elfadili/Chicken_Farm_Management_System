@@ -11,67 +11,44 @@ import ma.farm.model.Feed;
 
 /**
  * FeedDAO - Data Access Object for Feed inventory management
- *
- * Provides database operations for the Feed model including:
- * - CRUD operations (Create, Read, Update, Delete)
- * - Filtering by type and stock levels
- * - Low stock alerts
- *
- * All database operations use prepared statements to prevent SQL injection.
- *
- * @author Chicken Farm Management System
- * @version 1.0
  */
 public class FeedDAO {
 
     private final DatabaseConnection dbConnection;
 
-    /**
-     * Constructor - Initializes the DAO with a database connection instance
-     */
     public FeedDAO() {
         this.dbConnection = DatabaseConnection.getInstance();
     }
 
-    /**
-     * Maps a ResultSet row to a Feed object
-     *
-     * @param rs the ResultSet positioned at the current row
-     * @return a Feed object populated with data from the ResultSet
-     * @throws SQLException if a database access error occurs
-     */
     private Feed mapResultSetToFeed(ResultSet rs) throws SQLException {
         Feed feed = new Feed();
         feed.setId(rs.getInt("id"));
         feed.setName(rs.getString("name"));
         feed.setType(rs.getString("type"));
-        feed.setQuantityKg(rs.getDouble("quantity_kg"));
-        feed.setPricePerKg(rs.getDouble("price_per_kg"));
+        feed.setQuantityKg(rs.getDouble("quantityKg"));
+        feed.setPricePerKg(rs.getDouble("pricePerKg"));
         feed.setSupplier(rs.getString("supplier"));
         
-        String lastRestockDateStr = rs.getString("last_restock_date");
+        String lastRestockDateStr = rs.getString("lastRestockDate");
         if (lastRestockDateStr != null) {
             feed.setLastRestockDate(LocalDate.parse(lastRestockDateStr));
         }
         
-        String expiryDateStr = rs.getString("expiry_date");
+        String expiryDateStr = rs.getString("expiryDate");
         if (expiryDateStr != null) {
             feed.setExpiryDate(LocalDate.parse(expiryDateStr));
         }
         
-        feed.setMinStockLevel(rs.getDouble("min_stock_level"));
+        feed.setMinStockLevel(rs.getDouble("minStockLevel"));
         
         return feed;
     }
 
     /**
      * Add a new feed to the database
-     *
-     * @param feed the Feed object to add
-     * @return true if successful, false otherwise
      */
     public boolean addFeed(Feed feed) {
-        String sql = "INSERT INTO feed (name, type, quantity_kg, price_per_kg, supplier, last_restock_date, expiry_date, min_stock_level) " +
+        String sql = "INSERT INTO feed (name, type, quantityKg, pricePerKg, supplier, lastRestockDate, expiryDate, minStockLevel) " +
                      "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         
         try (PreparedStatement stmt = dbConnection.getConnection().prepareStatement(sql)) {
@@ -85,6 +62,7 @@ public class FeedDAO {
             stmt.setDouble(8, feed.getMinStockLevel());
             
             int rowsAffected = stmt.executeUpdate();
+            System.out.println("Feed insert: " + rowsAffected + " rows affected");
             return rowsAffected > 0;
         } catch (SQLException e) {
             System.err.println("Error adding feed: " + e.getMessage());
@@ -95,8 +73,6 @@ public class FeedDAO {
 
     /**
      * Get all feed from the database
-     *
-     * @return a list of all Feed objects
      */
     public List<Feed> getAllFeed() {
         List<Feed> feedList = new ArrayList<>();
@@ -118,9 +94,6 @@ public class FeedDAO {
 
     /**
      * Get feed by ID
-     *
-     * @param id the feed ID
-     * @return the Feed object, or null if not found
      */
     public Feed getFeedById(int id) {
         String sql = "SELECT * FROM feed WHERE id = ?";
@@ -143,9 +116,6 @@ public class FeedDAO {
 
     /**
      * Get feed by type
-     *
-     * @param type the feed type
-     * @return a list of Feed objects matching the type
      */
     public List<Feed> getFeedByType(String type) {
         List<Feed> feedList = new ArrayList<>();
@@ -169,12 +139,10 @@ public class FeedDAO {
 
     /**
      * Get all feed with low stock
-     *
-     * @return a list of Feed objects with quantity below minimum level
      */
     public List<Feed> getLowStockFeed() {
         List<Feed> feedList = new ArrayList<>();
-        String sql = "SELECT * FROM feed WHERE quantity_kg < min_stock_level ORDER BY name";
+        String sql = "SELECT * FROM feed WHERE quantityKg < minStockLevel ORDER BY name";
         
         try (Statement stmt = dbConnection.getConnection().createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
@@ -192,15 +160,13 @@ public class FeedDAO {
 
     /**
      * Get all expiring feed (within 30 days)
-     *
-     * @return a list of Feed objects expiring soon
      */
     public List<Feed> getExpiringFeed() {
         List<Feed> feedList = new ArrayList<>();
-        String sql = "SELECT * FROM feed WHERE expiry_date IS NOT NULL " +
-                     "AND expiry_date <= date('now', '+30 days') " +
-                     "AND expiry_date >= date('now') " +
-                     "ORDER BY expiry_date";
+        String sql = "SELECT * FROM feed WHERE expiryDate IS NOT NULL " +
+                     "AND expiryDate <= date('now', '+30 days') " +
+                     "AND expiryDate >= date('now') " +
+                     "ORDER BY expiryDate";
         
         try (Statement stmt = dbConnection.getConnection().createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
@@ -218,14 +184,12 @@ public class FeedDAO {
 
     /**
      * Get expired feed
-     *
-     * @return a list of expired Feed objects
      */
     public List<Feed> getExpiredFeed() {
         List<Feed> feedList = new ArrayList<>();
-        String sql = "SELECT * FROM feed WHERE expiry_date IS NOT NULL " +
-                     "AND expiry_date < date('now') " +
-                     "ORDER BY expiry_date DESC";
+        String sql = "SELECT * FROM feed WHERE expiryDate IS NOT NULL " +
+                     "AND expiryDate < date('now') " +
+                     "ORDER BY expiryDate DESC";
         
         try (Statement stmt = dbConnection.getConnection().createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
@@ -243,15 +207,11 @@ public class FeedDAO {
 
     /**
      * Update feed information
-     *
-     * @param feed the Feed object with updated data
-     * @return true if successful, false otherwise
      */
     public boolean updateFeed(Feed feed) {
-        String sql = "UPDATE feed SET name = ?, type = ?, quantity_kg = ?, price_per_kg = ?, " +
-                     "supplier = ?, last_restock_date = ?, expiry_date = ?, min_stock_level = ? " +
-                     "WHERE id = ?";
-        
+        String sql = "UPDATE feed SET name = ?, type = ?, quantityKg = ?, pricePerKg = ?, supplier = ?, " +
+                     "lastRestockDate = ?, expiryDate = ?, minStockLevel = ? WHERE id = ?";
+
         try (PreparedStatement stmt = dbConnection.getConnection().prepareStatement(sql)) {
             stmt.setString(1, feed.getName());
             stmt.setString(2, feed.getType());
@@ -274,13 +234,9 @@ public class FeedDAO {
 
     /**
      * Update feed quantity (for usage/consumption)
-     *
-     * @param feedId the feed ID
-     * @param newQuantity the new quantity in kg
-     * @return true if successful, false otherwise
      */
     public boolean updateQuantity(int feedId, double newQuantity) {
-        String sql = "UPDATE feed SET quantity_kg = ? WHERE id = ?";
+        String sql = "UPDATE feed SET quantityKg = ? WHERE id = ?";
         
         try (PreparedStatement stmt = dbConnection.getConnection().prepareStatement(sql)) {
             stmt.setDouble(1, newQuantity);
@@ -297,9 +253,6 @@ public class FeedDAO {
 
     /**
      * Delete feed from the database
-     *
-     * @param feedId the feed ID
-     * @return true if successful, false otherwise
      */
     public boolean deleteFeed(int feedId) {
         String sql = "DELETE FROM feed WHERE id = ?";
@@ -318,11 +271,9 @@ public class FeedDAO {
 
     /**
      * Get total value of all feed inventory
-     *
-     * @return the total value in currency
      */
     public double getTotalFeedValue() {
-        String sql = "SELECT SUM(quantity_kg * price_per_kg) as total FROM feed";
+        String sql = "SELECT SUM(quantityKg * pricePerKg) as total FROM feed";
         
         try (Statement stmt = dbConnection.getConnection().createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
@@ -340,11 +291,9 @@ public class FeedDAO {
 
     /**
      * Get total quantity of all feed
-     *
-     * @return the total quantity in kg
      */
     public double getTotalFeedQuantity() {
-        String sql = "SELECT SUM(quantity_kg) as total FROM feed";
+        String sql = "SELECT SUM(quantityKg) as total FROM feed";
         
         try (Statement stmt = dbConnection.getConnection().createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {

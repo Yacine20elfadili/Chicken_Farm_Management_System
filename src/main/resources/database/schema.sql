@@ -535,7 +535,7 @@ CREATE TABLE IF NOT EXISTS equipment (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name VARCHAR(100) NOT NULL,
     category VARCHAR(50) NOT NULL,
-    quantity INTEGER NOT NULL DEFAULT 1,
+    quantity INTEGER NOT NULL DEFAULT 0,
     status VARCHAR(20) NOT NULL DEFAULT 'Good',
     purchaseDate DATE,
     purchasePrice REAL NOT NULL DEFAULT 0,

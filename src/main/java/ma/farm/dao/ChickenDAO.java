@@ -132,6 +132,35 @@ public class ChickenDAO {
         return chickens;
     }
 
+    /**
+     * Retrieves the total dead chickens recorded for a house within a date range
+     *
+     * Used to track flock health and adjust house chicken counts.
+     *
+     * @param houseId the ID of the house
+     * @param startDate the start date (inclusive)
+     * @param endDate the end date (inclusive)
+     * @return the total number of dead chickens recorded
+     */
+    public int getTotalDeadChickens(int houseId, LocalDate startDate, LocalDate endDate) {
+        String sql = "SELECT COALESCE(SUM(deadChickens), 0) AS total FROM egg_production " +
+                "WHERE houseId = ? AND productionDate BETWEEN ? AND ?";
+        try (PreparedStatement stmt = dbConnection.getConnection().prepareStatement(sql)) {
+            stmt.setInt(1, houseId);
+            // Convert LocalDate to String for SQLite
+            stmt.setString(2, startDate.toString());
+            stmt.setString(3, endDate.toString());
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("total");
+            }
+        } catch (SQLException e) {
+            System.err.println("Error getting total dead chickens: " + e.getMessage());
+        }
+        return 0;
+    }
+
+
     // Get chickens due for transfer
     public List<Chicken> getChickensDueForTransfer(LocalDate date) {
         String sql = "SELECT * FROM chickens WHERE nextTransferDate <= ? AND nextTransferDate IS NOT NULL ORDER BY nextTransferDate ASC";
