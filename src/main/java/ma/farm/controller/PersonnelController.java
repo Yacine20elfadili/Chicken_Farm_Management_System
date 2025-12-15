@@ -33,6 +33,25 @@ public class PersonnelController {
     @FXML
     private Label totalTrackersLabel;
 
+    // Statistics labels for new departments
+    @FXML
+    private Label totalPersonnelLabel;
+
+    @FXML
+    private Label totalVeterinaryLabel;
+
+    @FXML
+    private Label totalInventoryLabel;
+
+    @FXML
+    private Label totalSupervisorsLabel;
+
+    @FXML
+    private Label totalFarmhandsLabel;
+
+    // Filter state
+    private String currentFilter = "All"; // Default filter
+
     // DAO
     private PersonnelDAO personnelDAO;
 
@@ -53,20 +72,39 @@ public class PersonnelController {
             personnelGrid.setVgap(25);
         }
 
-        // Load personnel data
+        // Load all operations personnel by default
         loadPersonnelData();
 
-        // Update statistics
-        updateStatistics();
+        // Update all statistics
+        updateAllStatistics();
     }
 
     /**
-     * Load and display all personnel
+     * Load and display personnel based on current filter
      */
     private void loadPersonnelData() {
         try {
-            // Get all personnel from PersonnelDAO
-            List<Personnel> personnelList = personnelDAO.getAllPersonnel();
+            // Get personnel based on current filter
+            List<Personnel> personnelList;
+
+            switch (currentFilter) {
+                case "Veterinary":
+                    personnelList = personnelDAO.getAllVeterinary();
+                    break;
+                case "Inventory":
+                    personnelList = personnelDAO.getAllInventoryTrackers();
+                    break;
+                case "Supervisors":
+                    personnelList = personnelDAO.getAllSupervisors();
+                    break;
+                case "Farmhands":
+                    personnelList = personnelDAO.getAllFarmhands();
+                    break;
+                case "All":
+                default:
+                    personnelList = personnelDAO.getOperationsPersonnel();
+                    break;
+            }
 
             // Clear grid
             if (personnelGrid != null) {
@@ -106,8 +144,6 @@ public class PersonnelController {
                 }
             }
 
-            // Update statistics
-            updateStatistics();
         } catch (Exception e) {
             System.err.println("Error loading personnel data: " + e.getMessage());
             e.printStackTrace();
@@ -515,17 +551,74 @@ public class PersonnelController {
     }
 
     /**
-     * Refresh personnel grid
+     * Update all statistics labels
+     */
+    private void updateAllStatistics() {
+        try {
+            // Total operations personnel
+            int totalPersonnel = personnelDAO.getOperationsPersonnel().size();
+            if (totalPersonnelLabel != null) {
+                totalPersonnelLabel.setText(String.valueOf(totalPersonnel));
+            }
+
+            // Still update old labels for backward compatibility
+            if (totalWorkersLabel != null) {
+                totalWorkersLabel.setText(String.valueOf(totalPersonnel));
+            }
+
+            // Veterinary staff
+            int veterinaryCount = personnelDAO.countByJobTitle("veterinary");
+            if (totalVeterinaryLabel != null) {
+                totalVeterinaryLabel.setText(String.valueOf(veterinaryCount));
+            }
+
+            // Inventory trackers
+            int inventoryCount = personnelDAO.countByJobTitle("inventory_tracker");
+            if (totalInventoryLabel != null) {
+                totalInventoryLabel.setText(String.valueOf(inventoryCount));
+            }
+
+            // Supervisors
+            int supervisorsCount = personnelDAO.countByJobTitle("supervisor");
+            if (totalSupervisorsLabel != null) {
+                totalSupervisorsLabel.setText(String.valueOf(supervisorsCount));
+            }
+
+            // Farmhands
+            int farmhandsCount = personnelDAO.countByJobTitle("farmhand");
+            if (totalFarmhandsLabel != null) {
+                totalFarmhandsLabel.setText(String.valueOf(farmhandsCount));
+            }
+
+            // Still update old tracker label
+            if (totalTrackersLabel != null) {
+                totalTrackersLabel.setText(String.valueOf(supervisorsCount));
+            }
+
+        } catch (Exception e) {
+            System.err.println("Error updating statistics: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Handle filter button clicks
+     * @param filterType the filter to apply (All, Veterinary, Inventory, Supervisors, Farmhands)
+     */
+    @FXML
+    public void handleFilterChange(String filterType) {
+        currentFilter = filterType;
+        loadPersonnelData();
+        System.out.println("Filter changed to: " + filterType);
+    }
+
+    /**
+     * Refresh all data and statistics
      */
     @FXML
     public void refreshData() {
-        // Reload personnel data
         loadPersonnelData();
-
-        // Update statistics
-        updateStatistics();
-
-        // Clear selection
+        updateAllStatistics();
         selectedPersonnel = null;
     }
 }

@@ -37,6 +37,7 @@ public class Personnel {
     private boolean isActive;               // Employment status (true = currently employed)
     private String address;                 // Home address
     private String emergencyContact;        // Emergency contact name and phone
+    private Integer supervisorId;              // Foreign key to supervisor (null if no supervisor)
 
     /**
      * Default constructor
@@ -67,10 +68,10 @@ public class Personnel {
 
     /**
      * Full constructor
-     * 
+     *
      * Creates a complete Personnel object with all fields populated.
      * Used primarily by DAO when retrieving records from the database.
-     * 
+     *
      * @param id the database ID
      * @param fullName the full name
      * @param age the age
@@ -83,10 +84,11 @@ public class Personnel {
      * @param isActive whether the employee is currently active
      * @param address the home address
      * @param emergencyContact the emergency contact information
+     * @param supervisorId the supervisor's ID (null if no supervisor)
      */
     public Personnel(int id, String fullName, int age, String phone, String email,
                      String jobTitle, LocalDate hireDate, double salary, String shift,
-                     boolean isActive, String address, String emergencyContact) {
+                     boolean isActive, String address, String emergencyContact, Integer supervisorId) {
         this.id = id;
         this.fullName = fullName;
         this.age = age;
@@ -99,6 +101,7 @@ public class Personnel {
         this.isActive = isActive;
         this.address = address;
         this.emergencyContact = emergencyContact;
+        this.supervisorId = supervisorId;
     }
 
     /**
@@ -291,6 +294,62 @@ public class Personnel {
      */
     public void setEmergencyContact(String emergencyContact) {
         this.emergencyContact = emergencyContact;
+    }
+
+    /**
+     * Gets the supervisor ID of this personnel
+     * @return the supervisor ID, or null if no supervisor
+     */
+    public Integer getSupervisorId() {
+        return supervisorId;
+    }
+
+    /**
+     * Sets the supervisor ID of this personnel
+     * @param supervisorId the supervisor ID, or null if no supervisor
+     */
+    public void setSupervisorId(Integer supervisorId) {
+        this.supervisorId = supervisorId;
+    }
+
+    /**
+     * Checks if this personnel has a supervisor
+     * @return true if supervisorId is not null, false otherwise
+     */
+    public boolean hasSupervisor() {
+        return supervisorId != null;
+    }
+
+    /**
+     * Checks if this personnel is a supervisor (has the supervisor job title)
+     * @return true if job title is "supervisor", false otherwise
+     */
+    public boolean isSupervisor() {
+        return "supervisor".equalsIgnoreCase(this.jobTitle);
+    }
+
+    /**
+     * Checks if this personnel is a farmhand (regular worker)
+     * @return true if job title is "farmhand", false otherwise
+     */
+    public boolean isFarmhand() {
+        return "farmhand".equalsIgnoreCase(this.jobTitle);
+    }
+
+    /**
+     * Checks if this personnel is veterinary staff
+     * @return true if job title is "veterinary", false otherwise
+     */
+    public boolean isVeterinary() {
+        return "veterinary".equalsIgnoreCase(this.jobTitle);
+    }
+
+    /**
+     * Checks if this personnel is an inventory tracker
+     * @return true if job title is "inventory_tracker", false otherwise
+     */
+    public boolean isInventoryTracker() {
+        return "inventory_tracker".equalsIgnoreCase(this.jobTitle);
     }
 
     /**

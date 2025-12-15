@@ -41,8 +41,34 @@ CREATE TABLE IF NOT EXISTS personnel (
 );
 
 
+-- ============================================================
+-- UPDATE: Add supervisor relationship to personnel table
+-- ============================================================
 
+-- Add supervisorId column to existing personnel table (if not exists)
+-- Note: This is safe to run multiple times
+ALTER TABLE personnel ADD COLUMN supervisorId INTEGER REFERENCES personnel(id) ON DELETE SET NULL;
 
+-- Create index for supervisor lookups
+CREATE INDEX IF NOT EXISTS idx_personnel_supervisor ON personnel(supervisorId);
+
+-- ============================================================
+-- UPDATE: Add new job titles for operations personnel
+-- ============================================================
+
+-- Insert new job titles (using INSERT OR IGNORE to prevent duplicates)
+INSERT OR IGNORE INTO jobTitles (name) VALUES ('veterinary');
+INSERT OR IGNORE INTO jobTitles (name) VALUES ('inventory_tracker');
+INSERT OR IGNORE INTO jobTitles (name) VALUES ('supervisor');
+INSERT OR IGNORE INTO jobTitles (name) VALUES ('farmhand');
+INSERT OR IGNORE INTO jobTitles (name) VALUES ('administration');
+INSERT OR IGNORE INTO jobTitles (name) VALUES ('cashier');
+
+-- Note: 'tracker' and 'worker' already exist from previous schema
+
+-- Insert default job titles if not exists
+INSERT OR IGNORE INTO jobTitles (name) VALUES ('tracker')
+INSERT OR IGNORE INTO jobTitles (name) VALUES ('worker')
 
 
 
@@ -58,11 +84,7 @@ INSERT OR IGNORE INTO users (name, email, password)
 VALUES ('Administrator', 'admin@farm.ma', 'admin123')
 ON CONFLICT(email) DO NOTHING;
 
--- Insert default job titles if not exists
-INSERT OR IGNORE INTO jobTitles (name) VALUES ('tracker')
-ON CONFLICT(name) DO NOTHING;
-INSERT OR IGNORE INTO jobTitles (name) VALUES ('worker')
-ON CONFLICT(name) DO NOTHING;
+
 
 -- Insert default shifts if not exists
 INSERT OR IGNORE INTO shifts (name, startTime, endTime)

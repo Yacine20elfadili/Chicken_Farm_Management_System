@@ -149,8 +149,8 @@ public class PersonnelDAO {
     // Create personnel
     public boolean createPersonnel(Personnel personnel) {
         String sql =
-            "INSERT INTO personnel (fullName, age, phone, email, jobTitle, hireDate, salary, shift, isActive, address, emergencyContact) " +
-            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                "INSERT INTO personnel (fullName, age, phone, email, jobTitle, hireDate, salary, shift, isActive, address, emergencyContact, supervisorId) " +
+                        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (
             PreparedStatement stmt = dbConnection
@@ -189,6 +189,7 @@ public class PersonnelDAO {
             stmt.setBoolean(9, personnel.isActive());
             stmt.setString(10, personnel.getAddress());
             stmt.setString(11, personnel.getEmergencyContact());
+            stmt.setObject(12, personnel.getSupervisorId(), java.sql.Types.INTEGER);
 
             int rows = stmt.executeUpdate();
             if (rows == 0) return false;
@@ -225,7 +226,7 @@ public class PersonnelDAO {
     // Update personnel
     public boolean updatePersonnel(Personnel personnel) {
         String sql =
-            "UPDATE personnel SET fullName = ?, age = ?, phone = ?, email = ?, jobTitle = ?, hireDate = ?, salary = ?, shift = ?, isActive = ?, address = ?, emergencyContact = ? WHERE id = ?";
+                "UPDATE personnel SET fullName = ?, age = ?, phone = ?, email = ?, jobTitle = ?, hireDate = ?, salary = ?, shift = ?, isActive = ?, address = ?, emergencyContact = ?, supervisorId = ? WHERE id = ?";
 
         try (
             PreparedStatement stmt = dbConnection
@@ -264,7 +265,8 @@ public class PersonnelDAO {
             stmt.setBoolean(9, personnel.isActive());
             stmt.setString(10, personnel.getAddress());
             stmt.setString(11, personnel.getEmergencyContact());
-            stmt.setInt(12, personnel.getId());
+            stmt.setObject(12, personnel.getSupervisorId(), java.sql.Types.INTEGER);
+            stmt.setInt(13, personnel.getId());
 
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
@@ -333,7 +335,8 @@ public class PersonnelDAO {
                     getShiftName(rs.getInt("shift")),
                     rs.getBoolean("isActive"),
                     rs.getString("address"),
-                    rs.getString("emergencyContact")
+                    rs.getString("emergencyContact"),
+                    rs.getObject("supervisorId", Integer.class)
                 );
             }
         } catch (SQLException e) {
@@ -376,7 +379,8 @@ public class PersonnelDAO {
                     getShiftName(rs.getInt("shift")),
                     rs.getBoolean("isActive"),
                     rs.getString("address"),
-                    rs.getString("emergencyContact")
+                    rs.getString("emergencyContact"),
+                    rs.getObject("supervisorId", Integer.class)
                 );
                 personnelList.add(personnel);
             }
@@ -421,7 +425,8 @@ public class PersonnelDAO {
                     getShiftName(rs.getInt("shift")),
                     rs.getBoolean("isActive"),
                     rs.getString("address"),
-                    rs.getString("emergencyContact")
+                    rs.getString("emergencyContact"),
+                    rs.getObject("supervisorId", Integer.class)
                 );
                 personnelList.add(personnel);
             }
@@ -478,7 +483,8 @@ public class PersonnelDAO {
                     getShiftName(rs.getInt("shift")),
                     rs.getBoolean("isActive"),
                     rs.getString("address"),
-                    rs.getString("emergencyContact")
+                    rs.getString("emergencyContact"),
+                    rs.getObject("supervisorId", Integer.class)
                 );
                 personnelList.add(personnel);
             }
@@ -535,7 +541,8 @@ public class PersonnelDAO {
                     getShiftName(rs.getInt("shift")),
                     rs.getBoolean("isActive"),
                     rs.getString("address"),
-                    rs.getString("emergencyContact")
+                    rs.getString("emergencyContact"),
+                    rs.getObject("supervisorId", Integer.class)
                 );
                 personnelList.add(personnel);
             }
@@ -587,7 +594,8 @@ public class PersonnelDAO {
                     getShiftName(rs.getInt("shift")),
                     rs.getBoolean("isActive"),
                     rs.getString("address"),
-                    rs.getString("emergencyContact")
+                    rs.getString("emergencyContact"),
+                    rs.getObject("supervisorId", Integer.class)
                 );
             }
         } catch (SQLException e) {
@@ -778,7 +786,8 @@ public class PersonnelDAO {
                     getShiftName(rs.getInt("shift")),
                     rs.getBoolean("isActive"),
                     rs.getString("address"),
-                    rs.getString("emergencyContact")
+                    rs.getString("emergencyContact"),
+                    rs.getObject("supervisorId", Integer.class)
                 );
                 personnelList.add(personnel);
             }
@@ -831,7 +840,8 @@ public class PersonnelDAO {
                     getShiftName(rs.getInt("shift")),
                     rs.getBoolean("isActive"),
                     rs.getString("address"),
-                    rs.getString("emergencyContact")
+                    rs.getString("emergencyContact"),
+                    rs.getObject("supervisorId", Integer.class)
                 );
                 personnelList.add(personnel);
             }
@@ -843,5 +853,204 @@ public class PersonnelDAO {
         return personnelList;
     }
 
+    /**
+     * Retrieves all personnel who are supervisors
+     *
+     * @return a List of Personnel with supervisor job title
+     */
+    public List<Personnel> getAllSupervisors() {
+        return getPersonnelByJobTitle("supervisor");
+    }
+
+    /**
+     * Retrieves all farmhands (workers under supervisors)
+     *
+     * @return a List of Personnel with farmhand job title
+     */
+    public List<Personnel> getAllFarmhands() {
+        return getPersonnelByJobTitle("farmhand");
+    }
+
+    /**
+     * Retrieves all veterinary staff
+     *
+     * @return a List of Personnel with veterinary job title
+     */
+    public List<Personnel> getAllVeterinary() {
+        return getPersonnelByJobTitle("veterinary");
+    }
+
+    /**
+     * Retrieves all inventory trackers
+     *
+     * @return a List of Personnel with inventory_tracker job title
+     */
+    public List<Personnel> getAllInventoryTrackers() {
+        return getPersonnelByJobTitle("inventory_tracker");
+    }
+
+    /**
+     * Retrieves all personnel under a specific supervisor
+     *
+     * @param supervisorId the ID of the supervisor
+     * @return a List of Personnel who report to this supervisor
+     */
+    public List<Personnel> getPersonnelBySupervisorId(int supervisorId) {
+        String sql = "SELECT * FROM personnel WHERE supervisorId = ?";
+        List<Personnel> personnelList = new ArrayList<>();
+        try (
+                PreparedStatement stmt = dbConnection
+                        .getConnection()
+                        .prepareStatement(sql)
+        ) {
+            stmt.setInt(1, supervisorId);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                LocalDate hireDate = null;
+                try {
+                    String hireDateStr = rs.getString("hireDate");
+                    if (hireDateStr != null && !hireDateStr.isEmpty()) {
+                        hireDate = LocalDate.parse(hireDateStr);
+                    }
+                } catch (Exception e) {
+                    // Date parsing error - skip
+                }
+                Personnel personnel = new Personnel(
+                        rs.getInt("id"),
+                        rs.getString("fullName"),
+                        rs.getInt("age"),
+                        rs.getString("phone"),
+                        rs.getString("email"),
+                        getJobTitleName(rs.getInt("jobTitle")),
+                        hireDate,
+                        rs.getDouble("salary"),
+                        getShiftName(rs.getInt("shift")),
+                        rs.getBoolean("isActive"),
+                        rs.getString("address"),
+                        rs.getString("emergencyContact"),
+                        rs.getObject("supervisorId", Integer.class)
+                );
+                personnelList.add(personnel);
+            }
+        } catch (SQLException e) {
+            System.err.println(
+                    "Error getting personnel by supervisor: " + e.getMessage()
+            );
+        }
+        return personnelList;
+    }
+
+    /**
+     * Gets the count of personnel under a specific supervisor
+     *
+     * @param supervisorId the ID of the supervisor
+     * @return the number of subordinates
+     */
+    public int getSubordinateCount(int supervisorId) {
+        String sql = "SELECT COUNT(*) AS count FROM personnel WHERE supervisorId = ?";
+        try (
+                PreparedStatement stmt = dbConnection
+                        .getConnection()
+                        .prepareStatement(sql)
+        ) {
+            stmt.setInt(1, supervisorId);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("count");
+            }
+        } catch (SQLException e) {
+            System.err.println(
+                    "Error counting subordinates: " + e.getMessage()
+            );
+        }
+        return 0;
+    }
+
+    /**
+     * Checks if a supervisor has any subordinates
+     *
+     * @param supervisorId the ID of the supervisor
+     * @return true if the supervisor has subordinates, false otherwise
+     */
+    public boolean hasSupervisedPersonnel(int supervisorId) {
+        return getSubordinateCount(supervisorId) > 0;
+    }
+
+    /**
+     * Gets all operations personnel (excludes admin and cashier)
+     *
+     * @return a List of Personnel excluding admin/cashier roles
+     */
+    public List<Personnel> getOperationsPersonnel() {
+        String sql = "SELECT * FROM personnel WHERE jobTitle IN " +
+                "(SELECT id FROM jobTitles WHERE name IN ('veterinary', 'inventory_tracker', 'supervisor', 'farmhand'))";
+        List<Personnel> personnelList = new ArrayList<>();
+        try (Statement stmt = dbConnection.getConnection().createStatement()) {
+            ResultSet rs = stmt.executeQuery(sql);
+            while (rs.next()) {
+                LocalDate hireDate = null;
+                try {
+                    String hireDateStr = rs.getString("hireDate");
+                    if (hireDateStr != null && !hireDateStr.isEmpty()) {
+                        hireDate = LocalDate.parse(hireDateStr);
+                    }
+                } catch (Exception e) {
+                    // Date parsing error - skip
+                }
+                Personnel personnel = new Personnel(
+                        rs.getInt("id"),
+                        rs.getString("fullName"),
+                        rs.getInt("age"),
+                        rs.getString("phone"),
+                        rs.getString("email"),
+                        getJobTitleName(rs.getInt("jobTitle")),
+                        hireDate,
+                        rs.getDouble("salary"),
+                        getShiftName(rs.getInt("shift")),
+                        rs.getBoolean("isActive"),
+                        rs.getString("address"),
+                        rs.getString("emergencyContact"),
+                        rs.getObject("supervisorId", Integer.class)
+                );
+                personnelList.add(personnel);
+            }
+        } catch (SQLException e) {
+            System.err.println(
+                    "Error getting operations personnel: " + e.getMessage()
+            );
+        }
+        return personnelList;
+    }
+
+    /**
+     * Count personnel by job title
+     *
+     * @param jobTitle the job title to count
+     * @return the number of personnel with that job title
+     */
+    public int countByJobTitle(String jobTitle) {
+        int jobTitleId = getJobTitleId(jobTitle);
+        if (jobTitleId == -1) {
+            return 0;
+        }
+
+        String sql = "SELECT COUNT(*) AS count FROM personnel WHERE jobTitle = ?";
+        try (
+                PreparedStatement stmt = dbConnection
+                        .getConnection()
+                        .prepareStatement(sql)
+        ) {
+            stmt.setInt(1, jobTitleId);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("count");
+            }
+        } catch (SQLException e) {
+            System.err.println(
+                    "Error counting personnel by job title: " + e.getMessage()
+            );
+        }
+        return 0;
+    }
 
 }
