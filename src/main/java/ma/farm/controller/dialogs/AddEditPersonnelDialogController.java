@@ -217,16 +217,18 @@ public class AddEditPersonnelDialogController {
         }
     }
 
-    /**
-     * Handle save button click
-     */
     @FXML
     public void handleSave() {
+        System.out.println("DEBUG: Save button clicked");
+
         if (validateInput()) {
             try {
                 // Create or update personnel object
                 if (personnel == null) {
                     personnel = new Personnel();
+                    System.out.println("DEBUG: Creating new personnel");
+                } else {
+                    System.out.println("DEBUG: Updating existing personnel ID: " + personnel.getId());
                 }
 
                 // Set all fields
@@ -242,10 +244,16 @@ public class AddEditPersonnelDialogController {
                 personnel.setEmergencyContact(emergencyContactField.getText().trim());
                 personnel.setActive(true); // Always active when creating/editing
 
+                System.out.println("DEBUG: Personnel object prepared:");
+                System.out.println("  Name: " + personnel.getFullName());
+                System.out.println("  Job Title: " + personnel.getJobTitle());
+                System.out.println("  Email: " + personnel.getEmail());
+
                 // Set supervisor if farmhand
                 if ("farmhand".equalsIgnoreCase(jobTitleComboBox.getValue())) {
                     Integer supervisorId = extractSupervisorId(supervisorComboBox.getValue());
                     personnel.setSupervisorId(supervisorId);
+                    System.out.println("DEBUG: Farmhand supervisor ID: " + supervisorId);
                 } else {
                     personnel.setSupervisorId(null);
                 }
@@ -254,23 +262,30 @@ public class AddEditPersonnelDialogController {
                 boolean success;
                 if (personnel.getId() == 0) {
                     // CREATE
+                    System.out.println("DEBUG: Calling createPersonnel()");
                     success = personnelDAO.createPersonnel(personnel);
                 } else {
                     // UPDATE
+                    System.out.println("DEBUG: Calling updatePersonnel()");
                     success = personnelDAO.updatePersonnel(personnel);
                 }
 
                 if (success) {
+                    System.out.println("DEBUG: Personnel saved successfully, ID: " + personnel.getId());
                     saveClicked = true;
                     dialogStage.close();
                 } else {
-                    showError("Échec de l'enregistrement du personnel");
+                    System.err.println("DEBUG: Failed to save personnel");
+                    showError("Échec de l'enregistrement du personnel. Vérifiez les logs.");
                 }
 
             } catch (Exception e) {
-                showError("Erreur lors de l'enregistrement: " + e.getMessage());
+                System.err.println("ERROR during save: " + e.getMessage());
                 e.printStackTrace();
+                showError("Erreur lors de l'enregistrement: " + e.getMessage());
             }
+        } else {
+            System.out.println("DEBUG: Validation failed");
         }
     }
 

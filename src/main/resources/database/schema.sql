@@ -1,5 +1,9 @@
 PRAGMA foreign_keys = ON;
 
+-- DROP TABLE IF EXISTS personnel;
+-- DROP TABLE IF EXISTS shifts;
+-- DROP TABLE IF EXISTS jobTitles;
+
 CREATE TABLE IF NOT EXISTS jobTitles (
                                          id INTEGER PRIMARY KEY AUTOINCREMENT,
                                          name VARCHAR(50) NOT NULL UNIQUE
@@ -56,13 +60,14 @@ CREATE INDEX IF NOT EXISTS idx_personnel_supervisor ON personnel(supervisorId);
 -- UPDATE: Add new job titles for operations personnel
 -- ============================================================
 
--- Insert new job titles (using INSERT OR IGNORE to prevent duplicates)
+-- Update the schema.sql file (fix job titles insertion)
 INSERT OR IGNORE INTO jobTitles (name) VALUES ('veterinary');
 INSERT OR IGNORE INTO jobTitles (name) VALUES ('inventory_tracker');
 INSERT OR IGNORE INTO jobTitles (name) VALUES ('supervisor');
 INSERT OR IGNORE INTO jobTitles (name) VALUES ('farmhand');
 INSERT OR IGNORE INTO jobTitles (name) VALUES ('administration');
 INSERT OR IGNORE INTO jobTitles (name) VALUES ('cashier');
+-- Also add legacy titles for backward compatibility
 INSERT OR IGNORE INTO jobTitles (name) VALUES ('tracker');
 INSERT OR IGNORE INTO jobTitles (name) VALUES ('worker');
 
@@ -90,6 +95,33 @@ ON CONFLICT(name) DO NOTHING;
 INSERT OR IGNORE INTO shifts (name, startTime, endTime)
 VALUES ('evening', '15:00:01', '00:00:00')
 ON CONFLICT(name) DO NOTHING;
+
+
+-- Check all tables and their contents
+SELECT 'jobTitles' as table_name, COUNT(*) as row_count FROM jobTitles
+UNION ALL
+SELECT 'shifts' as table_name, COUNT(*) as row_count FROM shifts
+UNION ALL
+SELECT 'personnel' as table_name, COUNT(*) as row_count FROM personnel
+UNION ALL
+SELECT 'users' as table_name, COUNT(*) as row_count FROM users;
+
+-- Check personnel details
+SELECT
+    p.id,
+    p.fullName,
+    p.email,
+    j.name as jobTitle,
+    s.name as shift,
+    p.isActive,
+    p.supervisorId
+FROM personnel p
+         LEFT JOIN jobTitles j ON p.jobTitle = j.id
+         LEFT JOIN shifts s ON p.shift = s.id;
+
+-- Check if foreign key constraints are working
+PRAGMA foreign_keys;
+PRAGMA foreign_key_check;
 
 -- -- Insert default personnel if not exists
 -- INSERT OR IGNORE INTO personnel (fullName, age, phone, email, jobTitle, hireDate, salary, shift, isActive, address, emergencyContact)

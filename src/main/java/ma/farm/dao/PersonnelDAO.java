@@ -46,17 +46,20 @@ public class PersonnelDAO {
         String jobTitle = null;
         String query = "SELECT name FROM jobTitles WHERE id = ?";
         try (
-            PreparedStatement stmt = dbConnection
-                .getConnection()
-                .prepareStatement(query)
+                PreparedStatement stmt = dbConnection
+                        .getConnection()
+                        .prepareStatement(query)
         ) {
             stmt.setInt(1, jobTitleId);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
                 jobTitle = rs.getString("name");
+                System.out.println("DEBUG: Found job title ID " + jobTitleId + " = " + jobTitle);
+            } else {
+                System.err.println("WARNING: No job title found for ID: " + jobTitleId);
             }
         } catch (SQLException e) {
-            System.err.println("Error getting job title: " + e.getMessage());
+            System.err.println("ERROR getting job title ID " + jobTitleId + ": " + e.getMessage());
         }
         return jobTitle;
     }
@@ -67,73 +70,136 @@ public class PersonnelDAO {
      * @param jobTitle the name of the job title (e.g., "tracker", "worker")
      * @return the database ID of the job title, or -1 if not found
      */
-    private int getJobTitleId(String jobTitle) {
+    public int getJobTitleId(String jobTitle) {
         int jobTitleId = -1;
         String query = "SELECT id FROM jobTitles WHERE name = ?";
         try (
-            PreparedStatement stmt = dbConnection
-                .getConnection()
-                .prepareStatement(query)
+                PreparedStatement stmt = dbConnection
+                        .getConnection()
+                        .prepareStatement(query)
         ) {
             stmt.setString(1, jobTitle);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
                 jobTitleId = rs.getInt(1);
+                System.out.println("DEBUG: Job title '" + jobTitle + "' has ID: " + jobTitleId);
+            } else {
+                System.err.println("WARNING: No ID found for job title: " + jobTitle);
+                // Try to insert it if it doesn't exist
+                if (!insertJobTitle(jobTitle)) {
+                    System.err.println("ERROR: Failed to insert job title: " + jobTitle);
+                }
             }
         } catch (SQLException e) {
-            System.err.println("Error getting job title id: " + e.getMessage());
+            System.err.println("ERROR getting job title id for '" + jobTitle + "': " + e.getMessage());
+            e.printStackTrace();
         }
         return jobTitleId;
     }
 
     /**
-     * Retrieves shift name from its database ID
-     *
-     * @param shiftId the database ID of the shift
-     * @return the name of the shift (e.g., "morning", "evening", "night"), or null if not found
+     * Insert a new job title if it doesn't exist
+     */
+    private boolean insertJobTitle(String jobTitle) {
+        String sql = "INSERT OR IGNORE INTO jobTitles (name) VALUES (?)";
+        try (
+                PreparedStatement stmt = dbConnection
+                        .getConnection()
+                        .prepareStatement(sql)
+        ) {
+            stmt.setString(1, jobTitle);
+            int rows = stmt.executeUpdate();
+            System.out.println("DEBUG: Inserted job title '" + jobTitle + "', rows affected: " + rows);
+            return rows > 0;
+        } catch (SQLException e) {
+            System.err.println("ERROR inserting job title '" + jobTitle + "': " + e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Improved shift lookup
      */
     private String getShiftName(int shiftId) {
         String shift = null;
         String query = "SELECT name FROM shifts WHERE id = ?";
         try (
-            PreparedStatement stmt = dbConnection
-                .getConnection()
-                .prepareStatement(query)
+                PreparedStatement stmt = dbConnection
+                        .getConnection()
+                        .prepareStatement(query)
         ) {
             stmt.setInt(1, shiftId);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
                 shift = rs.getString("name");
+                System.out.println("DEBUG: Found shift ID " + shiftId + " = " + shift);
+            } else {
+                System.err.println("WARNING: No shift found for ID: " + shiftId);
             }
         } catch (SQLException e) {
-            System.err.println("Error getting shift: " + e.getMessage());
+            System.err.println("ERROR getting shift ID " + shiftId + ": " + e.getMessage());
         }
         return shift;
     }
 
     /**
-     * Retrieves shift ID from its name
-     *
-     * @param shift the name of the shift (e.g., "morning", "evening", "night")
-     * @return the database ID of the shift, or -1 if not found
+     * Improved shift ID lookup
      */
     private int getShiftId(String shift) {
         int shiftId = -1;
         String query = "SELECT id FROM shifts WHERE name = ?";
         try (
-            PreparedStatement stmt = dbConnection
-                .getConnection()
-                .prepareStatement(query)
+                PreparedStatement stmt = dbConnection
+                        .getConnection()
+                        .prepareStatement(query)
         ) {
             stmt.setString(1, shift);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
                 shiftId = rs.getInt(1);
+                System.out.println("DEBUG: Shift '" + shift + "' has ID: " + shiftId);
+            } else {
+                System.err.println("WARNING: No ID found for shift: " + shift);
+                // Try to insert it if it doesn't exist
+                if (!insertShift(shift)) {
+                    System.err.println("ERROR: Failed to insert shift: " + shift);
+                }
             }
         } catch (SQLException e) {
-            System.err.println("Error getting shift id: " + e.getMessage());
+            System.err.println("ERROR getting shift id for '" + shift + "': " + e.getMessage());
         }
         return shiftId;
+    }
+
+    /**
+     * Insert a new shift if it doesn't exist
+     */
+    private boolean insertShift(String shift) {
+        // Default times for new shifts
+        String startTime = "06:00:00";
+        String endTime = "15:00:00";
+
+        if ("evening".equalsIgnoreCase(shift)) {
+            startTime = "15:00:00";
+            endTime = "00:00:00";
+        }
+
+        String sql = "INSERT OR IGNORE INTO shifts (name, startTime, endTime) VALUES (?, ?, ?)";
+        try (
+                PreparedStatement stmt = dbConnection
+                        .getConnection()
+                        .prepareStatement(sql)
+        ) {
+            stmt.setString(1, shift);
+            stmt.setString(2, startTime);
+            stmt.setString(3, endTime);
+            int rows = stmt.executeUpdate();
+            System.out.println("DEBUG: Inserted shift '" + shift + "', rows affected: " + rows);
+            return rows > 0;
+        } catch (SQLException e) {
+            System.err.println("ERROR inserting shift '" + shift + "': " + e.getMessage());
+            return false;
+        }
     }
 
     /**
@@ -147,70 +213,98 @@ public class PersonnelDAO {
      * @throws RuntimeException if the job title or shift is invalid
      */
     // Create personnel
+    /**
+     * Create personnel with better error handling
+     */
     public boolean createPersonnel(Personnel personnel) {
-        String sql =
-                "INSERT INTO personnel (fullName, age, phone, email, jobTitle, hireDate, salary, shift, isActive, address, emergencyContact, supervisorId) " +
-                        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        System.out.println("DEBUG: Creating personnel: " + personnel.getFullName());
+
+        // Check if email already exists
+        if (emailExists(personnel.getEmail())) {
+            System.err.println("ERROR: Email already exists: " + personnel.getEmail());
+            return false;
+        }
+
+        String sql = "INSERT INTO personnel (fullName, age, phone, email, jobTitle, hireDate, salary, shift, isActive, address, emergencyContact, supervisorId) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (
-            PreparedStatement stmt = dbConnection
-                .getConnection()
-                .prepareStatement(sql)
+                PreparedStatement stmt = dbConnection
+                        .getConnection()
+                        .prepareStatement(sql)
         ) {
+            // Set basic fields
             stmt.setString(1, personnel.getFullName());
             stmt.setInt(2, personnel.getAge());
             stmt.setString(3, personnel.getPhone());
             stmt.setString(4, personnel.getEmail());
 
+            // Job Title
             int jobTitleId = getJobTitleId(personnel.getJobTitle());
             if (jobTitleId == -1) {
-                System.err.println(
-                    "Invalid job title: " + personnel.getJobTitle()
-                );
+                System.err.println("ERROR: Invalid job title: " + personnel.getJobTitle());
                 return false;
             }
             stmt.setInt(5, jobTitleId);
+            System.out.println("DEBUG: Using jobTitle ID: " + jobTitleId + " for: " + personnel.getJobTitle());
 
+            // Hire Date
             if (personnel.getHireDate() != null) {
                 stmt.setDate(6, java.sql.Date.valueOf(personnel.getHireDate()));
             } else {
                 stmt.setNull(6, java.sql.Types.DATE);
             }
 
+            // Salary
             stmt.setDouble(7, personnel.getSalary());
 
+            // Shift
             int shiftId = getShiftId(personnel.getShift());
             if (shiftId == -1) {
-                System.err.println("Invalid shift: " + personnel.getShift());
+                System.err.println("ERROR: Invalid shift: " + personnel.getShift());
                 return false;
             }
             stmt.setInt(8, shiftId);
+            System.out.println("DEBUG: Using shift ID: " + shiftId + " for: " + personnel.getShift());
 
+            // Other fields
             stmt.setBoolean(9, personnel.isActive());
-            stmt.setString(10, personnel.getAddress());
-            stmt.setString(11, personnel.getEmergencyContact());
-            stmt.setObject(12, personnel.getSupervisorId(), java.sql.Types.INTEGER);
+            stmt.setString(10, personnel.getAddress() != null ? personnel.getAddress() : "");
+            stmt.setString(11, personnel.getEmergencyContact() != null ? personnel.getEmergencyContact() : "");
 
+            // Supervisor
+            if (personnel.getSupervisorId() != null) {
+                stmt.setInt(12, personnel.getSupervisorId());
+            } else {
+                stmt.setNull(12, java.sql.Types.INTEGER);
+            }
+
+            // Execute insert
             int rows = stmt.executeUpdate();
-            if (rows == 0) return false;
+            System.out.println("DEBUG: Insert executed, rows affected: " + rows);
 
-            // SQLite: get inserted ID
-            try (
-                Statement idStmt = dbConnection
-                    .getConnection()
-                    .createStatement();
-                ResultSet rs = idStmt.executeQuery(
-                    "SELECT last_insert_rowid() AS id"
-                )
-            ) {
+            if (rows == 0) {
+                System.err.println("ERROR: No rows inserted");
+                return false;
+            }
+
+            // For SQLite, we need to get the last insert ID separately
+            try (Statement idStmt = dbConnection.getConnection().createStatement();
+                 ResultSet rs = idStmt.executeQuery("SELECT last_insert_rowid()")) {
                 if (rs.next()) {
-                    personnel.setId(rs.getInt("id"));
+                    int generatedId = rs.getInt(1);
+                    personnel.setId(generatedId);
+                    System.out.println("DEBUG: Generated ID using last_insert_rowid(): " + generatedId);
                 }
             }
 
             return true;
+
         } catch (SQLException e) {
-            System.err.println("Error creating personnel: " + e.getMessage());
+            System.err.println("SQL ERROR creating personnel: " + e.getMessage());
+            System.err.println("SQL State: " + e.getSQLState());
+            System.err.println("Error Code: " + e.getErrorCode());
+            e.printStackTrace();
             return false;
         }
     }
@@ -225,13 +319,14 @@ public class PersonnelDAO {
      */
     // Update personnel
     public boolean updatePersonnel(Personnel personnel) {
-        String sql =
-                "UPDATE personnel SET fullName = ?, age = ?, phone = ?, email = ?, jobTitle = ?, hireDate = ?, salary = ?, shift = ?, isActive = ?, address = ?, emergencyContact = ?, supervisorId = ? WHERE id = ?";
+        System.out.println("DEBUG: Updating personnel ID: " + personnel.getId());
+
+        String sql = "UPDATE personnel SET fullName = ?, age = ?, phone = ?, email = ?, jobTitle = ?, hireDate = ?, salary = ?, shift = ?, isActive = ?, address = ?, emergencyContact = ?, supervisorId = ? WHERE id = ?";
 
         try (
-            PreparedStatement stmt = dbConnection
-                .getConnection()
-                .prepareStatement(sql)
+                PreparedStatement stmt = dbConnection
+                        .getConnection()
+                        .prepareStatement(sql)
         ) {
             stmt.setString(1, personnel.getFullName());
             stmt.setInt(2, personnel.getAge());
@@ -241,7 +336,7 @@ public class PersonnelDAO {
             int jobTitleId = getJobTitleId(personnel.getJobTitle());
             if (jobTitleId == -1) {
                 System.err.println(
-                    "Invalid job title: " + personnel.getJobTitle()
+                        "ERROR: Invalid job title: " + personnel.getJobTitle()
                 );
                 return false;
             }
@@ -257,20 +352,24 @@ public class PersonnelDAO {
 
             int shiftId = getShiftId(personnel.getShift());
             if (shiftId == -1) {
-                System.err.println("Invalid shift: " + personnel.getShift());
+                System.err.println("ERROR: Invalid shift: " + personnel.getShift());
                 return false;
             }
             stmt.setInt(8, shiftId);
 
             stmt.setBoolean(9, personnel.isActive());
-            stmt.setString(10, personnel.getAddress());
-            stmt.setString(11, personnel.getEmergencyContact());
+            stmt.setString(10, personnel.getAddress() != null ? personnel.getAddress() : "");
+            stmt.setString(11, personnel.getEmergencyContact() != null ? personnel.getEmergencyContact() : "");
             stmt.setObject(12, personnel.getSupervisorId(), java.sql.Types.INTEGER);
             stmt.setInt(13, personnel.getId());
 
-            return stmt.executeUpdate() > 0;
+            int rowsUpdated = stmt.executeUpdate();
+            System.out.println("DEBUG: Rows updated: " + rowsUpdated);
+            return rowsUpdated > 0;
+
         } catch (SQLException e) {
-            System.err.println("Error updating personnel: " + e.getMessage());
+            System.err.println("ERROR updating personnel: " + e.getMessage());
+            e.printStackTrace();
         }
         return false;
     }
@@ -305,11 +404,13 @@ public class PersonnelDAO {
      */
     // Get personnel by id
     public Personnel getPersonnelById(int id) {
+        System.out.println("DEBUG: Getting personnel by ID: " + id);
+
         String sql = "SELECT * FROM personnel WHERE id = ?";
         try (
-            PreparedStatement stmt = dbConnection
-                .getConnection()
-                .prepareStatement(sql)
+                PreparedStatement stmt = dbConnection
+                        .getConnection()
+                        .prepareStatement(sql)
         ) {
             stmt.setInt(1, id);
             ResultSet rs = stmt.executeQuery();
@@ -321,26 +422,46 @@ public class PersonnelDAO {
                         hireDate = LocalDate.parse(hireDateStr);
                     }
                 } catch (Exception e) {
-                    // Date parsing error - skip
+                    System.err.println("WARNING: Error parsing hire date for ID " + id + ": " + e.getMessage());
                 }
+
+                // Get job title name
+                int jobTitleId = rs.getInt("jobTitle");
+                String jobTitleName = getJobTitleName(jobTitleId);
+                if (jobTitleName == null) {
+                    System.err.println("ERROR: Could not find job title for ID: " + jobTitleId);
+                    return null;
+                }
+
+                // Get shift name
+                int shiftId = rs.getInt("shift");
+                String shiftName = getShiftName(shiftId);
+                if (shiftName == null) {
+                    System.err.println("ERROR: Could not find shift for ID: " + shiftId);
+                    return null;
+                }
+
                 return new Personnel(
-                    rs.getInt("id"),
-                    rs.getString("fullName"),
-                    rs.getInt("age"),
-                    rs.getString("phone"),
-                    rs.getString("email"),
-                    getJobTitleName(rs.getInt("jobTitle")),
-                    hireDate,
-                    rs.getDouble("salary"),
-                    getShiftName(rs.getInt("shift")),
-                    rs.getBoolean("isActive"),
-                    rs.getString("address"),
-                    rs.getString("emergencyContact"),
-                    rs.getObject("supervisorId", Integer.class)
+                        rs.getInt("id"),
+                        rs.getString("fullName"),
+                        rs.getInt("age"),
+                        rs.getString("phone"),
+                        rs.getString("email"),
+                        jobTitleName,
+                        hireDate,
+                        rs.getDouble("salary"),
+                        shiftName,
+                        rs.getBoolean("isActive"),
+                        rs.getString("address"),
+                        rs.getString("emergencyContact"),
+                        rs.getObject("supervisorId", Integer.class)
                 );
+            } else {
+                System.out.println("DEBUG: No personnel found with ID: " + id);
             }
         } catch (SQLException e) {
-            System.err.println("Error getting personnel: " + e.getMessage());
+            System.err.println("ERROR getting personnel: " + e.getMessage());
+            e.printStackTrace();
         }
         return null;
     }
@@ -350,44 +471,82 @@ public class PersonnelDAO {
      *
      * @return a List of all Personnel objects, or an empty list if no records found
      */
-    // Get all personnel
+    /**
+     * Get all personnel with debug info
+     */
     public List<Personnel> getAllPersonnel() {
+        System.out.println("DEBUG: Getting all personnel");
         String sql = "SELECT * FROM personnel";
         List<Personnel> personnelList = new ArrayList<>();
+
         try (Statement stmt = dbConnection.getConnection().createStatement()) {
             ResultSet rs = stmt.executeQuery(sql);
-            while (rs.next()) {
-                LocalDate hireDate = null;
-                try {
-                    String hireDateStr = rs.getString("hireDate");
-                    if (hireDateStr != null && !hireDateStr.isEmpty()) {
-                        hireDate = LocalDate.parse(hireDateStr);
-                    }
-                } catch (Exception e) {
-                    // Date parsing error - skip
-                }
+            int count = 0;
 
-                Personnel personnel = new Personnel(
-                    rs.getInt("id"),
-                    rs.getString("fullName"),
-                    rs.getInt("age"),
-                    rs.getString("phone"),
-                    rs.getString("email"),
-                    getJobTitleName(rs.getInt("jobTitle")),
-                    hireDate,
-                    rs.getDouble("salary"),
-                    getShiftName(rs.getInt("shift")),
-                    rs.getBoolean("isActive"),
-                    rs.getString("address"),
-                    rs.getString("emergencyContact"),
-                    rs.getObject("supervisorId", Integer.class)
-                );
-                personnelList.add(personnel);
+            while (rs.next()) {
+                count++;
+                try {
+                    // Debug output for each record
+                    System.out.println("DEBUG: Processing personnel record #" + count);
+                    System.out.println("  ID: " + rs.getInt("id"));
+                    System.out.println("  Name: " + rs.getString("fullName"));
+                    System.out.println("  JobTitle ID: " + rs.getInt("jobTitle"));
+                    System.out.println("  Shift ID: " + rs.getInt("shift"));
+
+                    // Parse hire date
+                    LocalDate hireDate = null;
+                    try {
+                        String hireDateStr = rs.getString("hireDate");
+                        if (hireDateStr != null && !hireDateStr.isEmpty()) {
+                            hireDate = LocalDate.parse(hireDateStr);
+                        }
+                    } catch (Exception e) {
+                        System.err.println("WARNING: Error parsing hire date for ID " + rs.getInt("id"));
+                    }
+
+                    // Get job title name
+                    String jobTitleName = getJobTitleName(rs.getInt("jobTitle"));
+                    if (jobTitleName == null) {
+                        System.err.println("ERROR: Could not get job title for ID " + rs.getInt("jobTitle"));
+                        continue; // Skip this record
+                    }
+
+                    // Get shift name
+                    String shiftName = getShiftName(rs.getInt("shift"));
+                    if (shiftName == null) {
+                        System.err.println("ERROR: Could not get shift for ID " + rs.getInt("shift"));
+                        continue; // Skip this record
+                    }
+
+                    Personnel personnel = new Personnel(
+                            rs.getInt("id"),
+                            rs.getString("fullName"),
+                            rs.getInt("age"),
+                            rs.getString("phone"),
+                            rs.getString("email"),
+                            jobTitleName,
+                            hireDate,
+                            rs.getDouble("salary"),
+                            shiftName,
+                            rs.getBoolean("isActive"),
+                            rs.getString("address"),
+                            rs.getString("emergencyContact"),
+                            rs.getObject("supervisorId", Integer.class)
+                    );
+
+                    personnelList.add(personnel);
+
+                } catch (Exception e) {
+                    System.err.println("ERROR processing personnel record #" + count + ": " + e.getMessage());
+                    e.printStackTrace();
+                }
             }
+
+            System.out.println("DEBUG: Successfully loaded " + personnelList.size() + " personnel records");
+
         } catch (SQLException e) {
-            System.err.println(
-                "Error getting personnel list: " + e.getMessage()
-            );
+            System.err.println("ERROR getting personnel list: " + e.getMessage());
+            e.printStackTrace();
         }
         return personnelList;
     }
@@ -676,22 +835,25 @@ public class PersonnelDAO {
      * @return true if the email exists in the database, false otherwise
      */
     // Check if email exists
+    /**
+     * Check if email exists with debug
+     */
     public boolean emailExists(String email) {
         String sql = "SELECT 1 FROM personnel WHERE email = ? LIMIT 1";
         try (
-            PreparedStatement stmt = dbConnection
-                .getConnection()
-                .prepareStatement(sql)
+                PreparedStatement stmt = dbConnection
+                        .getConnection()
+                        .prepareStatement(sql)
         ) {
             stmt.setString(1, email);
             ResultSet rs = stmt.executeQuery();
-            return rs.next();
+            boolean exists = rs.next();
+            System.out.println("DEBUG: Email '" + email + "' exists: " + exists);
+            return exists;
         } catch (SQLException e) {
-            System.err.println(
-                "Error checking email existence: " + e.getMessage()
-            );
+            System.err.println("ERROR checking email existence: " + e.getMessage());
+            return false;
         }
-        return false;
     }
 
     /**
@@ -981,45 +1143,90 @@ public class PersonnelDAO {
      *
      * @return a List of Personnel excluding admin/cashier roles
      */
+    /**
+     * Get operations personnel with better error handling
+     */
     public List<Personnel> getOperationsPersonnel() {
-        String sql = "SELECT * FROM personnel WHERE jobTitle IN " +
-                "(SELECT id FROM jobTitles WHERE name IN ('veterinary', 'inventory_tracker', 'supervisor', 'farmhand'))";
+        System.out.println("DEBUG: Getting operations personnel");
+
+        // First, ensure the job titles exist
+        ensureJobTitlesExist();
+
+        String sql = "SELECT p.* FROM personnel p " +
+                "JOIN jobTitles j ON p.jobTitle = j.id " +
+                "WHERE j.name IN ('veterinary', 'inventory_tracker', 'supervisor', 'farmhand')";
+
         List<Personnel> personnelList = new ArrayList<>();
         try (Statement stmt = dbConnection.getConnection().createStatement()) {
             ResultSet rs = stmt.executeQuery(sql);
+            int count = 0;
+
             while (rs.next()) {
-                LocalDate hireDate = null;
+                count++;
                 try {
-                    String hireDateStr = rs.getString("hireDate");
-                    if (hireDateStr != null && !hireDateStr.isEmpty()) {
-                        hireDate = LocalDate.parse(hireDateStr);
+                    LocalDate hireDate = null;
+                    try {
+                        String hireDateStr = rs.getString("hireDate");
+                        if (hireDateStr != null && !hireDateStr.isEmpty()) {
+                            hireDate = LocalDate.parse(hireDateStr);
+                        }
+                    } catch (Exception e) {
+                        // Date parsing error - skip
                     }
+
+                    String jobTitleName = getJobTitleName(rs.getInt("jobTitle"));
+                    String shiftName = getShiftName(rs.getInt("shift"));
+
+                    if (jobTitleName == null || shiftName == null) {
+                        System.err.println("WARNING: Skipping personnel record due to missing job title or shift");
+                        continue;
+                    }
+
+                    Personnel personnel = new Personnel(
+                            rs.getInt("id"),
+                            rs.getString("fullName"),
+                            rs.getInt("age"),
+                            rs.getString("phone"),
+                            rs.getString("email"),
+                            jobTitleName,
+                            hireDate,
+                            rs.getDouble("salary"),
+                            shiftName,
+                            rs.getBoolean("isActive"),
+                            rs.getString("address"),
+                            rs.getString("emergencyContact"),
+                            rs.getObject("supervisorId", Integer.class)
+                    );
+
+                    personnelList.add(personnel);
+
                 } catch (Exception e) {
-                    // Date parsing error - skip
+                    System.err.println("ERROR processing operations personnel #" + count + ": " + e.getMessage());
                 }
-                Personnel personnel = new Personnel(
-                        rs.getInt("id"),
-                        rs.getString("fullName"),
-                        rs.getInt("age"),
-                        rs.getString("phone"),
-                        rs.getString("email"),
-                        getJobTitleName(rs.getInt("jobTitle")),
-                        hireDate,
-                        rs.getDouble("salary"),
-                        getShiftName(rs.getInt("shift")),
-                        rs.getBoolean("isActive"),
-                        rs.getString("address"),
-                        rs.getString("emergencyContact"),
-                        rs.getObject("supervisorId", Integer.class)
-                );
-                personnelList.add(personnel);
             }
+
+            System.out.println("DEBUG: Loaded " + personnelList.size() + " operations personnel");
+
         } catch (SQLException e) {
-            System.err.println(
-                    "Error getting operations personnel: " + e.getMessage()
-            );
+            System.err.println("ERROR getting operations personnel: " + e.getMessage());
+            e.printStackTrace();
         }
         return personnelList;
+    }
+
+    /**
+     * Ensure required job titles exist in database
+     */
+    private void ensureJobTitlesExist() {
+        System.out.println("DEBUG: Ensuring job titles exist");
+        String[] requiredTitles = {
+                "veterinary", "inventory_tracker", "supervisor", "farmhand",
+                "administration", "cashier", "tracker", "worker"
+        };
+
+        for (String title : requiredTitles) {
+            getJobTitleId(title); // This will create it if it doesn't exist
+        }
     }
 
     /**
