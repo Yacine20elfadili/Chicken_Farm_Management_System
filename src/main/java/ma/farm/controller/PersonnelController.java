@@ -35,8 +35,6 @@ public class PersonnelController {
 
     // FXML Components
     @FXML private GridPane personnelGrid;
-    @FXML private Label totalWorkersLabel;
-    @FXML private Label totalTrackersLabel;
     @FXML private Label totalPersonnelLabel;
     @FXML private Label totalVeterinaryLabel;
     @FXML private Label totalInventoryLabel;
@@ -194,9 +192,9 @@ public class PersonnelController {
 
         topRow.getChildren().addAll(nameLabel, actions);
 
-        Label jobTitleLabel = new Label(personnel.getJobTitle() == null ? "N/A" : personnel.getJobTitle());
+        Label jobTitleLabel = new Label(); // Empty label
         jobTitleLabel.setPadding(new Insets(4,8,4,8));
-        applyJobTitleBadge(jobTitleLabel, personnel.getJobTitle());
+        applyJobTitleBadge(jobTitleLabel, personnel.getJobTitle()); // This now sets text AND style
 
         Label ageLabel = new Label("👤 " + personnel.getAge() + " ans");
         Label phoneLabel = new Label("📞 " + (personnel.getPhone() == null ? "N/A" : personnel.getPhone()));
@@ -260,6 +258,13 @@ public class PersonnelController {
             if (controller.isSaveClicked()) {
                 refreshData();
                 updateAllStatistics();
+
+                // NEW: Show success message
+                Alert successAlert = new Alert(Alert.AlertType.INFORMATION);
+                successAlert.setTitle("Succès");
+                successAlert.setHeaderText("Personnel edited and saved avec succès");
+                successAlert.setContentText("Le personnel a été re enregistré dans la base de données.");
+                successAlert.showAndWait();
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -292,9 +297,18 @@ public class PersonnelController {
      * Apply job title badge
      */
     private void applyJobTitleBadge(Label label, String jobTitle) {
-        if (label == null || jobTitle == null) return;
+        if (label == null) {
+            System.err.println("ERROR: Cannot apply badge to null label");
+            return;
+        }
 
-        String key = jobTitle.toLowerCase();
+        if (jobTitle == null || jobTitle.trim().isEmpty()) {
+            label.setText("N/A");
+            label.setStyle("-fx-background-radius: 5px; -fx-padding: 5 10; -fx-font-size: 13px; -fx-font-weight: bold; -fx-background-color: #adb5bd; -fx-text-fill: white;");
+            return;
+        }
+
+        String key = jobTitle.toLowerCase().trim();
         label.setStyle("-fx-background-radius: 5px; -fx-padding: 5 10; -fx-font-size: 13px; -fx-font-weight: bold;");
 
         switch (key) {
@@ -318,6 +332,7 @@ public class PersonnelController {
             default:
                 label.setStyle(label.getStyle() + "-fx-background-color: #adb5bd; -fx-text-fill: white;");
                 label.setText(jobTitle);
+                System.err.println("WARNING: Unknown job title: " + jobTitle);
                 break;
         }
     }
@@ -331,9 +346,7 @@ public class PersonnelController {
             if (totalPersonnelLabel != null) {
                 totalPersonnelLabel.setText(String.valueOf(totalPersonnel));
             }
-            if (totalWorkersLabel != null) {
-                totalWorkersLabel.setText(String.valueOf(totalPersonnel));
-            }
+            // Remove totalWorkersLabel - it's not used in the FXML
 
             int veterinaryCount = personnelDAO.countByJobTitle("veterinary");
             if (totalVeterinaryLabel != null) {
@@ -355,9 +368,7 @@ public class PersonnelController {
                 totalFarmhandsLabel.setText(String.valueOf(farmhandsCount));
             }
 
-            if (totalTrackersLabel != null) {
-                totalTrackersLabel.setText(String.valueOf(supervisorsCount));
-            }
+
 
         } catch (Exception e) {
             System.err.println("Error updating statistics: " + e.getMessage());
@@ -390,7 +401,15 @@ public class PersonnelController {
             if (controller.isSaveClicked()) {
                 refreshData();
                 updateAllStatistics();
+
+                // NEW: Show success message
+                Alert successAlert = new Alert(Alert.AlertType.INFORMATION);
+                successAlert.setTitle("Succès");
+                successAlert.setHeaderText("Personnel ajouté avec succès");
+                successAlert.setContentText("Le nouveau personnel a été enregistré dans la base de données.");
+                successAlert.showAndWait();
             }
+
         } catch (IOException e) {
             System.err.println("Error opening Add Personnel dialog: " + e.getMessage());
             e.printStackTrace();

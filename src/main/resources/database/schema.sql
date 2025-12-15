@@ -40,22 +40,19 @@ CREATE TABLE IF NOT EXISTS personnel (
                                          isActive BOOLEAN DEFAULT 1,
                                          address VARCHAR(255),
                                          emergencyContact VARCHAR(100),
+                                         supervisorId INTEGER DEFAULT NULL,
                                          FOREIGN KEY (jobTitle) REFERENCES jobTitles(id),
-                                         FOREIGN KEY (shift) REFERENCES shifts(id)
+                                         FOREIGN KEY (shift) REFERENCES shifts(id),
+                                         FOREIGN KEY (supervisorId) REFERENCES personnel(id) ON DELETE SET NULL
 );
 
-
--- ============================================================
--- UPDATE: Add supervisor relationship to personnel table
--- ============================================================
-
--- Add supervisorId column to existing personnel table (if not exists)
--- Note: This is safe to run multiple times
-ALTER TABLE personnel ADD COLUMN supervisorId INTEGER REFERENCES personnel(id) ON DELETE SET NULL;
+-- Remove this line entirely:
+-- ALTER TABLE personnel ADD COLUMN supervisorId INTEGER REFERENCES personnel(id) ON DELETE SET NULL;
 
 -- Create index for supervisor lookups
 CREATE INDEX IF NOT EXISTS idx_personnel_supervisor ON personnel(supervisorId);
-
+-- Create index for personnel email lookups
+CREATE INDEX IF NOT EXISTS idx_personnel_email ON personnel(email);
 -- ============================================================
 -- UPDATE: Add new job titles for operations personnel
 -- ============================================================

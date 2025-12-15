@@ -30,6 +30,26 @@ public class PersonnelDAO {
     private final DatabaseConnection dbConnection;
 
     /**
+     * Safely retrieves supervisorId from ResultSet, handling empty strings and nulls
+     */
+    private Integer getSafeSupervisorId(ResultSet rs) throws SQLException {
+        try {
+            Object supervisorIdObj = rs.getObject("supervisorId");
+            if (supervisorIdObj == null) {
+                return null;
+            }
+            String strValue = supervisorIdObj.toString().trim();
+            if (strValue.isEmpty()) {
+                return null;
+            }
+            return Integer.parseInt(strValue);
+        } catch (NumberFormatException e) {
+            System.err.println("WARNING: Invalid supervisorId format for personnel ID " + rs.getInt("id"));
+            return null;
+        }
+    }
+
+    /**
      * Constructor - Initializes the DAO with a database connection instance
      */
     public PersonnelDAO() {
@@ -454,7 +474,7 @@ public class PersonnelDAO {
                         rs.getBoolean("isActive"),
                         rs.getString("address"),
                         rs.getString("emergencyContact"),
-                        rs.getObject("supervisorId", Integer.class)
+                        getSafeSupervisorId(rs)
                 );
             } else {
                 System.out.println("DEBUG: No personnel found with ID: " + id);
@@ -531,7 +551,7 @@ public class PersonnelDAO {
                             rs.getBoolean("isActive"),
                             rs.getString("address"),
                             rs.getString("emergencyContact"),
-                            rs.getObject("supervisorId", Integer.class)
+                            getSafeSupervisorId(rs)
                     );
 
                     personnelList.add(personnel);
@@ -585,7 +605,7 @@ public class PersonnelDAO {
                     rs.getBoolean("isActive"),
                     rs.getString("address"),
                     rs.getString("emergencyContact"),
-                    rs.getObject("supervisorId", Integer.class)
+                    getSafeSupervisorId(rs)
                 );
                 personnelList.add(personnel);
             }
@@ -643,7 +663,7 @@ public class PersonnelDAO {
                     rs.getBoolean("isActive"),
                     rs.getString("address"),
                     rs.getString("emergencyContact"),
-                    rs.getObject("supervisorId", Integer.class)
+                    getSafeSupervisorId(rs)
                 );
                 personnelList.add(personnel);
             }
@@ -701,7 +721,7 @@ public class PersonnelDAO {
                     rs.getBoolean("isActive"),
                     rs.getString("address"),
                     rs.getString("emergencyContact"),
-                    rs.getObject("supervisorId", Integer.class)
+                    getSafeSupervisorId(rs)
                 );
                 personnelList.add(personnel);
             }
@@ -754,7 +774,7 @@ public class PersonnelDAO {
                     rs.getBoolean("isActive"),
                     rs.getString("address"),
                     rs.getString("emergencyContact"),
-                    rs.getObject("supervisorId", Integer.class)
+                    getSafeSupervisorId(rs)
                 );
             }
         } catch (SQLException e) {
@@ -949,7 +969,7 @@ public class PersonnelDAO {
                     rs.getBoolean("isActive"),
                     rs.getString("address"),
                     rs.getString("emergencyContact"),
-                    rs.getObject("supervisorId", Integer.class)
+                    getSafeSupervisorId(rs)
                 );
                 personnelList.add(personnel);
             }
@@ -1003,7 +1023,7 @@ public class PersonnelDAO {
                     rs.getBoolean("isActive"),
                     rs.getString("address"),
                     rs.getString("emergencyContact"),
-                    rs.getObject("supervisorId", Integer.class)
+                    getSafeSupervisorId(rs)
                 );
                 personnelList.add(personnel);
             }
@@ -1090,7 +1110,7 @@ public class PersonnelDAO {
                         rs.getBoolean("isActive"),
                         rs.getString("address"),
                         rs.getString("emergencyContact"),
-                        rs.getObject("supervisorId", Integer.class)
+                        getSafeSupervisorId(rs)
                 );
                 personnelList.add(personnel);
             }
@@ -1195,7 +1215,7 @@ public class PersonnelDAO {
                             rs.getBoolean("isActive"),
                             rs.getString("address"),
                             rs.getString("emergencyContact"),
-                            rs.getObject("supervisorId", Integer.class)
+                            getSafeSupervisorId(rs)
                     );
 
                     personnelList.add(personnel);

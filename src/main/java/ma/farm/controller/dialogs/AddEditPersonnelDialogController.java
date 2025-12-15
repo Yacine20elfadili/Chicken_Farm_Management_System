@@ -5,6 +5,7 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import ma.farm.dao.PersonnelDAO;
 import ma.farm.model.Personnel;
@@ -38,6 +39,8 @@ public class AddEditPersonnelDialogController {
     @FXML private ComboBox<String> shiftComboBox;
     @FXML private TextArea addressTextArea;
     @FXML private TextField emergencyContactField;
+    @FXML private VBox supervisorSection;
+    @FXML private Button saveButton;
 
     // Error Labels
     @FXML private Label fullNameErrorLabel;
@@ -138,10 +141,10 @@ public class AddEditPersonnelDialogController {
             if (newVal != null) {
                 boolean isFarmhand = "farmhand".equalsIgnoreCase(newVal);
 
-                // Show/hide supervisor field
-                if (supervisorComboBox != null) {
-                    supervisorComboBox.setVisible(isFarmhand);
-                    supervisorComboBox.setManaged(isFarmhand);
+                // Show/hide entire supervisor section
+                if (supervisorSection != null) {
+                    supervisorSection.setVisible(isFarmhand);
+                    supervisorSection.setManaged(isFarmhand);
                 }
 
                 if (supervisorErrorLabel != null) {
@@ -155,12 +158,16 @@ public class AddEditPersonnelDialogController {
                         noSupervisorWarningLabel.setVisible(true);
                         noSupervisorWarningLabel.setManaged(true);
                     }
-                    // Disable farmhand option
-                    showError("Aucun superviseur disponible. Ajoutez un superviseur d'abord.");
+                    if (saveButton != null) {
+                        saveButton.setDisable(true);
+                    }
                 } else {
                     if (noSupervisorWarningLabel != null) {
                         noSupervisorWarningLabel.setVisible(false);
                         noSupervisorWarningLabel.setManaged(false);
+                    }
+                    if (saveButton != null) {
+                        saveButton.setDisable(false);
                     }
                 }
             }
@@ -286,6 +293,24 @@ public class AddEditPersonnelDialogController {
             }
         } else {
             System.out.println("DEBUG: Validation failed");
+
+            // NEW: Show alert with validation errors
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Validation Échouée");
+            alert.setHeaderText("Veuillez corriger les erreurs suivantes:");
+
+            StringBuilder errors = new StringBuilder();
+            if (fullNameErrorLabel.isVisible()) errors.append("• ").append(fullNameErrorLabel.getText()).append("\n");
+            if (ageErrorLabel.isVisible()) errors.append("• ").append(ageErrorLabel.getText()).append("\n");
+            if (phoneErrorLabel.isVisible()) errors.append("• ").append(phoneErrorLabel.getText()).append("\n");
+            if (emailErrorLabel.isVisible()) errors.append("• ").append(emailErrorLabel.getText()).append("\n");
+            if (jobTitleErrorLabel.isVisible()) errors.append("• ").append(jobTitleErrorLabel.getText()).append("\n");
+            if (supervisorErrorLabel.isVisible()) errors.append("• ").append(supervisorErrorLabel.getText()).append("\n");
+            if (salaryErrorLabel.isVisible()) errors.append("• ").append(salaryErrorLabel.getText()).append("\n");
+            if (shiftErrorLabel.isVisible()) errors.append("• ").append(shiftErrorLabel.getText()).append("\n");
+
+            alert.setContentText(errors.toString());
+            alert.showAndWait();
         }
     }
 
@@ -338,11 +363,24 @@ public class AddEditPersonnelDialogController {
             isValid = false;
         }
 
-        // Phone validation (basic)
-        if (ValidationUtil.isEmpty(phoneField.getText())) {
+
+        // Phone validation (format check)
+        String phone = phoneField.getText().trim();
+        if (ValidationUtil.isEmpty(phone)) {
             phoneErrorLabel.setText("Le téléphone est requis");
             phoneErrorLabel.setVisible(true);
+            phoneErrorLabel.setManaged(true);
             isValid = false;
+        } else {
+            // Moroccan phone format: +212 6XX XXX XXX or 0612345678
+            String phonePattern = "^(\\+212|0)[5-7][0-9]{8}$";
+            String cleanPhone = phone.replaceAll("\\s+", ""); // Remove spaces
+            if (!cleanPhone.matches(phonePattern)) {
+                phoneErrorLabel.setText("Format invalide. Ex: +212 6XX XXX XXX ou 0612345678");
+                phoneErrorLabel.setVisible(true);
+                phoneErrorLabel.setManaged(true);
+                isValid = false;
+            }
         }
 
         // Email validation

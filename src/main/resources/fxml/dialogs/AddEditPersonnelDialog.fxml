@@ -61,7 +61,7 @@
                                     <children>
                                         <Label text="Nom Complet *" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #495057;" />
                                         <TextField fx:id="fullNameField" promptText="Ex: Ahmed Hassan" style="-fx-font-size: 13px; -fx-padding: 10px;" />
-                                        <Label fx:id="fullNameErrorLabel" text="Le nom complet est requis" style="-fx-text-fill: #dc3545; -fx-font-size: 12px;" visible="false" />
+                                        <Label fx:id="fullNameErrorLabel" text="Le nom complet est requis" style="-fx-text-fill: #dc3545; -fx-font-size: 12px;" visible="false" managed="false"/>
                                     </children>
                                 </VBox>
 
@@ -77,7 +77,7 @@
                                             <children>
                                                 <Label text="Âge *" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #495057;" />
                                                 <TextField fx:id="ageField" promptText="Ex: 30" style="-fx-font-size: 13px; -fx-padding: 10px;" />
-                                                <Label fx:id="ageErrorLabel" text="L'âge doit être entre 18 et 100" style="-fx-text-fill: #dc3545; -fx-font-size: 12px;" visible="false" />
+                                                <Label fx:id="ageErrorLabel" text="L'âge doit être entre 18 et 100" style="-fx-text-fill: #dc3545; -fx-font-size: 12px;" visible="false" managed="false"/>
                                             </children>
                                         </VBox>
 
@@ -86,7 +86,7 @@
                                             <children>
                                                 <Label text="Téléphone *" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #495057;" />
                                                 <TextField fx:id="phoneField" promptText="Ex: +212 6XX XXX XXX" style="-fx-font-size: 13px; -fx-padding: 10px;" />
-                                                <Label fx:id="phoneErrorLabel" text="Le téléphone est requis" style="-fx-text-fill: #dc3545; -fx-font-size: 12px;" visible="false" />
+                                                <Label fx:id="phoneErrorLabel" text="Le téléphone est requis" style="-fx-text-fill: #dc3545; -fx-font-size: 12px;" visible="false" managed="false"/>
                                             </children>
                                         </VBox>
                                     </children>
@@ -97,7 +97,7 @@
                                     <children>
                                         <Label text="Email *" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #495057;" />
                                         <TextField fx:id="emailField" promptText="Ex: ahmed@farm.ma" style="-fx-font-size: 13px; -fx-padding: 10px;" />
-                                        <Label fx:id="emailErrorLabel" text="Email invalide" style="-fx-text-fill: #dc3545; -fx-font-size: 12px;" visible="false" />
+                                        <Label fx:id="emailErrorLabel" text="Email invalide" style="-fx-text-fill: #dc3545; -fx-font-size: 12px;" visible="false" managed="false"/>
                                     </children>
                                 </VBox>
 
@@ -132,7 +132,7 @@
                                     <children>
                                         <Label text="Titre du Poste *" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #495057;" />
                                         <ComboBox fx:id="jobTitleComboBox" promptText="Sélectionnez un titre" prefWidth="540.0" style="-fx-font-size: 13px;" />
-                                        <Label fx:id="jobTitleErrorLabel" text="Le titre du poste est requis" style="-fx-text-fill: #dc3545; -fx-font-size: 12px;" visible="false" />
+                                        <Label fx:id="jobTitleErrorLabel" text="Le titre du poste est requis" style="-fx-text-fill: #dc3545; -fx-font-size: 12px;" visible="false" managed="false"/>
                                     </children>
                                 </VBox>
 
@@ -141,7 +141,7 @@
                                     <children>
                                         <Label text="Superviseur *" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #495057;" />
                                         <ComboBox fx:id="supervisorComboBox" promptText="Sélectionnez un superviseur" prefWidth="540.0" style="-fx-font-size: 13px;" />
-                                        <Label fx:id="supervisorErrorLabel" text="Le superviseur est requis pour les ouvriers" style="-fx-text-fill: #dc3545; -fx-font-size: 12px;" visible="false" />
+                                        <Label fx:id="supervisorErrorLabel" text="Le superviseur est requis pour les ouvriers" style="-fx-text-fill: #dc3545; -fx-font-size: 12px;" visible="false" managed="false" />
                                     </children>
                                 </VBox>
 
@@ -165,7 +165,7 @@
                                             <children>
                                                 <Label text="Salaire (MAD) *" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #495057;" />
                                                 <TextField fx:id="salaryField" promptText="Ex: 5000.00" style="-fx-font-size: 13px; -fx-padding: 10px;" />
-                                                <Label fx:id="salaryErrorLabel" text="Le salaire doit être un nombre valide" style="-fx-text-fill: #dc3545; -fx-font-size: 12px;" visible="false" />
+                                                <Label fx:id="salaryErrorLabel" text="Le salaire doit être un nombre valide" style="-fx-text-fill: #dc3545; -fx-font-size: 12px;" visible="false" managed="false"/>
                                             </children>
                                         </VBox>
                                     </children>
@@ -176,7 +176,7 @@
                                     <children>
                                         <Label text="Équipe *" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #495057;" />
                                         <ComboBox fx:id="shiftComboBox" promptText="Sélectionnez une équipe" prefWidth="540.0" style="-fx-font-size: 13px;" />
-                                        <Label fx:id="shiftErrorLabel" text="L'équipe est requise" style="-fx-text-fill: #dc3545; -fx-font-size: 12px;" visible="false" />
+                                        <Label fx:id="shiftErrorLabel" text="L'équipe est requise" style="-fx-text-fill: #dc3545; -fx-font-size: 12px;" visible="false" managed="false"/>
                                     </children>
                                 </VBox>
                             </children>
