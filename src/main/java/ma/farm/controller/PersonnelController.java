@@ -1,10 +1,12 @@
 package ma.farm.controller;
 
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
@@ -602,14 +604,17 @@ public class PersonnelController {
     }
 
     /**
-     * Handle filter button clicks
-     * @param filterType the filter to apply (All, Veterinary, Inventory, Supervisors, Farmhands)
+     * Handle filter button clicks (called from FXML buttons with onAction="#handleFilterChange")
+     * Reads the button's userData to determine which filter to apply.
      */
     @FXML
-    public void handleFilterChange(String filterType) {
-        currentFilter = filterType;
-        loadPersonnelData();
-        System.out.println("Filter changed to: " + filterType);
+    public void handleFilterChange(ActionEvent event) {
+        String filterType = "All";
+        if (event != null && event.getSource() instanceof Button) {
+            Object ud = ((Button) event.getSource()).getUserData();
+            if (ud != null) filterType = ud.toString();
+        }
+        handleFilterByJobTitle(filterType);
     }
 
     /**

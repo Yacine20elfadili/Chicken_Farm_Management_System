@@ -4,6 +4,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import ma.farm.dao.PersonnelDAO;
 import ma.farm.model.Personnel;
@@ -49,7 +50,7 @@ public class AddEditPersonnelDialogController {
     @FXML private Label shiftErrorLabel;
 
     // Warning Banner
-    @FXML private Label noSupervisorWarningLabel;
+    @FXML private HBox noSupervisorWarningLabel;
 
     // DAOs
     private PersonnelDAO personnelDAO;
