@@ -63,12 +63,8 @@ INSERT OR IGNORE INTO jobTitles (name) VALUES ('supervisor');
 INSERT OR IGNORE INTO jobTitles (name) VALUES ('farmhand');
 INSERT OR IGNORE INTO jobTitles (name) VALUES ('administration');
 INSERT OR IGNORE INTO jobTitles (name) VALUES ('cashier');
-
--- Note: 'tracker' and 'worker' already exist from previous schema
-
--- Insert default job titles if not exists
-INSERT OR IGNORE INTO jobTitles (name) VALUES ('tracker')
-INSERT OR IGNORE INTO jobTitles (name) VALUES ('worker')
+INSERT OR IGNORE INTO jobTitles (name) VALUES ('tracker');
+INSERT OR IGNORE INTO jobTitles (name) VALUES ('worker');
 
 
 

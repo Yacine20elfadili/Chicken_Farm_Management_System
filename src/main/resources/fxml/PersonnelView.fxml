@@ -187,18 +187,6 @@
                                     <children>
                                         <Button text="➕ Ajouter Personnel" onAction="#handleAddPersonnel"
                                                 style="-fx-background-color: #28a745; -fx-text-fill: white; -fx-padding: 10 25; -fx-background-radius: 5; -fx-font-size: 14px; -fx-cursor: hand;" />
-
-                                        <Button text="✏️ Modifier" onAction="#handleEditPersonnel"
-                                                style="-fx-background-color: #ffc107; -fx-text-fill: #212529; -fx-padding: 10 25; -fx-background-radius: 5; -fx-font-size: 14px; -fx-cursor: hand;" />
-
-                                        <Button text="🗑️ Supprimer" onAction="#handleDeletePersonnel"
-                                                style="-fx-background-color: #dc3545; -fx-text-fill: white; -fx-padding: 10 25; -fx-background-radius: 5; -fx-font-size: 14px; -fx-cursor: hand;" />
-
-                                        <Button text="👁️ Voir Détails" onAction="#handleViewDetails"
-                                                style="-fx-background-color: #17a2b8; -fx-text-fill: white; -fx-padding: 10 25; -fx-background-radius: 5; -fx-font-size: 14px; -fx-cursor: hand;" />
-
-                                        <Button text="🔄 Actualiser" onAction="#refreshData"
-                                                style="-fx-background-color: #6c757d; -fx-text-fill: white; -fx-padding: 10 25; -fx-background-radius: 5; -fx-font-size: 14px; -fx-cursor: hand;" />
                                     </children>
                                 </HBox>
 

@@ -2,21 +2,29 @@ package ma.farm.controller;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import ma.farm.dao.PersonnelDAO;
 import ma.farm.model.Personnel;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -175,67 +183,138 @@ public class PersonnelController {
      * @return VBox card containing personnel info
      */
     private VBox createPersonnelCard(Personnel personnel) {
-        // Create VBox card container
         VBox card = new VBox(8);
         card.setAlignment(Pos.TOP_LEFT);
-        card.setPadding(new Insets(20));
-
-        // Set card styling (border, padding, background)
+        card.setPadding(new Insets(12));
         card.setStyle(
                 "-fx-background-color: white; " +
                         "-fx-border-color: #dee2e6; " +
-                        "-fx-border-width: 2px; " +
-                        "-fx-border-radius: 10px; " +
-                        "-fx-background-radius: 10px; " +
-                        "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 8, 0, 0, 2);"
+                        "-fx-border-width: 1.5px; " +
+                        "-fx-border-radius: 8px; " +
+                        "-fx-background-radius: 8px;"
         );
+        card.setMinWidth(240);
+        card.setPrefHeight(180);
 
-        // Set fixed size to prevent overlap
-        card.setMinWidth(250);
-        card.setMaxWidth(350);
-        card.setPrefWidth(280);
-        card.setMinHeight(180);
-        card.setPrefHeight(200);
-        card.setCursor(Cursor.HAND);
-
-        // Add name label (bold, larger font)
-        Label nameLabel = new Label(personnel.getFullName() != null ? personnel.getFullName() : "Unknown");
-        nameLabel.setFont(Font.font("System", FontWeight.BOLD, 18));
+        // Top row: name + action icons
+        HBox topRow = new HBox();
+        topRow.setAlignment(Pos.CENTER_LEFT);
+        Label nameLabel = new Label(personnel.getFullName() == null ? "Unknown" : personnel.getFullName());
+        nameLabel.setFont(Font.font("System", FontWeight.BOLD, 16));
         nameLabel.setStyle("-fx-text-fill: #212529;");
-        nameLabel.setWrapText(true);
-        nameLabel.setMaxWidth(Double.MAX_VALUE);
+        HBox.setHgrow(nameLabel, Priority.ALWAYS);
 
-        // Add job title label (with badge) - MOVED UP
-        Label jobTitleLabel = new Label(personnel.getJobTitle() != null ? personnel.getJobTitle() : "Unknown");
-        jobTitleLabel.setPadding(new Insets(5, 10, 5, 10));
-        jobTitleLabel.setMaxWidth(Double.MAX_VALUE);
+        // action icons (no text)
+        Button editIcon = new Button("✏");
+        editIcon.setTooltip(new Tooltip("Modifier"));
+        editIcon.setStyle("-fx-background-color: transparent; -fx-font-size: 14px;");
+        editIcon.setOnAction(evt -> {
+            // open edit dialog for this personnel
+            openEditDialog(personnel);
+        });
 
-        // Apply job title badge color
+        Button deleteIcon = new Button("🗑");
+        deleteIcon.setTooltip(new Tooltip("Supprimer"));
+        deleteIcon.setStyle("-fx-background-color: transparent; -fx-font-size: 14px;");
+        deleteIcon.setOnAction(evt -> {
+            openDeleteConfirmation(personnel);
+        });
+
+        Button viewIcon = new Button("👁");
+        viewIcon.setTooltip(new Tooltip("Voir détails"));
+        viewIcon.setStyle("-fx-background-color: transparent; -fx-font-size: 14px;");
+        viewIcon.setOnAction(evt -> openDetailDialog(personnel));
+
+        HBox actions = new HBox(6, viewIcon, editIcon, deleteIcon);
+        actions.setAlignment(Pos.CENTER_RIGHT);
+
+        topRow.getChildren().addAll(nameLabel, actions);
+
+        // job title badge
+        Label jobTitleLabel = new Label(personnel.getJobTitle() == null ? "N/A" : personnel.getJobTitle());
+        jobTitleLabel.setPadding(new Insets(4,8,4,8));
         applyJobTitleBadge(jobTitleLabel, personnel.getJobTitle());
 
-        // Add age label
-        Label ageLabel = new Label("👤 Age: " + personnel.getAge() + " ans");
-        ageLabel.setStyle("-fx-text-fill: #6c757d; -fx-font-size: 13px;");
-        ageLabel.setWrapText(true);
-        ageLabel.setMaxWidth(Double.MAX_VALUE);
+        Label ageLabel = new Label("👤 " + personnel.getAge() + " ans");
+        Label phoneLabel = new Label("📞 " + (personnel.getPhone() == null ? "N/A" : personnel.getPhone()));
+        Label emailLabel = new Label("✉️ " + (personnel.getEmail() == null ? "N/A" : personnel.getEmail()));
 
-        // Add phone label
-        Label phoneLabel = new Label("📞 " + (personnel.getPhone() != null ? personnel.getPhone() : "N/A"));
-        phoneLabel.setStyle("-fx-text-fill: #6c757d; -fx-font-size: 13px;");
-        phoneLabel.setWrapText(true);
-        phoneLabel.setMaxWidth(Double.MAX_VALUE);
+        VBox info = new VBox(6, jobTitleLabel, ageLabel, phoneLabel, emailLabel);
+        info.setPadding(new Insets(6,0,0,0));
 
-        // Add email label
-        Label emailLabel = new Label("✉️ " + (personnel.getEmail() != null ? personnel.getEmail() : "N/A"));
-        emailLabel.setStyle("-fx-text-fill: #6c757d; -fx-font-size: 12px;");
-        emailLabel.setWrapText(true);
-        emailLabel.setMaxWidth(Double.MAX_VALUE);
+        card.getChildren().addAll(topRow, info);
 
-        // Add all labels to card
-        card.getChildren().addAll(nameLabel, jobTitleLabel, ageLabel, phoneLabel, emailLabel);
+        // click selects card (visual)
+        card.setOnMouseClicked(evt -> highlightSelectedCard(card));
 
-        // Return card
         return card;
+    }
+
+    // new helpers for card actions:
+    private void openEditDialog(Personnel p) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/dialogs/AddEditPersonnelDialog.fxml"));
+            Parent root = loader.load();
+            ma.farm.controller.dialogs.AddEditPersonnelDialogController controller = loader.getController();
+
+            Stage dialogStage = new Stage();
+            dialogStage.setTitle("Modifier Personnel");
+            dialogStage.initModality(Modality.APPLICATION_MODAL);
+            if (personnelGrid != null && personnelGrid.getScene() != null) dialogStage.initOwner(personnelGrid.getScene().getWindow());
+            dialogStage.setScene(new Scene(root));
+            controller.setDialogStage(dialogStage);
+            controller.setPersonnel(p);
+            dialogStage.showAndWait();
+
+            if (controller.isSaveClicked()) {
+                refreshData();
+                updateAllStatistics();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void openDeleteConfirmation(Personnel p) {
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+        confirm.setTitle("Confirmer la suppression");
+        confirm.setHeaderText("Supprimer personnel");
+        confirm.setContentText("Supprimer " + p.getFullName() + " ?");
+        confirm.showAndWait().ifPresent(resp -> {
+            if (resp == ButtonType.OK) {
+                boolean ok = personnelDAO.deletePersonnel(p.getId());
+                if (ok) {
+                    refreshData();
+                    updateAllStatistics();
+                } else {
+                    Alert err = new Alert(Alert.AlertType.ERROR, "Suppression échouée.");
+                    err.showAndWait();
+                }
+            }
+        });
+    }
+
+    private void openDetailDialog(Personnel p) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/dialogs/PersonnelDetailDialog.fxml"));
+            Parent root = loader.load();
+            ma.farm.controller.dialogs.PersonnelDetailDialogController controller = loader.getController();
+
+            Stage detailStage = new Stage();
+            detailStage.setTitle("Détails: " + p.getFullName());
+            detailStage.initModality(Modality.APPLICATION_MODAL);
+            if (personnelGrid != null && personnelGrid.getScene() != null) detailStage.initOwner(personnelGrid.getScene().getWindow());
+            detailStage.setScene(new Scene(root));
+            controller.setDialogStage(detailStage);
+            controller.setPersonnel(p);
+            detailStage.showAndWait();
+
+            // refresh after detail (in case of edit there)
+            refreshData();
+            updateAllStatistics();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -248,12 +327,12 @@ public class PersonnelController {
 
             // Count total workers (job title = "Worker")
             long workersCount = allPersonnel.stream()
-                    .filter(p -> "Worker".equalsIgnoreCase(p.getJobTitle()))
+                    .filter(p -> "Worker".equalsIgnoreCase(p.getJobTitle()) || "farmhand".equalsIgnoreCase(p.getJobTitle()))
                     .count();
 
             // Count total trackers (job title = "Tracker")
             long trackersCount = allPersonnel.stream()
-                    .filter(p -> "Tracker".equalsIgnoreCase(p.getJobTitle()))
+                    .filter(p -> "Tracker".equalsIgnoreCase(p.getJobTitle()) || "supervisor".equalsIgnoreCase(p.getJobTitle()))
                     .count();
 
             // Update totalWorkersLabel
@@ -277,26 +356,34 @@ public class PersonnelController {
      */
     @FXML
     public void handleAddPersonnel() {
-        // TODO: Open add personnel dialog
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Add Personnel");
-        alert.setHeaderText("Add Personnel Feature");
-        alert.setContentText("This feature will open a dialog to add new worker/tracker.\n\n" +
-                "Required fields:\n" +
-                "- Full name\n" +
-                "- Age\n" +
-                "- Phone\n" +
-                "- Email\n" +
-                "- Job title (Worker or Tracker)\n\n" +
-                "Dialog implementation is pending.");
-        alert.showAndWait();
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/dialogs/AddEditPersonnelDialog.fxml"));
+            Parent root = loader.load();
+            ma.farm.controller.dialogs.AddEditPersonnelDialogController controller = loader.getController();
 
-        // After dialog implementation:
-        // - Get personnel details
-        // - Validate inputs (email format, age > 0, etc.)
-        // - Create Personnel record
-        // - Save to database using personnelDAO.createPersonnel()
-        // - Refresh personnel grid
+            Stage dialogStage = new Stage();
+            dialogStage.setTitle("Ajouter Personnel");
+            dialogStage.initModality(Modality.APPLICATION_MODAL);
+            // owner
+            if (personnelGrid != null && personnelGrid.getScene() != null) {
+                dialogStage.initOwner(personnelGrid.getScene().getWindow());
+            }
+            dialogStage.setScene(new Scene(root));
+            controller.setDialogStage(dialogStage);
+            controller.setPersonnel(null); // add mode
+
+            dialogStage.showAndWait();
+
+            if (controller.isSaveClicked()) {
+                refreshData();
+                updateAllStatistics();
+            }
+        } catch (IOException e) {
+            System.err.println("Error opening Add Personnel dialog: " + e.getMessage());
+            e.printStackTrace();
+            Alert alert = new Alert(Alert.AlertType.ERROR, "Impossible d'ouvrir le dialogue d'ajout.");
+            alert.showAndWait();
+        }
     }
 
     /**
@@ -315,21 +402,34 @@ public class PersonnelController {
             return;
         }
 
-        // TODO: Open edit personnel dialog with current data
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Edit Personnel");
-        alert.setHeaderText("Edit Personnel Feature");
-        alert.setContentText("This feature will open a dialog to edit the selected personnel.\n\n" +
-                "Current personnel: " + selectedPersonnel.getFullName() + "\n\n" +
-                "Dialog implementation is pending.");
-        alert.showAndWait();
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/dialogs/AddEditPersonnelDialog.fxml"));
+            Parent root = loader.load();
+            ma.farm.controller.dialogs.AddEditPersonnelDialogController controller = loader.getController();
 
-        // After dialog implementation:
-        // - Get updated personnel details
-        // - Validate inputs
-        // - Update Personnel record
-        // - Save to database using personnelDAO.updatePersonnel()
-        // - Refresh personnel grid
+            Stage dialogStage = new Stage();
+            dialogStage.setTitle("Modifier Personnel");
+            dialogStage.initModality(Modality.APPLICATION_MODAL);
+            if (personnelGrid != null && personnelGrid.getScene() != null) {
+                dialogStage.initOwner(personnelGrid.getScene().getWindow());
+            }
+            dialogStage.setScene(new Scene(root));
+            controller.setDialogStage(dialogStage);
+            controller.setPersonnel(selectedPersonnel);
+
+            dialogStage.showAndWait();
+
+            if (controller.isSaveClicked()) {
+                refreshData();
+                updateAllStatistics();
+            }
+
+        } catch (IOException e) {
+            System.err.println("Error opening Edit Personnel dialog: " + e.getMessage());
+            e.printStackTrace();
+            Alert alert = new Alert(Alert.AlertType.ERROR, "Impossible d'ouvrir le dialogue de modification.");
+            alert.showAndWait();
+        }
     }
 
     /**
@@ -368,6 +468,7 @@ public class PersonnelController {
 
                         // Refresh personnel grid
                         refreshData();
+                        updateAllStatistics();
 
                         Alert alert = new Alert(Alert.AlertType.INFORMATION);
                         alert.setTitle("Success");
@@ -411,43 +512,34 @@ public class PersonnelController {
             return;
         }
 
-        // Show details dialog
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Personnel Details");
-        alert.setHeaderText("Details for " + selectedPersonnel.getFullName());
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/dialogs/PersonnelDetailDialog.fxml"));
+            Parent root = loader.load();
+            ma.farm.controller.dialogs.PersonnelDetailDialogController controller = loader.getController();
 
-        StringBuilder details = new StringBuilder();
-        details.append("Full Name: ").append(selectedPersonnel.getFullName()).append("\n");
-        details.append("Age: ").append(selectedPersonnel.getAge()).append(" years\n");
-        details.append("Phone: ").append(selectedPersonnel.getPhone() != null ? selectedPersonnel.getPhone() : "N/A").append("\n");
-        details.append("Email: ").append(selectedPersonnel.getEmail() != null ? selectedPersonnel.getEmail() : "N/A").append("\n");
-        details.append("Job Title: ").append(selectedPersonnel.getJobTitle() != null ? selectedPersonnel.getJobTitle() : "N/A").append("\n");
+            Stage detailStage = new Stage();
+            detailStage.setTitle("Personnel Details: " + selectedPersonnel.getFullName());
+            detailStage.initModality(Modality.APPLICATION_MODAL);
+            if (personnelGrid != null && personnelGrid.getScene() != null) {
+                detailStage.initOwner(personnelGrid.getScene().getWindow());
+            }
+            detailStage.setScene(new Scene(root));
 
-        if (selectedPersonnel.getHireDate() != null) {
-            details.append("Hire Date: ").append(selectedPersonnel.getHireDate()).append("\n");
-            details.append("Years of Service: ").append(selectedPersonnel.getYearsOfService()).append(" years\n");
+            controller.setDialogStage(detailStage);
+            controller.setPersonnel(selectedPersonnel);
+
+            detailStage.showAndWait();
+
+            // After closing detail dialog refresh to pick up any edits
+            refreshData();
+            updateAllStatistics();
+
+        } catch (IOException e) {
+            System.err.println("Error opening details dialog: " + e.getMessage());
+            e.printStackTrace();
+            Alert alert = new Alert(Alert.AlertType.ERROR, "Impossible d'ouvrir le dialogue de détails.");
+            alert.showAndWait();
         }
-
-        if (selectedPersonnel.getSalary() > 0) {
-            details.append("Salary: ").append(String.format("%.2f MAD", selectedPersonnel.getSalary())).append("\n");
-        }
-
-        if (selectedPersonnel.getShift() != null) {
-            details.append("Shift: ").append(selectedPersonnel.getShift()).append("\n");
-        }
-
-        if (selectedPersonnel.getAddress() != null) {
-            details.append("Address: ").append(selectedPersonnel.getAddress()).append("\n");
-        }
-
-        if (selectedPersonnel.getEmergencyContact() != null) {
-            details.append("Emergency Contact: ").append(selectedPersonnel.getEmergencyContact()).append("\n");
-        }
-
-        details.append("Status: ").append(selectedPersonnel.isActive() ? "Active" : "Inactive");
-
-        alert.setContentText(details.toString());
-        alert.showAndWait();
     }
 
     /**
@@ -457,49 +549,47 @@ public class PersonnelController {
     @FXML
     public void handleFilterByJobTitle(String jobTitle) {
         try {
-            List<Personnel> filteredPersonnel;
+            // Map friendly UI names to DB jobTitle keys
+            String key = null;
+            if (jobTitle == null) jobTitle = "All";
 
-            if ("All".equalsIgnoreCase(jobTitle)) {
-                // Get all personnel
-                filteredPersonnel = personnelDAO.getAllPersonnel();
-            } else {
-                // Get personnel by job title
-                filteredPersonnel = personnelDAO.getPersonnelByJobTitle(jobTitle);
+            switch (jobTitle.toLowerCase()) {
+                case "all":
+                    currentFilter = "All";
+                    break;
+                case "veterinary":
+                case "vétérinaires":
+                    currentFilter = "Veterinary";
+                    break;
+                case "inventory":
+                case "inventaire":
+                    currentFilter = "Inventory";
+                    break;
+                case "supervisors":
+                case "superviseurs":
+                    currentFilter = "Supervisors";
+                    break;
+                case "farmhands":
+                case "ouvriers":
+                    currentFilter = "Farmhands";
+                    break;
+                default:
+                    // If caller passes DB key already, try to normalize
+                    if ("veterinary".equalsIgnoreCase(jobTitle) || "inventory_tracker".equalsIgnoreCase(jobTitle)
+                            || "supervisor".equalsIgnoreCase(jobTitle) || "farmhand".equalsIgnoreCase(jobTitle)) {
+                        // Set friendly filter to trigger correct DAO call in loadPersonnelData
+                        if ("veterinary".equalsIgnoreCase(jobTitle)) currentFilter = "Veterinary";
+                        else if ("inventory_tracker".equalsIgnoreCase(jobTitle)) currentFilter = "Inventory";
+                        else if ("supervisor".equalsIgnoreCase(jobTitle)) currentFilter = "Supervisors";
+                        else if ("farmhand".equalsIgnoreCase(jobTitle)) currentFilter = "Farmhands";
+                    } else {
+                        currentFilter = "All";
+                    }
             }
 
-            // Clear grid
-            if (personnelGrid != null) {
-                personnelGrid.getChildren().clear();
-            }
+            // Reload view using currentFilter
+            loadPersonnelData();
 
-            // Recreate grid with filtered personnel
-            int row = 0;
-            int col = 0;
-            int maxColumns = 3;
-
-            for (Personnel personnel : filteredPersonnel) {
-                VBox card = createPersonnelCard(personnel);
-
-                card.setOnMouseClicked(event -> {
-                    selectedPersonnel = personnel;
-                    highlightSelectedCard(card);
-                });
-
-                // Set constraints to prevent overlap
-                GridPane.setHgrow(card, Priority.ALWAYS);
-                GridPane.setVgrow(card, Priority.NEVER);
-                GridPane.setFillWidth(card, true);
-
-                if (personnelGrid != null) {
-                    personnelGrid.add(card, col, row);
-                }
-
-                col++;
-                if (col >= maxColumns) {
-                    col = 0;
-                    row++;
-                }
-            }
         } catch (Exception e) {
             System.err.println("Error filtering personnel: " + e.getMessage());
             e.printStackTrace();
@@ -509,46 +599,44 @@ public class PersonnelController {
     /**
      * Apply job title badge styling
      * @param label Label to style
-     * @param jobTitle Job title (Worker or Tracker)
+     * @param jobTitle Job title (DB key or friendly)
      */
     private void applyJobTitleBadge(Label label, String jobTitle) {
         if (label == null || jobTitle == null) {
             return;
         }
 
-        // Remove previous style classes
-        label.getStyleClass().removeAll("job-tracker", "job-worker");
+        String key = jobTitle.toLowerCase();
 
-        // Apply color based on job title
-        if ("Tracker".equalsIgnoreCase(jobTitle)) {
-            // Blue background for Tracker
-            label.setStyle(
-                    "-fx-background-color: #007bff; " +
-                            "-fx-text-fill: white; " +
-                            "-fx-background-radius: 5px; " +
-                            "-fx-font-size: 13px; " +
-                            "-fx-font-weight: bold; " +
-                            "-fx-alignment: center;"
-            );
-        } else if ("Worker".equalsIgnoreCase(jobTitle)) {
-            // Gray background for Worker
-            label.setStyle(
-                    "-fx-background-color: #6c757d; " +
-                            "-fx-text-fill: white; " +
-                            "-fx-background-radius: 5px; " +
-                            "-fx-font-size: 13px; " +
-                            "-fx-font-weight: bold; " +
-                            "-fx-alignment: center;"
-            );
-        } else {
-            // Default styling
-            label.setStyle(
-                    "-fx-background-color: #6c757d; " +
-                            "-fx-text-fill: white; " +
-                            "-fx-background-radius: 5px; " +
-                            "-fx-font-size: 13px; " +
-                            "-fx-alignment: center;"
-            );
+        // Default styling reset
+        label.setStyle("-fx-background-radius: 5px; -fx-padding: 5 10; -fx-font-size: 13px; -fx-font-weight: bold;");
+
+        switch (key) {
+            case "veterinary":
+                label.setStyle(label.getStyle() + "-fx-background-color: #17a2b8; -fx-text-fill: white;");
+                label.setText("Vétérinaire");
+                break;
+            case "inventory_tracker":
+                label.setStyle(label.getStyle() + "-fx-background-color: #6f42c1; -fx-text-fill: white;");
+                label.setText("Inventaire");
+                break;
+            case "supervisor":
+                label.setStyle(label.getStyle() + "-fx-background-color: #007bff; -fx-text-fill: white;");
+                label.setText("Superviseur");
+                break;
+            case "farmhand":
+            case "worker":
+                label.setStyle(label.getStyle() + "-fx-background-color: #6c757d; -fx-text-fill: white;");
+                label.setText("Ouvrier");
+                break;
+            case "tracker":
+                label.setStyle(label.getStyle() + "-fx-background-color: #007bff; -fx-text-fill: white;");
+                label.setText("Tracker");
+                break;
+            default:
+                label.setStyle(label.getStyle() + "-fx-background-color: #adb5bd; -fx-text-fill: white;");
+                label.setText(jobTitle);
+                break;
         }
     }
 
