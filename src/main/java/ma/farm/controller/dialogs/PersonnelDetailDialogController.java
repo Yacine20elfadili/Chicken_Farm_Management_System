@@ -2,16 +2,20 @@ package ma.farm.controller.dialogs;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import ma.farm.dao.PersonnelDAO;
+import ma.farm.model.AdminPosition;
 import ma.farm.model.Personnel;
+import ma.farm.model.PersonnelType;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -21,12 +25,11 @@ import java.util.List;
 /**
  * PersonnelDetailDialogController - Shows full personnel details
  *
- * Features:
- * - Display complete personnel information
- * - Show supervisor relationship (for workers)
- * - Show subordinates list (for supervisors)
- * - Edit button to open edit dialog
- * - Clickable supervisor/subordinate names
+ * Updated for new structure:
+ * - Display admin positions for admin_staff
+ * - Show department (administration/farm)
+ * - Handle supervisor/subordinate relationships
+ * - Updated job title formatting
  */
 public class PersonnelDetailDialogController {
 
@@ -43,12 +46,18 @@ public class PersonnelDetailDialogController {
     @FXML private Label addressLabel;
     @FXML private Label emergencyContactLabel;
     @FXML private Label statusLabel;
+    @FXML private Label departmentLabel;
 
-    // Relationship Section
+    // Positions Section (Admin Staff only)
+    @FXML private VBox positionsSection;
+    @FXML private FlowPane positionsPane;
+
+    // Relationship Section - Supervisor
     @FXML private VBox supervisorSection;
     @FXML private Label supervisorNameLabel;
     @FXML private Button viewSupervisorButton;
 
+    // Relationship Section - Subordinates
     @FXML private VBox subordinatesSection;
     @FXML private Label subordinateCountLabel;
     @FXML private ListView<String> subordinatesListView;
@@ -63,8 +72,8 @@ public class PersonnelDetailDialogController {
     // State
     private Stage dialogStage;
     private Personnel personnel;
-    private Personnel supervisor; // If worker has supervisor
-    private List<Personnel> subordinates; // If supervisor has subordinates
+    private Personnel supervisor;
+    private List<Personnel> subordinates;
 
     /**
      * Initialize method
@@ -87,6 +96,7 @@ public class PersonnelDetailDialogController {
     public void setPersonnel(Personnel personnel) {
         this.personnel = personnel;
         displayPersonnelInfo();
+        loadPositions();
         loadRelationships();
     }
 
@@ -97,35 +107,113 @@ public class PersonnelDetailDialogController {
         if (personnel == null) return;
 
         // Basic Info
-        nameLabel.setText(personnel.getFullName());
-        ageLabel.setText(personnel.getAge() + " ans");
-        phoneLabel.setText(personnel.getPhone());
-        emailLabel.setText(personnel.getEmail());
-        jobTitleLabel.setText(formatJobTitle(personnel.getJobTitle()));
-
-        // Employment Info
-        if (personnel.getHireDate() != null) {
-            hireDateLabel.setText(personnel.getHireDate().toString());
-            yearsOfServiceLabel.setText(calculateYearsOfService(personnel.getHireDate()) + " ans");
-        } else {
-            hireDateLabel.setText("Non spécifié");
-            yearsOfServiceLabel.setText("N/A");
+        if (nameLabel != null) {
+            nameLabel.setText(personnel.getFullName());
+        }
+        if (ageLabel != null) {
+            ageLabel.setText(personnel.getAge() + " ans");
+        }
+        if (phoneLabel != null) {
+            phoneLabel.setText(personnel.getPhone() != null ? personnel.getPhone() : "Non spécifié");
+        }
+        if (emailLabel != null) {
+            emailLabel.setText(personnel.getEmail() != null ? personnel.getEmail() : "Non spécifié");
+        }
+        if (jobTitleLabel != null) {
+            jobTitleLabel.setText(formatJobTitle(personnel.getJobTitle()));
         }
 
-        salaryLabel.setText(String.format("%.2f MAD", personnel.getSalary()));
-        shiftLabel.setText(formatShift(personnel.getShift()));
+        // Department
+        if (departmentLabel != null) {
+            String dept = personnel.getDepartment();
+            if ("administration".equals(dept)) {
+                departmentLabel.setText("Administration");
+                departmentLabel.setStyle("-fx-background-color: #007bff; -fx-text-fill: white; -fx-padding: 5 10; -fx-background-radius: 5;");
+            } else if ("farm".equals(dept)) {
+                departmentLabel.setText("Ferme");
+                departmentLabel.setStyle("-fx-background-color: #28a745; -fx-text-fill: white; -fx-padding: 5 10; -fx-background-radius: 5;");
+            } else {
+                departmentLabel.setText("Non spécifié");
+            }
+        }
+
+        // Employment Info
+        if (hireDateLabel != null) {
+            if (personnel.getHireDate() != null) {
+                hireDateLabel.setText(personnel.getHireDate().toString());
+            } else {
+                hireDateLabel.setText("Non spécifié");
+            }
+        }
+
+        if (yearsOfServiceLabel != null) {
+            yearsOfServiceLabel.setText(personnel.getYearsOfService() + " ans");
+        }
+
+        if (salaryLabel != null) {
+            salaryLabel.setText(String.format("%.2f MAD", personnel.getSalary()));
+        }
+
+        // Hide shift label (removed from new structure)
+        if (shiftLabel != null) {
+            shiftLabel.setVisible(false);
+            shiftLabel.setManaged(false);
+        }
 
         // Additional Info
-        addressLabel.setText(personnel.getAddress() != null ? personnel.getAddress() : "Non spécifié");
-        emergencyContactLabel.setText(personnel.getEmergencyContact() != null ? personnel.getEmergencyContact() : "Non spécifié");
+        if (addressLabel != null) {
+            addressLabel.setText(personnel.getAddress() != null ? personnel.getAddress() : "Non spécifié");
+        }
+        if (emergencyContactLabel != null) {
+            emergencyContactLabel.setText(personnel.getEmergencyContact() != null ? personnel.getEmergencyContact() : "Non spécifié");
+        }
 
         // Status
-        if (personnel.isActive()) {
-            statusLabel.setText("Actif");
-            statusLabel.setStyle("-fx-background-color: #d4edda; -fx-text-fill: #155724; -fx-padding: 5 10; -fx-background-radius: 5;");
-        } else {
-            statusLabel.setText("Inactif");
-            statusLabel.setStyle("-fx-background-color: #f8d7da; -fx-text-fill: #721c24; -fx-padding: 5 10; -fx-background-radius: 5;");
+        if (statusLabel != null) {
+            if (personnel.isActive()) {
+                statusLabel.setText("Actif");
+                statusLabel.setStyle("-fx-background-color: #d4edda; -fx-text-fill: #155724; -fx-padding: 5 10; -fx-background-radius: 5;");
+            } else {
+                statusLabel.setText("Inactif");
+                statusLabel.setStyle("-fx-background-color: #f8d7da; -fx-text-fill: #721c24; -fx-padding: 5 10; -fx-background-radius: 5;");
+            }
+        }
+    }
+
+    /**
+     * Load and display positions for admin staff
+     */
+    private void loadPositions() {
+        // Hide positions section by default
+        if (positionsSection != null) {
+            positionsSection.setVisible(false);
+            positionsSection.setManaged(false);
+        }
+
+        // Only show for admin_staff
+        if (personnel == null || !personnel.isAdminStaff()) {
+            return;
+        }
+
+        if (positionsSection != null && positionsPane != null) {
+            positionsSection.setVisible(true);
+            positionsSection.setManaged(true);
+
+            positionsPane.getChildren().clear();
+
+            AdminPosition[] positions = personnel.getAdminPositions();
+            if (positions != null && positions.length > 0) {
+                for (AdminPosition pos : positions) {
+                    Label posLabel = new Label(pos.getDisplayNameFr());
+                    posLabel.setStyle("-fx-background-color: #e9ecef; -fx-text-fill: #495057; " +
+                                     "-fx-padding: 5 12; -fx-background-radius: 15; -fx-font-size: 12px;");
+                    positionsPane.getChildren().add(posLabel);
+                }
+            } else {
+                Label noPos = new Label("Aucune position assignée");
+                noPos.setStyle("-fx-text-fill: #6c757d; -fx-font-style: italic;");
+                positionsPane.getChildren().add(noPos);
+            }
         }
     }
 
@@ -134,47 +222,66 @@ public class PersonnelDetailDialogController {
      */
     private void loadRelationships() {
         // Hide both sections initially
-        supervisorSection.setVisible(false);
-        supervisorSection.setManaged(false);
-        subordinatesSection.setVisible(false);
-        subordinatesSection.setManaged(false);
+        if (supervisorSection != null) {
+            supervisorSection.setVisible(false);
+            supervisorSection.setManaged(false);
+        }
+        if (subordinatesSection != null) {
+            subordinatesSection.setVisible(false);
+            subordinatesSection.setManaged(false);
+        }
 
-        // Check if personnel has a supervisor (is a worker)
-        if (personnel.hasSupervisor()) {
+        if (personnel == null) return;
+
+        // Check if personnel is a subordinate (has a supervisor)
+        if (personnel.isSubordinate() && personnel.hasSupervisor()) {
             supervisor = personnelDAO.getPersonnelById(personnel.getSupervisorId());
-            if (supervisor != null) {
+            if (supervisor != null && supervisorSection != null) {
                 supervisorSection.setVisible(true);
                 supervisorSection.setManaged(true);
-                supervisorNameLabel.setText(supervisor.getFullName());
+
+                if (supervisorNameLabel != null) {
+                    supervisorNameLabel.setText(supervisor.getFullName());
+                }
 
                 // Setup click handler for supervisor button
-                viewSupervisorButton.setOnAction(e -> handleViewSupervisor());
+                if (viewSupervisorButton != null) {
+                    viewSupervisorButton.setOnAction(e -> handleViewSupervisor());
+                }
             }
         }
 
-        // Check if personnel is a supervisor (has subordinates)
+        // Check if personnel is a supervisor (can have subordinates)
         if (personnel.isSupervisor()) {
-            subordinates = personnelDAO.getPersonnelBySupervisorId(personnel.getId());
-            if (!subordinates.isEmpty()) {
+            subordinates = personnelDAO.getSubordinatesBySupervisorId(personnel.getId());
+
+            if (subordinatesSection != null) {
                 subordinatesSection.setVisible(true);
                 subordinatesSection.setManaged(true);
-                subordinateCountLabel.setText(subordinates.size() + " subordonné(s)");
 
-                // Populate subordinates list
-                subordinatesListView.getItems().clear();
-                for (Personnel subordinate : subordinates) {
-                    subordinatesListView.getItems().add(subordinate.getFullName() + " - " + formatJobTitle(subordinate.getJobTitle()));
+                if (subordinateCountLabel != null) {
+                    subordinateCountLabel.setText(subordinates.size() + " subordonné(s)");
                 }
 
-                // Setup click handler for subordinates list
-                subordinatesListView.setOnMouseClicked(event -> {
-                    if (event.getClickCount() == 2) { // Double-click
-                        String selected = subordinatesListView.getSelectionModel().getSelectedItem();
-                        if (selected != null) {
-                            handleViewSubordinate(selected);
-                        }
+                // Populate subordinates list
+                if (subordinatesListView != null) {
+                    subordinatesListView.getItems().clear();
+                    for (Personnel subordinate : subordinates) {
+                        subordinatesListView.getItems().add(
+                            subordinate.getFullName() + " - " + formatJobTitle(subordinate.getJobTitle())
+                        );
                     }
-                });
+
+                    // Setup click handler for subordinates list
+                    subordinatesListView.setOnMouseClicked(event -> {
+                        if (event.getClickCount() == 2) {
+                            String selected = subordinatesListView.getSelectionModel().getSelectedItem();
+                            if (selected != null) {
+                                handleViewSubordinate(selected);
+                            }
+                        }
+                    });
+                }
             }
         }
     }
@@ -192,6 +299,8 @@ public class PersonnelDetailDialogController {
      * Handle subordinate selection
      */
     private void handleViewSubordinate(String selectedItem) {
+        if (subordinates == null || selectedItem == null) return;
+
         // Extract name from "Name - Job Title"
         String name = selectedItem.split(" - ")[0];
 
@@ -259,6 +368,7 @@ public class PersonnelDetailDialogController {
             if (controller.isSaveClicked()) {
                 personnel = personnelDAO.getPersonnelById(personnel.getId());
                 displayPersonnelInfo();
+                loadPositions();
                 loadRelationships();
             }
 
@@ -273,42 +383,53 @@ public class PersonnelDetailDialogController {
      */
     @FXML
     public void handleClose() {
-        dialogStage.close();
+        if (dialogStage != null) {
+            dialogStage.close();
+        }
     }
 
     /**
-     * Format job title for display
+     * Format job title for display (updated for new structure)
      */
     private String formatJobTitle(String jobTitle) {
         if (jobTitle == null) return "Non spécifié";
 
+        // Try to get from PersonnelType enum first
+        PersonnelType type = PersonnelType.fromCode(jobTitle);
+        if (type != null) {
+            return type.getDisplayNameFr();
+        }
+
+        // Fallback for legacy job titles
         switch (jobTitle.toLowerCase()) {
-            case "veterinary": return "Vétérinaire";
-            case "inventory_tracker": return "Gestionnaire d'Inventaire";
-            case "supervisor": return "Superviseur";
-            case "farmhand": return "Ouvrier Agricole";
-            default: return jobTitle;
+            case "farm_owner":
+                return "Propriétaire / Directeur Général";
+            case "cashier":
+                return "Caissier";
+            case "admin_staff":
+                return "Personnel Administratif";
+            case "veterinary_supervisor":
+                return "Superviseur Vétérinaire";
+            case "veterinary_subordinate":
+                return "Subordonné Vétérinaire";
+            case "inventory_supervisor":
+                return "Superviseur Inventaire";
+            case "inventory_subordinate":
+                return "Subordonné Inventaire";
+            case "farmhand_supervisor":
+                return "Superviseur Ouvriers";
+            case "farmhand_subordinate":
+                return "Subordonné Ouvrier";
+            case "veterinary":
+                return "Vétérinaire";
+            case "inventory_tracker":
+                return "Gestionnaire d'Inventaire";
+            case "supervisor":
+                return "Superviseur";
+            case "farmhand":
+                return "Ouvrier Agricole";
+            default:
+                return jobTitle;
         }
-    }
-
-    /**
-     * Format shift for display
-     */
-    private String formatShift(String shift) {
-        if (shift == null) return "Non spécifié";
-
-        switch (shift.toLowerCase()) {
-            case "morning": return "Matin";
-            case "evening": return "Soir";
-            default: return shift;
-        }
-    }
-
-    /**
-     * Calculate years of service from hire date
-     */
-    private int calculateYearsOfService(LocalDate hireDate) {
-        if (hireDate == null) return 0;
-        return Period.between(hireDate, LocalDate.now()).getYears();
     }
 }
