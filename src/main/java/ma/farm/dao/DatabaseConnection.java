@@ -190,39 +190,4 @@ public class DatabaseConnection {
         }
     }
 
-    /**
-     * Test method to verify database functionality
-     */
-    public static void main(String[] args) {
-        System.out.println("=== Database Connection Test ===\n");
-
-        try {
-            // Get instance (will create database if needed)
-            DatabaseConnection dbConn = DatabaseConnection.getInstance();
-
-            if (dbConn != null && dbConn.getConnection() != null) {
-                System.out.println("✓ Database connection successful");
-                System.out.println("✓ Database file: " + new File(getDatabasePath()).getAbsolutePath());
-
-                // Test a simple query
-                try (Statement stmt = dbConn.getConnection().createStatement()) {
-                    var rs = stmt.executeQuery("SELECT COUNT(*) as count FROM users");
-                    if (rs.next()) {
-                        System.out.println("✓ Users table exists with " + rs.getInt("count") + " users");
-                    }
-                } catch (SQLException e) {
-                    System.err.println("✗ Error querying users: " + e.getMessage());
-                }
-
-            } else {
-                System.out.println("✗ Database connection failed");
-            }
-
-        } catch (Exception e) {
-            System.err.println("✗ Error: " + e.getMessage());
-            e.printStackTrace();
-        }
-
-        System.out.println("\n=== Test Complete ===");
-    }
 }

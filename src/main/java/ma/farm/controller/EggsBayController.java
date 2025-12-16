@@ -368,7 +368,7 @@ public class EggsBayController {
         try {
             // Load the dialog FXML
             FXMLLoader loader = new FXMLLoader(
-                getClass().getResource("/dialogs/RecordEggCollectionDialog.fxml")
+                getClass().getResource("/fxml/dialogs/RecordEggCollectionDialog.fxml")
             );
             Parent dialogContent = loader.load();
             RecordEggCollectionDialogController dialogController = loader.getController();

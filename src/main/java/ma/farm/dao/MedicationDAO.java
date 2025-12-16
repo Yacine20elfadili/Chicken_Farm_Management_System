@@ -11,35 +11,15 @@ import ma.farm.model.Medication;
 
 /**
  * MedicationDAO - Data Access Object for Medication inventory management
- *
- * Provides database operations for the Medication model including:
- * - CRUD operations (Create, Read, Update, Delete)
- * - Filtering by type and stock levels
- * - Low stock alerts and expiry tracking
- *
- * All database operations use prepared statements to prevent SQL injection.
- *
- * @author Chicken Farm Management System
- * @version 1.0
  */
 public class MedicationDAO {
 
     private final DatabaseConnection dbConnection;
 
-    /**
-     * Constructor - Initializes the DAO with a database connection instance
-     */
     public MedicationDAO() {
         this.dbConnection = DatabaseConnection.getInstance();
     }
 
-    /**
-     * Maps a ResultSet row to a Medication object
-     *
-     * @param rs the ResultSet positioned at the current row
-     * @return a Medication object populated with data from the ResultSet
-     * @throws SQLException if a database access error occurs
-     */
     private Medication mapResultSetToMedication(ResultSet rs) throws SQLException {
         Medication medication = new Medication();
         medication.setId(rs.getInt("id"));
@@ -47,20 +27,20 @@ public class MedicationDAO {
         medication.setType(rs.getString("type"));
         medication.setQuantity(rs.getInt("quantity"));
         medication.setUnit(rs.getString("unit"));
-        medication.setPricePerUnit(rs.getDouble("price_per_unit"));
+        medication.setPricePerUnit(rs.getDouble("pricePerUnit"));
         medication.setSupplier(rs.getString("supplier"));
         
-        String purchaseDateStr = rs.getString("purchase_date");
+        String purchaseDateStr = rs.getString("purchaseDate");
         if (purchaseDateStr != null) {
             medication.setPurchaseDate(LocalDate.parse(purchaseDateStr));
         }
         
-        String expiryDateStr = rs.getString("expiry_date");
+        String expiryDateStr = rs.getString("expiryDate");
         if (expiryDateStr != null) {
             medication.setExpiryDate(LocalDate.parse(expiryDateStr));
         }
         
-        medication.setMinStockLevel(rs.getInt("min_stock_level"));
+        medication.setMinStockLevel(rs.getInt("minStockLevel"));
         medication.setUsage(rs.getString("usage"));
         
         return medication;
@@ -68,14 +48,10 @@ public class MedicationDAO {
 
     /**
      * Add a new medication to the database
-     *
-     * @param medication the Medication object to add
-     * @return true if successful, false otherwise
      */
     public boolean addMedication(Medication medication) {
-        String sql = "INSERT INTO medication (name, type, quantity, unit, price_per_unit, supplier, purchase_date, expiry_date, min_stock_level, usage) " +
-                     "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        
+        String sql = "INSERT INTO medications (name, type, quantity, unit, pricePerUnit, supplier, purchaseDate, expiryDate, minStockLevel, usage) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
         try (PreparedStatement stmt = dbConnection.getConnection().prepareStatement(sql)) {
             stmt.setString(1, medication.getName());
             stmt.setString(2, medication.getType());
@@ -89,6 +65,7 @@ public class MedicationDAO {
             stmt.setString(10, medication.getUsage());
             
             int rowsAffected = stmt.executeUpdate();
+            System.out.println("Medication insert: " + rowsAffected + " rows affected");
             return rowsAffected > 0;
         } catch (SQLException e) {
             System.err.println("Error adding medication: " + e.getMessage());
@@ -99,12 +76,10 @@ public class MedicationDAO {
 
     /**
      * Get all medications from the database
-     *
-     * @return a list of all Medication objects
      */
     public List<Medication> getAllMedications() {
         List<Medication> medicationList = new ArrayList<>();
-        String sql = "SELECT * FROM medication ORDER BY name";
+        String sql = "SELECT * FROM medications ORDER BY name";
         
         try (Statement stmt = dbConnection.getConnection().createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
@@ -122,12 +97,9 @@ public class MedicationDAO {
 
     /**
      * Get medication by ID
-     *
-     * @param id the medication ID
-     * @return the Medication object, or null if not found
      */
     public Medication getMedicationById(int id) {
-        String sql = "SELECT * FROM medication WHERE id = ?";
+        String sql = "SELECT * FROM medications WHERE id = ?";
         
         try (PreparedStatement stmt = dbConnection.getConnection().prepareStatement(sql)) {
             stmt.setInt(1, id);
@@ -147,13 +119,10 @@ public class MedicationDAO {
 
     /**
      * Get medications by type
-     *
-     * @param type the medication type
-     * @return a list of Medication objects matching the type
      */
     public List<Medication> getMedicationByType(String type) {
         List<Medication> medicationList = new ArrayList<>();
-        String sql = "SELECT * FROM medication WHERE type = ? ORDER BY name";
+        String sql = "SELECT * FROM medications WHERE type = ? ORDER BY name";
         
         try (PreparedStatement stmt = dbConnection.getConnection().prepareStatement(sql)) {
             stmt.setString(1, type);
@@ -173,12 +142,10 @@ public class MedicationDAO {
 
     /**
      * Get all medications with low stock
-     *
-     * @return a list of Medication objects with quantity below minimum level
      */
     public List<Medication> getLowStockMedications() {
         List<Medication> medicationList = new ArrayList<>();
-        String sql = "SELECT * FROM medication WHERE quantity < min_stock_level ORDER BY name";
+        String sql = "SELECT * FROM medications WHERE quantity < minStockLevel ORDER BY name";
         
         try (Statement stmt = dbConnection.getConnection().createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
@@ -196,15 +163,13 @@ public class MedicationDAO {
 
     /**
      * Get all expiring medications (within 30 days)
-     *
-     * @return a list of Medication objects expiring soon
      */
     public List<Medication> getExpiringMedications() {
         List<Medication> medicationList = new ArrayList<>();
-        String sql = "SELECT * FROM medication WHERE expiry_date IS NOT NULL " +
-                     "AND expiry_date <= date('now', '+30 days') " +
-                     "AND expiry_date >= date('now') " +
-                     "ORDER BY expiry_date";
+        String sql = "SELECT * FROM medications WHERE expiryDate IS NOT NULL " +
+                     "AND expiryDate <= date('now', '+30 days') " +
+                     "AND expiryDate >= date('now') " +
+                     "ORDER BY expiryDate";
         
         try (Statement stmt = dbConnection.getConnection().createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
@@ -222,14 +187,12 @@ public class MedicationDAO {
 
     /**
      * Get expired medications
-     *
-     * @return a list of expired Medication objects
      */
     public List<Medication> getExpiredMedications() {
         List<Medication> medicationList = new ArrayList<>();
-        String sql = "SELECT * FROM medication WHERE expiry_date IS NOT NULL " +
-                     "AND expiry_date < date('now') " +
-                     "ORDER BY expiry_date DESC";
+        String sql = "SELECT * FROM medications WHERE expiryDate IS NOT NULL " +
+                     "AND expiryDate < date('now') " +
+                     "ORDER BY expiryDate DESC";
         
         try (Statement stmt = dbConnection.getConnection().createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
@@ -247,13 +210,10 @@ public class MedicationDAO {
 
     /**
      * Update medication information
-     *
-     * @param medication the Medication object with updated data
-     * @return true if successful, false otherwise
      */
     public boolean updateMedication(Medication medication) {
-        String sql = "UPDATE medication SET name = ?, type = ?, quantity = ?, unit = ?, price_per_unit = ?, " +
-                     "supplier = ?, purchase_date = ?, expiry_date = ?, min_stock_level = ?, usage = ? " +
+        String sql = "UPDATE medications SET name = ?, type = ?, quantity = ?, unit = ?, pricePerUnit = ?, " +
+                     "supplier = ?, purchaseDate = ?, expiryDate = ?, minStockLevel = ?, usage = ? " +
                      "WHERE id = ?";
         
         try (PreparedStatement stmt = dbConnection.getConnection().prepareStatement(sql)) {
@@ -280,13 +240,9 @@ public class MedicationDAO {
 
     /**
      * Update medication quantity (for usage/consumption)
-     *
-     * @param medicationId the medication ID
-     * @param newQuantity the new quantity
-     * @return true if successful, false otherwise
      */
     public boolean updateQuantity(int medicationId, double newQuantity) {
-        String sql = "UPDATE medication SET quantity = ? WHERE id = ?";
+        String sql = "UPDATE medications SET quantity = ? WHERE id = ?";
         
         try (PreparedStatement stmt = dbConnection.getConnection().prepareStatement(sql)) {
             stmt.setInt(1, (int) newQuantity);
@@ -303,12 +259,9 @@ public class MedicationDAO {
 
     /**
      * Delete medication from the database
-     *
-     * @param medicationId the medication ID
-     * @return true if successful, false otherwise
      */
     public boolean deleteMedication(int medicationId) {
-        String sql = "DELETE FROM medication WHERE id = ?";
+        String sql = "DELETE FROM medications WHERE id = ?";
         
         try (PreparedStatement stmt = dbConnection.getConnection().prepareStatement(sql)) {
             stmt.setInt(1, medicationId);
@@ -324,11 +277,9 @@ public class MedicationDAO {
 
     /**
      * Get total value of all medication inventory
-     *
-     * @return the total value in currency
      */
     public double getTotalMedicationValue() {
-        String sql = "SELECT SUM(quantity * price_per_unit) as total FROM medication";
+        String sql = "SELECT SUM(quantity * pricePerUnit) as total FROM medications";
         
         try (Statement stmt = dbConnection.getConnection().createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
@@ -346,11 +297,9 @@ public class MedicationDAO {
 
     /**
      * Get count of low stock medications
-     *
-     * @return the number of medications with low stock
      */
     public int getLowStockMedicationCount() {
-        String sql = "SELECT COUNT(*) as count FROM medication WHERE quantity < min_stock_level";
+        String sql = "SELECT COUNT(*) as count FROM medications WHERE quantity < minStockLevel";
         
         try (Statement stmt = dbConnection.getConnection().createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
