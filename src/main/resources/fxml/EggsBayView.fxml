@@ -15,17 +15,17 @@
 <AnchorPane prefHeight="700.0" prefWidth="950.0" styleClass="main-content" stylesheets="@../css/style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ma.farm.controller.EggsBayController">
 
     <children>
-        <VBox prefHeight="75.0" prefWidth="950.0" spacing="10.0" styleClass="header" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+        <VBox prefHeight="75.0" prefWidth="950.0" styleClass="header" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
             <children>
                 <HBox prefHeight="33.0" prefWidth="999.0">
                     <children>
                         <Label styleClass="header-title" text="Espace Œufs" textAlignment="CENTER" />
                         <Region prefHeight="33.0" HBox.hgrow="ALWAYS" />
                         <!-- Action Buttons -->
-                        <Button fx:id="recordCollectionButton" onAction="#handleRecordCollection" prefHeight="32.0" prefWidth="150.0" style="-fx-font-size: 12; -fx-padding: 8;" text="Enregistrer Collecte" />
+                        <Button fx:id="recordCollectionButton" onAction="#handleRecordCollection" prefHeight="37.0" prefWidth="171.0" styleClass="btn-primary" text="Enregistrer Collecte" />
                     </children>
                     <VBox.margin>
-                        <Insets right="20.0" top="10.0" left="20.0" />
+                        <Insets right="20.0" top="10.0" />
                     </VBox.margin>
                 </HBox>
                 <HBox prefHeight="100.0" prefWidth="200.0">
@@ -144,7 +144,7 @@
                                 </HBox>
 
                                 <!-- No Egg Laying Houses Message (Hidden by default) -->
-                                <VBox fx:id="noEggHousesMessage" prefHeight="180.0" prefWidth="907.0" visible="false" managed="false">
+                                <VBox fx:id="noEggHousesMessage" managed="false" prefHeight="180.0" prefWidth="907.0" visible="false">
                                     <styleClass>
                                         <String fx:value="metric-card" />
                                         <String fx:value="no-data-card" />
@@ -185,8 +185,7 @@
                                                                 <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                                                             </padding>
                                                         </Label>
-                                                        <Button fx:id="sellEggsButton" onAction="#handleSellEggs" text="💰 Vendre"
-                                                                style="-fx-background-color: #28a745; -fx-text-fill: white; -fx-font-size: 12px; -fx-font-weight: bold; -fx-padding: 8 16; -fx-background-radius: 5; -fx-cursor: hand;" />
+                                                        <Button fx:id="sellEggsButton" onAction="#handleSellEggs" style="-fx-background-color: #28a745; -fx-text-fill: white; -fx-font-size: 12px; -fx-font-weight: bold; -fx-padding: 8 16; -fx-background-radius: 5; -fx-cursor: hand;" text="💰 Vendre" />
                                                     </children>
                                                 </HBox>
                                                 <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0">
