@@ -7,8 +7,8 @@
 <VBox xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
       fx:controller="ma.farm.controller.dialogs.RecordMortalityDialogController"
-      prefWidth="550.0"
-      prefHeight="720.0"
+      prefWidth="850.0"
+      prefHeight="480.0"
       spacing="12"
       style="-fx-background-color: #ffffff;">
 
@@ -26,91 +26,97 @@
 
     <Separator/>
 
-    <!-- Scrollable Form Content -->
-    <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS"
-                style="-fx-background-color: transparent; -fx-background: transparent; -fx-border-color: transparent;">
-        <VBox spacing="15.0" style="-fx-padding: 5 10 5 0;">
+    <!-- Main Content - Horizontal Layout -->
+    <HBox spacing="20.0" VBox.vgrow="ALWAYS">
 
-            <!-- Form Content -->
-            <VBox spacing="15.0">
-                <!-- House Selection -->
-                <VBox spacing="8.0">
-                    <Label text="Select House" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #333333;"/>
-                    <ComboBox fx:id="houseComboBox" promptText="Select house..." maxWidth="Infinity"
-                              style="-fx-background-color: #ffffff; -fx-border-color: #ced4da; -fx-border-radius: 5; -fx-background-radius: 5;"/>
-                </VBox>
+        <!-- Left Column - Primary Info -->
+        <VBox spacing="15.0" HBox.hgrow="ALWAYS"
+              style="-fx-background-color: #f8f9fa; -fx-padding: 15; -fx-background-radius: 8;">
+            <Label text="📋 Primary Information"
+                   style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #333333;"/>
 
-                <!-- Death Date -->
-                <VBox spacing="8.0">
-                    <Label text="Death Date" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #333333;"/>
-                    <DatePicker fx:id="deathDatePicker" maxWidth="Infinity"/>
-                </VBox>
-
-                <!-- Death Count -->
-                <VBox spacing="8.0">
-                    <Label text="Number of Deaths" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #333333;"/>
-                    <TextField fx:id="deathCountField" promptText="e.g., 5"
-                               style="-fx-background-color: #ffffff; -fx-border-color: #ced4da; -fx-border-radius: 5; -fx-background-radius: 5; -fx-padding: 8 12;"/>
-                </VBox>
-
-                <!-- Cause of Death -->
-                <VBox spacing="8.0">
-                    <Label text="Cause of Death" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #333333;"/>
-                    <ComboBox fx:id="causeComboBox" promptText="Select or type cause..."
-                              editable="true" maxWidth="Infinity"
-                              style="-fx-background-color: #ffffff; -fx-border-color: #ced4da; -fx-border-radius: 5; -fx-background-radius: 5;"/>
-                </VBox>
+            <!-- House Selection -->
+            <VBox spacing="8.0">
+                <Label text="Select House" style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #333333;"/>
+                <ComboBox fx:id="houseComboBox" promptText="Select house..." maxWidth="Infinity"
+                          style="-fx-background-color: #ffffff; -fx-border-color: #ced4da; -fx-border-radius: 5; -fx-background-radius: 5;"/>
             </VBox>
 
-            <Separator/>
+            <!-- Death Date -->
+            <VBox spacing="8.0">
+                <Label text="Death Date" style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #333333;"/>
+                <DatePicker fx:id="deathDatePicker" maxWidth="Infinity"/>
+            </VBox>
 
-            <!-- Additional Details Section -->
-            <VBox spacing="12.0"
-                  style="-fx-background-color: #f8f9fa; -fx-padding: 15; -fx-background-radius: 8;">
-                <Label text="📋 Additional Details"
-                       style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #666666;"/>
+            <!-- Death Count -->
+            <VBox spacing="8.0">
+                <Label text="Number of Deaths" style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #333333;"/>
+                <TextField fx:id="deathCountField" promptText="e.g., 5"
+                           style="-fx-background-color: #ffffff; -fx-border-color: #ced4da; -fx-border-radius: 5; -fx-background-radius: 5; -fx-padding: 8 12;"/>
+            </VBox>
 
-                <!-- Symptoms -->
-                <VBox spacing="5.0">
-                    <Label text="Symptoms (Optional)" style="-fx-text-fill: #555555; -fx-font-size: 12px;"/>
-                    <TextArea fx:id="symptomsArea" promptText="Describe symptoms observed..."
-                              prefRowCount="2" wrapText="true"
-                              style="-fx-background-color: #ffffff; -fx-border-color: #ced4da; -fx-border-radius: 5; -fx-background-radius: 5;"/>
-                </VBox>
+            <!-- Cause of Death -->
+            <VBox spacing="8.0">
+                <Label text="Cause of Death" style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #333333;"/>
+                <ComboBox fx:id="causeComboBox" promptText="Select or type cause..."
+                          editable="true" maxWidth="Infinity"
+                          style="-fx-background-color: #ffffff; -fx-border-color: #ced4da; -fx-border-radius: 5; -fx-background-radius: 5;"/>
+            </VBox>
+        </VBox>
 
-                <!-- Outbreak Status -->
-                <HBox spacing="15.0" alignment="CENTER_LEFT">
-                    <CheckBox fx:id="isOutbreakCheckBox" text="Mark as outbreak"
-                              style="-fx-text-fill: #333333;"/>
-                </HBox>
+        <!-- Center Column - Details -->
+        <VBox spacing="15.0" HBox.hgrow="ALWAYS"
+              style="-fx-background-color: #f8f9fa; -fx-padding: 15; -fx-background-radius: 8;">
+            <Label text="📝 Additional Details"
+                   style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #333333;"/>
 
-                <!-- Recorded By -->
-                <VBox spacing="5.0">
-                    <Label text="Recorded By" style="-fx-text-fill: #555555; -fx-font-size: 12px;"/>
-                    <TextField fx:id="recordedByField" promptText="Worker name..."
-                               style="-fx-background-color: #ffffff; -fx-border-color: #ced4da; -fx-border-radius: 5; -fx-background-radius: 5; -fx-padding: 8 12;"/>
-                </VBox>
+            <!-- Symptoms -->
+            <VBox spacing="5.0" VBox.vgrow="ALWAYS">
+                <Label text="Symptoms (Optional)" style="-fx-text-fill: #555555; -fx-font-size: 12px;"/>
+                <TextArea fx:id="symptomsArea" promptText="Describe symptoms observed..."
+                          prefRowCount="3" wrapText="true" VBox.vgrow="ALWAYS"
+                          style="-fx-background-color: #ffffff; -fx-border-color: #ced4da; -fx-border-radius: 5; -fx-background-radius: 5;"/>
+            </VBox>
 
-                <!-- Notes -->
-                <VBox spacing="5.0">
-                    <Label text="Notes (Optional)" style="-fx-text-fill: #555555; -fx-font-size: 12px;"/>
-                    <TextArea fx:id="notesArea" promptText="Additional notes..."
-                              prefRowCount="2" wrapText="true"
-                              style="-fx-background-color: #ffffff; -fx-border-color: #ced4da; -fx-border-radius: 5; -fx-background-radius: 5;"/>
-                </VBox>
+            <!-- Outbreak Status -->
+            <HBox spacing="15.0" alignment="CENTER_LEFT">
+                <CheckBox fx:id="isOutbreakCheckBox" text="Mark as outbreak"
+                          style="-fx-text-fill: #333333; -fx-font-size: 12px;"/>
+            </HBox>
+
+            <!-- Recorded By -->
+            <VBox spacing="5.0">
+                <Label text="Recorded By" style="-fx-text-fill: #555555; -fx-font-size: 12px;"/>
+                <TextField fx:id="recordedByField" promptText="Worker name..."
+                           style="-fx-background-color: #ffffff; -fx-border-color: #ced4da; -fx-border-radius: 5; -fx-background-radius: 5; -fx-padding: 8 12;"/>
+            </VBox>
+        </VBox>
+
+        <!-- Right Column - Notes & Warning -->
+        <VBox spacing="15.0" HBox.hgrow="ALWAYS"
+              style="-fx-background-color: #f8f9fa; -fx-padding: 15; -fx-background-radius: 8;">
+            <Label text="💬 Notes"
+                   style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #333333;"/>
+
+            <!-- Notes -->
+            <VBox spacing="5.0" VBox.vgrow="ALWAYS">
+                <Label text="Additional Notes (Optional)" style="-fx-text-fill: #555555; -fx-font-size: 12px;"/>
+                <TextArea fx:id="notesArea" promptText="Additional notes..."
+                          prefRowCount="5" wrapText="true" VBox.vgrow="ALWAYS"
+                          style="-fx-background-color: #ffffff; -fx-border-color: #ced4da; -fx-border-radius: 5; -fx-background-radius: 5;"/>
             </VBox>
 
             <!-- Warning Label -->
             <HBox spacing="10.0" alignment="CENTER_LEFT"
                   style="-fx-background-color: #fff3cd; -fx-padding: 12; -fx-background-radius: 5;">
-                <Label text="⚠" style="-fx-font-size: 18px; -fx-text-fill: #856404;"/>
-                <Label text="Recording mortality will automatically decrease the chicken count in the selected house."
-                       wrapText="true" style="-fx-text-fill: #856404; -fx-font-size: 12px;"
+                <Label text="⚠" style="-fx-font-size: 16px; -fx-text-fill: #856404;"/>
+                <Label text="Recording mortality will decrease the chicken count."
+                       wrapText="true" style="-fx-text-fill: #856404; -fx-font-size: 11px;"
                        HBox.hgrow="ALWAYS"/>
             </HBox>
-
         </VBox>
-    </ScrollPane>
+
+    </HBox>
 
     <!-- Error Label -->
     <Label fx:id="errorLabel" style="-fx-text-fill: #dc3545;" wrapText="true" visible="false" managed="false"/>
@@ -118,8 +124,7 @@
     <Separator/>
 
     <!-- Button Bar - Fixed at bottom -->
-    <HBox spacing="12.0" alignment="CENTER_RIGHT"
-          style="-fx-padding: 10 0 0 0;">
+    <HBox spacing="12.0" alignment="CENTER_RIGHT">
         <Button text="Cancel" onAction="#handleCancel"
                 style="-fx-background-color: #6c757d; -fx-text-fill: white; -fx-font-size: 13px; -fx-padding: 10 24; -fx-background-radius: 6; -fx-cursor: hand;"
                 prefWidth="100"/>
