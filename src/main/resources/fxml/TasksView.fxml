@@ -2,6 +2,7 @@
 
 <?import java.lang.String?>
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.ScrollPane?>
@@ -9,168 +10,118 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
 <AnchorPane prefHeight="700.0" prefWidth="950.0" styleClass="main-content" stylesheets="@../css/style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ma.farm.controller.TasksController">
-
     <children>
-        <VBox prefHeight="75.0" prefWidth="950.0" spacing="10.0" styleClass="header" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+        <VBox AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
             <children>
-                <HBox prefHeight="33.0" prefWidth="999.0">
-                    <children>
-                        <Label styleClass="header-title" text="Gestion des Tâches" textAlignment="CENTER" />
-                    </children>
-                    <VBox.margin>
-                        <Insets top="10.0" />
-                    </VBox.margin>
-                </HBox>
-                <HBox prefHeight="100.0" prefWidth="200.0">
-                    <children>
-                        <Label prefHeight="28.0" prefWidth="368.0" styleClass="header-subtitle" text="Suivez et gérez toutes les tâches quotidiennes de la ferme" textAlignment="CENTER" />
-                    </children>
-                    <VBox.margin>
-                        <Insets />
-                    </VBox.margin>
-                </HBox>
-            </children>
-        </VBox>
-        <VBox prefHeight="200.0" prefWidth="100.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="80.0">
-            <children>
-                <ScrollPane fitToHeight="true" fitToWidth="true" prefHeight="716.0" prefWidth="1000.0" styleClass="main-content" VBox.vgrow="ALWAYS">
+                <ScrollPane fitToHeight="true" fitToWidth="true" styleClass="main-content" VBox.vgrow="ALWAYS">
                     <content>
-                        <VBox prefHeight="200.0" prefWidth="100.0" spacing="35.0" styleClass="main-content">
+                        <VBox spacing="25.0" styleClass="main-content">
+                            <padding>
+                                <Insets bottom="30.0" left="20.0" right="20.0" top="20.0" />
+                            </padding>
                             <children>
-                                <HBox prefHeight="134.0" prefWidth="907.0" spacing="40.0">
-                           <children>
-                              <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="20.0" styleClass="metric-card" HBox.hgrow="ALWAYS">
-                                 <children>
-                                    <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
-                                       <children>
-                                          <ImageView fitHeight="50.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true" styleClass="card-icon">
-                                             <image>
-                                                <Image url="@../images/icons/total-tasks.png" />
-                                             </image>
-                                          </ImageView>
-                                          <Label styleClass="cards-title" text="Tâches Totales" />
-                                       </children>
-                                    </HBox>
-                                    <Label fx:id="totalTasksLabel" styleClass="task-stats" text="000" />
-                                    <Label styleClass="task-cards-description" text="tâches planifiées" />
-                                 </children>
-                              </VBox>
-                              <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="20.0" styleClass="metric-card" HBox.hgrow="ALWAYS">
-                                 <children>
-                                    <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
-                                       <children>
-                                          <ImageView fitHeight="50.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true" styleClass="card-icon">
-                                             <image>
-                                                <Image url="@../images/icons/done-task.png" />
-                                             </image>
-                                          </ImageView>
-                                          <Label prefHeight="18.0" prefWidth="127.0" styleClass="cards-title" text="Tâches Terminées" />
-                                       </children>
-                                    </HBox>
-                                    <Label fx:id="doneTasksLabel" text="000">
-                                       <styleClass>
-                                          <String fx:value="task-stats" />
-                                          <String fx:value="done-tasks" />
-                                       </styleClass>
-                                    </Label>
-                                    <Label styleClass="task-cards-description" text="réalisé" />
-                                 </children>
-                              </VBox>
-                              <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="20.0" styleClass="metric-card" HBox.hgrow="ALWAYS">
-                                 <children>
-                                    <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
-                                       <children>
-                                          <ImageView fitHeight="50.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true" styleClass="card-icon">
-                                             <image>
-                                                <Image url="@../images/icons/pending-tasks.png" />
-                                             </image>
-                                          </ImageView>
-                                          <Label styleClass="cards-title" text="Tâches En Attente" />
-                                       </children>
-                                    </HBox>
-                                    <Label fx:id="pendingTasksLabel" text="000">
-                                       <styleClass>
-                                          <String fx:value="task-stats" />
-                                          <String fx:value="pending-tasks" />
-                                       </styleClass>
-                                    </Label>
-                                    <Label styleClass="task-cards-description" text="à faire" />
-                                 </children>
-                              </VBox>
-                              <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="20.0" styleClass="metric-card" HBox.hgrow="ALWAYS">
-                                 <children>
-                                    <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
-                                       <children>
-                                          <ImageView fitHeight="50.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true" styleClass="card-icon">
-                                             <image>
-                                                <Image url="@../images/icons/missed-tasks.png" />
-                                             </image>
-                                          </ImageView>
-                                          <Label styleClass="cards-title" text="Tâches Manquées" />
-                                       </children>
-                                    </HBox>
-                                    <Label fx:id="missedTasksLabel" text="000">
-                                       <styleClass>
-                                          <String fx:value="task-stats" />
-                                          <String fx:value="missed-tasks" />
-                                       </styleClass>
-                                    </Label>
-                                    <Label styleClass="task-cards-description" text="besoin d'action" />
-                                 </children>
-                              </VBox>
-                           </children>
-                                </HBox>
-                        <VBox prefHeight="600.0" prefWidth="894.0" spacing="10.0" styleClass="metric-card" VBox.vgrow="ALWAYS">
-                           <children>
-                              <Label styleClass="cards-title" text="Liste des Tâches" />
-                               <ListView fx:id="tasksListView" prefHeight="400.0" prefWidth="600.0" styleClass="task-list-view" VBox.vgrow="ALWAYS">
-                                   <placeholder>
-                                       <Label style="-fx-text-fill: gray; -fx-font-style: italic;" text="Aucune tâche pour aujourd'hui" />
-                                   </placeholder>
-                               </ListView>
-
-                               <!-- - - - - - - - - - - - - - - - - - - - - - - - - -->
-                               <!-- CELLULE DESIGN EXAMPLE - FOR VISUALIZATION ONLY -->
-                               <!-- - - - - - - - - - - - - - - - - - - - - - - - - -->     <!-- to see the cellule design set visible="false" to "true" and managed="false" to "true"  -->
-
-                               <VBox managed="false" style="-fx-background-color: white; -fx-background-radius: 8; -fx-padding: 10; -fx-border-color: #e0e0e0; -fx-border-width: 1;" visible="false">
-                                 <Label text="this is a design for the task cell factory ! ! " />
-
-                                   <HBox alignment="CENTER_LEFT" spacing="15" style="-fx-border-color: #eee; -fx-border-width: 0 0 1 0;">
+                                <!-- STATISTICS ROW -->
+                                <HBox spacing="40.0">
                                     <children>
-                                       <Label styleClass="status-done" text="status" />
-                                       <VBox prefHeight="200.0" prefWidth="100.0" spacing="5.0" HBox.hgrow="ALWAYS">
-                                          <children>
-                                             <Label styleClass="task-description" text="Record feed consumption H1-H4" />
-                                             <Label styleClass="task-assigned-to" text="Assigned to: Ahmed Elbagi" />
-                                             <Label styleClass="task-due-date" text="Due: 12/09/2025" />
-                                          </children>
-                                       </VBox>
+                                        <VBox alignment="CENTER" spacing="15.0" styleClass="metric-card" HBox.hgrow="ALWAYS">
+                                            <children>
+                                                <HBox alignment="CENTER" spacing="10.0">
+                                                    <children>
+                                                        <ImageView fitHeight="40.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true">
+                                                            <image><Image url="@../images/icons/total-tasks.png" /></image>
+                                                        </ImageView>
+                                                        <Label styleClass="cards-title" text="Tâches Totales" />
+                                                    </children>
+                                                </HBox>
+                                                <Label fx:id="totalTasksLabel" styleClass="task-stats" text="0" />
+                                                <Label styleClass="task-cards-description" text="tâches planifiées" />
+                                            </children>
+                                        </VBox>
+                                        <VBox alignment="CENTER" spacing="15.0" styleClass="metric-card" HBox.hgrow="ALWAYS">
+                                            <children>
+                                                <HBox alignment="CENTER" spacing="10.0">
+                                                    <children>
+                                                        <ImageView fitHeight="40.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true">
+                                                            <image><Image url="@../images/icons/done-task.png" /></image>
+                                                        </ImageView>
+                                                        <Label styleClass="cards-title" text="Terminées" />
+                                                    </children>
+                                                </HBox>
+                                                <Label fx:id="doneTasksLabel" text="0"><styleClass><String fx:value="task-stats" /><String fx:value="done-tasks" /></styleClass></Label>
+                                                <Label styleClass="task-cards-description" text="réalisées" />
+                                            </children>
+                                        </VBox>
+                                        <VBox alignment="CENTER" spacing="15.0" styleClass="metric-card" HBox.hgrow="ALWAYS">
+                                            <children>
+                                                <HBox alignment="CENTER" spacing="10.0">
+                                                    <children>
+                                                        <ImageView fitHeight="40.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true">
+                                                            <image><Image url="@../images/icons/pending-tasks.png" /></image>
+                                                        </ImageView>
+                                                        <Label styleClass="cards-title" text="En Attente" />
+                                                    </children>
+                                                </HBox>
+                                                <Label fx:id="pendingTasksLabel" text="0"><styleClass><String fx:value="task-stats" /><String fx:value="pending-tasks" /></styleClass></Label>
+                                                <Label styleClass="task-cards-description" text="à faire" />
+                                            </children>
+                                        </VBox>
+                                        <VBox alignment="CENTER" spacing="15.0" styleClass="metric-card" HBox.hgrow="ALWAYS">
+                                            <children>
+                                                <HBox alignment="CENTER" spacing="10.0">
+                                                    <children>
+                                                        <ImageView fitHeight="40.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true">
+                                                            <image><Image url="@../images/icons/missed-tasks.png" /></image>
+                                                        </ImageView>
+                                                        <Label styleClass="cards-title" text="Manquées" />
+                                                    </children>
+                                                </HBox>
+                                                <Label fx:id="missedTasksLabel" text="0"><styleClass><String fx:value="task-stats" /><String fx:value="missed-tasks" /></styleClass></Label>
+                                                <Label styleClass="task-cards-description" text="en retard" />
+                                            </children>
+                                        </VBox>
                                     </children>
-                                   </HBox>
-                               </VBox>
+                                </HBox>
 
-                               <!-- - - - - - - - - - - - - - - - - - - - - - - - - -->
-                               <!-- - - - - - - - - - - - - - - - - - - - - - - - - -->
-                               <!-- - - - - - - - - - - - - - - - - - - - - - - - - -->
+                                <!-- HEADER ROW -->
+                                <VBox spacing="10.0" styleClass="header" style="-fx-padding: 15;">
+                                    <children>
+                                        <HBox alignment="CENTER_LEFT" spacing="15.0">
+                                            <children>
+                                                <Label styleClass="header-title" text="Gestion des Tâches" />
+                                                <Region HBox.hgrow="ALWAYS" />
+                                                <Button fx:id="addTaskButton" onAction="#handleAddTask" style="-fx-background-color: #28a745; -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold; -fx-cursor: hand; -fx-padding: 10 20; -fx-background-radius: 5;" text="+ Nouvelle Tâche" />
+                                                <Button fx:id="refreshButton" onAction="#refreshData" style="-fx-background-color: #17a2b8; -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold; -fx-cursor: hand; -fx-padding: 10 15; -fx-background-radius: 5;" text="Actualiser" />
+                                            </children>
+                                        </HBox>
+                                        <Label styleClass="header-subtitle" text="Suivez et gérez toutes les tâches quotidiennes de la ferme" />
+                                    </children>
+                                </VBox>
 
-                           </children>
-                        </VBox>
+                                <!-- TASK LIST -->
+                                <VBox spacing="10.0" styleClass="metric-card" VBox.vgrow="ALWAYS">
+                                    <children>
+                                        <Label styleClass="cards-title" text="Liste des Tâches" />
+                                        <ListView fx:id="tasksListView" styleClass="task-list-view" VBox.vgrow="ALWAYS">
+                                            <placeholder>
+                                                <VBox alignment="CENTER" spacing="10.0">
+                                                    <children>
+                                                        <Label style="-fx-text-fill: #6c757d; -fx-font-size: 16px; -fx-font-weight: bold;" text="Aucune tâche" />
+                                                        <Label style="-fx-text-fill: #adb5bd; -fx-font-size: 13px;" text="Cliquez sur + Nouvelle Tâche pour créer votre première tâche" />
+                                                    </children>
+                                                </VBox>
+                                            </placeholder>
+                                        </ListView>
+                                    </children>
+                                </VBox>
                             </children>
-                     <padding>
-                        <Insets bottom="30.0" left="20.0" right="20.0" top="30.0" />
-                     </padding>
                         </VBox>
                     </content>
-                    <VBox.margin>
-                        <Insets />
-                    </VBox.margin>
                 </ScrollPane>
             </children>
         </VBox>
     </children>
-
 </AnchorPane>
