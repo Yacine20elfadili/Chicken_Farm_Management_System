@@ -23,7 +23,6 @@
                         <Region prefHeight="33.0" HBox.hgrow="ALWAYS" />
                         <!-- Action Buttons -->
                         <Button fx:id="recordCollectionButton" onAction="#handleRecordCollection" prefHeight="32.0" prefWidth="150.0" style="-fx-font-size: 12; -fx-padding: 8;" text="Enregistrer Collecte" />
-                        <Button fx:id="refreshButton" onAction="#refreshData" prefHeight="32.0" prefWidth="100.0" style="-fx-font-size: 12; -fx-padding: 8; -fx-margin-left: 10;" text="Actualiser" />
                     </children>
                     <VBox.margin>
                         <Insets right="20.0" top="10.0" left="20.0" />
@@ -94,7 +93,7 @@
                                                 </HBox>
                                             </children>
                                         </VBox>
-                                        
+
                                         <!-- House 3 Card (Default: Not configured) -->
                                         <VBox fx:id="house3Card" prefHeight="180.0" prefWidth="100.0" styleClass="metric-card" HBox.hgrow="ALWAYS">
                                             <children>
@@ -143,7 +142,7 @@
                                         </VBox>
                                     </children>
                                 </HBox>
-                                
+
                                 <!-- No Egg Laying Houses Message (Hidden by default) -->
                                 <VBox fx:id="noEggHousesMessage" prefHeight="180.0" prefWidth="907.0" visible="false" managed="false">
                                     <styleClass>
@@ -177,7 +176,7 @@
                                     <children>
                                         <VBox fx:id="storageCard" prefHeight="177.0" prefWidth="907.0" styleClass="storage-card" HBox.hgrow="ALWAYS">
                                             <children>
-                                                <HBox alignment="CENTER_LEFT" prefHeight="40.0" prefWidth="867.0">
+                                                <HBox alignment="CENTER_LEFT" prefHeight="40.0" prefWidth="867.0" spacing="10.0">
                                                     <children>
                                                         <Label styleClass="storage-title" text="Stock d'œufs" />
                                                         <Region prefHeight="0.0" prefWidth="0.0" HBox.hgrow="ALWAYS" />
@@ -186,6 +185,8 @@
                                                                 <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                                                             </padding>
                                                         </Label>
+                                                        <Button fx:id="sellEggsButton" onAction="#handleSellEggs" text="💰 Vendre"
+                                                                style="-fx-background-color: #28a745; -fx-text-fill: white; -fx-font-size: 12px; -fx-font-weight: bold; -fx-padding: 8 16; -fx-background-radius: 5; -fx-cursor: hand;" />
                                                     </children>
                                                 </HBox>
                                                 <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0">

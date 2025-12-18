@@ -1,23 +1,31 @@
 package ma.farm.model;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.Objects;
 
 /**
  * House model - Represents a chicken house/bay
  * Used in: Dashboard, Chicken Bay, Eggs Bay pages
+ *
+ * House Types and Durations:
+ * - DayOld: 24 weeks (168 days) - then distribute to EggLayer/MeatMale
+ * - FemaleEggLayer: 48 weeks (336 days) - then transfer to FemaleMeat
+ * - FemaleMeat: 6 weeks (42 days) - then sell
+ * - MaleMeat: 8 weeks (56 days) - then sell
  */
 public class House {
 
     // Fields
     private int id;
-    private String name;                    // H1, H2, H3, H4
+    private String name;                    // e.g., "DayOld-House-1", "FemaleEggLayer-House-2"
     private HouseType type;                 // DAY_OLD, EGG_LAYER, MEAT_FEMALE, MEAT_MALE
     private int chickenCount;               // Current number of chickens
     private int capacity;                   // Maximum capacity
     private HealthStatus healthStatus;      // GOOD, FAIR, POOR
     private LocalDate lastCleaningDate;
     private LocalDate creationDate;
+    private LocalDate arrivalDate;          // Date when chickens arrived in this house
 
     // Default constructor
     public House() {
@@ -29,11 +37,24 @@ public class House {
         this.type = type;
         this.chickenCount = 0;
         this.capacity = capacity;
+        this.healthStatus = HealthStatus.GOOD;
+        this.creationDate = LocalDate.now();
+    }
+
+    // Constructor with capacity only (for Config Houses)
+    public House(HouseType type, int index, int capacity) {
+        this.name = type.generateHouseName(index);
+        this.type = type;
+        this.chickenCount = 0;
+        this.capacity = capacity;
+        this.healthStatus = HealthStatus.GOOD;
+        this.creationDate = LocalDate.now();
     }
 
     // Full constructor
     public House(int id, String name, HouseType type, int chickenCount, int capacity,
-                 HealthStatus healthStatus, LocalDate lastCleaningDate, LocalDate creationDate) {
+                 HealthStatus healthStatus, LocalDate lastCleaningDate, LocalDate creationDate,
+                 LocalDate arrivalDate) {
         this.id = id;
         this.name = name;
         this.type = type;
@@ -42,9 +63,11 @@ public class House {
         this.healthStatus = healthStatus;
         this.lastCleaningDate = lastCleaningDate;
         this.creationDate = creationDate;
+        this.arrivalDate = arrivalDate;
     }
 
-    // Getters and Setters
+    // ==================== Getters and Setters ====================
+
     public int getId() {
         return id;
     }
@@ -109,11 +132,19 @@ public class House {
         this.creationDate = creationDate;
     }
 
+    public LocalDate getArrivalDate() {
+        return arrivalDate;
+    }
+
+    public void setArrivalDate(LocalDate arrivalDate) {
+        this.arrivalDate = arrivalDate;
+    }
+
     // ==================== Database Helper Methods ====================
 
     /**
      * Gets the house type as a String for database storage
-     * @return the type display name (e.g., "Egg Layer") or null
+     * @return the type display name (e.g., "DayOld") or null
      */
     public String getTypeAsString() {
         return type != null ? type.getDisplayName() : null;
@@ -121,7 +152,7 @@ public class House {
 
     /**
      * Sets the house type from a String (from database)
-     * @param typeStr the type display name (e.g., "Egg Layer")
+     * @param typeStr the type display name (e.g., "DayOld")
      */
     public void setTypeFromString(String typeStr) {
         if (typeStr != null && !typeStr.isEmpty()) {
@@ -157,7 +188,106 @@ public class House {
         }
     }
 
-    // Business methods
+    // ==================== Age and Time Calculation Methods ====================
+
+    /**
+     * Calculate the age of chickens in this house in days
+     * Based on arrivalDate and current date
+     * @return age in days, or 0 if no chickens or no arrival date
+     */
+    public int getAgeInDays() {
+        if (arrivalDate == null || chickenCount == 0) {
+            return 0;
+        }
+        return (int) ChronoUnit.DAYS.between(arrivalDate, LocalDate.now());
+    }
+
+    /**
+     * Get the formatted age string (e.g., "6w 3d")
+     * @return formatted age string
+     */
+    public String getFormattedAge() {
+        int ageDays = getAgeInDays();
+        return HouseType.formatAge(ageDays);
+    }
+
+    /**
+     * Get the color status for the age display
+     * Green: 0-50%, Orange: 50-75%, Red: 75-100%
+     * @return "green", "orange", or "red"
+     */
+    public String getAgeColorStatus() {
+        if (type == null) return "green";
+        return type.getAgeColorStatus(getAgeInDays());
+    }
+
+    /**
+     * Calculate the estimated transfer/sell date based on arrival date and house type duration
+     * @return the estimated date, or null if no arrival date
+     */
+    public LocalDate getEstimatedEndDate() {
+        if (arrivalDate == null || type == null) {
+            return null;
+        }
+        return arrivalDate.plusDays(type.getMaxDurationDays());
+    }
+
+    /**
+     * Get the formatted estimated end date (DD/MM/YYYY)
+     * @return formatted date string or "N/A"
+     */
+    public String getFormattedEstimatedEndDate() {
+        LocalDate endDate = getEstimatedEndDate();
+        if (endDate == null) {
+            return "N/A";
+        }
+        return String.format("%02d/%02d/%04d",
+            endDate.getDayOfMonth(),
+            endDate.getMonthValue(),
+            endDate.getYear());
+    }
+
+    /**
+     * Check if chickens have passed the sell threshold (60% of duration)
+     * Only applicable for MEAT_FEMALE and MEAT_MALE
+     * @return true if past threshold, false otherwise
+     */
+    public boolean isPastSellThreshold() {
+        if (type == null || chickenCount == 0) {
+            return false;
+        }
+        int threshold = type.getSellThresholdDays();
+        if (threshold == 0) {
+            return false; // Not a meat house
+        }
+        return getAgeInDays() >= threshold;
+    }
+
+    /**
+     * Check if chickens have reached the maximum duration
+     * @return true if at or past max duration
+     */
+    public boolean isAtMaxDuration() {
+        if (type == null || arrivalDate == null) {
+            return false;
+        }
+        return getAgeInDays() >= type.getMaxDurationDays();
+    }
+
+    /**
+     * Get days remaining until estimated end date
+     * @return days remaining, or 0 if no arrival date or past due
+     */
+    public int getDaysRemaining() {
+        LocalDate endDate = getEstimatedEndDate();
+        if (endDate == null) {
+            return 0;
+        }
+        long days = ChronoUnit.DAYS.between(LocalDate.now(), endDate);
+        return days > 0 ? (int) days : 0;
+    }
+
+    // ==================== Capacity Methods ====================
 
     /**
      * Calculate occupancy percentage
@@ -174,6 +304,93 @@ public class House {
     public boolean isFull() {
         return chickenCount >= capacity;
     }
+
+    /**
+     * Check if house is empty
+     * @return true if no chickens
+     */
+    public boolean isEmpty() {
+        return chickenCount == 0;
+    }
+
+    /**
+     * Get available capacity
+     * @return number of additional chickens that can fit
+     */
+    public int getAvailableCapacity() {
+        return Math.max(0, capacity - chickenCount);
+    }
+
+    /**
+     * Reset house to empty state (after sell/distribute/transfer)
+     * Clears chicken count and arrival date
+     */
+    public void reset() {
+        this.chickenCount = 0;
+        this.arrivalDate = null;
+    }
+
+    /**
+     * Add chickens to this house
+     * @param count number of chickens to add
+     * @param arrival the arrival date
+     * @return true if successful (doesn't exceed capacity)
+     */
+    public boolean addChickens(int count, LocalDate arrival) {
+        if (count <= 0) {
+            return false;
+        }
+        if (chickenCount + count > capacity) {
+            return false;
+        }
+        this.chickenCount += count;
+        if (this.arrivalDate == null) {
+            this.arrivalDate = arrival;
+        }
+        return true;
+    }
+
+    /**
+     * Remove chickens from this house (for mortality or partial sell)
+     * @param count number of chickens to remove
+     * @return true if successful
+     */
+    public boolean removeChickens(int count) {
+        if (count <= 0 || count > chickenCount) {
+            return false;
+        }
+        this.chickenCount -= count;
+        if (this.chickenCount == 0) {
+            this.arrivalDate = null; // Reset arrival date when empty
+        }
+        return true;
+    }
+
+    // ==================== Display Helper Methods ====================
+
+    /**
+     * Get a short display name for dropdowns
+     * @return name like "DayOld-House-1"
+     */
+    public String getDisplayName() {
+        return name;
+    }
+
+    /**
+     * Get card title (just the house number part)
+     * @return title like "House-1"
+     */
+    public String getCardTitle() {
+        if (name == null) return "House";
+        // Extract the House-X part from names like "DayOld-House-1"
+        int lastDash = name.lastIndexOf("-House-");
+        if (lastDash >= 0) {
+            return name.substring(lastDash + 1); // Returns "House-1"
+        }
+        return name;
+    }
+
+    // ==================== Object Methods ====================
 
     @Override
     public boolean equals(Object o) {
@@ -194,7 +411,7 @@ public class House {
                 ", chickenCount=" + chickenCount +
                 ", capacity=" + capacity +
                 ", healthStatus=" + healthStatus +
-                ", lastCleaningDate=" + lastCleaningDate +
+                ", arrivalDate=" + arrivalDate +
                 ", creationDate=" + creationDate +
                 '}';
     }

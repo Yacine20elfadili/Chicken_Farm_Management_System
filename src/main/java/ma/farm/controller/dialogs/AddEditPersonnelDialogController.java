@@ -4,56 +4,98 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import ma.farm.dao.PersonnelDAO;
+import ma.farm.model.AdminPosition;
 import ma.farm.model.Personnel;
-import ma.farm.util.ValidationUtil;
+import ma.farm.model.PersonnelType;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * AddEditPersonnelDialogController - Handles Add/Edit Personnel Dialog
  *
+ * New Structure:
+ * - Toggle between Administration and Farm departments
+ * - Administration: Farm Owner, Cashier, Admin Staff with position checkboxes
+ * - Farm: Supervisors and Subordinates with auto-linking
+ *
  * Features:
- * - Add new personnel or edit existing
- * - Job title-specific validation (farmhand requires supervisor)
- * - Prevents adding farmhands if no supervisors exist
+ * - Department toggle (Admin/Farm)
+ * - Job title dropdown based on department
+ * - Position checkboxes for Admin Staff
+ * - Supervisor selection for subordinates
+ * - Singleton validation
  * - Email uniqueness validation
- * - Age and phone validation
  */
 public class AddEditPersonnelDialogController {
 
-    // FXML Components - Basic Info
+    // FXML Components - Header
     @FXML private Label dialogTitle;
+
+    // FXML Components - Basic Info
     @FXML private TextField fullNameField;
     @FXML private TextField ageField;
     @FXML private TextField phoneField;
     @FXML private TextField emailField;
-    @FXML private ComboBox<String> jobTitleComboBox;
-    @FXML private ComboBox<String> supervisorComboBox;
-    @FXML private DatePicker hireDatePicker;
-    @FXML private TextField salaryField;
-    @FXML private ComboBox<String> shiftComboBox;
     @FXML private TextArea addressTextArea;
     @FXML private TextField emergencyContactField;
-    @FXML private VBox supervisorSection;
-    @FXML private Button saveButton;
 
-    // Error Labels
+    // FXML Components - Department Toggle
+    @FXML private ToggleGroup departmentToggle;
+    @FXML private RadioButton adminRadio;
+    @FXML private RadioButton farmRadio;
+    @FXML private HBox departmentToggleBox;
+
+    // FXML Components - Job Title
+    @FXML private ComboBox<String> jobTitleComboBox;
+    @FXML private VBox jobTitleSection;
+
+    // FXML Components - Positions (Admin Staff only)
+    @FXML private VBox positionsSection;
+    @FXML private FlowPane positionsPane;
+    @FXML private CheckBox accountingCheckBox;
+    @FXML private CheckBox hrCheckBox;
+    @FXML private CheckBox legalCheckBox;
+    @FXML private CheckBox salesCheckBox;
+
+    // FXML Components - Supervisor Selection (Subordinates only)
+    @FXML private VBox supervisorSection;
+    @FXML private ComboBox<String> supervisorComboBox; // Keep for backward compatibility, but hidden
+    @FXML private Label supervisorInfoLabel;
+
+    // Store the selected supervisor ID internally (auto-selected since only one per type)
+    private Integer selectedSupervisorId = null;
+
+    // FXML Components - Employment Info
+    @FXML private DatePicker hireDatePicker;
+    @FXML private TextField salaryField;
+
+    // FXML Components - Error Labels
     @FXML private Label fullNameErrorLabel;
     @FXML private Label ageErrorLabel;
     @FXML private Label phoneErrorLabel;
     @FXML private Label emailErrorLabel;
     @FXML private Label jobTitleErrorLabel;
+    @FXML private Label positionsErrorLabel;
     @FXML private Label supervisorErrorLabel;
     @FXML private Label salaryErrorLabel;
-    @FXML private Label shiftErrorLabel;
 
-    // Warning Banner
+    // FXML Components - Warning Banner
     @FXML private HBox noSupervisorWarningLabel;
+
+    // FXML Components - Buttons
+    @FXML private Button saveButton;
+    @FXML private Button cancelButton;
+
+    // Legacy components (for backward compatibility)
+    @FXML private ComboBox<String> shiftComboBox;
+    @FXML private Label shiftErrorLabel;
 
     // DAOs
     private PersonnelDAO personnelDAO;
@@ -62,7 +104,13 @@ public class AddEditPersonnelDialogController {
     private Stage dialogStage;
     private Personnel personnel; // null for Add, populated for Edit
     private boolean saveClicked = false;
-    private List<Personnel> allSupervisors;
+    private String preselectedDepartment = null;
+    private String preselectedJobTitle = null;
+
+    // Supervisor cache
+    private List<Personnel> veterinarySupervisors = new ArrayList<>();
+    private List<Personnel> inventorySupervisors = new ArrayList<>();
+    private List<Personnel> farmhandSupervisors = new ArrayList<>();
 
     /**
      * Initialize method - called automatically after FXML loads
@@ -71,17 +119,17 @@ public class AddEditPersonnelDialogController {
     public void initialize() {
         personnelDAO = new PersonnelDAO();
 
-        // Load job titles
-        populateJobTitles();
+        // Setup department toggle
+        setupDepartmentToggle();
 
-        // Load shifts
-        populateShifts();
-
-        // Load supervisors
+        // Load supervisors for subordinate selection
         loadSupervisors();
 
-        // Setup job title listener to show/hide supervisor field
+        // Setup job title listener
         setupJobTitleListener();
+
+        // Setup position checkboxes
+        setupPositionCheckboxes();
 
         // Hide all error labels initially
         hideAllErrors();
@@ -91,92 +139,451 @@ public class AddEditPersonnelDialogController {
             noSupervisorWarningLabel.setVisible(false);
             noSupervisorWarningLabel.setManaged(false);
         }
+
+        // Default to admin department
+        if (adminRadio != null) {
+            adminRadio.setSelected(true);
+            updateJobTitlesForDepartment("administration");
+        } else {
+            // Fallback - populate with all job titles
+            populateAllJobTitles();
+        }
+
+        // Set default hire date
+        if (hireDatePicker != null) {
+            hireDatePicker.setValue(LocalDate.now());
+        }
+
+        // Hide shift section if exists (removed in new structure)
+        if (shiftComboBox != null) {
+            shiftComboBox.setVisible(false);
+            shiftComboBox.setManaged(false);
+        }
+        if (shiftErrorLabel != null) {
+            shiftErrorLabel.setVisible(false);
+            shiftErrorLabel.setManaged(false);
+        }
     }
 
     /**
-     * Populates job title ComboBox with operations personnel roles
+     * Setup department toggle radio buttons
      */
-    private void populateJobTitles() {
+    private void setupDepartmentToggle() {
+        if (departmentToggle == null) {
+            // Create toggle group programmatically if not defined in FXML
+            departmentToggle = new ToggleGroup();
+            if (adminRadio != null) adminRadio.setToggleGroup(departmentToggle);
+            if (farmRadio != null) farmRadio.setToggleGroup(departmentToggle);
+        }
+
+        if (departmentToggle != null) {
+            departmentToggle.selectedToggleProperty().addListener((obs, oldVal, newVal) -> {
+                if (newVal != null) {
+                    RadioButton selected = (RadioButton) newVal;
+                    String department = selected == adminRadio ? "administration" : "farm";
+                    updateJobTitlesForDepartment(department);
+                    hidePositionsSection();
+                    hideSupervisorSection();
+                }
+            });
+        }
+    }
+
+    /**
+     * Update job titles based on selected department
+     */
+    private void updateJobTitlesForDepartment(String department) {
+        if (jobTitleComboBox == null) return;
+
+        ObservableList<String> jobTitles = FXCollections.observableArrayList();
+
+        if ("administration".equals(department)) {
+            // Check which admin roles are available
+            if (!personnelDAO.hasFarmOwner()) {
+                jobTitles.add("farm_owner");
+            }
+            if (!personnelDAO.hasCashier()) {
+                jobTitles.add("cashier");
+            }
+            if (personnelDAO.canAddMoreAdminStaff()) {
+                jobTitles.add("admin_staff");
+            }
+
+            if (jobTitles.isEmpty()) {
+                jobTitles.add("(Tous les postes admin sont pourvus)");
+            }
+        } else {
+            // Farm department
+            // Add supervisors if not exists
+            if (!personnelDAO.hasSupervisor("veterinary_supervisor")) {
+                jobTitles.add("veterinary_supervisor");
+            }
+            if (!personnelDAO.hasSupervisor("inventory_supervisor")) {
+                jobTitles.add("inventory_supervisor");
+            }
+            if (!personnelDAO.hasSupervisor("farmhand_supervisor")) {
+                jobTitles.add("farmhand_supervisor");
+            }
+
+            // Add subordinates if their supervisors exist
+            if (personnelDAO.hasSupervisor("veterinary_supervisor")) {
+                jobTitles.add("veterinary_subordinate");
+            }
+            if (personnelDAO.hasSupervisor("inventory_supervisor")) {
+                jobTitles.add("inventory_subordinate");
+            }
+            if (personnelDAO.hasSupervisor("farmhand_supervisor")) {
+                jobTitles.add("farmhand_subordinate");
+            }
+
+            if (jobTitles.isEmpty()) {
+                jobTitles.add("(Aucun poste disponible)");
+            }
+        }
+
+        jobTitleComboBox.setItems(jobTitles);
+
+        // Auto-select if only one option or if preselected
+        if (preselectedJobTitle != null && jobTitles.contains(preselectedJobTitle)) {
+            jobTitleComboBox.setValue(preselectedJobTitle);
+        } else if (jobTitles.size() == 1 && !jobTitles.get(0).startsWith("(")) {
+            jobTitleComboBox.setValue(jobTitles.get(0));
+        }
+    }
+
+    /**
+     * Populate all job titles (fallback)
+     */
+    private void populateAllJobTitles() {
+        if (jobTitleComboBox == null) return;
+
         ObservableList<String> jobTitles = FXCollections.observableArrayList(
-                "veterinary",
-                "inventory_tracker",
-                "supervisor",
-                "farmhand"
+                "farm_owner",
+                "cashier",
+                "admin_staff",
+                "veterinary_supervisor",
+                "inventory_supervisor",
+                "farmhand_supervisor",
+                "veterinary_subordinate",
+                "inventory_subordinate",
+                "farmhand_subordinate"
         );
         jobTitleComboBox.setItems(jobTitles);
     }
 
     /**
-     * Populates shift ComboBox
-     */
-    private void populateShifts() {
-        ObservableList<String> shifts = FXCollections.observableArrayList(
-                "morning",
-                "evening"
-        );
-        shiftComboBox.setItems(shifts);
-    }
-
-    /**
-     * Loads all supervisors from database
+     * Load supervisors for subordinate selection
      */
     private void loadSupervisors() {
-        allSupervisors = personnelDAO.getAllSupervisors();
+        Personnel vetSup = personnelDAO.getSupervisorByType("veterinary_supervisor");
+        if (vetSup != null) veterinarySupervisors.add(vetSup);
 
-        ObservableList<String> supervisorNames = FXCollections.observableArrayList();
-        for (Personnel supervisor : allSupervisors) {
-            supervisorNames.add(supervisor.getFullName() + " (ID: " + supervisor.getId() + ")");
-        }
+        Personnel invSup = personnelDAO.getSupervisorByType("inventory_supervisor");
+        if (invSup != null) inventorySupervisors.add(invSup);
 
-        if (supervisorComboBox != null) {
-            supervisorComboBox.setItems(supervisorNames);
-        }
+        Personnel farmSup = personnelDAO.getSupervisorByType("farmhand_supervisor");
+        if (farmSup != null) farmhandSupervisors.add(farmSup);
     }
 
     /**
-     * Setup job title listener to handle supervisor field visibility
+     * Setup job title change listener
      */
     private void setupJobTitleListener() {
+        if (jobTitleComboBox == null) return;
+
         jobTitleComboBox.valueProperty().addListener((obs, oldVal, newVal) -> {
-            if (newVal != null) {
-                boolean isFarmhand = "farmhand".equalsIgnoreCase(newVal);
+            if (newVal == null || newVal.startsWith("(")) return;
 
-                // Show/hide entire supervisor section
-                if (supervisorSection != null) {
-                    supervisorSection.setVisible(isFarmhand);
-                    supervisorSection.setManaged(isFarmhand);
-                }
-
-                if (supervisorErrorLabel != null) {
-                    supervisorErrorLabel.setVisible(isFarmhand);
-                    supervisorErrorLabel.setManaged(isFarmhand);
-                }
-
-                // Show warning if farmhand selected but no supervisors exist
-                if (isFarmhand && allSupervisors.isEmpty()) {
-                    if (noSupervisorWarningLabel != null) {
-                        noSupervisorWarningLabel.setVisible(true);
-                        noSupervisorWarningLabel.setManaged(true);
-                    }
-                    if (saveButton != null) {
-                        saveButton.setDisable(true);
-                    }
+            // Show/hide positions section for admin_staff
+            if ("admin_staff".equals(newVal)) {
+                // Check if this is the first admin staff
+                if (personnelDAO.isAddingFirstAdminStaff()) {
+                    // First admin staff - hide positions section, auto-assign all 4
+                    hidePositionsSection();
+                    System.out.println("DEBUG: First admin staff - will auto-assign all 4 positions");
                 } else {
-                    if (noSupervisorWarningLabel != null) {
-                        noSupervisorWarningLabel.setVisible(false);
-                        noSupervisorWarningLabel.setManaged(false);
-                    }
-                    if (saveButton != null) {
-                        saveButton.setDisable(false);
-                    }
+                    // Subsequent admin staff - show position selection
+                    showPositionsSection();
+                    updateAvailablePositions();
                 }
+            } else {
+                hidePositionsSection();
+            }
+
+            // Show/hide supervisor section for subordinates
+            if (newVal.endsWith("_subordinate")) {
+                showSupervisorSection(newVal);
+            } else {
+                hideSupervisorSection();
+            }
+
+            // Enable/disable save button
+            if (saveButton != null) {
+                saveButton.setDisable(newVal.startsWith("("));
             }
         });
     }
 
     /**
+     * Setup position checkboxes
+     */
+    private void setupPositionCheckboxes() {
+        // Checkboxes are defined in FXML or created programmatically
+        if (positionsPane != null && accountingCheckBox == null) {
+            // Create checkboxes programmatically if not in FXML
+            accountingCheckBox = new CheckBox("Comptabilité");
+            hrCheckBox = new CheckBox("Ressources Humaines");
+            legalCheckBox = new CheckBox("Juridique");
+            salesCheckBox = new CheckBox("Ventes");
+
+            positionsPane.getChildren().addAll(accountingCheckBox, hrCheckBox, legalCheckBox, salesCheckBox);
+        }
+    }
+
+    /**
+     * Show positions section for admin staff
+     */
+    private void showPositionsSection() {
+        if (positionsSection != null) {
+            positionsSection.setVisible(true);
+            positionsSection.setManaged(true);
+        }
+    }
+
+    /**
+     * Hide positions section
+     */
+    private void hidePositionsSection() {
+        if (positionsSection != null) {
+            positionsSection.setVisible(false);
+            positionsSection.setManaged(false);
+        }
+    }
+
+    /**
+     * Update available positions based on what's already assigned
+     * For subsequent admin staff: shows positions held by first admin staff (available for delegation)
+     * Uses single-selection mode (only one position can be chosen)
+     */
+    private void updateAvailablePositions() {
+        System.out.println("DEBUG: updateAvailablePositions() called");
+
+        // Get positions available for delegation (from first admin staff)
+        AdminPosition[] availablePositions = personnelDAO.getAvailablePositions();
+        System.out.println("DEBUG: Available positions for delegation: " + (availablePositions != null ? availablePositions.length : "null"));
+
+        List<String> available = new ArrayList<>();
+        for (AdminPosition pos : availablePositions) {
+            available.add(pos.getCode());
+            System.out.println("DEBUG: Available position: " + pos.getCode());
+        }
+
+        // Also include positions currently assigned to this personnel (if editing)
+        if (personnel != null && personnel.getPositions() != null) {
+            AdminPosition[] currentPositions = personnel.getAdminPositions();
+            for (AdminPosition pos : currentPositions) {
+                if (!available.contains(pos.getCode())) {
+                    available.add(pos.getCode());
+                }
+            }
+        }
+
+        System.out.println("DEBUG: Final available list: " + available);
+
+        // Reset all checkboxes first
+        if (accountingCheckBox != null) accountingCheckBox.setSelected(false);
+        if (hrCheckBox != null) hrCheckBox.setSelected(false);
+        if (legalCheckBox != null) legalCheckBox.setSelected(false);
+        if (salesCheckBox != null) salesCheckBox.setSelected(false);
+
+        // Enable/disable checkboxes based on availability
+        if (accountingCheckBox != null) {
+            boolean isAvailable = available.contains("accounting");
+            accountingCheckBox.setDisable(!isAvailable);
+            System.out.println("DEBUG: accountingCheckBox - available=" + isAvailable + ", disabled=" + accountingCheckBox.isDisabled());
+            if (personnel != null && personnel.hasPosition(AdminPosition.ACCOUNTING)) {
+                accountingCheckBox.setSelected(true);
+            }
+        }
+        if (hrCheckBox != null) {
+            boolean isAvailable = available.contains("hr");
+            hrCheckBox.setDisable(!isAvailable);
+            System.out.println("DEBUG: hrCheckBox - available=" + isAvailable + ", disabled=" + hrCheckBox.isDisabled());
+            if (personnel != null && personnel.hasPosition(AdminPosition.HR)) {
+                hrCheckBox.setSelected(true);
+            }
+        }
+        if (legalCheckBox != null) {
+            boolean isAvailable = available.contains("legal");
+            legalCheckBox.setDisable(!isAvailable);
+            System.out.println("DEBUG: legalCheckBox - available=" + isAvailable + ", disabled=" + legalCheckBox.isDisabled());
+            if (personnel != null && personnel.hasPosition(AdminPosition.LEGAL)) {
+                legalCheckBox.setSelected(true);
+            }
+        }
+        if (salesCheckBox != null) {
+            boolean isAvailable = available.contains("sales");
+            salesCheckBox.setDisable(!isAvailable);
+            System.out.println("DEBUG: salesCheckBox - available=" + isAvailable + ", disabled=" + salesCheckBox.isDisabled());
+            if (personnel != null && personnel.hasPosition(AdminPosition.SALES)) {
+                salesCheckBox.setSelected(true);
+            }
+        }
+
+        // Setup single-selection behavior for subsequent admin staff
+        setupSinglePositionSelection();
+    }
+
+    /**
+     * Setup single-selection behavior for position checkboxes
+     * When adding a new admin staff (not the first), only ONE position can be selected
+     */
+    private void setupSinglePositionSelection() {
+        // Clear previous listeners first by removing and re-adding
+        CheckBox[] checkboxes = {accountingCheckBox, hrCheckBox, legalCheckBox, salesCheckBox};
+
+        for (CheckBox cb : checkboxes) {
+            if (cb != null) {
+                cb.selectedProperty().addListener((obs, oldVal, newVal) -> {
+                    if (newVal) {
+                        // Deselect all other checkboxes
+                        for (CheckBox other : checkboxes) {
+                            if (other != null && other != cb && other.isSelected()) {
+                                other.setSelected(false);
+                            }
+                        }
+                    }
+                });
+            }
+        }
+        System.out.println("DEBUG: Single-selection mode enabled for positions");
+    }
+
+    /**
+     * Show supervisor section for subordinates
+     * Since there's only ONE supervisor per type, we auto-assign and display info (no dropdown needed)
+     */
+    private void showSupervisorSection(String subordinateType) {
+        if (supervisorSection != null) {
+            supervisorSection.setVisible(true);
+            supervisorSection.setManaged(true);
+        }
+
+        // Hide the old ComboBox if it exists
+        if (supervisorComboBox != null) {
+            supervisorComboBox.setVisible(false);
+            supervisorComboBox.setManaged(false);
+        }
+
+        // Find the supervisor for this subordinate type
+        Personnel supervisor = null;
+        String supervisorTitle = "";
+
+        switch (subordinateType) {
+            case "veterinary_subordinate":
+                supervisor = !veterinarySupervisors.isEmpty() ? veterinarySupervisors.get(0) : null;
+                supervisorTitle = "Superviseur Vétérinaire";
+                break;
+            case "inventory_subordinate":
+                supervisor = !inventorySupervisors.isEmpty() ? inventorySupervisors.get(0) : null;
+                supervisorTitle = "Superviseur Inventaire";
+                break;
+            case "farmhand_subordinate":
+                supervisor = !farmhandSupervisors.isEmpty() ? farmhandSupervisors.get(0) : null;
+                supervisorTitle = "Superviseur Ouvriers";
+                break;
+        }
+
+        if (supervisor != null) {
+            // Store the supervisor ID for saving
+            selectedSupervisorId = supervisor.getId();
+
+            // Update the info label
+            if (supervisorInfoLabel != null) {
+                supervisorInfoLabel.setText(supervisor.getFullName() + " (" + supervisorTitle + ")");
+            }
+
+            if (noSupervisorWarningLabel != null) {
+                noSupervisorWarningLabel.setVisible(false);
+                noSupervisorWarningLabel.setManaged(false);
+            }
+            if (saveButton != null) {
+                saveButton.setDisable(false);
+            }
+
+            System.out.println("DEBUG: Auto-assigned supervisor: " + supervisor.getFullName() + " (ID: " + supervisor.getId() + ")");
+        } else {
+            // No supervisor available
+            selectedSupervisorId = null;
+
+            if (supervisorInfoLabel != null) {
+                supervisorInfoLabel.setText("Aucun superviseur disponible");
+                supervisorInfoLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #dc3545;");
+            }
+
+            if (noSupervisorWarningLabel != null) {
+                noSupervisorWarningLabel.setVisible(true);
+                noSupervisorWarningLabel.setManaged(true);
+            }
+            if (saveButton != null) {
+                saveButton.setDisable(true);
+            }
+
+            System.out.println("DEBUG: No supervisor available for " + subordinateType);
+        }
+    }
+
+    /**
+     * Hide supervisor section
+     */
+    private void hideSupervisorSection() {
+        if (supervisorSection != null) {
+            supervisorSection.setVisible(false);
+            supervisorSection.setManaged(false);
+        }
+        if (noSupervisorWarningLabel != null) {
+            noSupervisorWarningLabel.setVisible(false);
+            noSupervisorWarningLabel.setManaged(false);
+        }
+        if (saveButton != null) {
+            saveButton.setDisable(false);
+        }
+        // Clear the stored supervisor ID
+        selectedSupervisorId = null;
+    }
+
+    /**
+     * Hide all error labels
+     */
+    private void hideAllErrors() {
+        hideError(fullNameErrorLabel);
+        hideError(ageErrorLabel);
+        hideError(phoneErrorLabel);
+        hideError(emailErrorLabel);
+        hideError(jobTitleErrorLabel);
+        hideError(positionsErrorLabel);
+        hideError(supervisorErrorLabel);
+        hideError(salaryErrorLabel);
+        hideError(shiftErrorLabel);
+    }
+
+    private void hideError(Label label) {
+        if (label != null) {
+            label.setVisible(false);
+            label.setManaged(false);
+        }
+    }
+
+    private void showError(Label label, String message) {
+        if (label != null) {
+            label.setText(message);
+            label.setVisible(true);
+            label.setManaged(true);
+        }
+    }
+
+    /**
      * Sets the dialog stage
-     * @param dialogStage the stage
      */
     public void setDialogStage(Stage dialogStage) {
         this.dialogStage = dialogStage;
@@ -184,46 +591,112 @@ public class AddEditPersonnelDialogController {
 
     /**
      * Sets personnel for editing (null for new personnel)
-     * @param personnel the personnel to edit, or null
      */
     public void setPersonnel(Personnel personnel) {
         this.personnel = personnel;
 
         if (personnel != null) {
             // EDIT MODE
-            dialogTitle.setText("Modifier Personnel");
+            if (dialogTitle != null) {
+                dialogTitle.setText("Modifier Personnel");
+            }
             populateFields();
+
+            // Hide department toggle in edit mode
+            if (departmentToggleBox != null) {
+                departmentToggleBox.setVisible(false);
+                departmentToggleBox.setManaged(false);
+            }
+
+            // Disable job title change in edit mode
+            if (jobTitleComboBox != null) {
+                jobTitleComboBox.setDisable(true);
+            }
         } else {
             // ADD MODE
-            dialogTitle.setText("Ajouter Personnel");
-            hireDatePicker.setValue(LocalDate.now());
+            if (dialogTitle != null) {
+                dialogTitle.setText("Ajouter Personnel");
+            }
+
+            // Apply preselected values
+            if (preselectedDepartment != null) {
+                if ("administration".equals(preselectedDepartment) && adminRadio != null) {
+                    adminRadio.setSelected(true);
+                } else if ("farm".equals(preselectedDepartment) && farmRadio != null) {
+                    farmRadio.setSelected(true);
+                }
+                updateJobTitlesForDepartment(preselectedDepartment);
+            }
         }
     }
 
     /**
-     * Populates form fields with existing personnel data
+     * Preselect department before setting personnel
+     */
+    public void setPreselectedDepartment(String department) {
+        this.preselectedDepartment = department;
+    }
+
+    /**
+     * Preselect job title before setting personnel
+     */
+    public void setPreselectedJobTitle(String jobTitle) {
+        this.preselectedJobTitle = jobTitle;
+    }
+
+    /**
+     * Populate form fields with existing personnel data
      */
     private void populateFields() {
-        fullNameField.setText(personnel.getFullName());
-        ageField.setText(String.valueOf(personnel.getAge()));
-        phoneField.setText(personnel.getPhone());
-        emailField.setText(personnel.getEmail());
-        jobTitleComboBox.setValue(personnel.getJobTitle());
-        hireDatePicker.setValue(personnel.getHireDate());
-        salaryField.setText(String.valueOf(personnel.getSalary()));
-        shiftComboBox.setValue(personnel.getShift());
-        addressTextArea.setText(personnel.getAddress());
-        emergencyContactField.setText(personnel.getEmergencyContact());
+        if (personnel == null) return;
 
-        // Set supervisor if farmhand
-        if (personnel.hasSupervisor()) {
+        if (fullNameField != null) fullNameField.setText(personnel.getFullName());
+        if (ageField != null) ageField.setText(String.valueOf(personnel.getAge()));
+        if (phoneField != null) phoneField.setText(personnel.getPhone());
+        if (emailField != null) emailField.setText(personnel.getEmail());
+        if (addressTextArea != null) addressTextArea.setText(personnel.getAddress());
+        if (emergencyContactField != null) emergencyContactField.setText(personnel.getEmergencyContact());
+
+        if (hireDatePicker != null) hireDatePicker.setValue(personnel.getHireDate());
+        if (salaryField != null) salaryField.setText(String.valueOf(personnel.getSalary()));
+
+        // Set department radio
+        if (personnel.isAdministration() && adminRadio != null) {
+            adminRadio.setSelected(true);
+            updateJobTitlesForDepartment("administration");
+        } else if (personnel.isFarm() && farmRadio != null) {
+            farmRadio.setSelected(true);
+            updateJobTitlesForDepartment("farm");
+        }
+
+        // Set job title
+        if (jobTitleComboBox != null && personnel.getJobTitle() != null) {
+            // Add the current job title if not in list
+            if (!jobTitleComboBox.getItems().contains(personnel.getJobTitle())) {
+                jobTitleComboBox.getItems().add(personnel.getJobTitle());
+            }
+            jobTitleComboBox.setValue(personnel.getJobTitle());
+        }
+
+        // Set positions if admin_staff
+        if (personnel.isAdminStaff()) {
+            showPositionsSection();
+            updateAvailablePositions();
+        }
+
+        // Set supervisor if subordinate
+        if (personnel.isSubordinate() && personnel.getSupervisorId() != null) {
+            showSupervisorSection(personnel.getJobTitle());
             Personnel supervisor = personnelDAO.getPersonnelById(personnel.getSupervisorId());
-            if (supervisor != null) {
+            if (supervisor != null && supervisorComboBox != null) {
                 supervisorComboBox.setValue(supervisor.getFullName() + " (ID: " + supervisor.getId() + ")");
             }
         }
     }
 
+    /**
+     * Handle save button click
+     */
     @FXML
     public void handleSave() {
         System.out.println("DEBUG: Save button clicked");
@@ -243,220 +716,284 @@ public class AddEditPersonnelDialogController {
                 personnel.setAge(Integer.parseInt(ageField.getText().trim()));
                 personnel.setPhone(phoneField.getText().trim());
                 personnel.setEmail(emailField.getText().trim());
-                personnel.setJobTitle(jobTitleComboBox.getValue());
-                personnel.setHireDate(hireDatePicker.getValue());
-                personnel.setSalary(Double.parseDouble(salaryField.getText().trim()));
-                personnel.setShift(shiftComboBox.getValue());
-                personnel.setAddress(addressTextArea.getText().trim());
-                personnel.setEmergencyContact(emergencyContactField.getText().trim());
-                personnel.setActive(true); // Always active when creating/editing
 
-                System.out.println("DEBUG: Personnel object prepared:");
-                System.out.println("  Name: " + personnel.getFullName());
-                System.out.println("  Job Title: " + personnel.getJobTitle());
-                System.out.println("  Email: " + personnel.getEmail());
+                String selectedJobTitle = jobTitleComboBox.getValue();
+                personnel.setJobTitle(selectedJobTitle);
 
-                // Set supervisor if farmhand
-                if ("farmhand".equalsIgnoreCase(jobTitleComboBox.getValue())) {
-                    Integer supervisorId = extractSupervisorId(supervisorComboBox.getValue());
-                    personnel.setSupervisorId(supervisorId);
-                    System.out.println("DEBUG: Farmhand supervisor ID: " + supervisorId);
+                // Set department based on job title
+                PersonnelType personnelType = PersonnelType.fromCode(selectedJobTitle);
+                if (personnelType != null) {
+                    personnel.setDepartment(personnelType.getDepartment());
                 } else {
-                    personnel.setSupervisorId(null);
+                    // Fallback - determine from toggle
+                    String dept = (adminRadio != null && adminRadio.isSelected()) ? "administration" : "farm";
+                    personnel.setDepartment(dept);
                 }
+
+                // Set positions for admin_staff
+                if ("admin_staff".equals(selectedJobTitle)) {
+                    if (personnelDAO.isAddingFirstAdminStaff() && (personnel == null || personnel.getId() == 0)) {
+                        // First admin staff - auto-assign all 4 positions
+                        personnel.setPositions("accounting,hr,legal,sales");
+                        System.out.println("DEBUG: First admin staff - auto-assigned all 4 positions");
+                    } else if (personnel == null || personnel.getId() == 0) {
+                        // Subsequent admin staff - get selected position and delegate from first
+                        List<String> selectedPositions = new ArrayList<>();
+                        if (accountingCheckBox != null && accountingCheckBox.isSelected()) selectedPositions.add("accounting");
+                        if (hrCheckBox != null && hrCheckBox.isSelected()) selectedPositions.add("hr");
+                        if (legalCheckBox != null && legalCheckBox.isSelected()) selectedPositions.add("legal");
+                        if (salesCheckBox != null && salesCheckBox.isSelected()) selectedPositions.add("sales");
+                        personnel.setPositions(String.join(",", selectedPositions));
+
+                        // Remove selected position from first admin staff
+                        for (String pos : selectedPositions) {
+                            AdminPosition adminPos = AdminPosition.fromCode(pos);
+                            if (adminPos != null) {
+                                personnelDAO.removePositionFromFirstAdminStaff(adminPos);
+                            }
+                        }
+                        System.out.println("DEBUG: Subsequent admin staff - delegated position: " + selectedPositions);
+                    } else {
+                        // Editing existing admin staff - just update positions
+                        List<String> selectedPositions = new ArrayList<>();
+                        if (accountingCheckBox != null && accountingCheckBox.isSelected()) selectedPositions.add("accounting");
+                        if (hrCheckBox != null && hrCheckBox.isSelected()) selectedPositions.add("hr");
+                        if (legalCheckBox != null && legalCheckBox.isSelected()) selectedPositions.add("legal");
+                        if (salesCheckBox != null && salesCheckBox.isSelected()) selectedPositions.add("sales");
+                        personnel.setPositions(String.join(",", selectedPositions));
+                    }
+                }
+
+                // Set supervisor for subordinates
+                if (selectedJobTitle != null && selectedJobTitle.endsWith("_subordinate")) {
+                    Integer supervisorId = extractSupervisorId();
+                    personnel.setSupervisorId(supervisorId);
+                }
+
+                // Set employment details
+                if (hireDatePicker != null) {
+                    personnel.setHireDate(hireDatePicker.getValue());
+                }
+                if (salaryField != null && !salaryField.getText().trim().isEmpty()) {
+                    personnel.setSalary(Double.parseDouble(salaryField.getText().trim()));
+                }
+
+                // Set address and emergency contact
+                if (addressTextArea != null) {
+                    personnel.setAddress(addressTextArea.getText().trim());
+                }
+                if (emergencyContactField != null) {
+                    personnel.setEmergencyContact(emergencyContactField.getText().trim());
+                }
+
+                personnel.setActive(true);
 
                 // Save to database
                 boolean success;
-                if (personnel.getId() == 0) {
-                    // CREATE
-                    System.out.println("DEBUG: Calling createPersonnel()");
-                    success = personnelDAO.createPersonnel(personnel);
-                } else {
-                    // UPDATE
-                    System.out.println("DEBUG: Calling updatePersonnel()");
+                if (personnel.getId() > 0) {
                     success = personnelDAO.updatePersonnel(personnel);
+                } else {
+                    success = personnelDAO.createPersonnel(personnel);
                 }
 
                 if (success) {
-                    System.out.println("DEBUG: Personnel saved successfully, ID: " + personnel.getId());
                     saveClicked = true;
                     dialogStage.close();
                 } else {
-                    System.err.println("DEBUG: Failed to save personnel");
-                    showError("Échec de l'enregistrement du personnel. Vérifiez les logs.");
+                    showError(emailErrorLabel, "Erreur lors de l'enregistrement. Veuillez réessayer.");
                 }
 
             } catch (Exception e) {
-                System.err.println("ERROR during save: " + e.getMessage());
+                System.err.println("ERROR saving personnel: " + e.getMessage());
                 e.printStackTrace();
-                showError("Erreur lors de l'enregistrement: " + e.getMessage());
+                showError(emailErrorLabel, "Erreur: " + e.getMessage());
             }
-        } else {
-            System.out.println("DEBUG: Validation failed");
-
-            // NEW: Show alert with validation errors
-            Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle("Validation Échouée");
-            alert.setHeaderText("Veuillez corriger les erreurs suivantes:");
-
-            StringBuilder errors = new StringBuilder();
-            if (fullNameErrorLabel.isVisible()) errors.append("• ").append(fullNameErrorLabel.getText()).append("\n");
-            if (ageErrorLabel.isVisible()) errors.append("• ").append(ageErrorLabel.getText()).append("\n");
-            if (phoneErrorLabel.isVisible()) errors.append("• ").append(phoneErrorLabel.getText()).append("\n");
-            if (emailErrorLabel.isVisible()) errors.append("• ").append(emailErrorLabel.getText()).append("\n");
-            if (jobTitleErrorLabel.isVisible()) errors.append("• ").append(jobTitleErrorLabel.getText()).append("\n");
-            if (supervisorErrorLabel.isVisible()) errors.append("• ").append(supervisorErrorLabel.getText()).append("\n");
-            if (salaryErrorLabel.isVisible()) errors.append("• ").append(salaryErrorLabel.getText()).append("\n");
-            if (shiftErrorLabel.isVisible()) errors.append("• ").append(shiftErrorLabel.getText()).append("\n");
-
-            alert.setContentText(errors.toString());
-            alert.showAndWait();
         }
     }
 
     /**
-     * Extracts supervisor ID from ComboBox selection
-     * Format: "Name (ID: 123)"
+     * Extract supervisor ID - now uses the stored selectedSupervisorId
      */
-    private Integer extractSupervisorId(String selection) {
-        if (selection == null || selection.isEmpty()) {
+    private Integer extractSupervisorId() {
+        // Use the internally stored supervisor ID (auto-assigned)
+        if (selectedSupervisorId != null) {
+            return selectedSupervisorId;
+        }
+
+        // Fallback: try to extract from combo box if it exists (backward compatibility)
+        if (supervisorComboBox == null || supervisorComboBox.getValue() == null) {
             return null;
         }
 
+        String selected = supervisorComboBox.getValue();
+        if (selected.startsWith("(")) return null;
+
+        // Extract ID from "Name (ID: 123)"
         try {
-            int startIndex = selection.indexOf("ID: ") + 4;
-            int endIndex = selection.indexOf(")", startIndex);
-            String idStr = selection.substring(startIndex, endIndex);
-            return Integer.parseInt(idStr);
+            int startIdx = selected.lastIndexOf("ID: ") + 4;
+            int endIdx = selected.lastIndexOf(")");
+            if (startIdx > 3 && endIdx > startIdx) {
+                return Integer.parseInt(selected.substring(startIdx, endIdx));
+            }
         } catch (Exception e) {
-            System.err.println("Error extracting supervisor ID: " + e.getMessage());
-            return null;
+            System.err.println("ERROR extracting supervisor ID: " + e.getMessage());
         }
+
+        return null;
     }
 
     /**
-     * Validates all input fields
-     * @return true if all validations pass
+     * Validate all input fields
      */
     private boolean validateInput() {
         hideAllErrors();
-        boolean isValid = true;
+        boolean valid = true;
+        System.out.println("DEBUG: Starting validation...");
 
-        // Full Name validation
-        if (ValidationUtil.isEmpty(fullNameField.getText())) {
-            fullNameErrorLabel.setText("Le nom complet est requis");
-            fullNameErrorLabel.setVisible(true);
-            isValid = false;
-        }
-
-        // Age validation
-        try {
-            int age = Integer.parseInt(ageField.getText().trim());
-            if (age < 18 || age > 100) {
-                ageErrorLabel.setText("L'âge doit être entre 18 et 100");
-                ageErrorLabel.setVisible(true);
-                isValid = false;
-            }
-        } catch (NumberFormatException e) {
-            ageErrorLabel.setText("L'âge doit être un nombre valide");
-            ageErrorLabel.setVisible(true);
-            isValid = false;
-        }
-
-
-        // Phone validation (format check)
-        String phone = phoneField.getText().trim();
-        if (ValidationUtil.isEmpty(phone)) {
-            phoneErrorLabel.setText("Le téléphone est requis");
-            phoneErrorLabel.setVisible(true);
-            phoneErrorLabel.setManaged(true);
-            isValid = false;
+        // Full Name
+        if (fullNameField == null || fullNameField.getText().trim().isEmpty()) {
+            showError(fullNameErrorLabel, "Le nom complet est requis");
+            System.out.println("DEBUG: FAILED - Full name is empty");
+            valid = false;
         } else {
-            // Moroccan phone format: +212 6XX XXX XXX or 0612345678
-            String phonePattern = "^(\\+212|0)[5-7][0-9]{8}$";
-            String cleanPhone = phone.replaceAll("\\s+", ""); // Remove spaces
-            if (!cleanPhone.matches(phonePattern)) {
-                phoneErrorLabel.setText("Format invalide. Ex: +212 6XX XXX XXX ou 0612345678");
-                phoneErrorLabel.setVisible(true);
-                phoneErrorLabel.setManaged(true);
-                isValid = false;
+            System.out.println("DEBUG: OK - Full name: " + fullNameField.getText().trim());
+        }
+
+        // Age
+        if (ageField == null || ageField.getText().trim().isEmpty()) {
+            showError(ageErrorLabel, "L'âge est requis");
+            System.out.println("DEBUG: FAILED - Age is empty");
+            valid = false;
+        } else {
+            try {
+                int age = Integer.parseInt(ageField.getText().trim());
+                if (age < 18 || age > 100) {
+                    showError(ageErrorLabel, "L'âge doit être entre 18 et 100");
+                    System.out.println("DEBUG: FAILED - Age out of range: " + age);
+                    valid = false;
+                } else {
+                    System.out.println("DEBUG: OK - Age: " + age);
+                }
+            } catch (NumberFormatException e) {
+                showError(ageErrorLabel, "L'âge doit être un nombre valide");
+                System.out.println("DEBUG: FAILED - Age not a number");
+                valid = false;
             }
         }
 
-        // Email validation
-        String email = emailField.getText().trim();
-        if (!ValidationUtil.isValidEmail(email)) {
-            emailErrorLabel.setText("Email invalide");
-            emailErrorLabel.setVisible(true);
-            isValid = false;
+        // Phone
+        if (phoneField == null || phoneField.getText().trim().isEmpty()) {
+            showError(phoneErrorLabel, "Le téléphone est requis");
+            System.out.println("DEBUG: FAILED - Phone is empty");
+            valid = false;
         } else {
-            // Check email uniqueness (skip if editing same email)
-            Personnel existingPersonnel = personnelDAO.getPersonnelByEmail(email);
-            if (existingPersonnel != null) {
-                if (personnel == null || existingPersonnel.getId() != personnel.getId()) {
-                    emailErrorLabel.setText("Cet email existe déjà");
-                    emailErrorLabel.setVisible(true);
-                    isValid = false;
+            System.out.println("DEBUG: OK - Phone: " + phoneField.getText().trim());
+        }
+
+        // Email
+        if (emailField == null || emailField.getText().trim().isEmpty()) {
+            showError(emailErrorLabel, "L'email est requis");
+            System.out.println("DEBUG: FAILED - Email is empty");
+            valid = false;
+        } else {
+            String email = emailField.getText().trim();
+            if (!email.contains("@") || !email.contains(".")) {
+                showError(emailErrorLabel, "Format d'email invalide");
+                System.out.println("DEBUG: FAILED - Email format invalid: " + email);
+                valid = false;
+            } else {
+                // Check uniqueness
+                if (personnel == null || personnel.getId() == 0) {
+                    if (personnelDAO.emailExists(email)) {
+                        showError(emailErrorLabel, "Cet email existe déjà");
+                        System.out.println("DEBUG: FAILED - Email already exists: " + email);
+                        valid = false;
+                    } else {
+                        System.out.println("DEBUG: OK - Email: " + email);
+                    }
+                } else {
+                    if (personnelDAO.emailExistsForOther(email, personnel.getId())) {
+                        showError(emailErrorLabel, "Cet email existe déjà pour un autre personnel");
+                        System.out.println("DEBUG: FAILED - Email exists for other: " + email);
+                        valid = false;
+                    } else {
+                        System.out.println("DEBUG: OK - Email: " + email);
+                    }
                 }
             }
         }
 
-        // Job Title validation
-        if (jobTitleComboBox.getValue() == null) {
-            jobTitleErrorLabel.setText("Le titre du poste est requis");
-            jobTitleErrorLabel.setVisible(true);
-            isValid = false;
+        // Job Title
+        String jobTitleValue = (jobTitleComboBox != null) ? jobTitleComboBox.getValue() : null;
+        System.out.println("DEBUG: Job title value = '" + jobTitleValue + "'");
+        if (jobTitleComboBox == null || jobTitleValue == null || jobTitleValue.startsWith("(")) {
+            showError(jobTitleErrorLabel, "Le titre du poste est requis");
+            System.out.println("DEBUG: FAILED - Job title is null or invalid");
+            valid = false;
+        } else {
+            System.out.println("DEBUG: OK - Job title: " + jobTitleValue);
         }
 
-        // Supervisor validation (only for farmhands)
-        if ("farmhand".equalsIgnoreCase(jobTitleComboBox.getValue())) {
-            if (allSupervisors.isEmpty()) {
-                supervisorErrorLabel.setText("Aucun superviseur disponible");
-                supervisorErrorLabel.setVisible(true);
-                isValid = false;
-            } else if (supervisorComboBox.getValue() == null) {
-                supervisorErrorLabel.setText("Le superviseur est requis pour les ouvriers");
-                supervisorErrorLabel.setVisible(true);
-                isValid = false;
+        // Positions for admin_staff
+        if (jobTitleComboBox != null && "admin_staff".equals(jobTitleComboBox.getValue())) {
+            System.out.println("DEBUG: Checking positions for admin_staff...");
+
+            // First admin staff doesn't need position selection (auto-assigned all 4)
+            if (personnelDAO.isAddingFirstAdminStaff() && (personnel == null || personnel.getId() == 0)) {
+                System.out.println("DEBUG: OK - First admin staff, positions auto-assigned");
+            } else {
+                System.out.println("DEBUG: accountingCheckBox=" + (accountingCheckBox != null ? accountingCheckBox.isSelected() : "null"));
+                System.out.println("DEBUG: hrCheckBox=" + (hrCheckBox != null ? hrCheckBox.isSelected() : "null"));
+                System.out.println("DEBUG: legalCheckBox=" + (legalCheckBox != null ? legalCheckBox.isSelected() : "null"));
+                System.out.println("DEBUG: salesCheckBox=" + (salesCheckBox != null ? salesCheckBox.isSelected() : "null"));
+
+                boolean hasPosition = (accountingCheckBox != null && accountingCheckBox.isSelected()) ||
+                                     (hrCheckBox != null && hrCheckBox.isSelected()) ||
+                                     (legalCheckBox != null && legalCheckBox.isSelected()) ||
+                                     (salesCheckBox != null && salesCheckBox.isSelected());
+                if (!hasPosition) {
+                    showError(positionsErrorLabel, "Au moins une position est requise");
+                    System.out.println("DEBUG: FAILED - No position selected for admin_staff");
+                    valid = false;
+                } else {
+                    System.out.println("DEBUG: OK - At least one position selected");
+                }
             }
         }
 
-        // Salary validation
-        try {
-            double salary = Double.parseDouble(salaryField.getText().trim());
-            if (salary < 0) {
-                salaryErrorLabel.setText("Le salaire doit être positif");
-                salaryErrorLabel.setVisible(true);
-                isValid = false;
+        // Supervisor for subordinates
+        if (jobTitleComboBox != null && jobTitleComboBox.getValue() != null &&
+            jobTitleComboBox.getValue().endsWith("_subordinate")) {
+            System.out.println("DEBUG: Checking supervisor for subordinate...");
+            if (selectedSupervisorId == null) {
+                showError(supervisorErrorLabel, "Aucun superviseur disponible");
+                System.out.println("DEBUG: FAILED - No supervisor available for subordinate");
+                valid = false;
+            } else {
+                System.out.println("DEBUG: OK - Supervisor ID: " + selectedSupervisorId);
             }
-        } catch (NumberFormatException e) {
-            salaryErrorLabel.setText("Le salaire doit être un nombre valide");
-            salaryErrorLabel.setVisible(true);
-            isValid = false;
         }
 
-        // Shift validation
-        if (shiftComboBox.getValue() == null) {
-            shiftErrorLabel.setText("L'équipe est requise");
-            shiftErrorLabel.setVisible(true);
-            isValid = false;
+        // Salary (optional but must be valid if provided)
+        if (salaryField != null && !salaryField.getText().trim().isEmpty()) {
+            try {
+                double salary = Double.parseDouble(salaryField.getText().trim());
+                if (salary < 0) {
+                    showError(salaryErrorLabel, "Le salaire ne peut pas être négatif");
+                    System.out.println("DEBUG: FAILED - Salary is negative: " + salary);
+                    valid = false;
+                } else {
+                    System.out.println("DEBUG: OK - Salary: " + salary);
+                }
+            } catch (NumberFormatException e) {
+                showError(salaryErrorLabel, "Le salaire doit être un nombre valide");
+                System.out.println("DEBUG: FAILED - Salary not a valid number: " + salaryField.getText());
+                valid = false;
+            }
         }
 
-        return isValid;
-    }
-
-    /**
-     * Hide all error labels
-     */
-    private void hideAllErrors() {
-        fullNameErrorLabel.setVisible(false);
-        ageErrorLabel.setVisible(false);
-        phoneErrorLabel.setVisible(false);
-        emailErrorLabel.setVisible(false);
-        jobTitleErrorLabel.setVisible(false);
-        supervisorErrorLabel.setVisible(false);
-        salaryErrorLabel.setVisible(false);
-        shiftErrorLabel.setVisible(false);
+        System.out.println("DEBUG: Validation result = " + valid);
+        return valid;
     }
 
     /**
@@ -469,20 +1006,15 @@ public class AddEditPersonnelDialogController {
 
     /**
      * Returns whether save was clicked
-     * @return true if save was clicked
      */
     public boolean isSaveClicked() {
         return saveClicked;
     }
 
     /**
-     * Show error alert
+     * Returns the personnel (for retrieving after dialog closes)
      */
-    private void showError(String message) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle("Erreur");
-        alert.setHeaderText("Erreur de Validation");
-        alert.setContentText(message);
-        alert.showAndWait();
+    public Personnel getPersonnel() {
+        return personnel;
     }
 }

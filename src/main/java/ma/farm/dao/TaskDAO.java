@@ -4,6 +4,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Types;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -419,7 +420,12 @@ public class TaskDAO {
                     : null
             );
             stmt.setString(5, task.getAssignedTo());
-            stmt.setInt(6, task.getHouseId());
+            // Set houseId to NULL if 0 to avoid foreign key constraint violation
+            if (task.getHouseId() > 0) {
+                stmt.setInt(6, task.getHouseId());
+            } else {
+                stmt.setNull(6, Types.INTEGER);
+            }
             stmt.setString(7, task.getCategory());
             stmt.setInt(8, task.getCrackedEggs());
             stmt.setString(9, task.getNotes());
@@ -518,7 +524,12 @@ public class TaskDAO {
                     : null
             );
             stmt.setString(5, task.getAssignedTo());
-            stmt.setInt(6, task.getHouseId());
+            // Set houseId to NULL if 0 to avoid foreign key constraint violation
+            if (task.getHouseId() > 0) {
+                stmt.setInt(6, task.getHouseId());
+            } else {
+                stmt.setNull(6, Types.INTEGER);
+            }
             stmt.setString(7, task.getCategory());
             stmt.setInt(8, task.getCrackedEggs());
             stmt.setString(9, task.getNotes());

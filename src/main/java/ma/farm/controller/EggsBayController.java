@@ -6,12 +6,14 @@ import javafx.geometry.Insets;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import ma.farm.controller.dialogs.RecordEggCollectionDialogController;
+import ma.farm.controller.dialogs.SellEggsDialogController;
 import ma.farm.dao.EggProductionDAO;
 import ma.farm.dao.HouseDAO;
 import ma.farm.model.EggProduction;
@@ -76,6 +78,9 @@ public class EggsBayController {
     @FXML
     private Label storageStatusLabel;
 
+    @FXML
+    private Button sellEggsButton;
+
     // DAOs
     private EggProductionDAO eggProductionDAO;
     private HouseDAO houseDAO;
@@ -89,7 +94,7 @@ public class EggsBayController {
     @FXML
     public void initialize() {
         System.out.println("=== EggsBayController: Initializing ===");
-        
+
         // Initialize DAOs
         eggProductionDAO = new EggProductionDAO();
         houseDAO = new HouseDAO();
@@ -111,10 +116,10 @@ public class EggsBayController {
         try {
             // Get all houses from database
             List<House> allHouses = houseDAO.getAllHouses();
-            
+
             // Filter houses that can lay eggs (EGG_LAYER and MEAT_FEMALE)
             List<House> eggLayingHouses = allHouses.stream()
-                    .filter(house -> house.getType() == HouseType.EGG_LAYER || 
+                    .filter(house -> house.getType() == HouseType.EGG_LAYER ||
                                    house.getType() == HouseType.MEAT_FEMALE)
                     .collect(Collectors.toList());
 
@@ -243,7 +248,7 @@ public class EggsBayController {
         try {
             LocalDate today = LocalDate.now();
             List<EggProduction> productions = eggProductionDAO.getProductionByDate(today);
-            
+
             for (EggProduction prod : productions) {
                 if (prod.getHouseId() == house.getId()) {
                     eggsValueLabel.setText(String.valueOf(prod.getEggsCollected()));
@@ -261,43 +266,55 @@ public class EggsBayController {
 
     /**
      * Load and display production and cracked statistics
+     *
+     * Œufs Produits = eggsCollected (total eggs collected)
+     * Œufs Cracked = crackedEggs
      */
     private void loadStatistics() {
         try {
             LocalDate today = LocalDate.now();
-            LocalDate weekAgo = today.minusDays(7);
-            LocalDate monthAgo = today.minusDays(30);
+            LocalDate weekStart = today.minusDays(6); // Last 7 days including today
+            LocalDate monthStart = today.minusDays(29); // Last 30 days including today
+
+            // Get all production records
+            List<EggProduction> allProductions = eggProductionDAO.getAllProduction();
 
             // Today's statistics
             int eggsTodayProduced = 0;
             int eggsTodayCracked = 0;
 
-            List<EggProduction> todayProductions = eggProductionDAO.getProductionByDate(today);
-            for (EggProduction prod : todayProductions) {
-                eggsTodayProduced += prod.getEggsCollected();
-                eggsTodayCracked += prod.getCrackedEggs();
-            }
-
             // Week statistics
-            int eggsWeekProduced = eggProductionDAO.getTotalEggsByDateRange(weekAgo, today);
+            int eggsWeekProduced = 0;
             int eggsWeekCracked = 0;
-            List<EggProduction> weekProductions = eggProductionDAO.getLast7Days();
-            for (EggProduction prod : weekProductions) {
-                eggsWeekCracked += prod.getCrackedEggs();
-            }
 
             // Month statistics
-            int eggsMonthProduced = eggProductionDAO.getTotalEggsByDateRange(monthAgo, today);
+            int eggsMonthProduced = 0;
             int eggsMonthCracked = 0;
-            List<EggProduction> monthProductions = eggProductionDAO.getAllProduction();
-            for (EggProduction prod : monthProductions) {
-                if (!prod.getProductionDate().isBefore(monthAgo) && 
-                    !prod.getProductionDate().isAfter(today)) {
+
+            for (EggProduction prod : allProductions) {
+                LocalDate prodDate = prod.getProductionDate();
+                if (prodDate == null) continue;
+
+                // Today
+                if (prodDate.equals(today)) {
+                    eggsTodayProduced += prod.getEggsCollected();
+                    eggsTodayCracked += prod.getCrackedEggs();
+                }
+
+                // This week (last 7 days)
+                if (!prodDate.isBefore(weekStart) && !prodDate.isAfter(today)) {
+                    eggsWeekProduced += prod.getEggsCollected();
+                    eggsWeekCracked += prod.getCrackedEggs();
+                }
+
+                // This month (last 30 days)
+                if (!prodDate.isBefore(monthStart) && !prodDate.isAfter(today)) {
+                    eggsMonthProduced += prod.getEggsCollected();
                     eggsMonthCracked += prod.getCrackedEggs();
                 }
             }
 
-            // Update UI
+            // Update UI - Production
             if (productionTodayLabel != null) {
                 productionTodayLabel.setText(String.format("%,d", eggsTodayProduced));
             }
@@ -308,6 +325,7 @@ public class EggsBayController {
                 productionMonthLabel.setText(String.format("%,d", eggsMonthProduced));
             }
 
+            // Update UI - Cracked
             if (crackedTodayLabel != null) {
                 crackedTodayLabel.setText(String.format("%,d", eggsTodayCracked));
             }
@@ -318,7 +336,7 @@ public class EggsBayController {
                 crackedMonthLabel.setText(String.format("%,d", eggsMonthCracked));
             }
 
-            System.out.println("Statistics loaded - Today: " + eggsTodayProduced + " eggs, " + 
+            System.out.println("Statistics loaded - Today: " + eggsTodayProduced + " produced, " +
                              eggsTodayCracked + " cracked");
 
         } catch (Exception e) {
@@ -329,29 +347,43 @@ public class EggsBayController {
 
     /**
      * Load and display total eggs in storage
+     *
+     * Stock = SUM(eggsCollected) - SUM(crackedEggs) from all houses all time
+     * This equals SUM(goodEggs) since goodEggs = eggsCollected - crackedEggs
      */
     private void loadStorageData() {
         try {
-            // Get total good eggs from all time
+            // Get all production records
             List<EggProduction> allProductions = eggProductionDAO.getAllProduction();
 
-            int totalEggs = allProductions.stream()
-                    .mapToInt(EggProduction::getGoodEggs)
-                    .sum();
+            // Calculate total stock = sum of all good eggs (collected - cracked)
+            int totalEggsCollected = 0;
+            int totalCracked = 0;
+
+            for (EggProduction prod : allProductions) {
+                totalEggsCollected += prod.getEggsCollected();
+                totalCracked += prod.getCrackedEggs();
+            }
+
+            // Stock = Total Collected - Total Cracked
+            int totalStock = totalEggsCollected - totalCracked;
+            if (totalStock < 0) {
+                totalStock = 0;
+            }
 
             // Update totalEggsLabel
             if (totalEggsLabel != null) {
-                totalEggsLabel.setText(String.format("%,d", totalEggs));
+                totalEggsLabel.setText(String.format("%,d", totalStock));
             }
 
             // Calculate storage percentage
-            double percentage = calculateStoragePercentage(totalEggs);
+            double percentage = calculateStoragePercentage(totalStock);
 
             // Apply storage status badge
             applyStorageStatusBadge(percentage);
 
-            System.out.println("Storage loaded - Total eggs: " + totalEggs + 
-                             " (" + String.format("%.1f", percentage) + "%)");
+            System.out.println("Storage loaded - Collected: " + totalEggsCollected + ", Cracked: " + totalCracked +
+                             ", Stock: " + totalStock + " (" + String.format("%.1f", percentage) + "%)");
 
         } catch (Exception e) {
             System.err.println("Error loading storage data: " + e.getMessage());
@@ -377,7 +409,10 @@ public class EggsBayController {
             Stage dialogStage = new Stage();
             dialogStage.setTitle("Enregistrer la Collecte d'Œufs");
             dialogStage.initModality(Modality.APPLICATION_MODAL);
-            dialogStage.setScene(new Scene(dialogContent, 500, 400));
+            dialogStage.setScene(new Scene(dialogContent));
+            dialogStage.setResizable(true);
+            dialogStage.setMinWidth(520);
+            dialogStage.setMinHeight(550);
             dialogStage.showAndWait();
 
             // Check if save was clicked
@@ -385,7 +420,7 @@ public class EggsBayController {
                 System.out.println("Egg collection recorded successfully");
                 // Refresh data
                 refreshData();
-                
+
                 // Show success message
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
                 alert.setTitle("Succès");
@@ -397,7 +432,7 @@ public class EggsBayController {
         } catch (IOException e) {
             System.err.println("Error opening record collection dialog: " + e.getMessage());
             e.printStackTrace();
-            
+
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Erreur");
             alert.setHeaderText("Erreur");
@@ -407,17 +442,58 @@ public class EggsBayController {
     }
 
     /**
-     * Handle remove eggs button click
-     * TODO: Implement egg removal/sales tracking
+     * Handle sell eggs button click
+     * Opens dialog to sell eggs from storage
      */
     @FXML
-    public void handleRemoveEggs() {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Retirer des Œufs");
-        alert.setHeaderText("Fonctionnalité en Développement");
-        alert.setContentText("Cette fonctionnalité sera disponible dans une prochaine version.");
-        alert.showAndWait();
+    public void handleSellEggs() {
+        try {
+            // Load the dialog FXML
+            FXMLLoader loader = new FXMLLoader(
+                getClass().getResource("/fxml/dialogs/SellEggsDialog.fxml")
+            );
+            Parent dialogContent = loader.load();
+            SellEggsDialogController dialogController = loader.getController();
+
+            // Create and show the dialog
+            Stage dialogStage = new Stage();
+            dialogStage.setTitle("Vendre des Œufs");
+            dialogStage.initModality(Modality.APPLICATION_MODAL);
+            dialogStage.setScene(new Scene(dialogContent));
+            dialogStage.setResizable(true);
+            dialogStage.setMinWidth(750);
+            dialogStage.setMinHeight(480);
+            dialogStage.showAndWait();
+
+            // Check if save was clicked
+            if (dialogController.isSaved()) {
+                int soldQuantity = dialogController.getSoldQuantity();
+                System.out.println("Eggs sold successfully: " + soldQuantity);
+
+                // Refresh data
+                refreshData();
+
+                // Show success message
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Succès");
+                alert.setHeaderText("Vente Enregistrée");
+                alert.setContentText(soldQuantity + " œufs ont été vendus avec succès.");
+                alert.showAndWait();
+            }
+
+        } catch (IOException e) {
+            System.err.println("Error opening sell eggs dialog: " + e.getMessage());
+            e.printStackTrace();
+
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Erreur");
+            alert.setHeaderText("Erreur");
+            alert.setContentText("Impossible d'ouvrir le formulaire de vente.");
+            alert.showAndWait();
+        }
     }
+
+
 
     /**
      * Calculate storage capacity percentage
@@ -462,7 +538,7 @@ public class EggsBayController {
     @FXML
     public void refreshData() {
         System.out.println("Refreshing EggsBay data...");
-        
+
         // Re-check egg laying houses and reload data
         checkAndDisplayEggLayingHouses();
 

@@ -3,31 +3,43 @@ package ma.farm.controller;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import ma.farm.controller.dialogs.AddEditTaskDialogController;
+import ma.farm.dao.HouseDAO;
 import ma.farm.dao.TaskDAO;
+import ma.farm.model.House;
 import ma.farm.model.Task;
 import ma.farm.util.DateUtil;
 
+import java.io.IOException;
 import java.time.LocalDate;
-import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * TasksController - Controls the Tasks view
- * Shows: List of tasks with status badges
+ *
+ * Features:
+ * - Display tasks in ListView with custom cells
+ * - Statistics cards (Total, Done, Pending, Missed)
+ * - Full CRUD operations via dialog
+ * - Mark task as complete
+ * - Action buttons on each task cell
  */
 public class TasksController {
 
-    // FXML Components
-    @FXML
-    private ListView<Task> tasksListView;
-
+    // FXML Components - Statistics Labels
     @FXML
     private Label totalTasksLabel;
 
@@ -40,8 +52,20 @@ public class TasksController {
     @FXML
     private Label missedTasksLabel;
 
-    // DAO
+    // FXML Components - Task List
+    @FXML
+    private ListView<Task> tasksListView;
+
+    // FXML Components - Buttons
+    @FXML
+    private Button addTaskButton;
+
+    @FXML
+    private Button refreshButton;
+
+    // DAOs
     private TaskDAO taskDAO;
+    private HouseDAO houseDAO;
 
     // Observable list for UI
     private ObservableList<Task> tasksList;
@@ -51,8 +75,9 @@ public class TasksController {
      */
     @FXML
     public void initialize() {
-        // Initialize DAO
+        // Initialize DAOs
         taskDAO = new TaskDAO();
+        houseDAO = new HouseDAO();
 
         // Initialize observable list
         tasksList = FXCollections.observableArrayList();
@@ -69,7 +94,7 @@ public class TasksController {
 
     /**
      * Setup custom cell factory for task list items
-     * Creates custom UI for each task with badge, description, etc.
+     * Creates custom UI for each task with badge, description, action buttons
      */
     private void setupTaskCellFactory() {
         if (tasksListView == null) {
@@ -84,13 +109,240 @@ public class TasksController {
                 if (empty || task == null) {
                     setGraphic(null);
                     setText(null);
+                    setStyle("-fx-background-color: transparent;");
                 } else {
                     // Create custom cell content
                     HBox taskCell = createTaskCell(task);
                     setGraphic(taskCell);
+                    setStyle("-fx-background-color: transparent; -fx-padding: 5 0;");
                 }
             }
         });
+    }
+
+    /**
+     * Create custom task cell with status badge, info, and action buttons
+     * @param task The task to display
+     * @return Custom cell content
+     */
+    private HBox createTaskCell(Task task) {
+        // Main container
+        HBox mainContainer = new HBox(12);
+        mainContainer.setAlignment(Pos.CENTER_LEFT);
+        mainContainer.setPadding(new Insets(12, 15, 12, 15));
+        mainContainer.setStyle("-fx-background-color: white; -fx-background-radius: 8; " +
+                              "-fx-border-color: #e0e0e0; -fx-border-radius: 8; -fx-border-width: 1;");
+
+        // Status badge
+        Label statusBadge = createStatusBadge(task.getStatus());
+
+        // Priority indicator
+        Label priorityBadge = createPriorityBadge(task.getPriority());
+
+        // Task details VBox
+        VBox detailsBox = new VBox(4);
+        HBox.setHgrow(detailsBox, Priority.ALWAYS);
+
+        // Description
+        Label descriptionLabel = new Label(task.getDescription() != null ? task.getDescription() : "Sans description");
+        descriptionLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #2c3e50;");
+        descriptionLabel.setWrapText(true);
+        descriptionLabel.setMaxWidth(400);
+
+        // Info line (assigned to, house, due date)
+        HBox infoBox = new HBox(15);
+        infoBox.setAlignment(Pos.CENTER_LEFT);
+
+        // Category
+        if (task.getCategory() != null && !task.getCategory().isEmpty()) {
+            Label categoryLabel = new Label("📁 " + mapCategoryToFrench(task.getCategory()));
+            categoryLabel.setStyle("-fx-text-fill: #6c757d; -fx-font-size: 12px;");
+            infoBox.getChildren().add(categoryLabel);
+        }
+
+        // Assigned to
+        if (task.getAssignedTo() != null && !task.getAssignedTo().isEmpty()) {
+            Label assignedLabel = new Label("👤 " + task.getAssignedTo());
+            assignedLabel.setStyle("-fx-text-fill: #6c757d; -fx-font-size: 12px;");
+            infoBox.getChildren().add(assignedLabel);
+        }
+
+        // House
+        if (task.getHouseId() > 0) {
+            try {
+                House house = houseDAO.getHouseById(task.getHouseId());
+                if (house != null) {
+                    Label houseLabel = new Label("🏠 " + house.getName());
+                    houseLabel.setStyle("-fx-text-fill: #6c757d; -fx-font-size: 12px;");
+                    infoBox.getChildren().add(houseLabel);
+                }
+            } catch (Exception e) {
+                // Ignore
+            }
+        }
+
+        // Due date
+        if (task.getDueDate() != null) {
+            String dateStr = DateUtil.formatDate(task.getDueDate());
+            Label dueDateLabel = new Label("📅 " + dateStr);
+
+            // Color based on due date
+            if (task.isOverdue()) {
+                dueDateLabel.setStyle("-fx-text-fill: #dc3545; -fx-font-size: 12px; -fx-font-weight: bold;");
+            } else if (task.getDueDate().equals(LocalDate.now())) {
+                dueDateLabel.setStyle("-fx-text-fill: #ffc107; -fx-font-size: 12px; -fx-font-weight: bold;");
+            } else {
+                dueDateLabel.setStyle("-fx-text-fill: #6c757d; -fx-font-size: 12px;");
+            }
+            infoBox.getChildren().add(dueDateLabel);
+        }
+
+        detailsBox.getChildren().addAll(descriptionLabel, infoBox);
+
+        // Spacer
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.SOMETIMES);
+
+        // Action buttons
+        HBox actionBox = new HBox(8);
+        actionBox.setAlignment(Pos.CENTER_RIGHT);
+
+        // Complete button (only for non-done tasks)
+        if (!"Done".equalsIgnoreCase(task.getStatus())) {
+            Button completeBtn = new Button("✓");
+            completeBtn.setStyle("-fx-background-color: #28a745; -fx-text-fill: white; " +
+                                "-fx-font-size: 12px; -fx-cursor: hand; -fx-padding: 5 10; " +
+                                "-fx-background-radius: 4;");
+            completeBtn.setTooltip(new Tooltip("Marquer comme terminée"));
+            completeBtn.setOnAction(e -> handleMarkTaskComplete(task));
+            actionBox.getChildren().add(completeBtn);
+        }
+
+        // Edit button
+        Button editBtn = new Button("✏");
+        editBtn.setStyle("-fx-background-color: #007bff; -fx-text-fill: white; " +
+                        "-fx-font-size: 12px; -fx-cursor: hand; -fx-padding: 5 10; " +
+                        "-fx-background-radius: 4;");
+        editBtn.setTooltip(new Tooltip("Modifier"));
+        editBtn.setOnAction(e -> handleEditTask(task));
+
+        // Delete button
+        Button deleteBtn = new Button("🗑");
+        deleteBtn.setStyle("-fx-background-color: #dc3545; -fx-text-fill: white; " +
+                          "-fx-font-size: 12px; -fx-cursor: hand; -fx-padding: 5 10; " +
+                          "-fx-background-radius: 4;");
+        deleteBtn.setTooltip(new Tooltip("Supprimer"));
+        deleteBtn.setOnAction(e -> handleDeleteTask(task));
+
+        actionBox.getChildren().addAll(editBtn, deleteBtn);
+
+        // Assemble main container
+        mainContainer.getChildren().addAll(statusBadge, priorityBadge, detailsBox, spacer, actionBox);
+
+        return mainContainer;
+    }
+
+    /**
+     * Create status badge label
+     */
+    private Label createStatusBadge(String status) {
+        Label badge = new Label(mapStatusToFrench(status));
+        badge.setPadding(new Insets(4, 10, 4, 10));
+        badge.setMinWidth(80);
+        badge.setAlignment(Pos.CENTER);
+        badge.setStyle("-fx-background-radius: 4; -fx-text-fill: white; -fx-font-size: 11px; -fx-font-weight: bold;");
+
+        String bgColor;
+        switch (status != null ? status.toLowerCase() : "") {
+            case "done":
+                bgColor = "#28a745";
+                break;
+            case "pending":
+                bgColor = "#ffc107";
+                badge.setStyle(badge.getStyle() + " -fx-text-fill: #212529;");
+                break;
+            case "missed":
+                bgColor = "#dc3545";
+                break;
+            default:
+                bgColor = "#6c757d";
+        }
+        badge.setStyle(badge.getStyle() + " -fx-background-color: " + bgColor + ";");
+
+        return badge;
+    }
+
+    /**
+     * Create priority badge label
+     */
+    private Label createPriorityBadge(String priority) {
+        String displayText;
+        String bgColor;
+
+        switch (priority != null ? priority.toLowerCase() : "medium") {
+            case "high":
+                displayText = "▲";
+                bgColor = "#dc3545";
+                break;
+            case "low":
+                displayText = "▼";
+                bgColor = "#17a2b8";
+                break;
+            default: // medium
+                displayText = "●";
+                bgColor = "#ffc107";
+                break;
+        }
+
+        Label badge = new Label(displayText);
+        badge.setPadding(new Insets(2, 6, 2, 6));
+        badge.setStyle("-fx-background-color: " + bgColor + "; -fx-background-radius: 3; " +
+                      "-fx-text-fill: white; -fx-font-size: 10px;");
+        badge.setTooltip(new Tooltip("Priorité: " + mapPriorityToFrench(priority)));
+
+        return badge;
+    }
+
+    /**
+     * Map status to French
+     */
+    private String mapStatusToFrench(String status) {
+        if (status == null) return "Inconnu";
+        switch (status.toLowerCase()) {
+            case "done": return "Terminée";
+            case "pending": return "En Attente";
+            case "missed": return "Manquée";
+            default: return status;
+        }
+    }
+
+    /**
+     * Map priority to French
+     */
+    private String mapPriorityToFrench(String priority) {
+        if (priority == null) return "Moyenne";
+        switch (priority.toLowerCase()) {
+            case "high": return "Haute";
+            case "medium": return "Moyenne";
+            case "low": return "Basse";
+            default: return priority;
+        }
+    }
+
+    /**
+     * Map category to French
+     */
+    private String mapCategoryToFrench(String category) {
+        if (category == null) return "";
+        switch (category) {
+            case "Feeding": return "Alimentation";
+            case "Cleaning": return "Nettoyage";
+            case "Collection": return "Collecte";
+            case "Medical": return "Vétérinaire";
+            case "Inventory": return "Inventaire";
+            case "Administrative": return "Administratif";
+            default: return category;
+        }
     }
 
     /**
@@ -101,9 +353,16 @@ public class TasksController {
             // Get all tasks from TaskDAO
             List<Task> tasks = taskDAO.getAllTasks();
 
-            // Sort by status (Missed first, then Pending, then Done)
+            // Update overdue tasks status
+            for (Task task : tasks) {
+                if ("Pending".equalsIgnoreCase(task.getStatus()) && task.isOverdue()) {
+                    task.setStatus("Missed");
+                    taskDAO.updateTaskStatus(task.getId(), "Missed");
+                }
+            }
+
+            // Sort by status (Missed first, then Pending, then Done), then by due date
             tasks.sort((t1, t2) -> {
-                // Priority order: Missed > Pending > Done
                 int status1Priority = getStatusPriority(t1.getStatus());
                 int status2Priority = getStatusPriority(t2.getStatus());
 
@@ -111,18 +370,25 @@ public class TasksController {
                     return Integer.compare(status1Priority, status2Priority);
                 }
 
-                // If same status, sort by due date
+                // Then by priority
+                int priority1 = getPriorityOrder(t1.getPriority());
+                int priority2 = getPriorityOrder(t2.getPriority());
+                if (priority1 != priority2) {
+                    return Integer.compare(priority1, priority2);
+                }
+
+                // Then by due date
                 if (t1.getDueDate() == null && t2.getDueDate() == null) return 0;
                 if (t1.getDueDate() == null) return 1;
                 if (t2.getDueDate() == null) return -1;
                 return t1.getDueDate().compareTo(t2.getDueDate());
             });
 
-            // Add to tasksList
+            // Update observable list
             tasksList.clear();
             tasksList.addAll(tasks);
 
-            // Update tasksListView
+            // Update ListView
             if (tasksListView != null) {
                 tasksListView.setItems(tasksList);
             }
@@ -133,46 +399,47 @@ public class TasksController {
     }
 
     /**
-     * Get priority order for status (lower number = higher priority)
+     * Get priority order for status (lower = higher priority)
      */
     private int getStatusPriority(String status) {
         if (status == null) return 3;
         switch (status.toLowerCase()) {
-            case "missed":
-                return 0;
-            case "pending":
-                return 1;
-            case "done":
-                return 2;
-            default:
-                return 3;
+            case "missed": return 0;
+            case "pending": return 1;
+            case "done": return 2;
+            default: return 3;
         }
     }
 
     /**
-     * Update task statistics summary
+     * Get priority order (lower = higher priority)
+     */
+    private int getPriorityOrder(String priority) {
+        if (priority == null) return 2;
+        switch (priority.toLowerCase()) {
+            case "high": return 0;
+            case "medium": return 1;
+            case "low": return 2;
+            default: return 2;
+        }
+    }
+
+    /**
+     * Update task statistics
      */
     private void updateTaskStatistics() {
         try {
-            // Count total tasks
             int totalTasks = tasksList.size();
-
-            // Count done tasks
             long doneTasks = tasksList.stream()
-                    .filter(task -> "Done".equalsIgnoreCase(task.getStatus()))
+                    .filter(t -> "Done".equalsIgnoreCase(t.getStatus()))
                     .count();
-
-            // Count pending tasks
             long pendingTasks = tasksList.stream()
-                    .filter(task -> "Pending".equalsIgnoreCase(task.getStatus()))
+                    .filter(t -> "Pending".equalsIgnoreCase(t.getStatus()))
                     .count();
-
-            // Count missed tasks
             long missedTasks = tasksList.stream()
-                    .filter(task -> "Missed".equalsIgnoreCase(task.getStatus()) || task.isOverdue())
+                    .filter(t -> "Missed".equalsIgnoreCase(t.getStatus()))
                     .count();
 
-            // Update labels
             if (totalTasksLabel != null) {
                 totalTasksLabel.setText(String.valueOf(totalTasks));
             }
@@ -186,288 +453,201 @@ public class TasksController {
                 missedTasksLabel.setText(String.valueOf(missedTasks));
             }
         } catch (Exception e) {
-            System.err.println("Error updating task statistics: " + e.getMessage());
-            e.printStackTrace();
+            System.err.println("Error updating statistics: " + e.getMessage());
         }
     }
 
     /**
-     * Handle add task button click
-     * Opens dialog to create new task
+     * Handle add task button click - opens dialog
      */
     @FXML
     public void handleAddTask() {
-        // TODO: Open add task dialog
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Add Task");
-        alert.setHeaderText("Add Task Feature");
-        alert.setContentText("This feature will open a dialog to create a new task.\n\nDialog implementation is pending.");
-        alert.showAndWait();
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/dialogs/AddEditTaskDialog.fxml"));
+            Parent root = loader.load();
 
-        // After dialog implementation:
-        // - Get task details (description, due date, assigned worker, category, house)
-        // - Create Task record with status "Pending"
-        // - Save to database using taskDAO.addTask()
-        // - Refresh tasks list
+            AddEditTaskDialogController controller = loader.getController();
+
+            Stage dialogStage = new Stage();
+            dialogStage.setTitle("Nouvelle Tâche");
+            dialogStage.initModality(Modality.WINDOW_MODAL);
+            dialogStage.initOwner(tasksListView.getScene().getWindow());
+            dialogStage.setScene(new Scene(root));
+            dialogStage.setResizable(false);
+
+            controller.setDialogStage(dialogStage);
+            controller.setTask(null); // New task
+
+            dialogStage.showAndWait();
+
+            if (controller.isSaveClicked()) {
+                refreshData();
+                showSuccessAlert("Tâche créée", "La tâche a été créée avec succès.");
+            }
+        } catch (IOException e) {
+            System.err.println("Error opening add task dialog: " + e.getMessage());
+            e.printStackTrace();
+            showErrorAlert("Erreur", "Impossible d'ouvrir le formulaire de création.");
+        }
     }
 
     /**
-     * Handle mark as done button click
-     * Marks selected task as completed
+     * Handle edit task - opens dialog with task data
+     */
+    private void handleEditTask(Task task) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/dialogs/AddEditTaskDialog.fxml"));
+            Parent root = loader.load();
+
+            AddEditTaskDialogController controller = loader.getController();
+
+            Stage dialogStage = new Stage();
+            dialogStage.setTitle("Modifier Tâche");
+            dialogStage.initModality(Modality.WINDOW_MODAL);
+            dialogStage.initOwner(tasksListView.getScene().getWindow());
+            dialogStage.setScene(new Scene(root));
+            dialogStage.setResizable(false);
+
+            controller.setDialogStage(dialogStage);
+            controller.setTask(task); // Edit existing task
+
+            dialogStage.showAndWait();
+
+            if (controller.isSaveClicked()) {
+                refreshData();
+                showSuccessAlert("Tâche modifiée", "La tâche a été modifiée avec succès.");
+            }
+        } catch (IOException e) {
+            System.err.println("Error opening edit task dialog: " + e.getMessage());
+            e.printStackTrace();
+            showErrorAlert("Erreur", "Impossible d'ouvrir le formulaire de modification.");
+        }
+    }
+
+    /**
+     * Handle delete task
+     */
+    private void handleDeleteTask(Task task) {
+        Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
+        confirmAlert.setTitle("Confirmer la suppression");
+        confirmAlert.setHeaderText("Supprimer cette tâche ?");
+        confirmAlert.setContentText("Êtes-vous sûr de vouloir supprimer cette tâche ?\n\n" +
+                                   "\"" + task.getDescription() + "\"");
+
+        Optional<ButtonType> result = confirmAlert.showAndWait();
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            boolean success = taskDAO.deleteTask(task.getId());
+            if (success) {
+                refreshData();
+                showSuccessAlert("Tâche supprimée", "La tâche a été supprimée avec succès.");
+            } else {
+                showErrorAlert("Erreur", "Impossible de supprimer la tâche.");
+            }
+        }
+    }
+
+    /**
+     * Handle mark task as complete
+     */
+    private void handleMarkTaskComplete(Task task) {
+        // For Collection tasks, we could ask for cracked eggs count
+        // For now, just mark as complete
+
+        boolean success = taskDAO.markTaskComplete(task.getId());
+        if (success) {
+            refreshData();
+        } else {
+            showErrorAlert("Erreur", "Impossible de marquer la tâche comme terminée.");
+        }
+    }
+
+    /**
+     * Handle mark as done button click (legacy method)
      */
     @FXML
     public void handleMarkAsDone() {
-        // Get selected task from list
         Task selectedTask = tasksListView.getSelectionModel().getSelectedItem();
-
-        // If nothing selected, show error
         if (selectedTask == null) {
-            Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle("No Selection");
-            alert.setHeaderText("No Task Selected");
-            alert.setContentText("Please select a task to mark as done.");
-            alert.showAndWait();
+            showWarningAlert("Aucune sélection", "Veuillez sélectionner une tâche.");
             return;
         }
 
-        // If already done, show message
         if ("Done".equalsIgnoreCase(selectedTask.getStatus())) {
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Already Done");
-            alert.setHeaderText("Task Already Completed");
-            alert.setContentText("This task is already marked as done.");
-            alert.showAndWait();
+            showInfoAlert("Déjà terminée", "Cette tâche est déjà marquée comme terminée.");
             return;
         }
 
-        try {
-            // Update task status to "Done"
-            boolean success = taskDAO.markTaskComplete(selectedTask.getId());
-
-            if (success) {
-                // Refresh tasks list
-                refreshData();
-
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setTitle("Success");
-                alert.setHeaderText("Task Marked as Done");
-                alert.setContentText("The task has been successfully marked as completed.");
-                alert.showAndWait();
-            } else {
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle("Error");
-                alert.setHeaderText("Failed to Update Task");
-                alert.setContentText("Could not mark the task as done. Please try again.");
-                alert.showAndWait();
-            }
-        } catch (Exception e) {
-            System.err.println("Error marking task as done: " + e.getMessage());
-            e.printStackTrace();
-        }
+        handleMarkTaskComplete(selectedTask);
     }
 
     /**
-     * Handle edit task button click
-     * Opens dialog to edit existing task
+     * Handle edit task button click (legacy method)
      */
     @FXML
     public void handleEditTask() {
-        // Get selected task from list
         Task selectedTask = tasksListView.getSelectionModel().getSelectedItem();
-
-        // If nothing selected, show error
         if (selectedTask == null) {
-            Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle("No Selection");
-            alert.setHeaderText("No Task Selected");
-            alert.setContentText("Please select a task to edit.");
-            alert.showAndWait();
+            showWarningAlert("Aucune sélection", "Veuillez sélectionner une tâche à modifier.");
             return;
         }
-
-        // TODO: Open edit task dialog with current data
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Edit Task");
-        alert.setHeaderText("Edit Task Feature");
-        alert.setContentText("This feature will open a dialog to edit the selected task.\n\nDialog implementation is pending.");
-        alert.showAndWait();
-
-        // After dialog implementation:
-        // - Get updated task details
-        // - Update Task record
-        // - Save to database using taskDAO.updateTask()
-        // - Refresh tasks list
+        handleEditTask(selectedTask);
     }
 
     /**
-     * Handle delete task button click
-     * Deletes selected task
+     * Handle delete task button click (legacy method)
      */
     @FXML
     public void handleDeleteTask() {
-        // Get selected task from list
         Task selectedTask = tasksListView.getSelectionModel().getSelectedItem();
-
-        // If nothing selected, show error
         if (selectedTask == null) {
-            Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle("No Selection");
-            alert.setHeaderText("No Task Selected");
-            alert.setContentText("Please select a task to delete.");
-            alert.showAndWait();
+            showWarningAlert("Aucune sélection", "Veuillez sélectionner une tâche à supprimer.");
             return;
         }
-
-        // Show confirmation dialog
-        Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
-        confirmAlert.setTitle("Confirm Deletion");
-        confirmAlert.setHeaderText("Delete Task");
-        confirmAlert.setContentText("Are you sure you want to delete this task?\n\n" + selectedTask.getDescription());
-
-        confirmAlert.showAndWait().ifPresent(response -> {
-            if (response == ButtonType.OK) {
-                try {
-                    // Delete from database
-                    boolean success = taskDAO.deleteTask(selectedTask.getId());
-
-                    if (success) {
-                        // Refresh tasks list
-                        refreshData();
-
-                        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                        alert.setTitle("Success");
-                        alert.setHeaderText("Task Deleted");
-                        alert.setContentText("The task has been successfully deleted.");
-                        alert.showAndWait();
-                    } else {
-                        Alert alert = new Alert(Alert.AlertType.ERROR);
-                        alert.setTitle("Error");
-                        alert.setHeaderText("Failed to Delete Task");
-                        alert.setContentText("Could not delete the task. Please try again.");
-                        alert.showAndWait();
-                    }
-                } catch (Exception e) {
-                    System.err.println("Error deleting task: " + e.getMessage());
-                    e.printStackTrace();
-                }
-            }
-        });
+        handleDeleteTask(selectedTask);
     }
 
     /**
-     * Handle filter tasks by status
-     * @param status Status to filter by (All, Done, Pending, Missed)
-     */
-    @FXML
-    public void handleFilterByStatus(String status) {
-        try {
-            List<Task> filteredTasks;
-
-            if ("All".equalsIgnoreCase(status)) {
-                // Get all tasks
-                filteredTasks = taskDAO.getAllTasks();
-            } else {
-                // Get tasks by status
-                filteredTasks = taskDAO.getTasksByStatus(status);
-            }
-
-            // Update tasksListView
-            tasksList.clear();
-            tasksList.addAll(filteredTasks);
-        } catch (Exception e) {
-            System.err.println("Error filtering tasks: " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * Create custom task cell with status badge
-     * @param task The task to display
-     * @return Custom cell content
-     */
-    private HBox createTaskCell(Task task) {
-        // Create HBox container
-        HBox hbox = new HBox(15);
-        hbox.setAlignment(Pos.CENTER_LEFT);
-        hbox.setPadding(new Insets(10));
-
-        // Create status badge label
-        Label statusBadge = new Label(task.getStatus() != null ? task.getStatus() : "Unknown");
-        statusBadge.setPadding(new Insets(5, 10, 5, 10));
-        statusBadge.setStyle("-fx-background-radius: 5px; -fx-text-fill: white;");
-
-        // Apply badge color based on status
-        String status = task.getStatus() != null ? task.getStatus().toLowerCase() : "";
-        switch (status) {
-            case "done":
-                statusBadge.setStyle(statusBadge.getStyle() + " -fx-background-color: #28a745;");
-                break;
-            case "pending":
-                statusBadge.setStyle(statusBadge.getStyle() + " -fx-background-color: #ffc107;");
-                break;
-            case "missed":
-                statusBadge.setStyle(statusBadge.getStyle() + " -fx-background-color: #dc3545;");
-                break;
-            default:
-                statusBadge.setStyle(statusBadge.getStyle() + " -fx-background-color: #6c757d;");
-        }
-
-        // Create VBox for task details
-        VBox detailsBox = new VBox(5);
-
-        // Create task description label
-        Label descriptionLabel = new Label(task.getDescription() != null ? task.getDescription() : "No description");
-        descriptionLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 14px;");
-
-        // Create info line with worker name and due date
-        HBox infoBox = new HBox(15);
-
-        // Create worker name label
-        if (task.getAssignedTo() != null && !task.getAssignedTo().isEmpty()) {
-            Label workerLabel = new Label("👤 " + task.getAssignedTo());
-            workerLabel.setStyle("-fx-text-fill: #6c757d;");
-            infoBox.getChildren().add(workerLabel);
-        }
-
-        // Create due date label
-        if (task.getDueDate() != null) {
-            Label dueDateLabel = new Label("📅 " + DateUtil.formatDate(task.getDueDate()));
-            dueDateLabel.setStyle("-fx-text-fill: #6c757d;");
-            infoBox.getChildren().add(dueDateLabel);
-        }
-
-        // If egg collection task, show cracked eggs
-        if (task.getCrackedEggs() > 0) {
-            Label crackedEggsLabel = new Label("🥚 Cracked: " + task.getCrackedEggs());
-            crackedEggsLabel.setStyle("-fx-text-fill: #6c757d;");
-            infoBox.getChildren().add(crackedEggsLabel);
-        }
-
-        detailsBox.getChildren().addAll(descriptionLabel, infoBox);
-
-        // Create spacer
-        Region spacer = new Region();
-        HBox.setHgrow(spacer, Priority.ALWAYS);
-
-        // Create category label
-        Label categoryLabel = new Label(task.getCategory() != null ? task.getCategory() : "");
-        categoryLabel.setStyle("-fx-text-fill: #6c757d; -fx-font-style: italic;");
-
-        // Arrange in HBox
-        hbox.getChildren().addAll(statusBadge, detailsBox, spacer, categoryLabel);
-
-        return hbox;
-    }
-
-    /**
-     * Refresh tasks list
+     * Refresh all data
      */
     @FXML
     public void refreshData() {
-        // Reload tasks
         loadTasks();
-
-        // Update statistics
         updateTaskStatistics();
+    }
+
+    // ============================================================
+    // Alert Helper Methods
+    // ============================================================
+
+    private void showSuccessAlert(String header, String content) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Succès");
+        alert.setHeaderText(header);
+        alert.setContentText(content);
+        alert.showAndWait();
+    }
+
+    private void showErrorAlert(String header, String content) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Erreur");
+        alert.setHeaderText(header);
+        alert.setContentText(content);
+        alert.showAndWait();
+    }
+
+    private void showWarningAlert(String header, String content) {
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setTitle("Attention");
+        alert.setHeaderText(header);
+        alert.setContentText(content);
+        alert.showAndWait();
+    }
+
+    private void showInfoAlert(String header, String content) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Information");
+        alert.setHeaderText(header);
+        alert.setContentText(content);
+        alert.showAndWait();
     }
 }
