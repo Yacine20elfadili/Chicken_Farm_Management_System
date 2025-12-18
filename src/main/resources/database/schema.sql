@@ -130,13 +130,14 @@ VALUES ('Administrator', 'admin@farm.ma', 'admin123');
 
 CREATE TABLE IF NOT EXISTS houses (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name VARCHAR(10) NOT NULL UNIQUE,
+    name VARCHAR(100) NOT NULL UNIQUE,
     type VARCHAR(50) NOT NULL,
     chickenCount INTEGER DEFAULT 0 CHECK (chickenCount >= 0),
     capacity INTEGER NOT NULL CHECK (capacity > 0),
     healthStatus VARCHAR(50) DEFAULT 'Good' CHECK (healthStatus IN ('Good', 'Fair', 'Poor')),
     lastCleaningDate DATE,
     creationDate DATE DEFAULT CURRENT_DATE,
+    arrivalDate DATE,
     created_at TEXT DEFAULT CURRENT_TIMESTAMP,
     updated_at TEXT DEFAULT CURRENT_TIMESTAMP
 );

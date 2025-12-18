@@ -89,7 +89,7 @@ public class EggsBayController {
     @FXML
     public void initialize() {
         System.out.println("=== EggsBayController: Initializing ===");
-        
+
         // Initialize DAOs
         eggProductionDAO = new EggProductionDAO();
         houseDAO = new HouseDAO();
@@ -111,10 +111,10 @@ public class EggsBayController {
         try {
             // Get all houses from database
             List<House> allHouses = houseDAO.getAllHouses();
-            
+
             // Filter houses that can lay eggs (EGG_LAYER and MEAT_FEMALE)
             List<House> eggLayingHouses = allHouses.stream()
-                    .filter(house -> house.getType() == HouseType.EGG_LAYER || 
+                    .filter(house -> house.getType() == HouseType.EGG_LAYER ||
                                    house.getType() == HouseType.MEAT_FEMALE)
                     .collect(Collectors.toList());
 
@@ -243,7 +243,7 @@ public class EggsBayController {
         try {
             LocalDate today = LocalDate.now();
             List<EggProduction> productions = eggProductionDAO.getProductionByDate(today);
-            
+
             for (EggProduction prod : productions) {
                 if (prod.getHouseId() == house.getId()) {
                     eggsValueLabel.setText(String.valueOf(prod.getEggsCollected()));
@@ -291,7 +291,7 @@ public class EggsBayController {
             int eggsMonthCracked = 0;
             List<EggProduction> monthProductions = eggProductionDAO.getAllProduction();
             for (EggProduction prod : monthProductions) {
-                if (!prod.getProductionDate().isBefore(monthAgo) && 
+                if (!prod.getProductionDate().isBefore(monthAgo) &&
                     !prod.getProductionDate().isAfter(today)) {
                     eggsMonthCracked += prod.getCrackedEggs();
                 }
@@ -318,7 +318,7 @@ public class EggsBayController {
                 crackedMonthLabel.setText(String.format("%,d", eggsMonthCracked));
             }
 
-            System.out.println("Statistics loaded - Today: " + eggsTodayProduced + " eggs, " + 
+            System.out.println("Statistics loaded - Today: " + eggsTodayProduced + " eggs, " +
                              eggsTodayCracked + " cracked");
 
         } catch (Exception e) {
@@ -350,7 +350,7 @@ public class EggsBayController {
             // Apply storage status badge
             applyStorageStatusBadge(percentage);
 
-            System.out.println("Storage loaded - Total eggs: " + totalEggs + 
+            System.out.println("Storage loaded - Total eggs: " + totalEggs +
                              " (" + String.format("%.1f", percentage) + "%)");
 
         } catch (Exception e) {
@@ -377,7 +377,10 @@ public class EggsBayController {
             Stage dialogStage = new Stage();
             dialogStage.setTitle("Enregistrer la Collecte d'Œufs");
             dialogStage.initModality(Modality.APPLICATION_MODAL);
-            dialogStage.setScene(new Scene(dialogContent, 500, 400));
+            dialogStage.setScene(new Scene(dialogContent));
+            dialogStage.setResizable(true);
+            dialogStage.setMinWidth(520);
+            dialogStage.setMinHeight(550);
             dialogStage.showAndWait();
 
             // Check if save was clicked
@@ -385,7 +388,7 @@ public class EggsBayController {
                 System.out.println("Egg collection recorded successfully");
                 // Refresh data
                 refreshData();
-                
+
                 // Show success message
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
                 alert.setTitle("Succès");
@@ -397,7 +400,7 @@ public class EggsBayController {
         } catch (IOException e) {
             System.err.println("Error opening record collection dialog: " + e.getMessage());
             e.printStackTrace();
-            
+
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Erreur");
             alert.setHeaderText("Erreur");
@@ -462,7 +465,7 @@ public class EggsBayController {
     @FXML
     public void refreshData() {
         System.out.println("Refreshing EggsBay data...");
-        
+
         // Re-check egg laying houses and reload data
         checkAndDisplayEggLayingHouses();
 

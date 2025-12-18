@@ -13,12 +13,12 @@ import java.util.List;
  *
  * Handles all database operations for chicken houses including:
  * - CRUD operations
- * - House status tracking
+ * - House configuration (dynamic houses per type)
  * - Capacity management
- * - Health monitoring
+ * - Chicken lifecycle operations (import, distribute, transfer, sell)
  *
  * @author Farm Management System
- * @version 1.0
+ * @version 2.0
  */
 public class HouseDAO {
     private DatabaseConnection dbConnection;
@@ -34,85 +34,37 @@ public class HouseDAO {
      * @return true if successful, false otherwise
      */
     public boolean addHouse(House house) {
-        System.out.println("=== HouseDAO.addHouse() called ===");
-        System.out.println("House to add: " + house);
-
-        // Check if house has pre-set ID (for specific slots 1-4)
-        boolean hasPresetId = house.getId() > 0;
-        String sql;
-
-        if (hasPresetId) {
-            System.out.println("Using pre-set ID: " + house.getId());
-            sql = "INSERT INTO houses (id, name, type, chickenCount, capacity, healthStatus, " +
-                    "lastCleaningDate, creationDate) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-        } else {
-            System.out.println("Auto-generating ID");
-            sql = "INSERT INTO houses (name, type, chickenCount, capacity, healthStatus, " +
-                    "lastCleaningDate, creationDate) VALUES (?, ?, ?, ?, ?, ?, ?)";
-        }
+        String sql = "INSERT INTO houses (name, type, chickenCount, capacity, healthStatus, " +
+                "lastCleaningDate, creationDate, arrivalDate) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (PreparedStatement stmt = dbConnection.getConnection().prepareStatement(sql)) {
-            System.out.println("Database connection obtained: " + (dbConnection.getConnection() != null));
-
-            int paramIndex = 1;
-
-            // Set ID if pre-set
-            if (hasPresetId) {
-                stmt.setInt(paramIndex++, house.getId());
-                System.out.println("Set id: " + house.getId());
-            }
-
-            stmt.setString(paramIndex++, house.getName());
-            System.out.println("Set name: " + house.getName());
-
-            stmt.setString(paramIndex++, house.getTypeAsString());  // Using helper method
-            System.out.println("Set type: " + house.getTypeAsString());
-
-            stmt.setInt(paramIndex++, house.getChickenCount());
-            System.out.println("Set chickenCount: " + house.getChickenCount());
-
-            stmt.setInt(paramIndex++, house.getCapacity());
-            System.out.println("Set capacity: " + house.getCapacity());
-
-            stmt.setString(paramIndex++, house.getHealthStatusAsString());  // Using helper method
-            System.out.println("Set healthStatus: " + house.getHealthStatusAsString());
-
-            stmt.setString(paramIndex++, house.getLastCleaningDate() != null ?
+            stmt.setString(1, house.getName());
+            stmt.setString(2, house.getTypeAsString());
+            stmt.setInt(3, house.getChickenCount());
+            stmt.setInt(4, house.getCapacity());
+            stmt.setString(5, house.getHealthStatusAsString());
+            stmt.setString(6, house.getLastCleaningDate() != null ?
                     house.getLastCleaningDate().toString() : null);
-            System.out.println("Set lastCleaningDate: " + house.getLastCleaningDate());
+            stmt.setString(7, house.getCreationDate() != null ?
+                    house.getCreationDate().toString() : LocalDate.now().toString());
+            stmt.setString(8, house.getArrivalDate() != null ?
+                    house.getArrivalDate().toString() : null);
 
-            stmt.setString(paramIndex++, house.getCreationDate() != null ?
-                    house.getCreationDate().toString() : null);
-            System.out.println("Set creationDate: " + house.getCreationDate());
-
-            System.out.println("Executing SQL: " + sql);
             int rows = stmt.executeUpdate();
-            System.out.println("Rows inserted: " + rows);
 
-            if (rows == 0) {
-                System.out.println("No rows inserted!");
-                return false;
-            }
-
-            // Get generated ID only if not pre-set
-            if (!hasPresetId) {
+            if (rows > 0) {
+                // Get generated ID
                 try (Statement idStmt = dbConnection.getConnection().createStatement();
                      ResultSet rs = idStmt.executeQuery("SELECT last_insert_rowid() AS id")) {
                     if (rs.next()) {
-                        int generatedId = rs.getInt("id");
-                        house.setId(generatedId);
-                        System.out.println("Generated ID: " + generatedId);
+                        house.setId(rs.getInt("id"));
                     }
                 }
+                return true;
             }
-
-            System.out.println("House added successfully with ID: " + house.getId());
-            return true;
+            return false;
         } catch (SQLException e) {
-            System.err.println("=== SQL ERROR in addHouse ===");
-            System.err.println("Error message: " + e.getMessage());
-            System.err.println("SQL State: " + e.getSQLState());
-            System.err.println("Error Code: " + e.getErrorCode());
+            System.err.println("Error adding house: " + e.getMessage());
             e.printStackTrace();
             return false;
         }
@@ -126,17 +78,19 @@ public class HouseDAO {
      */
     public boolean updateHouse(House house) {
         String sql = "UPDATE houses SET name = ?, type = ?, chickenCount = ?, capacity = ?, " +
-                "healthStatus = ?, lastCleaningDate = ? WHERE id = ?";
+                "healthStatus = ?, lastCleaningDate = ?, arrivalDate = ? WHERE id = ?";
 
         try (PreparedStatement stmt = dbConnection.getConnection().prepareStatement(sql)) {
             stmt.setString(1, house.getName());
-            stmt.setString(2, house.getTypeAsString());  // Using helper method
+            stmt.setString(2, house.getTypeAsString());
             stmt.setInt(3, house.getChickenCount());
             stmt.setInt(4, house.getCapacity());
-            stmt.setString(5, house.getHealthStatusAsString());  // Using helper method
+            stmt.setString(5, house.getHealthStatusAsString());
             stmt.setString(6, house.getLastCleaningDate() != null ?
                     house.getLastCleaningDate().toString() : null);
-            stmt.setInt(7, house.getId());
+            stmt.setString(7, house.getArrivalDate() != null ?
+                    house.getArrivalDate().toString() : null);
+            stmt.setInt(8, house.getId());
 
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
@@ -158,6 +112,41 @@ public class HouseDAO {
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
             System.err.println("Error deleting house: " + e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Deletes all houses from the database
+     * Used for reconfiguration when no houses contain chickens
+     *
+     * @return true if successful
+     */
+    public boolean deleteAllHouses() {
+        String sql = "DELETE FROM houses";
+        try (Statement stmt = dbConnection.getConnection().createStatement()) {
+            stmt.executeUpdate(sql);
+            return true;
+        } catch (SQLException e) {
+            System.err.println("Error deleting all houses: " + e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Deletes all houses of a specific type
+     *
+     * @param type the house type to delete
+     * @return true if successful
+     */
+    public boolean deleteHousesByType(HouseType type) {
+        String sql = "DELETE FROM houses WHERE type = ?";
+        try (PreparedStatement stmt = dbConnection.getConnection().prepareStatement(sql)) {
+            stmt.setString(1, type.getDisplayName());
+            stmt.executeUpdate();
+            return true;
+        } catch (SQLException e) {
+            System.err.println("Error deleting houses by type: " + e.getMessage());
             return false;
         }
     }
@@ -185,7 +174,7 @@ public class HouseDAO {
     /**
      * Gets a house by name
      *
-     * @param name the house name (e.g., "H2")
+     * @param name the house name (e.g., "DayOld-House-1")
      * @return the House object or null if not found
      */
     public House getHouseByName(String name) {
@@ -208,7 +197,7 @@ public class HouseDAO {
      * @return List of all houses
      */
     public List<House> getAllHouses() {
-        String sql = "SELECT * FROM houses ORDER BY name";
+        String sql = "SELECT * FROM houses ORDER BY type, name";
         List<House> houses = new ArrayList<>();
 
         try (Statement stmt = dbConnection.getConnection().createStatement();
@@ -245,6 +234,108 @@ public class HouseDAO {
     }
 
     /**
+     * Gets empty houses by type (chickenCount = 0)
+     *
+     * @param type the house type
+     * @return List of empty houses of the specified type
+     */
+    public List<House> getEmptyHousesByType(HouseType type) {
+        String sql = "SELECT * FROM houses WHERE type = ? AND chickenCount = 0 ORDER BY name";
+        List<House> houses = new ArrayList<>();
+
+        try (PreparedStatement stmt = dbConnection.getConnection().prepareStatement(sql)) {
+            stmt.setString(1, type.getDisplayName());
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                houses.add(mapResultSetToHouse(rs));
+            }
+        } catch (SQLException e) {
+            System.err.println("Error getting empty houses by type: " + e.getMessage());
+        }
+        return houses;
+    }
+
+    /**
+     * Gets non-empty houses by type (chickenCount > 0)
+     *
+     * @param type the house type
+     * @return List of occupied houses of the specified type
+     */
+    public List<House> getOccupiedHousesByType(HouseType type) {
+        String sql = "SELECT * FROM houses WHERE type = ? AND chickenCount > 0 ORDER BY name";
+        List<House> houses = new ArrayList<>();
+
+        try (PreparedStatement stmt = dbConnection.getConnection().prepareStatement(sql)) {
+            stmt.setString(1, type.getDisplayName());
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                houses.add(mapResultSetToHouse(rs));
+            }
+        } catch (SQLException e) {
+            System.err.println("Error getting occupied houses by type: " + e.getMessage());
+        }
+        return houses;
+    }
+
+    /**
+     * Gets the count of houses by type
+     *
+     * @param type the house type
+     * @return count of houses
+     */
+    public int getHouseCountByType(HouseType type) {
+        String sql = "SELECT COUNT(*) FROM houses WHERE type = ?";
+        try (PreparedStatement stmt = dbConnection.getConnection().prepareStatement(sql)) {
+            stmt.setString(1, type.getDisplayName());
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error counting houses by type: " + e.getMessage());
+        }
+        return 0;
+    }
+
+    /**
+     * Gets total available capacity for empty houses of a type
+     *
+     * @param type the house type
+     * @return total available capacity
+     */
+    public int getTotalEmptyCapacityByType(HouseType type) {
+        String sql = "SELECT COALESCE(SUM(capacity), 0) FROM houses WHERE type = ? AND chickenCount = 0";
+        try (PreparedStatement stmt = dbConnection.getConnection().prepareStatement(sql)) {
+            stmt.setString(1, type.getDisplayName());
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error getting total empty capacity: " + e.getMessage());
+        }
+        return 0;
+    }
+
+    /**
+     * Checks if any house contains chickens
+     *
+     * @return true if at least one house has chickens
+     */
+    public boolean hasAnyChickens() {
+        String sql = "SELECT COUNT(*) FROM houses WHERE chickenCount > 0";
+        try (Statement stmt = dbConnection.getConnection().createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+        } catch (SQLException e) {
+            System.err.println("Error checking for chickens: " + e.getMessage());
+        }
+        return false;
+    }
+
+    /**
      * Updates the chicken count for a house
      *
      * @param houseId the house ID
@@ -259,6 +350,103 @@ public class HouseDAO {
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
             System.err.println("Error updating chicken count: " + e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Updates the arrival date for a house
+     *
+     * @param houseId the house ID
+     * @param arrivalDate the arrival date
+     * @return true if successful
+     */
+    public boolean updateArrivalDate(int houseId, LocalDate arrivalDate) {
+        String sql = "UPDATE houses SET arrivalDate = ? WHERE id = ?";
+        try (PreparedStatement stmt = dbConnection.getConnection().prepareStatement(sql)) {
+            stmt.setString(1, arrivalDate != null ? arrivalDate.toString() : null);
+            stmt.setInt(2, houseId);
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.err.println("Error updating arrival date: " + e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Adds chickens to a house (for import or transfer operations)
+     *
+     * @param houseId the house ID
+     * @param count number of chickens to add
+     * @param arrivalDate the arrival date
+     * @return true if successful
+     */
+    public boolean addChickensToHouse(int houseId, int count, LocalDate arrivalDate) {
+        String sql = "UPDATE houses SET chickenCount = chickenCount + ?, arrivalDate = ? WHERE id = ?";
+        try (PreparedStatement stmt = dbConnection.getConnection().prepareStatement(sql)) {
+            stmt.setInt(1, count);
+            stmt.setString(2, arrivalDate.toString());
+            stmt.setInt(3, houseId);
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.err.println("Error adding chickens to house: " + e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Removes chickens from a house (for mortality or sell operations)
+     *
+     * @param houseId the house ID
+     * @param count number of chickens to remove
+     * @return true if successful
+     */
+    public boolean removeChickensFromHouse(int houseId, int count) {
+        // First get current count to check
+        House house = getHouseById(houseId);
+        if (house == null || house.getChickenCount() < count) {
+            return false;
+        }
+
+        int newCount = house.getChickenCount() - count;
+        String sql;
+
+        if (newCount == 0) {
+            // Reset house when empty
+            sql = "UPDATE houses SET chickenCount = 0, arrivalDate = NULL WHERE id = ?";
+            try (PreparedStatement stmt = dbConnection.getConnection().prepareStatement(sql)) {
+                stmt.setInt(1, houseId);
+                return stmt.executeUpdate() > 0;
+            } catch (SQLException e) {
+                System.err.println("Error resetting house: " + e.getMessage());
+                return false;
+            }
+        } else {
+            sql = "UPDATE houses SET chickenCount = ? WHERE id = ?";
+            try (PreparedStatement stmt = dbConnection.getConnection().prepareStatement(sql)) {
+                stmt.setInt(1, newCount);
+                stmt.setInt(2, houseId);
+                return stmt.executeUpdate() > 0;
+            } catch (SQLException e) {
+                System.err.println("Error removing chickens from house: " + e.getMessage());
+                return false;
+            }
+        }
+    }
+
+    /**
+     * Resets a house to empty state (after distribute/transfer/sell all)
+     *
+     * @param houseId the house ID
+     * @return true if successful
+     */
+    public boolean resetHouse(int houseId) {
+        String sql = "UPDATE houses SET chickenCount = 0, arrivalDate = NULL WHERE id = ?";
+        try (PreparedStatement stmt = dbConnection.getConnection().prepareStatement(sql)) {
+            stmt.setInt(1, houseId);
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.err.println("Error resetting house: " + e.getMessage());
             return false;
         }
     }
@@ -320,6 +508,44 @@ public class HouseDAO {
     }
 
     /**
+     * Gets total chicken count by house type
+     *
+     * @param type the house type
+     * @return total chicken count for that type
+     */
+    public int getTotalChickenCountByType(HouseType type) {
+        String sql = "SELECT COALESCE(SUM(chickenCount), 0) FROM houses WHERE type = ?";
+        try (PreparedStatement stmt = dbConnection.getConnection().prepareStatement(sql)) {
+            stmt.setString(1, type.getDisplayName());
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error getting chicken count by type: " + e.getMessage());
+        }
+        return 0;
+    }
+
+    /**
+     * Check if houses are configured (at least one house exists)
+     *
+     * @return true if at least one house exists
+     */
+    public boolean areHousesConfigured() {
+        String sql = "SELECT COUNT(*) FROM houses";
+        try (Statement stmt = dbConnection.getConnection().createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+        } catch (SQLException e) {
+            System.err.println("Error checking house configuration: " + e.getMessage());
+        }
+        return false;
+    }
+
+    /**
      * Gets houses that need cleaning (based on days since last cleaning)
      *
      * @param daysSinceLastCleaning threshold in days
@@ -373,7 +599,11 @@ public class HouseDAO {
             house.setCreationDate(LocalDate.parse(creationStr));
         }
 
+        String arrivalStr = rs.getString("arrivalDate");
+        if (arrivalStr != null && !arrivalStr.isEmpty()) {
+            house.setArrivalDate(LocalDate.parse(arrivalStr));
+        }
+
         return house;
     }
-
 }

@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="ma.farm.controller.dialogs.TransferChickensDialogController"
+      prefWidth="550.0"
+      prefHeight="600.0"
+      spacing="15"
+      style="-fx-background-color: #ffffff;">
+
+    <padding>
+        <Insets bottom="20.0" left="25.0" right="25.0" top="20.0"/>
+    </padding>
+
+    <!-- Dialog Title -->
+    <VBox spacing="5.0">
+        <Label text="🔄 Transfer Chickens"
+               style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #1e2939;"/>
+        <Label fx:id="sourceHouseLabel" text="Transferring from: FemaleEggLayer-House-1"
+               style="-fx-font-size: 13px; -fx-text-fill: #666666;"/>
+    </VBox>
+
+    <Separator/>
+
+    <!-- Transfer Info -->
+    <HBox alignment="CENTER_LEFT" spacing="12.0"
+          style="-fx-background-color: #e8f5e9; -fx-padding: 12; -fx-background-radius: 5;">
+        <Label text="Total chickens to transfer:" style="-fx-font-weight: bold; -fx-text-fill: #2e7d32;"/>
+        <Label fx:id="totalChickensLabel" text="0"
+               style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2e7d32;"/>
+    </HBox>
+
+    <Separator/>
+
+    <!-- Destination House Selection -->
+    <VBox spacing="12.0" VBox.vgrow="ALWAYS"
+          style="-fx-background-color: #f3e5f5; -fx-padding: 15; -fx-background-radius: 8;">
+        <HBox alignment="CENTER_LEFT" spacing="10.0">
+            <Label text="🍗 Select Destination Female Meat Houses"
+                   style="-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #7b1fa2;"/>
+        </HBox>
+        <Label fx:id="capacityInfoLabel" text="Total available capacity: 0 chickens"
+               style="-fx-font-size: 11px; -fx-text-fill: #666666;"/>
+        <Label text="Select one or more houses to receive the chickens:"
+               style="-fx-font-size: 12px; -fx-text-fill: #555555;"/>
+
+        <ScrollPane fitToWidth="true" prefHeight="180" VBox.vgrow="ALWAYS"
+                    style="-fx-background-color: transparent; -fx-background: transparent; -fx-border-color: transparent;">
+            <VBox fx:id="destinationHousesContainer" spacing="8.0" style="-fx-padding: 5;">
+                <!-- Destination house checkboxes will be added dynamically -->
+            </VBox>
+        </ScrollPane>
+
+        <HBox alignment="CENTER_LEFT" spacing="10.0"
+              style="-fx-background-color: #ffffff; -fx-padding: 10; -fx-background-radius: 5; -fx-border-color: #e0e0e0; -fx-border-radius: 5;">
+            <Label text="Selected capacity:" style="-fx-font-weight: bold; -fx-text-fill: #333333;"/>
+            <Label fx:id="selectedCapacityLabel" text="0"
+                   style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #7b1fa2;"/>
+            <Label text="/" style="-fx-text-fill: #999999; -fx-font-size: 14px;"/>
+            <Label text="Needed:" style="-fx-text-fill: #666666;"/>
+            <Label fx:id="neededCapacityLabel" text="0"
+                   style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #333333;"/>
+        </HBox>
+
+        <Label fx:id="capacityErrorLabel" text="" style="-fx-text-fill: #dc3545; -fx-font-size: 11px;" visible="false"/>
+    </VBox>
+
+    <!-- Error Label -->
+    <Label fx:id="errorLabel" style="-fx-text-fill: #dc3545;" wrapText="true" visible="false" managed="false"/>
+
+    <Separator/>
+
+    <!-- Button Bar -->
+    <HBox spacing="12.0" alignment="CENTER_RIGHT">
+        <padding>
+            <Insets top="10.0"/>
+        </padding>
+        <Button text="Cancel" onAction="#handleCancel"
+                style="-fx-background-color: #6c757d; -fx-text-fill: white; -fx-font-size: 13px; -fx-padding: 10 24; -fx-background-radius: 6; -fx-cursor: hand;"
+                prefWidth="100"/>
+        <Button fx:id="confirmButton" text="Confirm Transfer" onAction="#handleConfirm"
+                style="-fx-background-color: #9c27b0; -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold; -fx-padding: 10 24; -fx-background-radius: 6; -fx-cursor: hand;"
+                prefWidth="160"/>
+    </HBox>
+</VBox>
