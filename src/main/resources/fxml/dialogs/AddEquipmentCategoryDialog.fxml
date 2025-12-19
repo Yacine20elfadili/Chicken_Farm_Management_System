@@ -1,22 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
 
-<VBox xmlns="http://javafx.com/javafx"
-      xmlns:fx="http://javafx.com/fxml"
-      fx:controller="ma.farm.controller.dialogs.AddEquipmentCategoryDialogController"
-      prefHeight="450.0" prefWidth="600.0" spacing="15.0" styleClass="dialog-container">
+<VBox prefHeight="450.0" prefWidth="600.0" style="-fx-background-color: #f8f9fa;" styleClass="dialog-container" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ma.farm.controller.dialogs.AddEquipmentCategoryDialogController">
     <padding>
-        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+        <Insets top="20.0" />
     </padding>
 
     <!-- Dialog Title -->
-    <Label fx:id="dialogTitle" styleClass="dialog-title" text="Ajouter Catégorie d'Équipement" />
+    <Label fx:id="dialogTitle" style="-fx-font-size: 24; -fx-font-weight: bold;" styleClass="dialog-title" text="Ajouter Catégorie d'Équipement">
+      <VBox.margin>
+         <Insets bottom="10.0" left="20.0" />
+      </VBox.margin></Label>
 
     <!-- Form Content -->
-    <ScrollPane fitToHeight="true" fitToWidth="true" styleClass="form-scroll">
+    <ScrollPane fitToHeight="true" fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent;">
         <content>
             <VBox spacing="15.0">
                 <padding>
@@ -25,40 +31,46 @@
 
                 <!-- Name -->
                 <VBox spacing="5.0">
-                    <Label styleClass="form-label" text="Nom de la Catégorie *" />
-                    <TextField fx:id="nameField" promptText="Ex: Pelles, Mangeoires, Pompes" styleClass="form-input" />
+                    <Label style="-fx-font-size: 13; -fx-font-weight: bold; -fx-text-fill: #495057;" styleClass="form-label" text="Nom de la Catégorie *" />
+                    <TextField fx:id="nameField" promptText="Ex: Pelles, Mangeoires, Pompes" style="-fx-font-size: 13; -fx-padding: 10;" styleClass="form-input" />
                     <Label fx:id="nameErrorLabel" styleClass="error-label" text="" />
                 </VBox>
 
                 <!-- Category Type -->
                 <VBox spacing="5.0">
-                    <Label styleClass="form-label" text="Type *" />
-                    <ComboBox fx:id="categoryComboBox" prefWidth="200.0" promptText="Sélectionner le type" styleClass="form-input" />
+                    <Label style="-fx-font-size: 13; -fx-font-weight: bold; -fx-text-fill: #495057;" styleClass="form-label" text="Type *" />
+                    <ComboBox fx:id="categoryComboBox" prefWidth="200.0" promptText="Sélectionner le type" style="-fx-background-color: #ffffff; -fx-border-color: #ced4da; -fx-background-radius: 5; -fx-border-radius: 5;" styleClass="form-input" />
                     <Label fx:id="categoryErrorLabel" styleClass="error-label" text="" />
                 </VBox>
 
                 <!-- Location -->
                 <VBox spacing="5.0">
-                    <Label styleClass="form-label" text="Localisation *" />
-                    <TextField fx:id="locationField" promptText="Ex: Hangar Principal, Maison 1" styleClass="form-input" />
+                    <Label style="-fx-font-size: 13; -fx-font-weight: bold; -fx-text-fill: #495057;" styleClass="form-label" text="Localisation *" />
+                    <TextField fx:id="locationField" promptText="Ex: Hangar Principal, Maison 1" style="-fx-font-size: 13; -fx-padding: 10;" styleClass="form-input" />
                     <Label fx:id="locationErrorLabel" styleClass="error-label" text="" />
                 </VBox>
 
                 <!-- Notes -->
                 <VBox spacing="5.0">
-                    <Label styleClass="form-label" text="Notes" />
-                    <TextArea fx:id="notesTextArea" prefRowCount="3" promptText="Informations supplémentaires..." styleClass="form-input" wrapText="true" />
+                    <Label style="-fx-font-size: 13; -fx-font-weight: bold; -fx-text-fill: #495057;" styleClass="form-label" text="Notes" />
+                    <TextArea fx:id="notesTextArea" prefRowCount="3" promptText="Informations supplémentaires..." style="-fx-font-size: 13; -fx-padding: 10;" styleClass="form-input" wrapText="true" />
                 </VBox>
 
                 <!-- Info Text -->
-                <Label styleClass="info-text" text="Note: La quantité sera 0 par défaut. Ajoutez des équipements individuels après création." wrapText="true" />
+                <Label style="-fx-text-fill: #856404; -fx-font-size: 11;" styleClass="info-text" text="Note: La quantité sera 0 par défaut. Ajoutez des équipements individuels après création." wrapText="true" />
             </VBox>
         </content>
+      <VBox.margin>
+         <Insets left="20.0" />
+      </VBox.margin>
     </ScrollPane>
 
     <!-- Buttons -->
-    <HBox alignment="CENTER_RIGHT" spacing="10.0">
-        <Button onAction="#handleCancel" styleClass="btn-secondary" text="Annuler" />
-        <Button onAction="#handleSave" styleClass="btn-primary" text="Enregistrer" />
+    <HBox alignment="CENTER_RIGHT" spacing="15.0" style="-fx-background-color: #f8f9fa; -fx-border-color: #dee2e6; -fx-border-width: 1px 0 0 0;">
+        <Button onAction="#handleCancel" prefHeight="50.0" prefWidth="130.0" style="-fx-background-color: #6c757d; -fx-text-fill: white; -fx-font-size: 14; -fx-background-radius: 5; -fx-cursor: hand;" styleClass="btn-secondary" text="Annuler" />
+        <Button onAction="#handleSave" prefHeight="50.0" prefWidth="130.0" style="-fx-background-color: #28a745; -fx-text-fill: white; -fx-font-size: 14; -fx-background-radius: 5; -fx-cursor: hand;" styleClass="btn-primary" text="Enregistrer" />
+      <padding>
+         <Insets bottom="15.0" left="25.0" right="25.0" top="15.0" />
+      </padding>
     </HBox>
 </VBox>

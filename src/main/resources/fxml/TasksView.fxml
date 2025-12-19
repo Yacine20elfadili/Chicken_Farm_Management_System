@@ -15,7 +15,27 @@
 
 <AnchorPane prefHeight="700.0" prefWidth="950.0" styleClass="main-content" stylesheets="@../css/style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ma.farm.controller.TasksController">
     <children>
-        <VBox AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+              <!-- HEADER ROW -->
+        <VBox styleClass="header" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <children>
+                <HBox alignment="CENTER_LEFT" spacing="15.0">
+                    <children>
+                        <Label styleClass="header-title" text="Gestion des Tâches" />
+                        <Region HBox.hgrow="ALWAYS" />
+                        <Button fx:id="addTaskButton" onAction="#handleAddTask" style="-fx-background-color: #28a745; -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold; -fx-cursor: hand; -fx-padding: 10 20; -fx-background-radius: 5;" text="+ Nouvelle Tâche" />
+                        <Button fx:id="refreshButton" onAction="#refreshData" style="-fx-background-color: #17a2b8; -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold; -fx-cursor: hand; -fx-padding: 10 15; -fx-background-radius: 5;" text="Actualiser" />
+                    </children>
+               <padding>
+                  <Insets right="20.0" />
+               </padding>
+               <VBox.margin>
+                  <Insets top="10.0" />
+               </VBox.margin>
+                </HBox>
+                <Label styleClass="header-subtitle" text="Suivez et gérez toutes les tâches quotidiennes de la ferme" />
+            </children>
+        </VBox>
+        <VBox AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="80.0">
             <children>
                 <ScrollPane fitToHeight="true" fitToWidth="true" styleClass="main-content" VBox.vgrow="ALWAYS">
                     <content>
@@ -85,21 +105,6 @@
                                         </VBox>
                                     </children>
                                 </HBox>
-
-                                <!-- HEADER ROW -->
-                                <VBox spacing="10.0" styleClass="header" style="-fx-padding: 15;">
-                                    <children>
-                                        <HBox alignment="CENTER_LEFT" spacing="15.0">
-                                            <children>
-                                                <Label styleClass="header-title" text="Gestion des Tâches" />
-                                                <Region HBox.hgrow="ALWAYS" />
-                                                <Button fx:id="addTaskButton" onAction="#handleAddTask" style="-fx-background-color: #28a745; -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold; -fx-cursor: hand; -fx-padding: 10 20; -fx-background-radius: 5;" text="+ Nouvelle Tâche" />
-                                                <Button fx:id="refreshButton" onAction="#refreshData" style="-fx-background-color: #17a2b8; -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold; -fx-cursor: hand; -fx-padding: 10 15; -fx-background-radius: 5;" text="Actualiser" />
-                                            </children>
-                                        </HBox>
-                                        <Label styleClass="header-subtitle" text="Suivez et gérez toutes les tâches quotidiennes de la ferme" />
-                                    </children>
-                                </VBox>
 
                                 <!-- TASK LIST -->
                                 <VBox spacing="10.0" styleClass="metric-card" VBox.vgrow="ALWAYS">
