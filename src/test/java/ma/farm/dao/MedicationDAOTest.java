@@ -92,16 +92,16 @@ public class MedicationDAOTest {
     @Test
     @Order(6)
     void testSearchByName() {
-        List<Medication> results = medicationDAO.searchByName("JUnit");
+        Medication results = medicationDAO.getMedicationByName("JUnit");
 
         assertNotNull(results);
-        assertTrue(results.size() > 0, "Search should return at least one match");
+        assertEquals("JUnit", results.getName(), "Search should return at 'JUnit'");
     }
 
     @Test
     @Order(7)
     void testLowStockCount() {
-        int count = medicationDAO.getLowStockCount();
+        int count = medicationDAO.getLowStockMedicationCount();
 
         assertTrue(count >= 0, "Low stock count must be >= 0");
     }
