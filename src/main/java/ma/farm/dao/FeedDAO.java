@@ -158,6 +158,11 @@ public class FeedDAO {
         return feedList;
     }
 
+    public Integer getLowStockCount() {
+        List<Feed> feed_list = getLowStockFeed();
+        return feed_list.size();
+    }
+
     /**
      * Get all expiring feed (within 30 days)
      */

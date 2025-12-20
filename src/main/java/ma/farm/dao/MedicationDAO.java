@@ -7,6 +7,8 @@ import java.sql.Statement;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+
+import ma.farm.model.Feed;
 import ma.farm.model.Medication;
 
 /**
@@ -118,6 +120,28 @@ public class MedicationDAO {
     }
 
     /**
+     * Get medication by name
+     */
+    public Medication getMedicationByName(String name) {
+        String sql = "SELECT * FROM medications WHERE name = ?";
+
+        try (PreparedStatement stmt = dbConnection.getConnection().prepareStatement(sql)) {
+            stmt.setString(1, name);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return mapResultSetToMedication(rs);
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error retrieving medication by name: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    /**
      * Get medications by type
      */
     public List<Medication> getMedicationByType(String type) {
@@ -139,6 +163,8 @@ public class MedicationDAO {
         
         return medicationList;
     }
+
+
 
     /**
      * Get all medications with low stock

@@ -304,7 +304,7 @@ END;
 
 CREATE TABLE IF NOT EXISTS feed (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name VARCHAR(100) NOT NULL,
+    name VARCHAR(100) NOT NULL UNIQUE,
     type VARCHAR(50) NOT NULL,
     quantityKg REAL NOT NULL DEFAULT 0,
     pricePerKg REAL NOT NULL DEFAULT 0,
@@ -315,7 +315,7 @@ CREATE TABLE IF NOT EXISTS feed (
     created_at TEXT DEFAULT CURRENT_TIMESTAMP,
     updated_at TEXT DEFAULT CURRENT_TIMESTAMP
 );
-
+CREATE INDEX IF NOT EXISTS idx_feed_name ON feed(name);
 CREATE INDEX IF NOT EXISTS idx_feed_type ON feed(type);
 CREATE INDEX IF NOT EXISTS idx_feed_expiry ON feed(expiryDate);
 
@@ -334,7 +334,7 @@ END;
 
 CREATE TABLE IF NOT EXISTS medications (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name VARCHAR(100) NOT NULL,
+    name VARCHAR(100) NOT NULL UNIQUE,
     type VARCHAR(50) NOT NULL,
     quantity INTEGER NOT NULL DEFAULT 0,
     unit VARCHAR(20) NOT NULL,
@@ -348,6 +348,7 @@ CREATE TABLE IF NOT EXISTS medications (
     updated_at TEXT DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE INDEX IF NOT EXISTS idx_medications_name ON medications(name);
 CREATE INDEX IF NOT EXISTS idx_medications_type ON medications(type);
 CREATE INDEX IF NOT EXISTS idx_medications_expiry ON medications(expiryDate);
 
