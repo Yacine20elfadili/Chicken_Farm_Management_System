@@ -2,9 +2,9 @@ package ma.farm.dao;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.Statement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import ma.farm.model.User;
@@ -19,11 +19,13 @@ public class UserDAO {
 
     // Create user
     public boolean createUser(User user) {
-        String sql = "INSERT INTO users (name, email, password) VALUES (?, ?, ?)";
+        String sql =
+            "INSERT INTO users (name, email, password) VALUES (?, ?, ?)";
 
-        try (Connection conn = dbConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
+        try (
+            Connection conn = dbConnection.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql)
+        ) {
             stmt.setString(1, user.getName());
             stmt.setString(2, user.getEmail());
             stmt.setString(3, user.getPassword());
@@ -32,16 +34,18 @@ public class UserDAO {
             if (rows == 0) return false;
 
             // SQLite: récupérer ID
-            try (Statement idStmt = conn.createStatement();
-                 ResultSet rs = idStmt.executeQuery("SELECT last_insert_rowid() AS id")) {
-
+            try (
+                Statement idStmt = conn.createStatement();
+                ResultSet rs = idStmt.executeQuery(
+                    "SELECT last_insert_rowid() AS id"
+                )
+            ) {
                 if (rs.next()) {
                     user.setId(rs.getInt("id"));
                 }
             }
 
             return true;
-
         } catch (Exception e) {
             System.err.println("Error creating user: " + e.getMessage());
             return false;
@@ -51,17 +55,21 @@ public class UserDAO {
     // Get user by ID
     public User getUserById(int id) {
         String sql = "SELECT * FROM users WHERE id = ?";
-        try (PreparedStatement stmt = dbConnection.getConnection().prepareStatement(sql)) {
+        try (
+            PreparedStatement stmt = dbConnection
+                .getConnection()
+                .prepareStatement(sql)
+        ) {
             stmt.setInt(1, id);
             ResultSet rs = stmt.executeQuery();
 
             if (rs.next()) {
                 return new User(
-                        rs.getInt("id"),
-                        rs.getString("name"),
-                        rs.getString("email"),
-                        rs.getString("password"),
-                        rs.getTimestamp("CreationDate").toLocalDateTime()
+                    rs.getInt("id"),
+                    rs.getString("name"),
+                    rs.getString("email"),
+                    rs.getString("password"),
+                    rs.getTimestamp("CreationDate").toLocalDateTime()
                 );
             }
         } catch (SQLException e) {
@@ -73,21 +81,27 @@ public class UserDAO {
     // Get user by email
     public User getUserByEmail(String email) {
         String sql = "SELECT * FROM users WHERE email = ?";
-        try (PreparedStatement stmt = dbConnection.getConnection().prepareStatement(sql)) {
+        try (
+            PreparedStatement stmt = dbConnection
+                .getConnection()
+                .prepareStatement(sql)
+        ) {
             stmt.setString(1, email);
             ResultSet rs = stmt.executeQuery();
 
             if (rs.next()) {
                 return new User(
-                        rs.getInt("id"),
-                        rs.getString("name"),
-                        rs.getString("email"),
-                        rs.getString("password"),
-                        rs.getTimestamp("CreationDate").toLocalDateTime()
+                    rs.getInt("id"),
+                    rs.getString("name"),
+                    rs.getString("email"),
+                    rs.getString("password"),
+                    rs.getTimestamp("CreationDate").toLocalDateTime()
                 );
             }
         } catch (SQLException e) {
-            System.err.println("Error getting user by email: " + e.getMessage());
+            System.err.println(
+                "Error getting user by email: " + e.getMessage()
+            );
         }
         return null;
     }
@@ -97,17 +111,20 @@ public class UserDAO {
         List<User> users = new ArrayList<>();
         String sql = "SELECT * FROM users";
 
-        try (Statement stmt = dbConnection.getConnection().createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
-
+        try (
+            Statement stmt = dbConnection.getConnection().createStatement();
+            ResultSet rs = stmt.executeQuery(sql)
+        ) {
             while (rs.next()) {
-                users.add(new User(
+                users.add(
+                    new User(
                         rs.getInt("id"),
                         rs.getString("name"),
                         rs.getString("email"),
                         rs.getString("password"),
                         rs.getTimestamp("CreationDate").toLocalDateTime()
-                ));
+                    )
+                );
             }
         } catch (SQLException e) {
             System.err.println("Error getting all users: " + e.getMessage());
@@ -118,7 +135,11 @@ public class UserDAO {
     // Validate login (plain text)
     public boolean validate(String email, String password) {
         String sql = "SELECT * FROM users WHERE email = ? AND password = ?";
-        try (PreparedStatement stmt = dbConnection.getConnection().prepareStatement(sql)) {
+        try (
+            PreparedStatement stmt = dbConnection
+                .getConnection()
+                .prepareStatement(sql)
+        ) {
             stmt.setString(1, email);
             stmt.setString(2, password);
             ResultSet rs = stmt.executeQuery();
@@ -131,8 +152,13 @@ public class UserDAO {
 
     // Update
     public boolean updateUser(User user) {
-        String sql = "UPDATE users SET name = ?, email = ?, password = ? WHERE id = ?";
-        try (PreparedStatement stmt = dbConnection.getConnection().prepareStatement(sql)) {
+        String sql =
+            "UPDATE users SET name = ?, email = ?, password = ? WHERE id = ?";
+        try (
+            PreparedStatement stmt = dbConnection
+                .getConnection()
+                .prepareStatement(sql)
+        ) {
             stmt.setString(1, user.getName());
             stmt.setString(2, user.getEmail());
             stmt.setString(3, user.getPassword());
@@ -148,7 +174,11 @@ public class UserDAO {
     // Delete
     public boolean deleteUser(int id) {
         String sql = "DELETE FROM users WHERE id = ?";
-        try (PreparedStatement stmt = dbConnection.getConnection().prepareStatement(sql)) {
+        try (
+            PreparedStatement stmt = dbConnection
+                .getConnection()
+                .prepareStatement(sql)
+        ) {
             stmt.setInt(1, id);
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
@@ -160,11 +190,11 @@ public class UserDAO {
     // Count
     public int getUserCount() {
         String sql = "SELECT COUNT(*) FROM users";
-        try (Statement stmt = dbConnection.getConnection().createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
-
+        try (
+            Statement stmt = dbConnection.getConnection().createStatement();
+            ResultSet rs = stmt.executeQuery(sql)
+        ) {
             return rs.next() ? rs.getInt(1) : 0;
-
         } catch (SQLException e) {
             System.err.println("Error getting user count: " + e.getMessage());
         }
@@ -172,8 +202,7 @@ public class UserDAO {
     }
 
     public User authenticate(String email, String password) {
-        if (validate(email, password))
-            return getUserByEmail(email);
+        if (validate(email, password)) return getUserByEmail(email);
 
         throw new SecurityException("Invalid email or password");
     }

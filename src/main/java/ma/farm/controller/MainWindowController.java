@@ -4,8 +4,9 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -13,24 +14,18 @@ import java.io.IOException;
 public class MainWindowController {
 
     @FXML
-    private BorderPane mainContainer;
-
-    @FXML
     private AnchorPane contentArea;
 
     @FXML
-    private SidebarController sidebarController; // Injected automatically by fx:include
+    private SidebarController sidebarController;
+
 
     /**
      * Initialize method - called automatically after FXML is loaded
      */
     @FXML
     public void initialize() {
-        // Set main controller reference in sidebar
-        if (sidebarController != null) {
-            sidebarController.setMainController(this);
-        }
-
+        sidebarController.setMainController(this);
         // Load Dashboard by default
         showDashboard();
     }
@@ -38,66 +33,55 @@ public class MainWindowController {
     /**
      * Load Dashboard page
      */
+    @FXML
     public void showDashboard() {
         loadPage("/fxml/DashboardView.fxml");
-        if (sidebarController != null) {
-            sidebarController.setActiveButton("dashboard");
-        }
     }
 
     /**
      * Load Chicken Bay page
      */
+    @FXML
     public void showChickenBay() {
         loadPage("/fxml/ChickenBayView.fxml");
-        if (sidebarController != null) {
-            sidebarController.setActiveButton("chickenBay");
-        }
     }
 
     /**
      * Load Eggs Bay page
      */
+    @FXML
     public void showEggsBay() {
         loadPage("/fxml/EggsBayView.fxml");
-        if (sidebarController != null) {
-            sidebarController.setActiveButton("eggsBay");
-        }
     }
 
     /**
      * Load Storage page
      */
+    @FXML
     public void showStorage() {
         loadPage("/fxml/StorageView.fxml");
-        if (sidebarController != null) {
-            sidebarController.setActiveButton("storage");
-        }
     }
 
     /**
      * Load Tasks page
      */
+    @FXML
     public void showTasks() {
         loadPage("/fxml/TasksView.fxml");
-        if (sidebarController != null) {
-            sidebarController.setActiveButton("tasks");
-        }
     }
 
     /**
      * Load Personnel page
      */
+    @FXML
     public void showPersonnel() {
         loadPage("/fxml/PersonnelView.fxml");
-        if (sidebarController != null) {
-            sidebarController.setActiveButton("personnel");
-        }
     }
 
     /**
      * Handle logout - return to login page
      */
+    @FXML
     public void handleLogout() {
         try {
             // Load login page
@@ -105,7 +89,7 @@ public class MainWindowController {
             Parent loginRoot = loader.load();
 
             // Get current stage
-            Stage stage = (Stage) mainContainer.getScene().getWindow();
+            Stage stage = (Stage) contentArea.getScene().getWindow();
 
             // Set login scene
             Scene loginScene = new Scene(loginRoot);

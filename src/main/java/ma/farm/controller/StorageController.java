@@ -3,20 +3,33 @@ package ma.farm.controller;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import ma.farm.controller.dialogs.AddEquipmentCategoryDialogController;
+import ma.farm.controller.dialogs.ManageEquipmentItemsDialogController;
+import ma.farm.controller.dialogs.UseFeedDialogController;
+import ma.farm.controller.dialogs.UseMedicationDialogController;
+import ma.farm.dao.EquipmentCategoryDAO;
 import ma.farm.dao.FeedDAO;
 import ma.farm.dao.MedicationDAO;
-import ma.farm.dao.EquipmentDAO;
+import ma.farm.model.EquipmentCategory;
 import ma.farm.model.Feed;
 import ma.farm.model.Medication;
-import ma.farm.model.Equipment;
+
+import java.io.IOException;
+import java.util.List;
 
 /**
  * StorageController - Controls the Storage view
- * Shows: Feed inventory, medications, equipment
+ * Shows: Feed inventory, medications, equipment categories
  */
 public class StorageController {
 
@@ -27,232 +40,545 @@ public class StorageController {
     @FXML
     private Label totalFeedTypesLabel;
 
+    @FXML
+    private Button addFeedButton;
+
+    @FXML
+    private Button useFeedButton;
+
     // FXML Components - Medications Card
+    @FXML
+    private ListView<String> medicationListView;
+
     @FXML
     private Label totalMedicationsLabel;
 
     @FXML
-    private Label lowStockMedicationsLabel;
-
-    // FXML Components - Equipment Table
-    @FXML
-    private TableView<Equipment> equipmentTable;
+    private Button addMedicationButton;
 
     @FXML
-    private TableColumn<Equipment, String> equipmentNameColumn;
+    private Button useMedicationButton;
+
+    // FXML Components - Equipment Categories Section
+    @FXML
+    private VBox equipmentCategoriesContainer;
 
     @FXML
-    private TableColumn<Equipment, Integer> equipmentQuantityColumn;
-
-    @FXML
-    private TableColumn<Equipment, String> equipmentStatusColumn;
+    private Button addEquipmentCategoryButton;
 
     // DAOs
     private FeedDAO feedDAO;
     private MedicationDAO medicationDAO;
-    private EquipmentDAO equipmentDAO;
+    private EquipmentCategoryDAO equipmentCategoryDAO;
 
     // Observable lists for UI
     private ObservableList<String> feedList;
-    private ObservableList<Equipment> equipmentList;
+    private ObservableList<String> medicationList;
 
     /**
      * Initialize method - called automatically after FXML loads
      */
     @FXML
     public void initialize() {
-        // TODO: Initialize DAOs
+        // Initialize DAOs
+        feedDAO = new FeedDAO();
+        medicationDAO = new MedicationDAO();
+        equipmentCategoryDAO = new EquipmentCategoryDAO();
 
-        // TODO: Setup table columns
+        // Initialize observable lists
+        feedList = FXCollections.observableArrayList();
+        medicationList = FXCollections.observableArrayList();
 
-        // TODO: Initialize observable lists
+        // Load feed data
+        loadFeedData();
 
-        // TODO: Load feed data
+        // Load medications data
+        loadMedicationsData();
 
-        // TODO: Load medications data
-
-        // TODO: Load equipment data
-    }
-
-    /**
-     * Setup equipment table columns
-     * Bind columns to Equipment model properties
-     */
-    private void setupTableColumns() {
-        // TODO: Bind equipmentNameColumn to name property
-
-        // TODO: Bind equipmentQuantityColumn to quantity property
-
-        // TODO: Bind equipmentStatusColumn to status property
-
-        // TODO: Add status badge cell factory (color coding)
+        // Load equipment categories
+        loadEquipmentCategories();
     }
 
     /**
      * Load and display feed inventory
      */
     private void loadFeedData() {
-        // TODO: Get all feed from FeedDAO
+        try {
+            List<Feed> feeds = feedDAO.getAllFeed();
 
-        // TODO: Format feed info (name, quantity, type)
+            feedList.clear();
 
-        // TODO: Add to feedList
+            for (Feed feed : feeds) {
+                String feedInfo = String.format("%s - %.1f kg (%s)",
+                        feed.getName(),
+                        feed.getQuantityKg(),
+                        feed.getType());
 
-        // TODO: Update feedListView
+                if (feed.isLowStock()) {
+                    feedInfo += " ⚠️ LOW STOCK";
+                }
 
-        // TODO: Update totalFeedTypesLabel
+                feedList.add(feedInfo);
+            }
 
-        // TODO: Highlight low stock items in red
+            if (feedListView != null) {
+                feedListView.setItems(feedList);
+
+                feedListView.setCellFactory(param -> new ListCell<String>() {
+                    @Override
+                    protected void updateItem(String item, boolean empty) {
+                        super.updateItem(item, empty);
+
+                        if (empty || item == null) {
+                            setText(null);
+                            setStyle("");
+                        } else {
+                            setText(item);
+
+                            if (item.contains("LOW STOCK")) {
+                                setStyle("-fx-text-fill: #dc3545; -fx-font-weight: bold;");
+                            } else {
+                                setStyle("");
+                            }
+                        }
+                    }
+                });
+            }
+
+            if (totalFeedTypesLabel != null) {
+                totalFeedTypesLabel.setText(String.valueOf(feeds.size()));
+            }
+        } catch (Exception e) {
+            System.err.println("Error loading feed data: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     /**
-     * Load and display medications data
+     * Load and display medications inventory
      */
     private void loadMedicationsData() {
-        // TODO: Get all medications from MedicationDAO
+        try {
+            List<Medication> medications = medicationDAO.getAllMedications();
 
-        // TODO: Count total medications
+            medicationList.clear();
 
-        // TODO: Count low stock medications
+            for (Medication medication : medications) {
+                String medicationInfo;
 
-        // TODO: Update totalMedicationsLabel
+                if (medication.getExpiryDate() != null && medication.getSupplier() != null) {
+                    medicationInfo = String.format("%s (%s) - %d %s\nExpire: %s | Fournisseur: %s",
+                            medication.getName(),
+                            medication.getType(),
+                            medication.getQuantity(),
+                            medication.getUnit(),
+                            medication.getExpiryDate().toString(),
+                            medication.getSupplier());
+                } else if (medication.getExpiryDate() != null) {
+                    medicationInfo = String.format("%s (%s) - %d %s\nExpire: %s",
+                            medication.getName(),
+                            medication.getType(),
+                            medication.getQuantity(),
+                            medication.getUnit(),
+                            medication.getExpiryDate().toString());
+                } else {
+                    medicationInfo = String.format("%s (%s) - %d %s",
+                            medication.getName(),
+                            medication.getType(),
+                            medication.getQuantity(),
+                            medication.getUnit());
+                }
 
-        // TODO: Update lowStockMedicationsLabel
+                if (medication.isExpired()) {
+                    medicationInfo = "🚫 EXPIRÉ - " + medicationInfo;
+                } else if (medication.isLowStock()) {
+                    medicationInfo = "⚠️ STOCK BAS - " + medicationInfo;
+                }
 
-        // TODO: Apply warning badge if low stock > 0
+                medicationList.add(medicationInfo);
+            }
+
+            if (medicationListView != null) {
+                medicationListView.setItems(medicationList);
+
+                medicationListView.setCellFactory(param -> new ListCell<String>() {
+                    @Override
+                    protected void updateItem(String item, boolean empty) {
+                        super.updateItem(item, empty);
+
+                        if (empty || item == null) {
+                            setText(null);
+                            setStyle("");
+                        } else {
+                            setText(item);
+
+                            if (item.contains("EXPIRÉ")) {
+                                setStyle("-fx-text-fill: #b91c1c; -fx-font-weight: bold; -fx-background-color: #fee2e2;");
+                            } else if (item.contains("STOCK BAS")) {
+                                setStyle("-fx-text-fill: #ea580c; -fx-font-weight: bold; -fx-background-color: #ffedd5;");
+                            } else {
+                                setStyle("");
+                            }
+                        }
+                    }
+                });
+            }
+
+            if (totalMedicationsLabel != null) {
+                totalMedicationsLabel.setText(String.valueOf(medications.size()));
+            }
+        } catch (Exception e) {
+            System.err.println("Error loading medications data: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     /**
-     * Load and display equipment table
+     * Load and display equipment categories as cards
      */
-    private void loadEquipmentData() {
-        // TODO: Get all equipment from EquipmentDAO
+    private void loadEquipmentCategories() {
+        if (equipmentCategoriesContainer == null) return;
 
-        // TODO: Add to equipmentList
+        try {
+            // Clear existing cards
+            equipmentCategoriesContainer.getChildren().clear();
 
-        // TODO: Update equipmentTable
+            // Get all categories with item counts
+            List<EquipmentCategory> categories = equipmentCategoryDAO.getAllCategoriesWithCounts();
 
-        // TODO: Sort by status (Broken first)
+            // Create a card for each category
+            for (EquipmentCategory category : categories) {
+                VBox categoryCard = createCategoryCard(category);
+                equipmentCategoriesContainer.getChildren().add(categoryCard);
+            }
+
+            // If no categories, show message
+            if (categories.isEmpty()) {
+                Label emptyLabel = new Label("Aucune catégorie d'équipement. Cliquez sur 'Ajouter Équipement' pour commencer.");
+                emptyLabel.setStyle("-fx-text-fill: #6b7280; -fx-font-style: italic; -fx-padding: 20;");
+                equipmentCategoriesContainer.getChildren().add(emptyLabel);
+            }
+
+        } catch (Exception e) {
+            System.err.println("Error loading equipment categories: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Create a card UI for an equipment category
+     */
+    private VBox createCategoryCard(EquipmentCategory category) {
+        VBox card = new VBox(10);
+        card.setStyle("-fx-background-color: white; -fx-padding: 15; -fx-border-color: #e5e7eb; " +
+                "-fx-border-radius: 8; -fx-background-radius: 8; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 4, 0, 0, 2);");
+        card.setPrefWidth(300);
+        VBox.setMargin(card, new Insets(10, 10, 10, 10));
+
+        // Header with category name and type badge
+        HBox header = new HBox(10);
+        header.setAlignment(Pos.CENTER_LEFT);
+
+        Label nameLabel = new Label(category.getName());
+        nameLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
+
+        Label typeBadge = new Label(category.getCategory());
+        typeBadge.setStyle("-fx-background-color: #dbeafe; -fx-text-fill: #1e40af; " +
+                "-fx-padding: 4 8; -fx-background-radius: 4; -fx-font-size: 11px;");
+
+        header.getChildren().addAll(nameLabel, typeBadge);
+
+        // Item count
+        Label countLabel = new Label("Quantité: " + category.getItemCount());
+        countLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #374151;");
+
+        // Location
+        Label locationLabel = new Label("📍 " + (category.getLocation() != null ? category.getLocation() : "Non spécifié"));
+        locationLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #6b7280;");
+
+        // Notes (if exists)
+        Label notesLabel = null;
+        if (category.getNotes() != null && !category.getNotes().isEmpty()) {
+            notesLabel = new Label("Note: " + category.getNotes());
+            notesLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: #9ca3af; -fx-wrap-text: true;");
+            notesLabel.setMaxWidth(270);
+        }
+
+        // Manage button
+        Button manageButton = new Button("Modifier Catégorie");
+        manageButton.setStyle("-fx-background-color: #3b82f6; -fx-text-fill: white; " +
+                "-fx-padding: 8 16; -fx-background-radius: 6; -fx-cursor: hand;");
+        manageButton.setOnAction(e -> handleManageCategory(category));
+
+        // Add all elements to card
+        card.getChildren().addAll(header, countLabel, locationLabel);
+        if (notesLabel != null) {
+            card.getChildren().add(notesLabel);
+        }
+        card.getChildren().add(manageButton);
+
+        return card;
+    }
+
+    /**
+     * Handle manage category button click
+     * Opens dialog to manage items in this category
+     */
+    private void handleManageCategory(EquipmentCategory category) {
+        try {
+            // Load Manage Items Dialog
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/dialogs/ManageEquipmentItemsDialog.fxml"));
+            Parent root = loader.load();
+
+            // Get controller and set category
+            ManageEquipmentItemsDialogController controller = loader.getController();
+            controller.setCategory(category);
+
+            // Create dialog stage
+            Stage dialogStage = new Stage();
+            dialogStage.setTitle("Gérer: " + category.getName());
+            dialogStage.initModality(Modality.WINDOW_MODAL);
+            dialogStage.initOwner(addEquipmentCategoryButton.getScene().getWindow());
+            dialogStage.setScene(new Scene(root));
+
+            controller.setDialogStage(dialogStage);
+
+            // Show dialog and wait
+            dialogStage.showAndWait();
+
+            // Refresh categories after dialog closes
+            loadEquipmentCategories();
+
+        } catch (IOException e) {
+            System.err.println("Error opening Manage Items dialog: " + e.getMessage());
+            e.printStackTrace();
+            showError("Erreur lors de l'ouverture du dialogue");
+        }
+    }
+
+    /**
+     * Handle add equipment category button click
+     */
+    @FXML
+    public void handleAddEquipmentCategory() {
+        try {
+            // Load Add Category Dialog
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/dialogs/AddEquipmentCategoryDialog.fxml"));
+            Parent root = loader.load();
+
+            // Get controller
+            AddEquipmentCategoryDialogController controller = loader.getController();
+
+            // Create dialog stage
+            Stage dialogStage = new Stage();
+            dialogStage.setTitle("Ajouter Catégorie d'Équipement");
+            dialogStage.initModality(Modality.WINDOW_MODAL);
+            dialogStage.initOwner(addEquipmentCategoryButton.getScene().getWindow());
+            dialogStage.setScene(new Scene(root));
+
+            controller.setDialogStage(dialogStage);
+
+            // Show dialog and wait
+            dialogStage.showAndWait();
+
+            // Refresh categories if save was clicked
+            if (controller.isSaveClicked()) {
+                loadEquipmentCategories();
+            }
+
+        } catch (IOException e) {
+            System.err.println("Error opening Add Category dialog: " + e.getMessage());
+            e.printStackTrace();
+            showError("Erreur lors de l'ouverture du dialogue");
+        }
     }
 
     /**
      * Handle add feed button click
-     * Opens dialog to add new feed or restock existing
+     * UNCHANGED - Same as before
      */
     @FXML
     public void handleAddFeed() {
-        // TODO: Open add/restock feed dialog
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/dialogs/AddEditFeedDialog.fxml"));
+            Parent root = loader.load();
 
-        // TODO: Get feed details (name, type, quantity, price)
+            Stage dialogStage = new Stage();
+            dialogStage.setTitle("Ajouter Aliment");
+            dialogStage.initModality(Modality.WINDOW_MODAL);
+            dialogStage.initOwner(addFeedButton.getScene().getWindow());
+            dialogStage.setScene(new Scene(root));
 
-        // TODO: Check if feed exists
+            dialogStage.showAndWait();
 
-        // TODO: If exists, update quantity (restock)
+            loadFeedData();
 
-        // TODO: If new, create Feed record
-
-        // TODO: Save to database
-
-        // TODO: Refresh feed data
+        } catch (IOException e) {
+            System.err.println("Error opening Add Feed dialog: " + e.getMessage());
+            e.printStackTrace();
+            showError("Erreur lors de l'ouverture du dialogue");
+        }
     }
 
     /**
      * Handle use feed button click
-     * Opens dialog to deduct feed from inventory
+     * NOW opens dialog that asks for quantity AND worker
      */
     @FXML
     public void handleUseFeed() {
-        // TODO: Open use feed dialog
+        // Get selected feed from list
+        String selectedFeedStr = feedListView.getSelectionModel().getSelectedItem();
 
-        // TODO: Get feed selection
+        if (selectedFeedStr == null) {
+            showWarning("Aucune sélection", "Veuillez sélectionner un aliment à utiliser");
+            return;
+        }
 
-        // TODO: Get quantity to use
+        // Extract feed name from the string
+        String feedName = selectedFeedStr.split(" - ")[0].trim();
 
-        // TODO: Validate available quantity
+        // Find the feed object
+        List<Feed> feeds = feedDAO.getAllFeed();
+        Feed selectedFeed = feeds.stream()
+                .filter(f -> f.getName().equals(feedName))
+                .findFirst()
+                .orElse(null);
 
-        // TODO: Deduct from inventory
+        if (selectedFeed == null) {
+            showError("Aliment introuvable");
+            return;
+        }
 
-        // TODO: Save to database
+        try {
+            // Load Use Feed Dialog
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/dialogs/UseFeedDialog.fxml"));
+            Parent root = loader.load();
 
-        // TODO: Refresh feed data
+            // Get controller and set feed
+            UseFeedDialogController controller = loader.getController();
+            controller.setFeed(selectedFeed);
+
+            // Create dialog stage
+            Stage dialogStage = new Stage();
+            dialogStage.setTitle("Utiliser Aliment");
+            dialogStage.initModality(Modality.WINDOW_MODAL);
+            dialogStage.initOwner(useFeedButton.getScene().getWindow());
+            dialogStage.setScene(new Scene(root));
+
+            controller.setDialogStage(dialogStage);
+
+            // Show dialog and wait
+            dialogStage.showAndWait();
+
+            // Refresh if usage was recorded
+            if (controller.isUsageRecorded()) {
+                loadFeedData();
+            }
+
+        } catch (IOException e) {
+            System.err.println("Error opening Use Feed dialog: " + e.getMessage());
+            e.printStackTrace();
+            showError("Erreur lors de l'ouverture du dialogue");
+        }
     }
 
     /**
      * Handle add medication button click
-     * Opens dialog to add new medication or restock
+     * UNCHANGED - Same as before
      */
     @FXML
     public void handleAddMedication() {
-        // TODO: Open add/restock medication dialog
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/dialogs/AddEditMedicationDialog.fxml"));
+            Parent root = loader.load();
 
-        // TODO: Get medication details
+            Stage dialogStage = new Stage();
+            dialogStage.setTitle("Ajouter Médicament");
+            dialogStage.initModality(Modality.WINDOW_MODAL);
+            dialogStage.initOwner(addMedicationButton.getScene().getWindow());
+            dialogStage.setScene(new Scene(root));
 
-        // TODO: Check if medication exists
+            dialogStage.showAndWait();
 
-        // TODO: Update or create record
+            loadMedicationsData();
 
-        // TODO: Save to database
-
-        // TODO: Refresh medications data
+        } catch (IOException e) {
+            System.err.println("Error opening Add Medication dialog: " + e.getMessage());
+            e.printStackTrace();
+            showError("Erreur lors de l'ouverture du dialogue");
+        }
     }
 
     /**
      * Handle use medication button click
-     * Opens dialog to deduct medication from inventory
+     * NOW opens dialog that asks for quantity AND worker
      */
     @FXML
     public void handleUseMedication() {
-        // TODO: Open use medication dialog
+        String selectedMedStr = medicationListView.getSelectionModel().getSelectedItem();
 
-        // TODO: Get medication selection
+        if (selectedMedStr == null) {
+            showWarning("Aucune sélection", "Veuillez sélectionner un médicament à utiliser");
+            return;
+        }
 
-        // TODO: Get quantity to use
+        // Extract medication name
+        String medName = selectedMedStr;
+        if (medName.contains("EXPIRÉ")) {
+            medName = medName.replace("🚫 EXPIRÉ - ", "");
+        } else if (medName.contains("STOCK BAS")) {
+            medName = medName.replace("⚠️ STOCK BAS - ", "");
+        }
+        medName = medName.split(" \\(")[0].trim();
 
-        // TODO: Validate available quantity
+        final String MedName = medName;
+        List<Medication> medications = medicationDAO.getAllMedications();
+        Medication selectedMed = medications.stream()
+                .filter(m -> m.getName().equals(MedName))
+                .findFirst()
+                .orElse(null);
 
-        // TODO: Deduct from inventory
+        if (selectedMed == null) {
+            showError("Médicament introuvable");
+            return;
+        }
 
-        // TODO: Save to database
+        if (selectedMed.isExpired()) {
+            showWarning("Médicament expiré", "Ce médicament est expiré et ne devrait pas être utilisé");
+            return;
+        }
 
-        // TODO: Refresh medications data
-    }
+        try {
+            // Load Use Medication Dialog
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/dialogs/UseMedicationDialog.fxml"));
+            Parent root = loader.load();
 
-    /**
-     * Handle add equipment button click
-     * Opens dialog to add new equipment
-     */
-    @FXML
-    public void handleAddEquipment() {
-        // TODO: Open add equipment dialog
+            // Get controller and set medication
+            UseMedicationDialogController controller = loader.getController();
+            controller.setMedication(selectedMed);
 
-        // TODO: Get equipment details
+            // Create dialog stage
+            Stage dialogStage = new Stage();
+            dialogStage.setTitle("Utiliser Médicament");
+            dialogStage.initModality(Modality.WINDOW_MODAL);
+            dialogStage.initOwner(useMedicationButton.getScene().getWindow());
+            dialogStage.setScene(new Scene(root));
 
-        // TODO: Create Equipment record
+            controller.setDialogStage(dialogStage);
 
-        // TODO: Save to database
+            // Show dialog and wait
+            dialogStage.showAndWait();
 
-        // TODO: Refresh equipment table
-    }
+            // Refresh if usage was recorded
+            if (controller.isUsageRecorded()) {
+                loadMedicationsData();
+            }
 
-    /**
-     * Handle update equipment status button click
-     * Opens dialog to change equipment status
-     */
-    @FXML
-    public void handleUpdateEquipmentStatus() {
-        // TODO: Get selected equipment from table
-
-        // TODO: If nothing selected, show error
-
-        // TODO: Open update status dialog
-
-        // TODO: Get new status (Good/Fair/Broken)
-
-        // TODO: Update equipment record
-
-        // TODO: Save to database
-
-        // TODO: Refresh equipment table
+        } catch (IOException e) {
+            System.err.println("Error opening Use Medication dialog: " + e.getMessage());
+            e.printStackTrace();
+            showError("Erreur lors de l'ouverture du dialogue");
+        }
     }
 
     /**
@@ -260,10 +586,34 @@ public class StorageController {
      */
     @FXML
     public void refreshData() {
-        // TODO: Reload feed data
+        loadFeedData();
+        loadMedicationsData();
+        loadEquipmentCategories();
+    }
 
-        // TODO: Reload medications data
+    // Helper methods for showing alerts
 
-        // TODO: Reload equipment data
+    private void showError(String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Erreur");
+        alert.setHeaderText("Une erreur s'est produite");
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+
+    private void showSuccess(String message) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Succès");
+        alert.setHeaderText("Opération réussie");
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+
+    private void showWarning(String header, String message) {
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setTitle("Attention");
+        alert.setHeaderText(header);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 }

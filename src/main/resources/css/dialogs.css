@@ -1,0 +1,563 @@
+/*=====================================================================================*/
+/*================================== DIALOG STYLES ====================================*/
+/*=====================================================================================*/
+
+/* ============= BASE DIALOG STYLING ============= */
+.dialog-root {
+    -fx-background-color: #ffffff;
+    -fx-padding: 20px;
+}
+
+.dialog-root * {
+    -fx-text-fill: #333333;
+}
+
+/* ============= DIALOG TITLE ============= */
+.dialog-title {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1e2939;
+    -fx-font-family: 'Segoe UI', Arial, sans-serif;
+}
+
+.dialog-subtitle {
+    -fx-font-size: 13px;
+    -fx-text-fill: #666666;
+    -fx-font-family: 'Segoe UI', Arial, sans-serif;
+}
+
+/* ============= LABELS ============= */
+.dialog-root .label {
+    -fx-text-fill: #333333;
+    -fx-font-family: 'Segoe UI', Arial, sans-serif;
+}
+
+.field-label {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #333333;
+}
+
+.info-label {
+    -fx-font-size: 11px;
+    -fx-text-fill: #666666;
+}
+
+.error-label {
+    -fx-font-size: 11px;
+    -fx-text-fill: #dc3545;
+}
+
+/* ============= TEXT FIELDS ============= */
+.dialog-root .text-field,
+.dialog-root .text-area {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #ced4da;
+    -fx-border-width: 1px;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+    -fx-padding: 8px 12px;
+    -fx-font-size: 13px;
+    -fx-text-fill: #333333;
+    -fx-prompt-text-fill: #999999;
+}
+
+.dialog-root .text-field:focused,
+.dialog-root .text-area:focused {
+    -fx-border-color: #ff781a;
+    -fx-effect: dropshadow(gaussian, rgba(255,120,26,0.25), 8, 0, 0, 0);
+}
+
+.dialog-root .text-field:hover,
+.dialog-root .text-area:hover {
+    -fx-border-color: #ff9800;
+}
+
+/* ============= COMBO BOX ============= */
+.dialog-root .combo-box {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #ced4da;
+    -fx-border-width: 1px;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+    -fx-padding: 4px 8px;
+}
+
+.dialog-root .combo-box:focused {
+    -fx-border-color: #ff781a;
+}
+
+.dialog-root .combo-box .list-cell {
+    -fx-text-fill: #333333;
+    -fx-background-color: #ffffff;
+}
+
+.dialog-root .combo-box-popup .list-view {
+    -fx-background-color: #ffffff;
+}
+
+.dialog-root .combo-box-popup .list-view .list-cell {
+    -fx-text-fill: #333333;
+    -fx-background-color: #ffffff;
+    -fx-padding: 8px 12px;
+}
+
+.dialog-root .combo-box-popup .list-view .list-cell:hover {
+    -fx-background-color: #f5f5f5;
+}
+
+.dialog-root .combo-box-popup .list-view .list-cell:selected {
+    -fx-background-color: #ff781a;
+    -fx-text-fill: #ffffff;
+}
+
+/* ============= DATE PICKER ============= */
+.dialog-root .date-picker {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #ced4da;
+    -fx-border-width: 1px;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+}
+
+.dialog-root .date-picker .text-field {
+    -fx-background-color: transparent;
+    -fx-border-width: 0;
+}
+
+.dialog-root .date-picker:focused {
+    -fx-border-color: #ff781a;
+}
+
+/* ============= SPINNER ============= */
+.dialog-root .spinner {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #ced4da;
+    -fx-border-width: 1px;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+}
+
+.dialog-root .spinner .text-field {
+    -fx-background-color: transparent;
+    -fx-text-fill: #333333;
+}
+
+.dialog-root .spinner .increment-arrow-button,
+.dialog-root .spinner .decrement-arrow-button {
+    -fx-background-color: #f8f9fa;
+    -fx-border-color: #ced4da;
+}
+
+.dialog-root .spinner .increment-arrow-button:hover,
+.dialog-root .spinner .decrement-arrow-button:hover {
+    -fx-background-color: #e9ecef;
+}
+
+/* ============= CHECK BOX ============= */
+.dialog-root .check-box {
+    -fx-text-fill: #333333;
+}
+
+.dialog-root .check-box .box {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #ced4da;
+    -fx-border-width: 1px;
+    -fx-border-radius: 3px;
+    -fx-background-radius: 3px;
+}
+
+.dialog-root .check-box:selected .box {
+    -fx-background-color: #ff781a;
+    -fx-border-color: #ff781a;
+}
+
+.dialog-root .check-box:selected .mark {
+    -fx-background-color: #ffffff;
+}
+
+/* ============= BUTTONS ============= */
+.dialog-btn-primary {
+    -fx-background-color: #28a745;
+    -fx-text-fill: #ffffff;
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
+    -fx-padding: 10px 24px;
+    -fx-background-radius: 6px;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(40,167,69,0.3), 8, 0, 0, 2);
+}
+
+.dialog-btn-primary:hover {
+    -fx-background-color: #218838;
+    -fx-effect: dropshadow(gaussian, rgba(40,167,69,0.4), 12, 0, 0, 4);
+}
+
+.dialog-btn-primary:pressed {
+    -fx-background-color: #1e7e34;
+    -fx-effect: dropshadow(gaussian, rgba(40,167,69,0.2), 5, 0, 0, 1);
+}
+
+.dialog-btn-secondary {
+    -fx-background-color: #6c757d;
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 13px;
+    -fx-padding: 10px 24px;
+    -fx-background-radius: 6px;
+    -fx-cursor: hand;
+}
+
+.dialog-btn-secondary:hover {
+    -fx-background-color: #5a6268;
+}
+
+.dialog-btn-secondary:pressed {
+    -fx-background-color: #545b62;
+}
+
+.dialog-btn-danger {
+    -fx-background-color: #dc3545;
+    -fx-text-fill: #ffffff;
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
+    -fx-padding: 10px 24px;
+    -fx-background-radius: 6px;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(220,53,69,0.3), 8, 0, 0, 2);
+}
+
+.dialog-btn-danger:hover {
+    -fx-background-color: #c82333;
+    -fx-effect: dropshadow(gaussian, rgba(220,53,69,0.4), 12, 0, 0, 4);
+}
+
+.dialog-btn-warning {
+    -fx-background-color: #ff9800;
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 12px;
+    -fx-padding: 6px 16px;
+    -fx-background-radius: 5px;
+    -fx-cursor: hand;
+}
+
+.dialog-btn-warning:hover {
+    -fx-background-color: #f57c00;
+}
+
+.dialog-btn-purple {
+    -fx-background-color: #9c27b0;
+    -fx-text-fill: #ffffff;
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
+    -fx-padding: 10px 24px;
+    -fx-background-radius: 6px;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(156,39,176,0.3), 8, 0, 0, 2);
+}
+
+.dialog-btn-purple:hover {
+    -fx-background-color: #7b1fa2;
+    -fx-effect: dropshadow(gaussian, rgba(156,39,176,0.4), 12, 0, 0, 4);
+}
+
+/* ============= SECTIONS / CARDS ============= */
+.dialog-section {
+    -fx-background-color: #ffffff;
+    -fx-padding: 15px;
+    -fx-background-radius: 8px;
+    -fx-border-radius: 8px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 0, 2);
+}
+
+.dialog-section .label {
+    -fx-text-fill: #333333;
+}
+
+.dialog-section-dayold {
+    -fx-background-color: #e3f2fd;
+    -fx-padding: 15px;
+    -fx-background-radius: 8px;
+}
+
+.dialog-section-dayold .label {
+    -fx-text-fill: #1565c0;
+}
+
+.dialog-section-female {
+    -fx-background-color: #fce4ec;
+    -fx-padding: 15px;
+    -fx-background-radius: 8px;
+}
+
+.dialog-section-female .label {
+    -fx-text-fill: #333333;
+}
+
+.dialog-section-female .section-title {
+    -fx-text-fill: #c2185b;
+}
+
+.dialog-section-male {
+    -fx-background-color: #fff3e0;
+    -fx-padding: 15px;
+    -fx-background-radius: 8px;
+}
+
+.dialog-section-male .label {
+    -fx-text-fill: #333333;
+}
+
+.dialog-section-male .section-title {
+    -fx-text-fill: #e65100;
+}
+
+.dialog-section-transfer {
+    -fx-background-color: #f3e5f5;
+    -fx-padding: 15px;
+    -fx-background-radius: 8px;
+}
+
+.dialog-section-transfer .label {
+    -fx-text-fill: #333333;
+}
+
+.dialog-section-transfer .section-title {
+    -fx-text-fill: #7b1fa2;
+}
+
+.dialog-section-sell {
+    -fx-background-color: #fff8e1;
+    -fx-padding: 15px;
+    -fx-background-radius: 8px;
+}
+
+.dialog-section-sell .label {
+    -fx-text-fill: #333333;
+}
+
+/* ============= INFO BOXES ============= */
+.info-box {
+    -fx-background-color: #e3f2fd;
+    -fx-padding: 10px 15px;
+    -fx-background-radius: 5px;
+}
+
+.info-box .label {
+    -fx-text-fill: #1565c0;
+}
+
+.info-box-success {
+    -fx-background-color: #e8f5e9;
+    -fx-padding: 10px 15px;
+    -fx-background-radius: 5px;
+}
+
+.info-box-success .label {
+    -fx-text-fill: #2e7d32;
+}
+
+.info-box-warning {
+    -fx-background-color: #fff3cd;
+    -fx-padding: 10px 15px;
+    -fx-background-radius: 5px;
+}
+
+.info-box-warning .label {
+    -fx-text-fill: #856404;
+}
+
+.info-box-danger {
+    -fx-background-color: #f8d7da;
+    -fx-padding: 10px 15px;
+    -fx-background-radius: 5px;
+}
+
+.info-box-danger .label {
+    -fx-text-fill: #721c24;
+}
+
+/* ============= SCROLL PANE ============= */
+.dialog-root .scroll-pane {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+}
+
+.dialog-root .scroll-pane .viewport {
+    -fx-background-color: transparent;
+}
+
+.dialog-root .scroll-pane .scroll-bar {
+    -fx-background-color: #f5f5f5;
+}
+
+.dialog-root .scroll-pane .scroll-bar .thumb {
+    -fx-background-color: #cccccc;
+    -fx-background-radius: 4px;
+}
+
+.dialog-root .scroll-pane .scroll-bar .thumb:hover {
+    -fx-background-color: #999999;
+}
+
+/* ============= SEPARATOR ============= */
+.dialog-root .separator .line {
+    -fx-border-color: #e0e0e0;
+    -fx-border-width: 1px 0 0 0;
+}
+
+/* ============= GRID PANE ============= */
+.dialog-root .grid-pane {
+    -fx-background-color: transparent;
+}
+
+/* ============= HOUSE CARD IN DIALOGS ============= */
+.house-assignment-row {
+    -fx-background-color: #ffffff;
+    -fx-padding: 8px 12px;
+    -fx-background-radius: 5px;
+    -fx-border-color: #e0e0e0;
+    -fx-border-width: 1px;
+    -fx-border-radius: 5px;
+}
+
+.house-assignment-row .label {
+    -fx-text-fill: #333333;
+}
+
+.house-assignment-row .text-field {
+    -fx-pref-width: 80px;
+}
+
+.house-checkbox-row {
+    -fx-background-color: #ffffff;
+    -fx-padding: 10px 15px;
+    -fx-background-radius: 5px;
+    -fx-border-color: #e0e0e0;
+    -fx-border-width: 1px;
+    -fx-border-radius: 5px;
+}
+
+.house-checkbox-row .label {
+    -fx-text-fill: #333333;
+}
+
+.house-checkbox-row .check-box {
+    -fx-text-fill: #333333;
+}
+
+.house-checkbox-row:hover {
+    -fx-background-color: #f8f9fa;
+    -fx-border-color: #ff781a;
+}
+
+/* ============= CAPACITY INDICATORS ============= */
+.capacity-label {
+    -fx-font-size: 11px;
+    -fx-text-fill: #666666;
+}
+
+.capacity-available {
+    -fx-text-fill: #28a745;
+    -fx-font-weight: bold;
+}
+
+.capacity-full {
+    -fx-text-fill: #dc3545;
+    -fx-font-weight: bold;
+}
+
+/* ============= STAT HIGHLIGHTS ============= */
+.stat-highlight {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+}
+
+.stat-highlight-blue {
+    -fx-text-fill: #1976D2;
+}
+
+.stat-highlight-green {
+    -fx-text-fill: #2e7d32;
+}
+
+.stat-highlight-orange {
+    -fx-text-fill: #f57c00;
+}
+
+.stat-highlight-purple {
+    -fx-text-fill: #7b1fa2;
+}
+
+.stat-highlight-red {
+    -fx-text-fill: #dc3545;
+}
+
+/* ============= CONFIG HOUSES SPECIFIC ============= */
+.config-section-dayold {
+    -fx-background-color: #ffffff;
+    -fx-padding: 15px;
+    -fx-background-radius: 8px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 0, 2);
+}
+
+.config-section-dayold .section-header {
+    -fx-text-fill: #2196F3;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+
+.config-section-egglayer {
+    -fx-background-color: #ffffff;
+    -fx-padding: 15px;
+    -fx-background-radius: 8px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 0, 2);
+}
+
+.config-section-egglayer .section-header {
+    -fx-text-fill: #E91E63;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+
+.config-section-femalemeat {
+    -fx-background-color: #ffffff;
+    -fx-padding: 15px;
+    -fx-background-radius: 8px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 0, 2);
+}
+
+.config-section-femalemeat .section-header {
+    -fx-text-fill: #9C27B0;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+
+.config-section-malemeat {
+    -fx-background-color: #ffffff;
+    -fx-padding: 15px;
+    -fx-background-radius: 8px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 0, 2);
+}
+
+.config-section-malemeat .section-header {
+    -fx-text-fill: #FF9800;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+
+/* ============= HOUSE TYPE COLORS ============= */
+.type-dayold {
+    -fx-text-fill: #2196F3;
+}
+
+.type-egglayer {
+    -fx-text-fill: #E91E63;
+}
+
+.type-femalemeat {
+    -fx-text-fill: #9C27B0;
+}
+
+.type-malemeat {
+    -fx-text-fill: #FF9800;
+}

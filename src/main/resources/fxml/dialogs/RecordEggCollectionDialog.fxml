@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="ma.farm.controller.dialogs.RecordEggCollectionDialogController"
+      prefWidth="520.0"
+      prefHeight="550.0"
+      spacing="15"
+      style="-fx-background-color: #ffffff;">
+
+    <padding>
+        <Insets bottom="20.0" left="25.0" right="25.0" top="20.0"/>
+    </padding>
+
+    <!-- Dialog Title -->
+    <VBox spacing="5.0">
+        <Label text="🥚 Enregistrer la Collecte"
+               style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #1e2939;"/>
+        <Label text="Enregistrer la collecte des oeufs pour une maison."
+               style="-fx-font-size: 13px; -fx-text-fill: #666666;"/>
+    </VBox>
+
+    <Separator/>
+
+    <!-- Error Label -->
+    <Label fx:id="errorLabel"
+           style="-fx-text-fill: #dc3545; -fx-padding: 10; -fx-background-color: #f8d7da; -fx-border-color: #f5c6cb; -fx-border-radius: 5; -fx-background-radius: 5;"
+           text="Error message" visible="false" managed="false" wrapText="true"/>
+
+    <!-- Form Content -->
+    <VBox spacing="15.0" VBox.vgrow="ALWAYS">
+
+        <!-- House Selection -->
+        <VBox spacing="8.0">
+            <Label text="Selectionner la Maison" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #333333;"/>
+            <ComboBox fx:id="houseSelector" promptText="Choisir une maison pondeuse..." maxWidth="Infinity"
+                      style="-fx-background-color: #ffffff; -fx-border-color: #ced4da; -fx-border-radius: 5; -fx-background-radius: 5;"/>
+        </VBox>
+
+        <!-- Eggs Collected -->
+        <VBox spacing="8.0">
+            <Label text="Oeufs Collectes" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #333333;"/>
+            <TextField fx:id="eggsCollectedField" promptText="Nombre d oeufs collectes..."
+                       style="-fx-background-color: #ffffff; -fx-border-color: #ced4da; -fx-border-radius: 5; -fx-background-radius: 5; -fx-padding: 8 12;"/>
+        </VBox>
+
+        <!-- Cracked Eggs -->
+        <VBox spacing="8.0">
+            <Label text="Oeufs Casses" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #333333;"/>
+            <TextField fx:id="crackedEggsField" promptText="Nombre d oeufs casses..."
+                       style="-fx-background-color: #ffffff; -fx-border-color: #ced4da; -fx-border-radius: 5; -fx-background-radius: 5; -fx-padding: 8 12;"/>
+        </VBox>
+
+        <!-- Date Picker -->
+        <VBox spacing="8.0">
+            <Label text="Date de Collecte" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #333333;"/>
+            <DatePicker fx:id="collectionDatePicker" maxWidth="Infinity"/>
+        </VBox>
+
+        <!-- Notes -->
+        <VBox spacing="8.0">
+            <Label text="Notes (Optionnel)" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #333333;"/>
+            <TextArea fx:id="notesArea" promptText="Ajouter des notes..." prefRowCount="3" wrapText="true"
+                      style="-fx-background-color: #ffffff; -fx-border-color: #ced4da; -fx-border-radius: 5; -fx-background-radius: 5;"/>
+        </VBox>
+
+    </VBox>
+
+    <Separator/>
+
+    <!-- Button Bar -->
+    <HBox spacing="12.0" alignment="CENTER_RIGHT" style="-fx-padding: 10 0 0 0;">
+        <Button fx:id="cancelButton" text="Annuler"
+                style="-fx-background-color: #6c757d; -fx-text-fill: white; -fx-font-size: 13px; -fx-padding: 10 24; -fx-background-radius: 6; -fx-cursor: hand;"
+                prefWidth="120"/>
+        <Button fx:id="saveButton" text="Enregistrer"
+                style="-fx-background-color: #28a745; -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold; -fx-padding: 10 24; -fx-background-radius: 6; -fx-cursor: hand;"
+                prefWidth="140"/>
+    </HBox>
+</VBox>

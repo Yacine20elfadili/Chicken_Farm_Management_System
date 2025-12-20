@@ -1,70 +1,202 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.Cursor?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
 
-<VBox xmlns="http://javafx.com/javafx"
-      xmlns:fx="http://javafx.com/fxml"
-      fx:controller="ma.farm.controller.SidebarController"
-      prefWidth="250.0"
-      spacing="10"
-      style="-fx-background-color: #2c3e50; -fx-padding: 20;">
+<VBox fx:id="sidebar" prefHeight="642.0" prefWidth="180.0" styleClass="side" stylesheets="@../css/style.css" VBox.vgrow="ALWAYS" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ma.farm.controller.SidebarController">
+    <children>
+        <HBox fx:id="sidebarHeader" alignment="CENTER_LEFT" prefHeight="300.0" spacing="10.0" styleClass="sidebar" VBox.vgrow="ALWAYS">
+            <children>
+                <ImageView fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
+                    <image>
+                        <Image url="@../images/logo.png" />
+                    </image>
+                </ImageView>
+                <Text fx:id="titleText" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Farm&#10;Management">
+                    <font>
+                        <Font name="Consolas" size="17.0" />
+                    </font>
+                </Text>
+            </children>
+            <padding>
+                <Insets left="10.0" />
+            </padding>
+        </HBox>
+        <!-- Main Sidebar -->
+        <VBox prefHeight="800.0" prefWidth="210.0" styleClass="sidebar" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <children>
 
-    <!-- App Title -->
-    <Label text="Chicken Farm"
-           style="-fx-text-fill: white; -fx-font-size: 20px; -fx-font-weight: bold; -fx-padding: 0 0 20 0;" />
+                <!-- Navigation Scrollable Area -->
+                <ScrollPane fx:id="sidebarScroll" fitToWidth="true" prefHeight="400.0" prefWidth="180.0" styleClass="sidebar">
+                    <content>
+                        <VBox fx:id="navContainer" fillWidth="true" styleClass="sidebar" VBox.vgrow="ALWAYS">
+                            <children>
+                                <AnchorPane fx:id="dashboardBtn" prefHeight="35.0" styleClass="sidebar-item">
+                                    <children>
+                                        <Label layoutX="54.0" layoutY="10.0" prefHeight="17.0" prefWidth="110.0" text="Tableau De Bord" textAlignment="CENTER" textFill="WHITE">
+                                            <font>
+                                                <Font name="Microsoft Sans Serif" size="14.0" />
+                                            </font>
+                                        </Label>
+                                        <ImageView fitHeight="24.0" fitWidth="24.0" layoutX="12.0" layoutY="7.0" pickOnBounds="true" preserveRatio="true">
+                                            <image>
+                                                <Image url="@../images/icons/dashboard.png" />
+                                            </image>
+                                        </ImageView>
+                                    </children>
+                                    <cursor>
+                                        <Cursor fx:constant="HAND" />
+                                    </cursor>
+                                </AnchorPane>
 
-    <!-- Navigation Buttons -->
-    <Button fx:id="dashboardBtn"
-            text="📊 Dashboard"
-            onAction="#showDashboard"
-            prefWidth="210"
-            prefHeight="45"
-            style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-size: 14px; -fx-cursor: hand;" />
+                                <AnchorPane fx:id="chickenBtn" prefHeight="35.0" styleClass="sidebar-item">
+                                    <children>
+                                        <Label layoutX="54.0" layoutY="10.0" prefHeight="17.0" prefWidth="89.0" text="Poulailler" textAlignment="CENTER" textFill="WHITE">
+                                            <font>
+                                                <Font name="Microsoft Sans Serif" size="14.0" />
+                                            </font>
+                                        </Label>
+                                        <ImageView fitHeight="24.0" fitWidth="24.0" layoutX="12.0" layoutY="7.0" pickOnBounds="true" preserveRatio="true">
+                                            <image>
+                                                <Image url="@../images/icons/chickens.png" />
+                                            </image>
+                                        </ImageView>
+                                    </children>
+                                    <cursor>
+                                        <Cursor fx:constant="HAND" />
+                                    </cursor>
+                                    <VBox.margin>
+                                        <Insets top="10.0" />
+                                    </VBox.margin>
+                                </AnchorPane>
 
-    <Button fx:id="chickenBayBtn"
-            text="🏠 Chicken Bay"
-            onAction="#showChickenBay"
-            prefWidth="210"
-            prefHeight="45"
-            style="-fx-background-color: #34495e; -fx-text-fill: white; -fx-font-size: 14px; -fx-cursor: hand;" />
+                                <AnchorPane fx:id="eggsBtn" prefHeight="35.0" styleClass="sidebar-item">
+                                    <children>
+                                        <Label layoutX="54.0" layoutY="10.0" prefHeight="17.0" prefWidth="89.0" text="Œufs" textAlignment="CENTER" textFill="WHITE">
+                                            <font>
+                                                <Font name="Microsoft Sans Serif" size="14.0" />
+                                            </font>
+                                        </Label>
+                                        <ImageView fitHeight="24.0" fitWidth="24.0" layoutX="12.0" layoutY="7.0" pickOnBounds="true" preserveRatio="true">
+                                            <image>
+                                                <Image url="@../images/icons/egg.png" />
+                                            </image>
+                                        </ImageView>
+                                    </children>
+                                    <cursor>
+                                        <Cursor fx:constant="HAND" />
+                                    </cursor>
+                                    <VBox.margin>
+                                        <Insets top="10.0" />
+                                    </VBox.margin>
+                                </AnchorPane>
 
-    <Button fx:id="eggsBayBtn"
-            text="🥚 Eggs Bay"
-            onAction="#showEggsBay"
-            prefWidth="210"
-            prefHeight="45"
-            style="-fx-background-color: #34495e; -fx-text-fill: white; -fx-font-size: 14px; -fx-cursor: hand;" />
+                                <AnchorPane fx:id="storageBtn" prefHeight="35.0" styleClass="sidebar-item">
+                                    <children>
+                                        <Label layoutX="54.0" layoutY="10.0" prefHeight="17.0" prefWidth="89.0" text="Réserve" textAlignment="CENTER" textFill="WHITE">
+                                            <font>
+                                                <Font name="Microsoft Sans Serif" size="14.0" />
+                                            </font>
+                                        </Label>
+                                        <ImageView fitHeight="24.0" fitWidth="24.0" layoutX="12.0" layoutY="7.0" pickOnBounds="true" preserveRatio="true">
+                                            <image>
+                                                <Image url="@../images/icons/box.png" />
+                                            </image>
+                                        </ImageView>
+                                    </children>
+                                    <cursor>
+                                        <Cursor fx:constant="HAND" />
+                                    </cursor>
+                                    <VBox.margin>
+                                        <Insets top="10.0" />
+                                    </VBox.margin>
+                                </AnchorPane>
 
-    <Button fx:id="storageBtn"
-            text="📦 Storage"
-            onAction="#showStorage"
-            prefWidth="210"
-            prefHeight="45"
-            style="-fx-background-color: #34495e; -fx-text-fill: white; -fx-font-size: 14px; -fx-cursor: hand;" />
+                                <AnchorPane fx:id="taskBtn" prefHeight="35.0" styleClass="sidebar-item">
+                                    <children>
+                                        <Label layoutX="54.0" layoutY="10.0" prefHeight="17.0" prefWidth="89.0" text="Tâches" textAlignment="CENTER" textFill="WHITE">
+                                            <font>
+                                                <Font name="Microsoft Sans Serif" size="14.0" />
+                                            </font>
+                                        </Label>
+                                        <ImageView fitHeight="24.0" fitWidth="24.0" layoutX="12.0" layoutY="7.0" pickOnBounds="true" preserveRatio="true">
+                                            <image>
+                                                <Image url="@../images/icons/tasks.png" />
+                                            </image>
+                                        </ImageView>
+                                    </children>
+                                    <cursor>
+                                        <Cursor fx:constant="HAND" />
+                                    </cursor>
+                                    <VBox.margin>
+                                        <Insets top="10.0" />
+                                    </VBox.margin>
+                                </AnchorPane>
 
-    <Button fx:id="tasksBtn"
-            text="✅ Tasks"
-            onAction="#showTasks"
-            prefWidth="210"
-            prefHeight="45"
-            style="-fx-background-color: #34495e; -fx-text-fill: white; -fx-font-size: 14px; -fx-cursor: hand;" />
+                                <AnchorPane fx:id="personnelBtn" prefHeight="35.0" styleClass="sidebar-item">
+                                    <children>
+                                        <Label layoutX="54.0" layoutY="10.0" prefHeight="17.0" prefWidth="89.0" text="Personnel" textAlignment="CENTER" textFill="WHITE">
+                                            <font>
+                                                <Font name="Microsoft Sans Serif" size="14.0" />
+                                            </font>
+                                        </Label>
+                                        <ImageView fitHeight="24.0" fitWidth="24.0" layoutX="12.0" layoutY="7.0" pickOnBounds="true" preserveRatio="true">
+                                            <image>
+                                                <Image url="@../images/icons/personnel.png" />
+                                            </image>
+                                        </ImageView>
+                                    </children>
+                                    <cursor>
+                                        <Cursor fx:constant="HAND" />
+                                    </cursor>
+                                    <VBox.margin>
+                                        <Insets top="10.0" />
+                                    </VBox.margin>
+                                </AnchorPane>
 
-    <Button fx:id="personnelBtn"
-            text="👨‍🌾 Personnel"
-            onAction="#showPersonnel"
-            prefWidth="210"
-            prefHeight="45"
-            style="-fx-background-color: #34495e; -fx-text-fill: white; -fx-font-size: 14px; -fx-cursor: hand;" />
-
-    <!-- Spacer to push logout button to bottom -->
-    <VBox VBox.vgrow="ALWAYS" />
-
-    <!-- Logout Button at Bottom -->
-    <Button text="🚪 Logout"
-            onAction="#handleLogout"
-            prefWidth="210"
-            prefHeight="45"
-            style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-size: 14px; -fx-cursor: hand;" />
+                            </children>
+                        </VBox>
+                    </content>
+                </ScrollPane>
+                <AnchorPane fx:id="logoutBtn" prefHeight="35.0" styleClass="logout-button">
+                    <children>
+                        <Label layoutX="54.0" layoutY="9.0" prefHeight="17.0" prefWidth="110.0" text="Déconnexion" textAlignment="CENTER" textFill="WHITE">
+                            <font>
+                                <Font name="Microsoft Sans Serif" size="14.0" />
+                            </font>
+                        </Label>
+                        <ImageView fitHeight="22.0" fitWidth="22.0" layoutX="12.0" layoutY="7.0" pickOnBounds="true" preserveRatio="true">
+                            <image>
+                                <Image url="@../images/icons/logout.png" />
+                            </image>
+                        </ImageView>
+                    </children>
+                    <cursor>
+                        <Cursor fx:constant="HAND" />
+                    </cursor>
+                    <VBox.margin>
+                        <Insets top="10.0" />
+                    </VBox.margin>
+                </AnchorPane>
+                <Button fx:id="sidebarMenu" mnemonicParsing="false" prefHeight="35.0" prefWidth="35.0" styleClass="menu-button" text="&lt;" textAlignment="CENTER">
+                    <VBox.margin>
+                        <Insets left="5.0" top="10.0" />
+                    </VBox.margin>
+               <font>
+                  <Font name="Verdana" size="1.0" />
+               </font>
+                </Button>
+            </children>
+        </VBox>
+    </children>
 </VBox>

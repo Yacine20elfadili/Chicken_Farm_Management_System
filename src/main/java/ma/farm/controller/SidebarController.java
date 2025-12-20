@@ -1,147 +1,147 @@
 package ma.farm.controller;
 
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
-
+import javafx.scene.control.ScrollPane;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
+import java.util.ArrayList;
+import java.util.List;
+import javafx.animation.*;
+import javafx.util.Duration;
 
 public class SidebarController {
 
-    @FXML
-    private Button dashboardBtn;
+    @FXML private VBox sidebar;
+    @FXML private HBox sidebarHeader;
 
-    @FXML
-    private Button chickenBayBtn;
+    @FXML private Text titleText;
 
-    @FXML
-    private Button eggsBayBtn;
+    @FXML private ScrollPane sidebarScroll;
 
-    @FXML
-    private Button storageBtn;
+    @FXML private AnchorPane dashboardBtn;
+    @FXML private AnchorPane chickenBtn;
+    @FXML private AnchorPane eggsBtn;
+    @FXML private AnchorPane storageBtn;
+    @FXML private AnchorPane taskBtn;
+    @FXML private AnchorPane personnelBtn;
+    @FXML private AnchorPane logoutBtn;
 
-    @FXML
-    private Button tasksBtn;
+    @FXML private Button sidebarMenu;
 
-    @FXML
-    private Button personnelBtn;
+    private final List<AnchorPane> modules = new ArrayList<>();
+    private boolean isCollapsed = false;
+    public final double expandedWidth = 180.0;
+    public final double collapsedWidth = 50.0;
+
+    // MAIN width controller
+    private final DoubleProperty sidebarWidth = new SimpleDoubleProperty(expandedWidth);
 
     private MainWindowController mainController;
 
-    /**
-     * Set the main controller for communication
-     */
+    @FXML
+    private void initialize() {
+
+        // Bind sidebar width to the animated property
+        sidebar.minWidthProperty().bind(sidebarWidth);
+        sidebar.maxWidthProperty().bind(sidebarWidth);
+        sidebar.prefWidthProperty().bind(sidebarWidth);
+
+        sidebarHeader.minWidthProperty().bind(sidebarWidth);
+        sidebarHeader.maxWidthProperty().bind(sidebarWidth);
+        sidebarHeader.prefWidthProperty().bind(sidebarWidth);
+
+        sidebarMenu.setText("<");
+        dashboardBtn.getStyleClass().add("sidebar-item-active");
+
+        modules.add(dashboardBtn);
+        modules.add(chickenBtn);
+        modules.add(eggsBtn);
+        modules.add(storageBtn);
+        modules.add(taskBtn);
+        modules.add(personnelBtn);
+        modules.add(logoutBtn);
+
+        for (AnchorPane module : modules) {
+            if (module != null) {
+                module.setOnMouseClicked(event -> activate(module));
+            }
+        }
+
+        sidebarMenu.setOnMouseClicked(event -> toggleSidebar());
+        sidebarScroll.setFitToWidth(true); // makes scroll content resize nicely
+    }
+
     public void setMainController(MainWindowController mainController) {
         this.mainController = mainController;
     }
 
-    /**
-     * Load Dashboard page
-     */
-    @FXML
-    private void showDashboard() {
-        if (mainController != null) {
-            mainController.showDashboard();
-        }
+
+    private void animateSidebar(double targetWidth) {
+        Timeline timeline = new Timeline(
+                new KeyFrame(Duration.millis(250),
+                        new KeyValue(sidebarWidth, targetWidth, Interpolator.EASE_BOTH)
+                )
+        );
+        timeline.play();
     }
 
-    /**
-     * Load Chicken Bay page
-     */
-    @FXML
-    private void showChickenBay() {
-        if (mainController != null) {
-            mainController.showChickenBay();
-        }
+    private void collapseSidebar() {
+        titleText.setVisible(false);
+        sidebarMenu.setText(">");
+
+        animateSidebar(collapsedWidth);
     }
 
-    /**
-     * Load Eggs Bay page
-     */
-    @FXML
-    private void showEggsBay() {
-        if (mainController != null) {
-            mainController.showEggsBay();
-        }
+    private void expandSidebar() {
+        titleText.setVisible(true);
+        sidebarMenu.setText("<");
+
+        animateSidebar(expandedWidth);
     }
 
-    /**
-     * Load Storage page
-     */
     @FXML
-    private void showStorage() {
-        if (mainController != null) {
-            mainController.showStorage();
+    private void toggleSidebar() {
+        if (isCollapsed) {
+            expandSidebar();
+            sidebar.getStyleClass().remove("sidebar-collapsed");
+            logoutBtn.getStyleClass().remove("sidebar-collapsed");
+            sidebarHeader.getStyleClass().remove("sidebar-collapsed");
+        } else {
+            collapseSidebar();
+            sidebar.getStyleClass().add("sidebar-collapsed");
+            logoutBtn.getStyleClass().add("sidebar-collapsed");
+            sidebarHeader.getStyleClass().add("sidebar-collapsed");
         }
+        isCollapsed = !isCollapsed;
     }
 
-    /**
-     * Load Tasks page
-     */
-    @FXML
-    private void showTasks() {
-        if (mainController != null) {
-            mainController.showTasks();
-        }
-    }
 
-    /**
-     * Load Personnel page
-     */
-    @FXML
-    private void showPersonnel() {
-        if (mainController != null) {
-            mainController.showPersonnel();
-        }
-    }
+    private void activate(AnchorPane module) {
+        if (module == null) return;
 
-    /**
-     * Handle logout - return to login page
-     */
-    @FXML
-    private void handleLogout() {
-        if (mainController != null) {
-            mainController.handleLogout();
-        }
-    }
-
-    /**
-     * Update active button style
-     * @param buttonName The name of the active button
-     */
-    public void setActiveButton(String buttonName) {
-        // Reset all buttons to default style
-        Button[] buttons = {dashboardBtn, chickenBayBtn, eggsBayBtn, storageBtn, tasksBtn, personnelBtn};
-
-        for (Button btn : buttons) {
-            if (btn != null) {
-                btn.setStyle("-fx-background-color: #34495e; -fx-text-fill: white; -fx-font-size: 14px; -fx-cursor: hand;");
+        for (AnchorPane ap : modules) {
+            if (ap != null) {
+                ap.getStyleClass().remove("sidebar-item-active");
             }
         }
 
-        // Highlight the active button
-        Button activeButton = null;
-        switch (buttonName) {
-            case "dashboard":
-                activeButton = dashboardBtn;
-                break;
-            case "chickenBay":
-                activeButton = chickenBayBtn;
-                break;
-            case "eggsBay":
-                activeButton = eggsBayBtn;
-                break;
-            case "storage":
-                activeButton = storageBtn;
-                break;
-            case "tasks":
-                activeButton = tasksBtn;
-                break;
-            case "personnel":
-                activeButton = personnelBtn;
-                break;
-        }
+        module.getStyleClass().add("sidebar-item-active");
 
-        if (activeButton != null) {
-            activeButton.setStyle("-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-size: 14px; -fx-cursor: hand;");
+        if (mainController != null) {
+            switch (module.getId()) {
+                case "dashboardBtn" -> mainController.showDashboard();
+                case "chickenBtn" -> mainController.showChickenBay();
+                case "eggsBtn" -> mainController.showEggsBay();
+                case "storageBtn" -> mainController.showStorage();
+                case "taskBtn" -> mainController.showTasks();
+                case "personnelBtn" -> mainController.showPersonnel();
+                case "logoutBtn" -> mainController.handleLogout();
+            }
         }
     }
 }

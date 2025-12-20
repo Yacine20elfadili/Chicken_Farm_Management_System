@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="ma.farm.controller.dialogs.AddHouseDialogController"
+      prefWidth="500.0"
+      spacing="15"
+      style="-fx-background-color: white; -fx-padding: 20;">
+
+    <!-- Dialog Title -->
+    <Label text="Add New House" styleClass="dialog-title">
+        <font>
+            <Font name="System Bold" size="20.0"/>
+        </font>
+        <padding>
+            <Insets bottom="10.0"/>
+        </padding>
+    </Label>
+
+    <Separator/>
+
+    <!-- Form Content -->
+    <GridPane hgap="15" vgap="15">
+        <columnConstraints>
+            <ColumnConstraints minWidth="120" prefWidth="120"/>
+            <ColumnConstraints hgrow="ALWAYS" minWidth="200"/>
+        </columnConstraints>
+
+        <!-- House Name -->
+        <Label text="House Name:" GridPane.columnIndex="0" GridPane.rowIndex="0">
+            <font>
+                <Font name="System Bold" size="13.0"/>
+            </font>
+        </Label>
+        <TextField fx:id="nameField" promptText="e.g., House 1, Barn A"
+                   GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+
+        <!-- House Type -->
+        <Label text="House Type:" GridPane.columnIndex="0" GridPane.rowIndex="1">
+            <font>
+                <Font name="System Bold" size="13.0"/>
+            </font>
+        </Label>
+        <ComboBox fx:id="typeComboBox" promptText="Select house type"
+                  GridPane.columnIndex="1" GridPane.rowIndex="1"
+                  maxWidth="Infinity"/>
+
+        <!-- Capacity -->
+        <Label text="Capacity:" GridPane.columnIndex="0" GridPane.rowIndex="2">
+            <font>
+                <Font name="System Bold" size="13.0"/>
+            </font>
+        </Label>
+        <TextField fx:id="capacityField" promptText="Maximum number of chickens"
+                   GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+
+        <!-- Initial Chicken Count -->
+        <Label text="Initial Count:" GridPane.columnIndex="0" GridPane.rowIndex="3">
+            <font>
+                <Font name="System Bold" size="13.0"/>
+            </font>
+        </Label>
+        <TextField fx:id="chickenCountField" text="0" promptText="Current number of chickens"
+                   GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+
+        <!-- Health Status -->
+        <Label text="Health Status:" GridPane.columnIndex="0" GridPane.rowIndex="4">
+            <font>
+                <Font name="System Bold" size="13.0"/>
+            </font>
+        </Label>
+        <ComboBox fx:id="healthStatusComboBox" promptText="Select health status"
+                  GridPane.columnIndex="1" GridPane.rowIndex="4"
+                  maxWidth="Infinity"/>
+    </GridPane>
+
+    <!-- Error Label -->
+    <Label fx:id="errorLabel" textFill="red" wrapText="true" visible="false" managed="false"/>
+
+    <Separator/>
+
+    <!-- Button Bar -->
+    <HBox spacing="10" alignment="CENTER_RIGHT">
+        <padding>
+            <Insets top="10.0"/>
+        </padding>
+        <Button text="Cancel" onAction="#handleCancel" prefWidth="100"
+                style="-fx-background-color: #6c757d; -fx-text-fill: white; -fx-font-size: 13px; -fx-cursor: hand;"/>
+        <Button text="Add House" onAction="#handleSave" prefWidth="120"
+                style="-fx-background-color: #28a745; -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold; -fx-cursor: hand;"/>
+    </HBox>
+</VBox>

@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="ma.farm.controller.dialogs.ImportChicksDialogController"
+      prefWidth="500.0"
+      prefHeight="500.0"
+      spacing="15"
+      style="-fx-background-color: #ffffff;">
+
+    <padding>
+        <Insets bottom="20.0" left="25.0" right="25.0" top="20.0"/>
+    </padding>
+
+    <!-- Dialog Title -->
+    <VBox spacing="5.0">
+        <Label text="🐣 Import Day-Old Chicks"
+               style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #1e2939;"/>
+        <Label text="Import new day-old chicks into a DayOld house."
+               style="-fx-font-size: 13px; -fx-text-fill: #666666;"/>
+    </VBox>
+
+    <Separator/>
+
+    <!-- Form Content -->
+    <VBox spacing="15.0">
+        <!-- House Selection -->
+        <VBox spacing="8.0">
+            <Label text="Select House" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #333333;"/>
+            <ComboBox fx:id="houseComboBox" promptText="Select a DayOld house..." maxWidth="Infinity"
+                      style="-fx-background-color: #ffffff; -fx-border-color: #ced4da; -fx-border-radius: 5; -fx-background-radius: 5;"/>
+            <Label fx:id="capacityInfoLabel" text="Available capacity: -"
+                   style="-fx-font-size: 11px; -fx-text-fill: #666666;"/>
+        </VBox>
+
+        <!-- Quantity -->
+        <VBox spacing="8.0">
+            <Label text="Quantity" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #333333;"/>
+            <TextField fx:id="quantityField" promptText="Enter number of chicks..."
+                       style="-fx-background-color: #ffffff; -fx-border-color: #ced4da; -fx-border-radius: 5; -fx-background-radius: 5; -fx-padding: 8 12;"/>
+            <Label fx:id="quantityErrorLabel" text="" style="-fx-text-fill: #dc3545; -fx-font-size: 11px;" visible="false"/>
+        </VBox>
+    </VBox>
+
+    <Separator/>
+
+    <!-- Optional Fields Section -->
+    <VBox spacing="12.0"
+          style="-fx-background-color: #f8f9fa; -fx-padding: 15; -fx-background-radius: 8;">
+        <Label text="📋 Optional Fields (for record keeping)"
+               style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #666666;"/>
+
+        <!-- Supplier Name -->
+        <VBox spacing="5.0">
+            <Label text="Supplier Name" style="-fx-text-fill: #555555; -fx-font-size: 12px;"/>
+            <TextField fx:id="supplierField" promptText="(Optional) Supplier name..."
+                       style="-fx-background-color: #ffffff; -fx-border-color: #ced4da; -fx-border-radius: 5; -fx-background-radius: 5; -fx-padding: 8 12;"/>
+        </VBox>
+
+        <!-- Price per Chick -->
+        <VBox spacing="5.0">
+            <Label text="Price per Chick" style="-fx-text-fill: #555555; -fx-font-size: 12px;"/>
+            <HBox spacing="8.0" alignment="CENTER_LEFT">
+                <TextField fx:id="priceField" promptText="(Optional) Price..." prefWidth="180"
+                           style="-fx-background-color: #ffffff; -fx-border-color: #ced4da; -fx-border-radius: 5; -fx-background-radius: 5; -fx-padding: 8 12;"/>
+                <Label text="MAD" style="-fx-text-fill: #888888; -fx-font-weight: bold;"/>
+            </HBox>
+        </VBox>
+    </VBox>
+
+    <!-- Error Label -->
+    <Label fx:id="errorLabel" style="-fx-text-fill: #dc3545;" wrapText="true" visible="false" managed="false"/>
+
+    <Separator/>
+
+    <!-- Button Bar -->
+    <HBox spacing="12.0" alignment="CENTER_RIGHT">
+        <padding>
+            <Insets top="10.0"/>
+        </padding>
+        <Button text="Cancel" onAction="#handleCancel"
+                style="-fx-background-color: #6c757d; -fx-text-fill: white; -fx-font-size: 13px; -fx-padding: 10 24; -fx-background-radius: 6; -fx-cursor: hand;"
+                prefWidth="100"/>
+        <Button text="Import Chicks" onAction="#handleConfirm"
+                style="-fx-background-color: #28a745; -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold; -fx-padding: 10 24; -fx-background-radius: 6; -fx-cursor: hand;"
+                prefWidth="140"/>
+    </HBox>
+</VBox>

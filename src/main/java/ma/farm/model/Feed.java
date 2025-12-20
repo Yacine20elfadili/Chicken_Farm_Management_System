@@ -1,7 +1,6 @@
 package ma.farm.model;
 
 import java.time.LocalDate;
-import java.util.Objects;
 
 /**
  * Feed model - Represents feed inventory
@@ -26,76 +25,98 @@ public class Feed {
 
     // Constructor for new feed entry
     public Feed(String name, String type, double quantityKg, double pricePerKg) {
+        this.name = name;
+        this.type = type;
+        this.quantityKg = quantityKg;
+        this.pricePerKg = pricePerKg;
     }
 
     // Full constructor
     public Feed(int id, String name, String type, double quantityKg, double pricePerKg,
                 String supplier, LocalDate lastRestockDate, LocalDate expiryDate,
                 double minStockLevel) {
+        this.id = id;
+        this.name = name;
+        this.type = type;
+        this.quantityKg = quantityKg;
+        this.pricePerKg = pricePerKg;
+        this.supplier = supplier;
+        this.lastRestockDate = lastRestockDate;
+        this.expiryDate = expiryDate;
+        this.minStockLevel = minStockLevel;
     }
 
     // Getters and Setters
     public int getId() {
-        return 0;
+        return id;
     }
 
     public void setId(int id) {
+        this.id = id;
     }
 
     public String getName() {
-        return null;
+        return name;
     }
 
     public void setName(String name) {
+        this.name = name;
     }
 
     public String getType() {
-        return null;
+        return type;
     }
 
     public void setType(String type) {
+        this.type = type;
     }
 
     public double getQuantityKg() {
-        return 0.0;
+        return quantityKg;
     }
 
     public void setQuantityKg(double quantityKg) {
+        this.quantityKg = quantityKg;
     }
 
     public double getPricePerKg() {
-        return 0.0;
+        return pricePerKg;
     }
 
     public void setPricePerKg(double pricePerKg) {
+        this.pricePerKg = pricePerKg;
     }
 
     public String getSupplier() {
-        return null;
+        return supplier;
     }
 
     public void setSupplier(String supplier) {
+        this.supplier = supplier;
     }
 
     public LocalDate getLastRestockDate() {
-        return null;
+        return lastRestockDate;
     }
 
     public void setLastRestockDate(LocalDate lastRestockDate) {
+        this.lastRestockDate = lastRestockDate;
     }
 
     public LocalDate getExpiryDate() {
-        return null;
+        return expiryDate;
     }
 
     public void setExpiryDate(LocalDate expiryDate) {
+        this.expiryDate = expiryDate;
     }
 
     public double getMinStockLevel() {
-        return 0.0;
+        return minStockLevel;
     }
 
     public void setMinStockLevel(double minStockLevel) {
+        this.minStockLevel = minStockLevel;
     }
 
     // Business methods
@@ -105,15 +126,24 @@ public class Feed {
      * @return true if below minimum stock level
      */
     public boolean isLowStock() {
-        return false;
+        return quantityKg < minStockLevel;
     }
 
     /**
-     * Check if feed is expired or near expiry
-     * @return true if expired or expires within 7 days
+     * Check if feed is expired
      */
-    public boolean isExpiredOrNearExpiry() {
-        return false;
+    public boolean isExpired() {
+        if (expiryDate == null) return false;
+        return expiryDate.isBefore(LocalDate.now());
+    }
+
+    /**
+     * Check if feed is expiring soon (within 30 days)
+     */
+    public boolean isExpiringSoon() {
+        if (expiryDate == null) return false;
+        LocalDate thirtyDaysFromNow = LocalDate.now().plusDays(30);
+        return expiryDate.isBefore(thirtyDaysFromNow) && !isExpired();
     }
 
     /**
@@ -121,21 +151,34 @@ public class Feed {
      * @return Total value in currency
      */
     public double getTotalValue() {
-        return 0.0;
+        return quantityKg * pricePerKg;
     }
 
     @Override
     public boolean equals(Object o) {
-        return false;
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Feed feed = (Feed) o;
+        return id == feed.id;
     }
 
     @Override
     public int hashCode() {
-        return 0;
+        return Integer.hashCode(id);
     }
 
     @Override
     public String toString() {
-        return null;
+        return "Feed{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", type='" + type + '\'' +
+                ", quantityKg=" + quantityKg +
+                ", pricePerKg=" + pricePerKg +
+                ", supplier='" + supplier + '\'' +
+                ", lastRestockDate=" + lastRestockDate +
+                ", expiryDate=" + expiryDate +
+                ", minStockLevel=" + minStockLevel +
+                '}';
     }
 }

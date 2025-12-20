@@ -22,11 +22,11 @@ This project was developed as part of a university Java course by the following 
 
 ### 👨‍🏫 Supervising Professors
 
-| Name | GitHub Profile |
-|----|----------------|
-| Youssef ES-SAADY | [@ProfessorGitHub1](#) |
-| Abderrahmane SADIQ   | [@ProfessorGitHub2](#) |
-| Professor 3 | [@ProfessorGitHub3](#) |
+| Name               | GitHub Profile                     |
+|--------------------|------------------------------------|
+| Youssef ES-SAADY   | [https://github.com/essaady](#)    |
+| Abderrahmane SADIQ | [https://github.com/AbSadiqHub](#) |
+| AICHA DAKIR        | [@ProfessorGitHub3](#)             |
 
 ---
 
@@ -303,13 +303,14 @@ This project follows the **MVC (Model-View-Controller)** architectural pattern:
 
 ```txt
 Chicken_Farm_Management_System/
+│
 ├── database/
 │   └── farm.db
 │
 ├── UmlDiagrams/
-│   ├── Classe
-│   │   └── Diagrams
-│   │       ├── Images
+│   ├── Classe/
+│   │   └── Diagrams/
+│   │       ├── Images/
 │   │       │   ├── ChickenBatchManagement.png
 │   │       │   ├── CoreBusinessEntities.png
 │   │       │   ├── InventoryFinancialManagement.png
@@ -317,7 +318,7 @@ Chicken_Farm_Management_System/
 │   │       │   ├── PoultryFarmManagement.png
 │   │       │   ├── TaskAlertSystemManagement.png
 │   │       │   └── WorkerHierarchy.png
-│   │       └── SourceCode
+│   │       └── SourceCode/
 │   │           ├── Chicken Farm Class Diagram.plantuml
 │   │           ├── Chicken Farm Sub Class Diagram 1 _ Core Business Entities Diagram.plantuml
 │   │           ├── Chicken Farm Sub Class Diagram 2 _ Human Resources & Worker Management Diagram.plantuml
@@ -325,46 +326,50 @@ Chicken_Farm_Management_System/
 │   │           ├── Chicken Farm Sub Class Diagram 4 _ Commercial Operations Diagram.plantuml
 │   │           ├── Chicken Farm Sub Class Diagram 5 _ Inventory & Financial Management Diagram.plantuml
 │   │           └── Chicken Farm Sub Class Diagram 6 _ System Operations & Compliance Diagram.plantuml
-│   ├── Séquences
-│   │   └── Diagrams
-│   │       ├── Images
+│   │
+│   ├── Séquences/
+│   │   └── Diagrams/
+│   │       ├── Images/
 │   │       │   ├── BuyFromSupplier.png
 │   │       │   ├── CloseDayAndDashboard.png
 │   │       │   ├── DailyDataEntry.png
 │   │       │   └── SellToCustomer.png
-│   │       └── SourceCode
+│   │       └── SourceCode/
 │   │           ├── Chicken Farm Sequence Diagram 1 _ Buy from Supplier.plantuml
 │   │           ├── Chicken Farm Sequence Diagram 2 _ Sell to Customer.plantuml
 │   │           ├── Chicken Farm Sequence Diagram 3 _ Daily Data Entry.plantuml
 │   │           └── Chicken Farm Sequence Diagram 4 _ Close Day & Dashboard.plantuml
-│   ├── UseCase
-│   │   └── Diagrams
-│   │       ├── Images
+│   │
+│   ├── UseCase/
+│   │   └── Diagrams/
+│   │       ├── Images/
 │   │       │   ├── ChickenFarmAdministration.png
 │   │       │   ├── ChickenFarmExternalInteractions.png
 │   │       │   └── ChickenFarmInternalOperations.png
-│   │       └── SourceCode
+│   │       └── SourceCode/
 │   │           ├── Chicken Farm Management System _ Diagram 1 - Interactions externes.plantuml
 │   │           ├── Chicken Farm Management System _ Diagram 2 - Opérations internes.plantuml
 │   │           └── Chicken Farm Management System _ Diagram 3 - Administration et système.plantuml
-│   └── Version_MVP
-│       ├── Classe
-│       │   ├── Images
+│   │
+│   └── Version_MVP/
+│       ├── Classe/
+│       │   ├── Images/
 │       │   │   ├── Diagram_1_Domain_Model.png
 │       │   │   ├── Diagram_2_Data_Access_Layer.png
 │       │   │   ├── Diagram_3_Controller_Layer.png
 │       │   │   ├── Diagram_4_View_Layer.png
 │       │   │   ├── Diagram_5_Utility_Classes.png
 │       │   │   └── Diagram_6_Complete_Architecture.png
-│       │   └── SourceCode
+│       │   └── SourceCode/
 │       │       ├── Chicken Farm Class Diagram 1.plantuml
 │       │       ├── Chicken Farm Class Diagram 2.plantuml
 │       │       ├── Chicken Farm Class Diagram 3.plantuml
 │       │       ├── Chicken Farm Class Diagram 4.plantuml
 │       │       ├── Chicken Farm Class Diagram 5.plantuml
 │       │       └── Chicken Farm Class Diagram 6.plantuml
-│       ├── Séquences
-│       │   ├── Images
+│       │
+│       ├── Séquences/
+│       │   ├── Images/
 │       │   │   ├── MVP_Sequence_Diagram_1_Login.png
 │       │   │   ├── MVP_Sequence_Diagram_2_View_Dashboard.png
 │       │   │   ├── MVP_Sequence_Diagram_3_Chicken_Bay.png
@@ -372,20 +377,20 @@ Chicken_Farm_Management_System/
 │       │   │   ├── MVP_Sequence_Diagram_5_Storage.png
 │       │   │   ├── MVP_Sequence_Diagram_6_Tasks.png
 │       │   │   └── MVP_Sequence_Diagram_7_Personnel.png
-│       │   └── SourceCode
+│       │   └── SourceCode/
 │       │       ├── Chicken Farm Sequence Diagram 1.plantuml
 │       │       ├── Chicken Farm Sequence Diagram 2.plantuml
 │       │       ├── Chicken Farm Sequence Diagram 3.plantuml
 │       │       ├── Chicken Farm Sequence Diagram 4.plantuml
 │       │       ├── Chicken Farm Sequence Diagram 5.plantuml
-│       │       └── Chicken Farm Sequence Diagram 6.plantuml
+│       │       ├── Chicken Farm Sequence Diagram 6.plantuml
 │       │       └── Chicken Farm Sequence Diagram 7.plantuml
-│       └── UseCase
-│           ├── Images
+│       │
+│       └── UseCase/
+│           ├── Images/
 │           │   └── MVP_Use_Case_Diagram.png
-│           └── SourceCode
+│           └── SourceCode/
 │               └── Chicken Farm Use Case Diagram.plantuml
-│
 │
 ├── src/
 │   ├── main/
@@ -393,96 +398,105 @@ Chicken_Farm_Management_System/
 │   │   │   └── ma/
 │   │   │       └── farm/
 │   │   │           ├── controller/
-│   │   │           │   ├── LoginController.java
-│   │   │           │   ├── DashboardController.java
 │   │   │           │   ├── ChickenBayController.java
+│   │   │           │   ├── DashboardController.java
 │   │   │           │   ├── EggsBayController.java
+│   │   │           │   ├── LoginController.java
+│   │   │           │   ├── MainWindowController.java
+│   │   │           │   ├── PersonnelController.java
+│   │   │           │   ├── SidebarController.java
 │   │   │           │   ├── StorageController.java
-│   │   │           │   ├── TasksController.java
-│   │   │           │   └── PersonnelController.java
+│   │   │           │   └── TasksController.java
 │   │   │           │
 │   │   │           ├── dao/
-│   │   │           │   ├── DatabaseConnection.java
-│   │   │           │   ├── UserDAO.java
 │   │   │           │   ├── ChickenDAO.java
-│   │   │           │   ├── HouseDAO.java
+│   │   │           │   ├── DatabaseConnection.java
 │   │   │           │   ├── EggProductionDAO.java
-│   │   │           │   ├── MortalityDAO.java
+│   │   │           │   ├── EquipmentCategoryDAO.java
+│   │   │           │   ├── EquipmentItemDAO.java
 │   │   │           │   ├── FeedDAO.java
+│   │   │           │   ├── HouseDAO.java
 │   │   │           │   ├── MedicationDAO.java
-│   │   │           │   ├── EquipmentDAO.java
+│   │   │           │   ├── MortalityDAO.java
+│   │   │           │   ├── PersonnelDAO.java
 │   │   │           │   ├── TaskDAO.java
-│   │   │           │   └── PersonnelDAO.java
+│   │   │           │   └── UserDAO.java
 │   │   │           │
 │   │   │           ├── model/
-│   │   │           │   ├── User.java
 │   │   │           │   ├── Chicken.java
-│   │   │           │   ├── House.java
 │   │   │           │   ├── EggProduction.java
-│   │   │           │   ├── Mortality.java
-│   │   │           │   ├── Feed.java
-│   │   │           │   ├── Medication.java
 │   │   │           │   ├── Equipment.java
+│   │   │           │   ├── Feed.java
+│   │   │           │   ├── House.java
+│   │   │           │   ├── Medication.java
+│   │   │           │   ├── Mortality.java
+│   │   │           │   ├── Personnel.java
 │   │   │           │   ├── Task.java
-│   │   │           │   └── Personnel.java
+│   │   │           │   └── User.java
 │   │   │           │
 │   │   │           ├── util/
+│   │   │           │   ├── DateUtil.java
 │   │   │           │   ├── NavigationUtil.java
-│   │   │           │   ├── ValidationUtil.java
-│   │   │           │   └── DateUtil.java
-│   │   │           │
-│   │   │           ├── view/
-│   │   │           │   ├── LoginView.java
-│   │   │           │   ├── DashboardView.java
-│   │   │           │   ├── ChickenBayView.java
-│   │   │           │   ├── EggsBayView.java
-│   │   │           │   ├── StorageView.java
-│   │   │           │   ├── TasksView.java
-│   │   │           │   └── PersonnelView.java
+│   │   │           │   └── ValidationUtil.java
 │   │   │           │
 │   │   │           └── App.java
 │   │   │
 │   │   └── resources/
-│   │       ├── fxml/
-│   │       │   ├── LoginView.fxml
-│   │       │   ├── DashboardView.fxml
-│   │       │   ├── ChickenBayView.fxml
-│   │       │   ├── EggsBayView.fxml
-│   │       │   ├── StorageView.fxml
-│   │       │   ├── TasksView.fxml
-│   │       │   └── PersonnelView.fxml
-│   │       │
 │   │       ├── css/
 │   │       │   └── style.css
 │   │       │
-│   │       ├── images/
-│   │       │   └── icons/
-│   │       │       ├── chicken.png
-│   │       │       ├── egg.png
-│   │       │       ├── storage.png
-│   │       │       ├── task.png
-│   │       │       └── personnel.png
-│   │       │   └── logo.png
+│   │       ├── database/
+│   │       │   └── schema.sql
 │   │       │
-│   │       └── database/
-│   │           └── schema.sql
+│   │       ├── fxml/
+│   │       │   ├── ChickenBayView.fxml
+│   │       │   ├── DashboardView.fxml
+│   │       │   ├── EggsBayView.fxml
+│   │       │   ├── LoginView.fxml
+│   │       │   ├── MainWindow.fxml
+│   │       │   ├── PersonnelView.fxml
+│   │       │   ├── Sidebar.fxml
+│   │       │   ├── StorageView.fxml
+│   │       │   └── TasksView.fxml
+│   │       │
+│   │       └── images/
+│   │           ├── icons/
+│   │           │   ├── chicken.png
+│   │           │   ├── egg.png
+│   │           │   ├── personnel.png
+│   │           │   ├── storage.png
+│   │           │   └── task.png
+│   │           └── logo.png
 │   │
 │   └── test/
 │       └── java/
 │           └── ma/
 │               └── farm/
 │                   └── dao/
-│                       ├── DatabaseConnectionTest.java
-│                       ├── UserDAOTest.java
 │                       ├── ChickenDAOTest.java
+│                       ├── DatabaseConnectionTest.java
 │                       ├── EggProductionDAOTest.java
+│                       ├── EquipmentCategoryDAO.java
+│                       ├── EquipmentItemDAO.java
+│                       ├── FeedDAOTest.java
+│                       ├── HouseDAOTest.java
+│                       ├── MedicationDAOTest.java
+│                       ├── MortalityDAOTest.java
+│                       ├── PersonnelDAOTest.java
 │                       ├── TaskDAOTest.java
-│                       └── PersonnelDAOTest.java
+│                       └── UserDAOTest.java
+│
+├── target/
+│   ├── classes/
+│   ├── generated-sources/
+│   ├── generated-test-sources/
+│   ├── maven-status/
+│   └── test-classes/
 │
 ├── .gitignore
 ├── LICENSE.txt
 ├── pom.xml
-└── README.md
+└── README.md                     
 ```
 
 ### Expandability Notes
@@ -1020,9 +1034,9 @@ Permission is granted to use, copy, modify, and distribute this software for any
 
 We would like to thank our professors for their guidance and support throughout this project:
 
-- Professor [Name 1]
-- Professor [Name 2]
-- Professor [Name 3]
+- Professor [ Youssef ES-SAADY ]
+- Professor [ Abderrahmane SADIQ ]
+- Professor [ AICHA DAKIR ]
 
 ### Team Recognition
 
@@ -1037,4 +1051,4 @@ Special thanks to all team members for their dedication and hard work:
 
 ---
 
-**Built by the Farm Management Dev Team | University Java Project 2024**
+**Built by the Farm Management Dev Team | University Java Project 2025**

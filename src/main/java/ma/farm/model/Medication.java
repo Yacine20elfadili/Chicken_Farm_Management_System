@@ -1,7 +1,6 @@
 package ma.farm.model;
 
 import java.time.LocalDate;
-import java.util.Objects;
 
 /**
  * Medication model - Represents medication inventory
@@ -28,90 +27,116 @@ public class Medication {
 
     // Constructor for new medication
     public Medication(String name, String type, int quantity, String unit) {
+        this.name = name;
+        this.type = type;
+        this.quantity = quantity;
+        this.unit = unit;
     }
 
     // Full constructor
     public Medication(int id, String name, String type, int quantity, String unit,
                       double pricePerUnit, String supplier, LocalDate purchaseDate,
                       LocalDate expiryDate, int minStockLevel, String usage) {
+        this.id = id;
+        this.name = name;
+        this.type = type;
+        this.quantity = quantity;
+        this.unit = unit;
+        this.pricePerUnit = pricePerUnit;
+        this.supplier = supplier;
+        this.purchaseDate = purchaseDate;
+        this.expiryDate = expiryDate;
+        this.minStockLevel = minStockLevel;
+        this.usage = usage;
     }
 
     // Getters and Setters
     public int getId() {
-        return 0;
+        return id;
     }
 
     public void setId(int id) {
+        this.id = id;
     }
 
     public String getName() {
-        return null;
+        return name;
     }
 
     public void setName(String name) {
+        this.name = name;
     }
 
     public String getType() {
-        return null;
+        return type;
     }
 
     public void setType(String type) {
+        this.type = type;
     }
 
     public int getQuantity() {
-        return 0;
+        return quantity;
     }
 
     public void setQuantity(int quantity) {
+        this.quantity = quantity;
     }
 
     public String getUnit() {
-        return null;
+        return unit;
     }
 
     public void setUnit(String unit) {
+        this.unit = unit;
     }
 
     public double getPricePerUnit() {
-        return 0.0;
+        return pricePerUnit;
     }
 
     public void setPricePerUnit(double pricePerUnit) {
+        this.pricePerUnit = pricePerUnit;
     }
 
     public String getSupplier() {
-        return null;
+        return supplier;
     }
 
     public void setSupplier(String supplier) {
+        this.supplier = supplier;
     }
 
     public LocalDate getPurchaseDate() {
-        return null;
+        return purchaseDate;
     }
 
     public void setPurchaseDate(LocalDate purchaseDate) {
+        this.purchaseDate = purchaseDate;
     }
 
     public LocalDate getExpiryDate() {
-        return null;
+        return expiryDate;
     }
 
     public void setExpiryDate(LocalDate expiryDate) {
+        this.expiryDate = expiryDate;
     }
 
     public int getMinStockLevel() {
-        return 0;
+        return minStockLevel;
     }
 
     public void setMinStockLevel(int minStockLevel) {
+        this.minStockLevel = minStockLevel;
     }
 
     public String getUsage() {
-        return null;
+        return usage;
     }
 
     public void setUsage(String usage) {
+        this.usage = usage;
     }
 
     // Business methods
@@ -121,7 +146,7 @@ public class Medication {
      * @return true if below minimum stock level
      */
     public boolean isLowStock() {
-        return false;
+        return quantity < minStockLevel;
     }
 
     /**
@@ -129,7 +154,18 @@ public class Medication {
      * @return true if past expiry date
      */
     public boolean isExpired() {
-        return false;
+        if (expiryDate == null) return false;
+        return expiryDate.isBefore(LocalDate.now());
+    }
+
+    /**
+     * Check if medication is expiring soon (within 30 days)
+     * @return true if expiring soon
+     */
+    public boolean isExpiringSoon() {
+        if (expiryDate == null) return false;
+        LocalDate thirtyDaysFromNow = LocalDate.now().plusDays(30);
+        return expiryDate.isBefore(thirtyDaysFromNow) && !isExpired();
     }
 
     /**
@@ -137,21 +173,36 @@ public class Medication {
      * @return Total value in currency
      */
     public double getTotalValue() {
-        return 0.0;
+        return quantity * pricePerUnit;
     }
 
     @Override
     public boolean equals(Object o) {
-        return false;
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Medication medication = (Medication) o;
+        return id == medication.id;
     }
 
     @Override
     public int hashCode() {
-        return 0;
+        return Integer.hashCode(id);
     }
 
     @Override
     public String toString() {
-        return null;
+        return "Medication{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", type='" + type + '\'' +
+                ", quantity=" + quantity +
+                ", unit='" + unit + '\'' +
+                ", pricePerUnit=" + pricePerUnit +
+                ", supplier='" + supplier + '\'' +
+                ", purchaseDate=" + purchaseDate +
+                ", expiryDate=" + expiryDate +
+                ", minStockLevel=" + minStockLevel +
+                ", usage='" + usage + '\'' +
+                '}';
     }
 }

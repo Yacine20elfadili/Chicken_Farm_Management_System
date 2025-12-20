@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane prefHeight="700.0" prefWidth="700.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ma.farm.controller.dialogs.PersonnelDetailDialogController" style="-fx-background-color: #f8f9fa;">
+    <children>
+        <VBox prefHeight="80.0" prefWidth="700.0" style="-fx-background-color: #17a2b8;" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <padding><Insets bottom="15.0" left="25.0" right="25.0" top="15.0" /></padding>
+            <children>
+                <Label text="Details du Personnel" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: white;" />
+                <Label text="Informations completes" style="-fx-font-size: 13px; -fx-text-fill: #e3f2fd;" />
+            </children>
+        </VBox>
+        <ScrollPane fitToWidth="true" AnchorPane.bottomAnchor="70.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="80.0" style="-fx-background: transparent; -fx-background-color: transparent;">
+            <content>
+                <VBox spacing="20.0" style="-fx-background-color: transparent;">
+                    <padding><Insets bottom="20.0" left="25.0" right="25.0" top="20.0" /></padding>
+                    <children>
+                        <VBox spacing="15.0" style="-fx-background-color: white; -fx-background-radius: 8px; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);">
+                            <padding><Insets bottom="20.0" left="25.0" right="25.0" top="20.0" /></padding>
+                            <children>
+                                <Label text="Informations Personnelles" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #343a40;" />
+                                <Separator />
+                                <HBox spacing="15.0" alignment="CENTER_LEFT">
+                                    <children>
+                                        <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                                            <children>
+                                                <Label text="Nom Complet" style="-fx-font-size: 12px; -fx-text-fill: #6c757d; -fx-font-weight: bold;" />
+                                                <Label fx:id="nameLabel" text="Ahmed Hassan" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #212529;" />
+                                            </children>
+                                        </VBox>
+                                        <Label fx:id="departmentLabel" text="Administration" style="-fx-background-color: #007bff; -fx-text-fill: white; -fx-padding: 5 12; -fx-background-radius: 15px; -fx-font-size: 12px; -fx-font-weight: bold;" />
+                                        <Label fx:id="statusLabel" text="Actif" style="-fx-background-color: #d4edda; -fx-text-fill: #155724; -fx-padding: 8 15; -fx-background-radius: 20px; -fx-font-size: 13px; -fx-font-weight: bold;" />
+                                    </children>
+                                </HBox>
+                                <HBox spacing="30.0">
+                                    <children>
+                                        <VBox spacing="5.0">
+                                            <children>
+                                                <Label text="Age" style="-fx-font-size: 12px; -fx-text-fill: #6c757d; -fx-font-weight: bold;" />
+                                                <Label fx:id="ageLabel" text="30 ans" style="-fx-font-size: 15px; -fx-text-fill: #212529;" />
+                                            </children>
+                                        </VBox>
+                                        <VBox spacing="5.0">
+                                            <children>
+                                                <Label text="Telephone" style="-fx-font-size: 12px; -fx-text-fill: #6c757d; -fx-font-weight: bold;" />
+                                                <Label fx:id="phoneLabel" text="+212 6XX XXX XXX" style="-fx-font-size: 15px; -fx-text-fill: #212529;" />
+                                            </children>
+                                        </VBox>
+                                        <VBox spacing="5.0">
+                                            <children>
+                                                <Label text="Email" style="-fx-font-size: 12px; -fx-text-fill: #6c757d; -fx-font-weight: bold;" />
+                                                <Label fx:id="emailLabel" text="ahmed@farm.ma" style="-fx-font-size: 15px; -fx-text-fill: #212529;" />
+                                            </children>
+                                        </VBox>
+                                    </children>
+                                </HBox>
+                                <VBox spacing="5.0">
+                                    <children>
+                                        <Label text="Adresse" style="-fx-font-size: 12px; -fx-text-fill: #6c757d; -fx-font-weight: bold;" />
+                                        <Label fx:id="addressLabel" text="123 Rue Farm, Rabat" wrapText="true" style="-fx-font-size: 15px; -fx-text-fill: #212529;" />
+                                    </children>
+                                </VBox>
+                                <VBox spacing="5.0">
+                                    <children>
+                                        <Label text="Contact Urgence" style="-fx-font-size: 12px; -fx-text-fill: #6c757d; -fx-font-weight: bold;" />
+                                        <Label fx:id="emergencyContactLabel" text="Fatima Hassan +212 6XX XXX XXX" style="-fx-font-size: 15px; -fx-text-fill: #212529;" />
+                                    </children>
+                                </VBox>
+                            </children>
+                        </VBox>
+                        <VBox spacing="15.0" style="-fx-background-color: white; -fx-background-radius: 8px; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);">
+                            <padding><Insets bottom="20.0" left="25.0" right="25.0" top="20.0" /></padding>
+                            <children>
+                                <Label text="Informations Emploi" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #343a40;" />
+                                <Separator />
+                                <HBox spacing="30.0">
+                                    <children>
+                                        <VBox spacing="5.0">
+                                            <children>
+                                                <Label text="Titre du Poste" style="-fx-font-size: 12px; -fx-text-fill: #6c757d; -fx-font-weight: bold;" />
+                                                <Label fx:id="jobTitleLabel" text="Superviseur" style="-fx-font-size: 15px; -fx-text-fill: #212529; -fx-font-weight: bold;" />
+                                            </children>
+                                        </VBox>
+                                        <VBox spacing="5.0">
+                                            <children>
+                                                <Label text="Date Embauche" style="-fx-font-size: 12px; -fx-text-fill: #6c757d; -fx-font-weight: bold;" />
+                                                <Label fx:id="hireDateLabel" text="2025-01-01" style="-fx-font-size: 15px; -fx-text-fill: #212529;" />
+                                            </children>
+                                        </VBox>
+                                        <VBox spacing="5.0">
+                                            <children>
+                                                <Label text="Annees Service" style="-fx-font-size: 12px; -fx-text-fill: #6c757d; -fx-font-weight: bold;" />
+                                                <Label fx:id="yearsOfServiceLabel" text="0 ans" style="-fx-font-size: 15px; -fx-text-fill: #212529;" />
+                                            </children>
+                                        </VBox>
+                                        <VBox spacing="5.0">
+                                            <children>
+                                                <Label text="Salaire Mensuel" style="-fx-font-size: 12px; -fx-text-fill: #6c757d; -fx-font-weight: bold;" />
+                                                <Label fx:id="salaryLabel" text="5000.00 MAD" style="-fx-font-size: 15px; -fx-text-fill: #212529; -fx-font-weight: bold;" />
+                                            </children>
+                                        </VBox>
+                                    </children>
+                                </HBox>
+                                <Label fx:id="shiftLabel" visible="false" managed="false" />
+                            </children>
+                        </VBox>
+                        <VBox fx:id="positionsSection" spacing="15.0" style="-fx-background-color: white; -fx-background-radius: 8px; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);" visible="false" managed="false">
+                            <padding><Insets bottom="20.0" left="25.0" right="25.0" top="20.0" /></padding>
+                            <children>
+                                <Label text="Positions Administratives" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #343a40;" />
+                                <Separator />
+                                <FlowPane fx:id="positionsPane" hgap="10.0" vgap="10.0" />
+                            </children>
+                        </VBox>
+                        <VBox fx:id="supervisorSection" spacing="15.0" style="-fx-background-color: white; -fx-background-radius: 8px; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);" visible="false" managed="false">
+                            <padding><Insets bottom="20.0" left="25.0" right="25.0" top="20.0" /></padding>
+                            <children>
+                                <Label text="Superviseur" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #343a40;" />
+                                <Separator />
+                                <HBox spacing="15.0" alignment="CENTER_LEFT">
+                                    <children>
+                                        <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                                            <children>
+                                                <Label text="Rapporte a" style="-fx-font-size: 12px; -fx-text-fill: #6c757d; -fx-font-weight: bold;" />
+                                                <Label fx:id="supervisorNameLabel" text="Mohammed Al-Rashid" style="-fx-font-size: 16px; -fx-text-fill: #212529; -fx-font-weight: bold;" />
+                                            </children>
+                                        </VBox>
+                                        <Button fx:id="viewSupervisorButton" text="Voir Profil" style="-fx-background-color: #007bff; -fx-text-fill: white; -fx-padding: 8 20; -fx-background-radius: 5px; -fx-font-size: 13px; -fx-cursor: hand;" />
+                                    </children>
+                                </HBox>
+                            </children>
+                        </VBox>
+                        <VBox fx:id="subordinatesSection" spacing="15.0" style="-fx-background-color: white; -fx-background-radius: 8px; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);" visible="false" managed="false">
+                            <padding><Insets bottom="20.0" left="25.0" right="25.0" top="20.0" /></padding>
+                            <children>
+                                <HBox spacing="10.0" alignment="CENTER_LEFT">
+                                    <children>
+                                        <Label text="Subordonnes" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #343a40;" />
+                                        <Label fx:id="subordinateCountLabel" text="0 subordonne(s)" style="-fx-background-color: #e7f3ff; -fx-text-fill: #004085; -fx-padding: 5 12; -fx-background-radius: 15px; -fx-font-size: 12px; -fx-font-weight: bold;" />
+                                    </children>
+                                </HBox>
+                                <Separator />
+                                <Label text="Double-cliquez sur un nom pour voir les details" style="-fx-font-size: 12px; -fx-text-fill: #6c757d; -fx-font-style: italic;" />
+                                <ListView fx:id="subordinatesListView" prefHeight="150.0" style="-fx-background-color: #f8f9fa; -fx-border-color: #dee2e6; -fx-border-width: 1px; -fx-border-radius: 5px; -fx-background-radius: 5px;" />
+                            </children>
+                        </VBox>
+                    </children>
+                </VBox>
+            </content>
+        </ScrollPane>
+        <HBox spacing="15.0" alignment="CENTER_RIGHT" style="-fx-background-color: #f8f9fa; -fx-border-color: #dee2e6; -fx-border-width: 1px 0 0 0;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" prefHeight="70.0">
+            <padding><Insets bottom="15.0" left="25.0" right="25.0" top="15.0" /></padding>
+            <children>
+                <Button fx:id="editButton" text="Modifier" onAction="#handleEdit" prefWidth="130.0" prefHeight="40.0" style="-fx-background-color: #ffc107; -fx-text-fill: #212529; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 5px; -fx-cursor: hand;" />
+                <Button fx:id="closeButton" text="Fermer" onAction="#handleClose" prefWidth="130.0" prefHeight="40.0" style="-fx-background-color: #6c757d; -fx-text-fill: white; -fx-font-size: 14px; -fx-background-radius: 5px; -fx-cursor: hand;" />
+            </children>
+        </HBox>
+    </children>
+</AnchorPane>

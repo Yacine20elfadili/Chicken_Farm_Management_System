@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="ma.farm.controller.dialogs.AddEditEquipmentItemDialogController"
+      prefHeight="500.0" prefWidth="600.0" spacing="15.0" styleClass="dialog-container">
+    <padding>
+        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+    </padding>
+
+    <!-- Dialog Title -->
+    <Label fx:id="dialogTitle" styleClass="dialog-title" text="Ajouter Équipement" />
+
+    <!-- Form Content -->
+    <ScrollPane fitToHeight="true" fitToWidth="true" styleClass="form-scroll">
+        <content>
+            <VBox spacing="15.0">
+                <padding>
+                    <Insets bottom="10.0" right="10.0" />
+                </padding>
+
+                <!-- Status -->
+                <VBox spacing="5.0">
+                    <Label styleClass="form-label" text="État *" />
+                    <ComboBox fx:id="statusComboBox" prefWidth="200.0" promptText="Sélectionner l'état" styleClass="form-input" />
+                    <Label fx:id="statusErrorLabel" styleClass="error-label" text="" />
+                </VBox>
+
+                <!-- Purchase Date -->
+                <VBox spacing="5.0">
+                    <Label styleClass="form-label" text="Date d'Achat *" />
+                    <DatePicker fx:id="purchaseDatePicker" styleClass="form-input" />
+                    <Label fx:id="purchaseDateErrorLabel" styleClass="error-label" text="" />
+                </VBox>
+
+                <!-- Purchase Price -->
+                <VBox spacing="5.0">
+                    <Label styleClass="form-label" text="Prix d'Achat (MAD) *" />
+                    <TextField fx:id="purchasePriceField" promptText="Ex: 450.00" styleClass="form-input" />
+                    <Label fx:id="priceErrorLabel" styleClass="error-label" text="" />
+                </VBox>
+
+                <!-- Last Maintenance Date -->
+                <VBox spacing="5.0">
+                    <Label styleClass="form-label" text="Dernière Maintenance" />
+                    <DatePicker fx:id="lastMaintenanceDatePicker" styleClass="form-input" />
+                </VBox>
+
+                <!-- Next Maintenance Date -->
+                <VBox spacing="5.0">
+                    <Label styleClass="form-label" text="Prochaine Maintenance" />
+                    <DatePicker fx:id="nextMaintenanceDatePicker" styleClass="form-input" />
+                    <Label fx:id="maintenanceErrorLabel" styleClass="error-label" text="" />
+                </VBox>
+
+                <!-- Info Text -->
+                <Label styleClass="info-text" text="Note: Les dates de maintenance sont optionnelles mais recommandées pour le suivi." wrapText="true" />
+            </VBox>
+        </content>
+    </ScrollPane>
+
+    <!-- Buttons -->
+    <HBox alignment="CENTER_RIGHT" spacing="10.0">
+        <Button onAction="#handleCancel" styleClass="btn-secondary" text="Annuler" />
+        <Button onAction="#handleSave" styleClass="btn-primary" text="Enregistrer" />
+    </HBox>
+</VBox>
