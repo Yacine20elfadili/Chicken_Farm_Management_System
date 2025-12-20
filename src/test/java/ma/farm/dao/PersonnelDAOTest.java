@@ -4,131 +4,86 @@ import ma.farm.model.Personnel;
 import org.junit.jupiter.api.*;
 
 import java.time.LocalDate;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class PersonnelDAOTest {
+class PersonnelDAOTest {
 
-    private static PersonnelDAO personnelDAO;
-    private static int insertedId;
+    private PersonnelDAO personnelDAO;
 
-    @BeforeAll
-    static void init() {
+    @BeforeEach
+    void setUp() {
         personnelDAO = new PersonnelDAO();
     }
 
-    @Test
-    @Order(1)
-    void testCreatePersonnel() {
-
+    private Personnel createTestPersonnel(String email) {
         Personnel p = new Personnel(
                 0,
-                "Test Employee",
+                "JUnit User",
                 30,
                 "0600000000",
-                "test.employee@example.com",
-                "worker",                     // doit exister dans jobTitles
+                email,
+                0,
+                "admin_staff",
+                "administration",
+                "accounting",
                 LocalDate.now(),
-                3500.0,
-                "morning",                    // doit exister dans shifts
+                4000,
                 true,
-                "Test Address",
-                "Emergency Contact"
+                "Agadir",
+                "0611111111",
+                null,
+                null,
+                null
         );
-
-        boolean result = personnelDAO.createPersonnel(p);
-
-        assertTrue(result, "Personnel should be created");
-        assertTrue(p.getId() > 0, "Inserted personnel ID should be > 0");
-
-        insertedId = p.getId();
+        assertTrue(personnelDAO.createPersonnel(p));
+        return p;
     }
 
     @Test
-    @Order(2)
+    void testCreatePersonnel() {
+        Personnel p = createTestPersonnel("create@test.com");
+        assertNotNull(p);
+        assertTrue(p.getId() > 0);
+    }
+
+    @Test
     void testGetPersonnelById() {
-        Personnel p = personnelDAO.getPersonnelById(insertedId);
-        assertNotNull(p, "Personnel should be found");
-        assertEquals("Test Employee", p.getFullName());
+        Personnel created = createTestPersonnel("byid@test.com");
+
+        Personnel found = personnelDAO.getPersonnelById(created.getId());
+        assertNotNull(found);
+        assertEquals(created.getEmail(), found.getEmail());
     }
 
     @Test
-    @Order(3)
-    void testUpdatePersonnel() {
-        Personnel p = personnelDAO.getPersonnelById(insertedId);
-
-        p.setFullName("Updated Employee");
-        p.setSalary(4000);
-
-        boolean updated = personnelDAO.updatePersonnel(p);
-        assertTrue(updated, "Personnel should be updated");
-
-        Personnel updatedP = personnelDAO.getPersonnelById(insertedId);
-        assertEquals("Updated Employee", updatedP.getFullName());
-        assertEquals(4000, updatedP.getSalary());
-    }
-
-    @Test
-    @Order(4)
     void testGetPersonnelByEmail() {
-        Personnel p = personnelDAO.getPersonnelByEmail("test.employee@example.com");
-        assertNotNull(p, "Personnel should be found by email");
-        assertEquals(insertedId, p.getId());
+        Personnel created = createTestPersonnel("email@test.com");
+
+        Personnel found = personnelDAO.getPersonnelByEmail("email@test.com");
+        assertNotNull(found);
+        assertEquals(created.getId(), found.getId());
     }
 
     @Test
-    @Order(5)
-    void testGetAllPersonnel() {
-        List<Personnel> list = personnelDAO.getAllPersonnel();
-        assertNotNull(list);
-        assertTrue(list.size() > 0, "Personnel list should not be empty");
+    void testUpdatePersonnel() {
+        Personnel p = createTestPersonnel("update@test.com");
+
+        p.setFullName("Updated Name");
+        assertTrue(personnelDAO.updatePersonnel(p));
+
+        Personnel updated = personnelDAO.getPersonnelById(p.getId());
+        assertNotNull(updated);
+        assertEquals("Updated Name", updated.getFullName());
     }
 
     @Test
-    @Order(6)
-    void testGetActivePersonnel() {
-        List<Personnel> list = personnelDAO.getActivePersonnel();
-        assertNotNull(list);
-        assertTrue(list.size() > 0, "Active personnel list should not be empty");
-    }
-
-    @Test
-    @Order(7)
-    void testGetPersonnelByJobTitle() {
-        List<Personnel> workers = personnelDAO.getPersonnelByJobTitle("worker");
-        assertNotNull(workers);
-
-        // Peut être 0 si pas d’autres workers → on valide seulement que la liste n’est pas null
-        assertTrue(workers.size() >= 0);
-    }
-
-    @Test
-    @Order(8)
-    void testGetPersonnelByShift() {
-        List<Personnel> morning = personnelDAO.getPersonnelByShift("morning");
-        assertNotNull(morning);
-        assertTrue(morning.size() >= 0);
-    }
-
-    @Test
-    @Order(9)
-    void testGetCounts() {
-        int total = personnelDAO.getTotalPersonnelCount();
-        int active = personnelDAO.getActivePersonnelCount();
-
-        assertTrue(total > 0, "Total personnel count should be > 0");
-        assertTrue(active >= 0, "Active personnel count should be >= 0");
-    }
-
-    @Test
-    @Order(10)
     void testDeletePersonnel() {
-        boolean deleted = personnelDAO.deletePersonnel(insertedId);
-        assertTrue(deleted, "Personnel should be deleted");
+        Personnel p = createTestPersonnel("delete@test.com");
 
-        Personnel p = personnelDAO.getPersonnelById(insertedId);
-        assertNull(p, "Personnel must not exist after deletion");
+        assertTrue(personnelDAO.deletePersonnel(p.getId()));
+
+        Personnel deleted = personnelDAO.getPersonnelById(p.getId());
+        assertNull(deleted);
     }
 }

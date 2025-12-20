@@ -1,7 +1,12 @@
 package ma.farm.dao;
 
 import ma.farm.model.Feed;
-import org.junit.jupiter.api.*;
+
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.MethodOrderer;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -12,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class FeedDAOTest {
 
     private static FeedDAO feedDAO;
-    private static int createdFeedId;
+    private static int feedId;
 
     @BeforeAll
     static void setup() {
@@ -23,87 +28,114 @@ public class FeedDAOTest {
     @Order(1)
     void testAddFeed() {
         Feed feed = new Feed();
-        feed.setName("JUnit Test Feed");
-        feed.setType("Layer");
-        feed.setQuantityKg(120.0);
-        feed.setPricePerKg(10.0);
-        feed.setSupplier("JUnit Supplier");
+        feed.setName("Maïs Test");
+        feed.setType("Grain");
+        feed.setQuantityKg(500);
+        feed.setPricePerKg(3.5);
+        feed.setSupplier("Supplier-Test");
         feed.setLastRestockDate(LocalDate.now());
-        feed.setExpiryDate(LocalDate.now().plusDays(30));
-        feed.setMinStockLevel(50.0);
+        feed.setExpiryDate(LocalDate.now().plusDays(40));
+        feed.setMinStockLevel(100);
 
         boolean created = feedDAO.addFeed(feed);
-
-        assertTrue(created, "L'ajout doit réussir");
-        assertTrue(feed.getId() > 0, "L'ID doit être généré");
-
-        createdFeedId = feed.getId();
+        assertTrue(created);
     }
 
     @Test
     @Order(2)
-    void testGetFeedById() {
-        Feed feed = feedDAO.getFeedById(createdFeedId);
+    void testGetAllFeed() {
+        List<Feed> feeds = feedDAO.getAllFeed();
+        assertNotNull(feeds);
+        assertFalse(feeds.isEmpty());
 
-        assertNotNull(feed, "Feed ne doit pas être null");
-        assertEquals("JUnit Test Feed", feed.getName());
+        feedId = feeds.get(feeds.size() - 1).getId();
+        assertTrue(feedId > 0);
     }
 
     @Test
     @Order(3)
-    void testGetAllFeed() {
-        List<Feed> list = feedDAO.getAllFeed();
-        assertNotNull(list);
-        assertTrue(list.size() > 0, "La liste ne doit pas être vide");
+    void testGetFeedById() {
+        Feed feed = feedDAO.getFeedById(feedId);
+        assertNotNull(feed);
+        assertEquals("Maïs Test", feed.getName());
     }
 
     @Test
     @Order(4)
-    void testUpdateQuantity() {
-        boolean updated = feedDAO.updateQuantity(createdFeedId, 200.0);
-        assertTrue(updated);
-
-        Feed updatedFeed = feedDAO.getFeedById(createdFeedId);
-        assertEquals(200.0, updatedFeed.getQuantityKg());
+    void testGetFeedByType() {
+        List<Feed> feeds = feedDAO.getFeedByType("Grain");
+        assertFalse(feeds.isEmpty());
     }
 
     @Test
     @Order(5)
-    void testUpdateFeed() {
-        Feed feed = feedDAO.getFeedById(createdFeedId);
-
-        feed.setName("Updated JUnit Feed");
-        feed.setPricePerKg(12.5);
-
-        boolean updated = feedDAO.updateFeed(feed);
-        assertTrue(updated);
-
-        Feed updatedFeed = feedDAO.getFeedById(createdFeedId);
-        assertEquals("Updated JUnit Feed", updatedFeed.getName());
-        assertEquals(12.5, updatedFeed.getPricePerKg());
+    void testGetLowStockFeed() {
+        List<Feed> feeds = feedDAO.getLowStockFeed();
+        assertNotNull(feeds); // peut être vide
     }
 
     @Test
     @Order(6)
-    void testGetLowStockCount() {
-        int count = feedDAO.getLowStockCount();
-        assertTrue(count >= 0, "Le count doit être >= 0");
+    void testGetExpiringFeed() {
+        List<Feed> feeds = feedDAO.getExpiringFeed();
+        assertNotNull(feeds);
     }
 
     @Test
     @Order(7)
+    void testGetExpiredFeed() {
+        List<Feed> feeds = feedDAO.getExpiredFeed();
+        assertNotNull(feeds);
+    }
+
+    @Test
+    @Order(8)
+    void testUpdateFeed() {
+        Feed feed = feedDAO.getFeedById(feedId);
+        assertNotNull(feed);
+
+        feed.setQuantityKg(300);
+        feed.setPricePerKg(4.0);
+        feed.setSupplier("Supplier-Updated");
+
+        boolean updated = feedDAO.updateFeed(feed);
+        assertTrue(updated);
+
+        Feed updatedFeed = feedDAO.getFeedById(feedId);
+        assertEquals(300, updatedFeed.getQuantityKg());
+    }
+
+    @Test
+    @Order(9)
+    void testUpdateQuantity() {
+        boolean updated = feedDAO.updateQuantity(feedId, 200);
+        assertTrue(updated);
+
+        Feed feed = feedDAO.getFeedById(feedId);
+        assertEquals(200, feed.getQuantityKg());
+    }
+
+    @Test
+    @Order(10)
+    void testGetTotalFeedQuantity() {
+        double total = feedDAO.getTotalFeedQuantity();
+        assertTrue(total >= 0);
+    }
+
+    @Test
+    @Order(11)
     void testGetTotalFeedValue() {
         double value = feedDAO.getTotalFeedValue();
         assertTrue(value >= 0);
     }
 
     @Test
-    @Order(8)
+    @Order(12)
     void testDeleteFeed() {
-        boolean deleted = feedDAO.deleteFeed(createdFeedId);
-        assertTrue(deleted, "La suppression doit réussir");
+        boolean deleted = feedDAO.deleteFeed(feedId);
+        assertTrue(deleted);
 
-        Feed deletedFeed = feedDAO.getFeedById(createdFeedId);
-        assertNull(deletedFeed, "Le feed supprimé ne doit plus exister");
+        Feed feed = feedDAO.getFeedById(feedId);
+        assertNull(feed);
     }
 }

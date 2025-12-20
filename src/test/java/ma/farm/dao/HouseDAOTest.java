@@ -3,6 +3,7 @@ package ma.farm.dao;
 import ma.farm.model.House;
 import ma.farm.model.HouseType;
 import ma.farm.model.HealthStatus;
+
 import org.junit.jupiter.api.*;
 
 import java.time.LocalDate;
@@ -11,10 +12,10 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class HouseDAOTest {
+public class HouseDAOTest {
 
     private static HouseDAO houseDAO;
-    private static int house1Id, house2Id;
+    private static int houseId;
 
     @BeforeAll
     static void setup() {
@@ -23,94 +24,181 @@ class HouseDAOTest {
 
     @Test
     @Order(1)
-    @DisplayName("Ajouter des maisons")
     void testAddHouse() {
-        House h1 = new House("TestH1", HouseType.DAY_OLD, 1000);
-        h1.setCapacity(1200);
-        h1.setHealthStatus(HealthStatus.GOOD);
-        h1.setLastCleaningDate(LocalDate.now().minusDays(3));
-        h1.setCreationDate(LocalDate.now());
+        House house = new House();
+        house.setName("Test-House-1");
+        house.setType(HouseType.DAY_OLD);
+        house.setChickenCount(0);
+        house.setCapacity(1000);
+        house.setHealthStatus(HealthStatus.GOOD);
+        house.setCreationDate(LocalDate.now());
 
-        House h2 = new House("TestH2", HouseType.EGG_LAYER, 500);
-        h2.setCapacity(800);
-        h2.setHealthStatus(HealthStatus.FAIR);
-        h2.setLastCleaningDate(LocalDate.now().minusDays(5));
-        h2.setCreationDate(LocalDate.now());
+        boolean created = houseDAO.addHouse(house);
+        assertTrue(created);
+        assertTrue(house.getId() > 0);
 
-        assertTrue(houseDAO.addHouse(h1), "H1 doit être ajoutée");
-        assertTrue(houseDAO.addHouse(h2), "H2 doit être ajoutée");
-
-        house1Id = h1.getId();
-        house2Id = h2.getId();
-
-        assertTrue(house1Id > 0);
-        assertTrue(house2Id > 0);
+        houseId = house.getId();
     }
 
     @Test
     @Order(2)
-    @DisplayName("Lire les maisons")
-    void testReadHouses() {
-        House h1 = houseDAO.getHouseById(house1Id);
-        assertNotNull(h1);
-        assertEquals("TestH1", h1.getName());
-
-        House h2 = houseDAO.getHouseByName("TestH2");
-        assertNotNull(h2);
-        assertEquals(house2Id, h2.getId());
-
-        List<House> allHouses = houseDAO.getAllHouses();
-        assertTrue(allHouses.size() >= 2);
-
-        List<House> dayOlds = houseDAO.getHousesByType(HouseType.DAY_OLD);
-        assertTrue(dayOlds.stream().anyMatch(h -> h.getId() == house1Id));
+    void testGetHouseById() {
+        House house = houseDAO.getHouseById(houseId);
+        assertNotNull(house);
+        assertEquals("Test-House-1", house.getName());
     }
 
     @Test
     @Order(3)
-    @DisplayName("Mettre à jour les maisons")
-    void testUpdateHouse() {
-        // Mise à jour complète
-        House h2 = houseDAO.getHouseById(house2Id);
-        h2.setName("TestH2-Updated");
-        h2.setCapacity(900);
-        assertTrue(houseDAO.updateHouse(h2));
-
-        House updated = houseDAO.getHouseById(house2Id);
-        assertEquals("TestH2-Updated", updated.getName());
-        assertEquals(900, updated.getCapacity());
-
-        // Mise à jour spécifique
-        assertTrue(houseDAO.updateChickenCount(house1Id, 1100));
-        assertEquals(1100, houseDAO.getHouseById(house1Id).getChickenCount());
-
-        assertTrue(houseDAO.updateHealthStatus(house1Id, HealthStatus.POOR));
-        assertEquals(HealthStatus.POOR, houseDAO.getHouseById(house1Id).getHealthStatus());
-
-        LocalDate newDate = LocalDate.now();
-        assertTrue(houseDAO.updateLastCleaningDate(house1Id, newDate));
-        assertEquals(newDate, houseDAO.getHouseById(house1Id).getLastCleaningDate());
+    void testGetHouseByName() {
+        House house = houseDAO.getHouseByName("Test-House-1");
+        assertNotNull(house);
+        assertEquals(houseId, house.getId());
     }
 
     @Test
     @Order(4)
-    @DisplayName("Tester les statistiques et requêtes avancées")
-    void testStatsAndQueries() {
-        int totalChickens = houseDAO.getTotalChickenCount();
-        assertTrue(totalChickens > 0, "Total de poulets doit être supérieur à 0");
-
-        List<House> needCleaning = houseDAO.getHousesNeedingCleaning(2);
-        assertNotNull(needCleaning);
+    void testGetAllHouses() {
+        List<House> houses = houseDAO.getAllHouses();
+        assertFalse(houses.isEmpty());
     }
 
     @Test
     @Order(5)
-    @DisplayName("Supprimer les maisons")
-    void testDeleteHouse() {
-        assertTrue(houseDAO.deleteHouse(house1Id), "H1 doit être supprimée");
-        assertTrue(houseDAO.deleteHouse(house2Id), "H2 doit être supprimée");
+    void testGetHousesByType() {
+        List<House> houses = houseDAO.getHousesByType(HouseType.DAY_OLD);
+        assertFalse(houses.isEmpty());
+    }
 
-        assertNull(houseDAO.getHouseById(house1Id));
-        assertNull(houseDAO.getHouseById(house2Id));
+    @Test
+    @Order(6)
+    void testUpdateHouse() {
+        House house = houseDAO.getHouseById(houseId);
+        assertNotNull(house);
+
+        house.setCapacity(1200);
+        house.setHealthStatus(HealthStatus.FAIR);
+
+        boolean updated = houseDAO.updateHouse(house);
+        assertTrue(updated);
+
+        House updatedHouse = houseDAO.getHouseById(houseId);
+        assertEquals(1200, updatedHouse.getCapacity());
+        assertEquals(HealthStatus.FAIR, updatedHouse.getHealthStatus());
+    }
+
+    @Test
+    @Order(7)
+    void testUpdateChickenCount() {
+        boolean updated = houseDAO.updateChickenCount(houseId, 500);
+        assertTrue(updated);
+
+        House house = houseDAO.getHouseById(houseId);
+        assertEquals(500, house.getChickenCount());
+    }
+
+    @Test
+    @Order(8)
+    void testAddChickensToHouse() {
+        boolean added = houseDAO.addChickensToHouse(
+                houseId,
+                200,
+                LocalDate.now()
+        );
+        assertTrue(added);
+
+        House house = houseDAO.getHouseById(houseId);
+        assertEquals(700, house.getChickenCount());
+    }
+
+    @Test
+    @Order(9)
+    void testRemoveChickensFromHouse() {
+        boolean removed = houseDAO.removeChickensFromHouse(houseId, 200);
+        assertTrue(removed);
+
+        House house = houseDAO.getHouseById(houseId);
+        assertEquals(500, house.getChickenCount());
+    }
+
+    @Test
+    @Order(10)
+    void testUpdateArrivalDate() {
+        LocalDate date = LocalDate.now().minusDays(3);
+        boolean updated = houseDAO.updateArrivalDate(houseId, date);
+        assertTrue(updated);
+
+        House house = houseDAO.getHouseById(houseId);
+        assertEquals(date, house.getArrivalDate());
+    }
+
+    @Test
+    @Order(11)
+    void testUpdateHealthStatus() {
+        boolean updated = houseDAO.updateHealthStatus(houseId, HealthStatus.GOOD);
+        assertTrue(updated);
+
+        House house = houseDAO.getHouseById(houseId);
+        assertEquals(HealthStatus.GOOD, house.getHealthStatus());
+    }
+
+    @Test
+    @Order(12)
+    void testUpdateLastCleaningDate() {
+        LocalDate cleaningDate = LocalDate.now().minusDays(10);
+        boolean updated = houseDAO.updateLastCleaningDate(houseId, cleaningDate);
+        assertTrue(updated);
+
+        House house = houseDAO.getHouseById(houseId);
+        assertEquals(cleaningDate, house.getLastCleaningDate());
+    }
+
+    @Test
+    @Order(13)
+    void testHasAnyChickens() {
+        boolean hasChickens = houseDAO.hasAnyChickens();
+        assertTrue(hasChickens);
+    }
+
+    @Test
+    @Order(14)
+    void testGetTotalChickenCount() {
+        int total = houseDAO.getTotalChickenCount();
+        assertTrue(total >= 500);
+    }
+
+    @Test
+    @Order(15)
+    void testGetTotalChickenCountByType() {
+        int total = houseDAO.getTotalChickenCountByType(HouseType.DAY_OLD);
+        assertTrue(total >= 500);
+    }
+
+    @Test
+    @Order(16)
+    void testGetHousesNeedingCleaning() {
+        List<House> houses = houseDAO.getHousesNeedingCleaning(7);
+        assertNotNull(houses);
+    }
+
+    @Test
+    @Order(17)
+    void testResetHouse() {
+        boolean reset = houseDAO.resetHouse(houseId);
+        assertTrue(reset);
+
+        House house = houseDAO.getHouseById(houseId);
+        assertEquals(0, house.getChickenCount());
+        assertNull(house.getArrivalDate());
+    }
+
+    @Test
+    @Order(18)
+    void testDeleteHouse() {
+        boolean deleted = houseDAO.deleteHouse(houseId);
+        assertTrue(deleted);
+
+        House house = houseDAO.getHouseById(houseId);
+        assertNull(house);
     }
 }

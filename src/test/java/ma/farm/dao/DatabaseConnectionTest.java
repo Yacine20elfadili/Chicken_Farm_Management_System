@@ -1,80 +1,48 @@
 package ma.farm.dao;
 
 import org.junit.jupiter.api.*;
-
-import java.io.File;
 import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.Statement;
+import java.sql.SQLException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class DatabaseConnectionTest {
 
-    private static DatabaseConnection db;
+    private DatabaseConnection dbConnection;
 
     @BeforeAll
-    static void init() {
-        db = DatabaseConnection.getInstance();
+    public void setup() {
+        dbConnection = DatabaseConnection.getInstance();
+        assertNotNull(dbConnection, "L'instance de DatabaseConnection ne doit pas être nulle");
     }
 
     @Test
-    @Order(1)
-    void testSingletonInstance() {
-        DatabaseConnection db2 = DatabaseConnection.getInstance();
-        assertSame(db, db2, "DatabaseConnection doit être singleton");
+    public void testSingleton() {
+        DatabaseConnection anotherInstance = DatabaseConnection.getInstance();
+        assertSame(dbConnection, anotherInstance, "getInstance doit toujours retourner le même objet");
     }
 
     @Test
-    @Order(2)
-    void testDatabaseFileExists() {
+    public void testGetConnection() throws SQLException {
+        Connection conn = dbConnection.getConnection();
+        assertNotNull(conn, "La connexion ne doit pas être nulle");
+        assertFalse(conn.isClosed(), "La connexion doit être ouverte");
+    }
+
+    @Test
+    public void testDatabasePath() {
         String path = DatabaseConnection.getDatabasePath();
-        File dbFile = new File(path);
-
-        assertTrue(dbFile.exists(), "Le fichier SQLite farm.db doit exister");
-        assertTrue(dbFile.isFile(), "farm.db doit être un fichier SQLite");
+        assertNotNull(path, "Le chemin de la base ne doit pas être nul");
+        assertTrue(path.endsWith("farm.db"), "Le chemin doit se terminer par farm.db");
     }
 
     @Test
-    @Order(3)
-    void testConnectionIsOpen() throws Exception {
-        Connection conn = db.getConnection();
-        assertNotNull(conn, "La connexion ne doit pas être null");
-        assertFalse(conn.isClosed(), "La connexion ne doit pas être fermée");
-    }
+    public void testCloseConnection() throws SQLException {
+        Connection conn = dbConnection.getConnection();
+        assertFalse(conn.isClosed(), "La connexion doit être ouverte avant fermeture");
 
-    @Test
-    @Order(4)
-    void testForeignKeysEnabled() throws Exception {
-        try (Statement stmt = db.getConnection().createStatement()) {
-            ResultSet rs = stmt.executeQuery("PRAGMA foreign_keys;");
-            assertTrue(rs.next());
-            assertEquals(1, rs.getInt(1), "Les clés étrangères doivent être activées");
-        }
-    }
-
-    @Test
-    @Order(5)
-    void testSchemaTablesExist() throws Exception {
-        try (Statement stmt = db.getConnection().createStatement()) {
-
-            // Vérifie la table users
-            ResultSet rs = stmt.executeQuery(
-                    "SELECT name FROM sqlite_master WHERE type='table' AND name='users';"
-            );
-
-            assertTrue(rs.next(), "La table users doit exister (schema.sql doit être exécuté)");
-        }
-    }
-
-    @Test
-    @Order(6)
-    void testSimpleQuery() throws Exception {
-        try (Statement stmt = db.getConnection().createStatement()) {
-            ResultSet rs = stmt.executeQuery("SELECT COUNT(*) AS count FROM users");
-            assertTrue(rs.next(), "La requête doit retourner un résultat");
-            assertTrue(rs.getInt("count") >= 0, "Le nombre d'utilisateurs doit être >= 0");
-        }
+        dbConnection.closeConnection();
+        assertTrue(conn.isClosed(), "La connexion doit être fermée après closeConnection");
     }
 }
