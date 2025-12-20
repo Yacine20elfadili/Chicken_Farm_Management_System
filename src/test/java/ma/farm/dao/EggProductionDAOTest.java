@@ -1,7 +1,12 @@
 package ma.farm.dao;
 
 import ma.farm.model.EggProduction;
-import org.junit.jupiter.api.*;
+
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.MethodOrderer;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -11,67 +16,168 @@ import static org.junit.jupiter.api.Assertions.*;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class EggProductionDAOTest {
 
-    private static EggProductionDAO dao;
-    private static EggProduction testProduction;
+    private static EggProductionDAO eggProductionDAO;
+    private static int testProductionId;
+    private static int testHouseId;
 
     @BeforeAll
-    public static void setup() {
-        dao = new EggProductionDAO();
+    static void setup() {
+        eggProductionDAO = new EggProductionDAO();
+
+        // ⚠️ IMPORTANT : créer une house de test (clé étrangère)
+        String sql = """
+            INSERT INTO houses (name, type, chickenCount, capacity, healthStatus, creationDate)
+            VALUES ('TEST-HOUSE-EGG', 'Egg Layer', 500, 1000, 'Good', DATE('now'))
+        """;
+
+        try (var stmt = DatabaseConnection.getInstance()
+                .getConnection()
+                .createStatement()) {
+
+            stmt.executeUpdate(sql);
+
+            var rs = stmt.executeQuery("SELECT last_insert_rowid()");
+            if (rs.next()) {
+                testHouseId = rs.getInt(1);
+            }
+
+        } catch (Exception e) {
+            fail("House creation failed: " + e.getMessage());
+        }
     }
 
     @Test
     @Order(1)
-    public void testAddProduction() {
-        testProduction = new EggProduction(
-                2, // houseId
+    void testAddProduction() {
+        EggProduction production = new EggProduction(
+                0,
+                testHouseId,
                 LocalDate.now(),
-                500,
-                10,
-                5
+                100,
+                5,
+                95,
+                1,
+                "Worker-1",
+                "JUnit test"
         );
-        testProduction.setCollectedBy("TestUser");
-        testProduction.setNotes("JUnit test record");
 
-        boolean added = dao.addProduction(testProduction);
-        assertTrue(added, "Production should be added successfully");
-        assertTrue(testProduction.getId() > 0, "Generated ID should be set");
+        boolean created = eggProductionDAO.addProduction(production);
+        assertTrue(created);
+        assertTrue(production.getId() > 0);
+
+        testProductionId = production.getId();
     }
 
     @Test
     @Order(2)
-    public void testGetProductionById() {
-        EggProduction retrieved = dao.getProductionById(testProduction.getId());
-        assertNotNull(retrieved, "Retrieved production should not be null");
-        assertEquals(testProduction.getHouseId(), retrieved.getHouseId());
-        assertEquals(testProduction.getEggsCollected(), retrieved.getEggsCollected());
+    void testGetProductionById() {
+        EggProduction production =
+                eggProductionDAO.getProductionById(testProductionId);
+
+        assertNotNull(production);
+        assertEquals(testHouseId, production.getHouseId());
+        assertEquals(95, production.getGoodEggs());
     }
 
     @Test
     @Order(3)
-    public void testUpdateProduction() {
-        testProduction.setEggsCollected(550);
-        testProduction.calculateGoodEggs(); // assuming this updates goodEggs
-        boolean updated = dao.updateProduction(testProduction);
-        assertTrue(updated, "Production should be updated successfully");
+    void testGetProductionByDate() {
+        List<EggProduction> list =
+                eggProductionDAO.getProductionByDate(LocalDate.now());
 
-        EggProduction retrieved = dao.getProductionById(testProduction.getId());
-        assertEquals(550, retrieved.getEggsCollected(), "Eggs collected should be updated");
+        assertFalse(list.isEmpty());
     }
 
     @Test
     @Order(4)
-    public void testGetProductionByDate() {
-        List<EggProduction> productions = dao.getProductionByDate(LocalDate.now());
-        assertFalse(productions.isEmpty(), "There should be productions for today");
+    void testGetProductionByHouse() {
+        List<EggProduction> list =
+                eggProductionDAO.getProductionByHouse(testHouseId);
+
+        assertFalse(list.isEmpty());
     }
 
     @Test
     @Order(5)
-    public void testDeleteProduction() {
-        boolean deleted = dao.deleteProduction(testProduction.getId());
-        assertTrue(deleted, "Production should be deleted successfully");
+    void testUpdateProduction() {
+        EggProduction production =
+                eggProductionDAO.getProductionById(testProductionId);
 
-        EggProduction retrieved = dao.getProductionById(testProduction.getId());
-        assertNull(retrieved, "Deleted production should no longer exist");
+        assertNotNull(production);
+
+        production.setEggsCollected(120);
+        production.setCrackedEggs(10);
+        production.setGoodEggs(110);
+        production.setNotes("Updated by JUnit");
+        production.setCollectedBy("Worker-2");
+
+        boolean updated =
+                eggProductionDAO.updateProduction(production);
+
+        assertTrue(updated);
+
+        EggProduction updatedProduction =
+                eggProductionDAO.getProductionById(testProductionId);
+
+        assertEquals(110, updatedProduction.getGoodEggs());
+    }
+
+    @Test
+    @Order(6)
+    void testGetEggsToday() {
+        int eggsToday = eggProductionDAO.getEggsToday();
+        assertTrue(eggsToday >= 0);
+    }
+
+    @Test
+    @Order(7)
+    void testGetTotalEggsByDateRange() {
+        int total = eggProductionDAO.getTotalEggsByDateRange(
+                LocalDate.now().minusDays(1),
+                LocalDate.now().plusDays(1)
+        );
+
+        assertTrue(total >= 95);
+    }
+
+    @Test
+    @Order(8)
+    void testGetAverageEfficiencyByHouse() {
+        double efficiency =
+                eggProductionDAO.getAverageEfficiencyByHouse(testHouseId);
+
+        assertTrue(efficiency >= 0.0);
+    }
+
+    @Test
+    @Order(9)
+    void testGetProductionCountByHouse() {
+        int count =
+                eggProductionDAO.getProductionCountByHouse(testHouseId);
+
+        assertTrue(count > 0);
+    }
+
+    @Test
+    @Order(10)
+    void testGetAllProduction() {
+        List<EggProduction> list =
+                eggProductionDAO.getAllProduction();
+
+        assertFalse(list.isEmpty());
+    }
+
+    @Test
+    @Order(11)
+    void testDeleteProduction() {
+        boolean deleted =
+                eggProductionDAO.deleteProduction(testProductionId);
+
+        assertTrue(deleted);
+
+        EggProduction production =
+                eggProductionDAO.getProductionById(testProductionId);
+
+        assertNull(production);
     }
 }

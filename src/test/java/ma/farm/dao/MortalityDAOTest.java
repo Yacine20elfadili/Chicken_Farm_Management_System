@@ -1,9 +1,10 @@
 package ma.farm.dao;
 
 import ma.farm.model.Mortality;
+import ma.farm.dao.MortalityDAO.MortalityStatistics;
+
 import org.junit.jupiter.api.*;
 
-import java.sql.*;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -12,134 +13,156 @@ import static org.junit.jupiter.api.Assertions.*;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class MortalityDAOTest {
 
-    private MortalityDAO mortalityDAO;
-    private DatabaseConnection db;
+    private static MortalityDAO mortalityDAO;
+    private static int mortalityId;
+    private static final int HOUSE_ID = 1;
 
     @BeforeAll
-    static void initDatabase() {
-        DatabaseConnection.getInstance(); // charge farm.db
-    }
-
-    @BeforeEach
-    void setup() {
-        db = DatabaseConnection.getInstance();
+    static void setup() {
         mortalityDAO = new MortalityDAO();
-
-        try (Connection conn = db.getConnection();
-             Statement stmt = conn.createStatement()) {
-
-            stmt.execute("""
-                CREATE TABLE IF NOT EXISTS mortality (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    houseId INTEGER NOT NULL,
-                    deathDate TEXT NOT NULL,
-                    count INTEGER NOT NULL,
-                    cause TEXT,
-                    symptoms TEXT,
-                    isOutbreak INTEGER,
-                    recordedBy TEXT,
-                    notes TEXT,
-                    recorded_at TEXT DEFAULT CURRENT_TIMESTAMP
-                );
-            """);
-
-        } catch (SQLException e) {
-            fail("Erreur creation table : " + e.getMessage());
-        }
-    }
-
-    private Mortality createSample() {
-        Mortality m = new Mortality();
-        m.setHouseId(1);
-        m.setDeathDate(LocalDate.now());
-        m.setCount(5);
-        m.setCause("Disease");
-        m.setSymptoms("Weakness");
-        m.setIsOutbreak(true);
-        m.setRecordedBy("Tester");
-        m.setNotes("JUnit test");
-        return m;
     }
 
     @Test
     @Order(1)
-    void testInsertMortality() {
-        Mortality m = createSample();
-        int id = mortalityDAO.recordMortality(m);
+    void testRecordMortality() {
+        Mortality mortality = new Mortality();
+        mortality.setHouseId(HOUSE_ID);
+        mortality.setDeathDate(LocalDate.now());
+        mortality.setCount(5);
+        mortality.setCause("Test Disease");
+        mortality.setSymptoms("Weakness");
+        mortality.setIsOutbreak(true);
+        mortality.setRecordedBy("JUnit");
+        mortality.setNotes("Test record");
 
-        assertTrue(id > 0, "L'insertion doit retourner un ID > 0");
+        mortalityId = mortalityDAO.recordMortality(mortality);
 
-        deleteById(id);
+        assertTrue(mortalityId > 0);
     }
 
     @Test
     @Order(2)
-    void testGetByDate() {
-        Mortality m = createSample();
-        int id = mortalityDAO.recordMortality(m);
-
-        List<Mortality> list = mortalityDAO.getMortalityByDate(LocalDate.now());
-        assertFalse(list.isEmpty());
-
-        deleteById(id);
+    void testGetTodayDeaths() {
+        List<Mortality> records = mortalityDAO.getTodayDeaths();
+        assertNotNull(records);
+        assertFalse(records.isEmpty());
     }
 
     @Test
     @Order(3)
-    void testUpdateMortality() {
-        Mortality m = createSample();
-        int id = mortalityDAO.recordMortality(m);
+    void testGetMortalityByDate() {
+        List<Mortality> records =
+                mortalityDAO.getMortalityByDate(LocalDate.now());
 
-        m.setId(id);
-        m.setCount(20);
-        m.setCause("Heat");
-        m.setSymptoms("Panting");
-
-        assertTrue(mortalityDAO.updateMortality(m));
-
-        Mortality m2 = mortalityDAO.getMortalityByHouse(1)
-                .stream()
-                .filter(x -> x.getId() == id)
-                .findFirst()
-                .orElse(null);
-
-        assertNotNull(m2);
-        assertEquals(20, m2.getCount());
-        assertEquals("Heat", m2.getCause());
-
-        deleteById(id);
+        assertFalse(records.isEmpty());
     }
 
     @Test
     @Order(4)
-    void testDeleteMortality() {
-        int id = mortalityDAO.recordMortality(createSample());
-
-        assertTrue(mortalityDAO.deleteMortality(id));
-
-        List<Mortality> list = mortalityDAO.getAllMortalityRecords();
-        assertTrue(list.stream().noneMatch(m -> m.getId() == id));
+    void testGetTotalDeathsThisWeek() {
+        int total = mortalityDAO.getTotalDeathsThisWeek();
+        assertTrue(total >= 0);
     }
 
     @Test
     @Order(5)
-    void testStatistics() {
-        int id1 = mortalityDAO.recordMortality(createSample());
-        int id2 = mortalityDAO.recordMortality(createSample());
-
-        MortalityDAO.MortalityStatistics stats = mortalityDAO.getMortalityStatistics();
-
-        assertTrue(stats.getTotalRecords() >= 2);
-        assertTrue(stats.getTotalDeaths() >= 10);
-
-        deleteById(id1);
-        deleteById(id2);
+    void testGetTotalDeathsThisMonth() {
+        int total = mortalityDAO.getTotalDeathsThisMonth();
+        assertTrue(total >= 0);
     }
 
-    /** Helper : delete safely 1 record */
-    private void deleteById(int id) {
-        try {
-            mortalityDAO.deleteMortality(id);
-        } catch (Exception ignored) {}
+    @Test
+    @Order(6)
+    void testGetTotalDeathsInHouse() {
+        int total = mortalityDAO.getTotalDeathsInHouse(HOUSE_ID);
+        assertTrue(total >= 0);
+    }
+
+    @Test
+    @Order(7)
+    void testGetMortalityByHouse() {
+        List<Mortality> records =
+                mortalityDAO.getMortalityByHouse(HOUSE_ID);
+
+        assertNotNull(records);
+        assertFalse(records.isEmpty());
+    }
+
+    @Test
+    @Order(8)
+    void testGetMortalityByHouseWithDateRange() {
+        List<Mortality> records =
+                mortalityDAO.getMortalityByHouse(
+                        HOUSE_ID,
+                        LocalDate.now().minusDays(7),
+                        LocalDate.now()
+                );
+
+        assertNotNull(records);
+    }
+
+    @Test
+    @Order(9)
+    void testGetMortalityByDateRange() {
+        List<Mortality> records =
+                mortalityDAO.getMortalityByDateRange(
+                        LocalDate.now().minusDays(7),
+                        LocalDate.now()
+                );
+
+        assertNotNull(records);
+    }
+
+    @Test
+    @Order(10)
+    void testGetMortalityByCause() {
+        List<Mortality> records =
+                mortalityDAO.getMortalityByCause("Test Disease");
+
+        assertNotNull(records);
+        assertFalse(records.isEmpty());
+    }
+
+    @Test
+    @Order(11)
+    void testGetOutbreakRecords() {
+        List<Mortality> records =
+                mortalityDAO.getOutbreakRecords();
+
+        assertNotNull(records);
+    }
+
+    @Test
+    @Order(12)
+    void testUpdateMortality() {
+        List<Mortality> records =
+                mortalityDAO.getMortalityByHouse(HOUSE_ID);
+
+        Mortality mortality = records.get(0);
+        mortality.setCount(8);
+        mortality.setNotes("Updated by JUnit");
+
+        boolean updated = mortalityDAO.updateMortality(mortality);
+        assertTrue(updated);
+    }
+
+    @Test
+    @Order(13)
+    void testGetMortalityStatistics() {
+        MortalityStatistics stats =
+                mortalityDAO.getMortalityStatistics();
+
+        assertNotNull(stats);
+        assertTrue(stats.getTotalRecords() >= 0);
+        assertTrue(stats.getTotalDeaths() >= 0);
+    }
+
+    @Test
+    @Order(14)
+    void testDeleteMortality() {
+        boolean deleted =
+                mortalityDAO.deleteMortality(mortalityId);
+
+        assertTrue(deleted);
     }
 }

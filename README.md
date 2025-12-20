@@ -22,11 +22,11 @@ This project was developed as part of a university Java course by the following 
 
 ### 👨‍🏫 Supervising Professors
 
-| Name | GitHub Profile                  |
-|----|---------------------------------|
-| Youssef ES-SAADY | [https://github.com/essaady](#) |
-| Abderrahmane SADIQ   | [@ProfessorGitHub2](#)          |
-| Professor 3 | [@ProfessorGitHub3](#)          |
+| Name               | GitHub Profile                     |
+|--------------------|------------------------------------|
+| Youssef ES-SAADY   | [https://github.com/essaady](#)    |
+| Abderrahmane SADIQ | [https://github.com/AbSadiqHub](#) |
+| AICHA DAKIR        | [@ProfessorGitHub3](#)             |
 
 ---
 
@@ -412,7 +412,8 @@ Chicken_Farm_Management_System/
 │   │   │           │   ├── ChickenDAO.java
 │   │   │           │   ├── DatabaseConnection.java
 │   │   │           │   ├── EggProductionDAO.java
-│   │   │           │   ├── EquipmentDAO.java
+│   │   │           │   ├── EquipmentCategoryDAO.java
+│   │   │           │   ├── EquipmentItemDAO.java
 │   │   │           │   ├── FeedDAO.java
 │   │   │           │   ├── HouseDAO.java
 │   │   │           │   ├── MedicationDAO.java
@@ -475,7 +476,8 @@ Chicken_Farm_Management_System/
 │                       ├── ChickenDAOTest.java
 │                       ├── DatabaseConnectionTest.java
 │                       ├── EggProductionDAOTest.java
-│                       ├── EquipmentDAOTest.java
+│                       ├── EquipmentCategoryDAO.java
+│                       ├── EquipmentItemDAO.java
 │                       ├── FeedDAOTest.java
 │                       ├── HouseDAOTest.java
 │                       ├── MedicationDAOTest.java
@@ -1032,9 +1034,9 @@ Permission is granted to use, copy, modify, and distribute this software for any
 
 We would like to thank our professors for their guidance and support throughout this project:
 
-- Professor [Youssef ES-SAADY]
-- Professor [Abderrahmane SADIQ]
-- Professor [Name 3]
+- Professor [ Youssef ES-SAADY ]
+- Professor [ Abderrahmane SADIQ ]
+- Professor [ AICHA DAKIR ]
 
 ### Team Recognition
 

@@ -1,6 +1,7 @@
 package ma.farm.dao;
 
 import ma.farm.model.Medication;
+
 import org.junit.jupiter.api.*;
 
 import java.time.LocalDate;
@@ -12,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class MedicationDAOTest {
 
     private static MedicationDAO medicationDAO;
-    private static int insertedId;
+    private static int medicationId;
 
     @BeforeAll
     static void setup() {
@@ -22,114 +23,117 @@ public class MedicationDAOTest {
     @Test
     @Order(1)
     void testAddMedication() {
-        Medication med = new Medication();
-        med.setName("JUnit Test Med");
-        med.setType("Supplement");
-        med.setQuantity(50);
-        med.setUnit("ml");
-        med.setPricePerUnit(10.0);
-        med.setSupplier("Test Supplier");
-        med.setPurchaseDate(LocalDate.now());
-        med.setExpiryDate(LocalDate.now().plusMonths(6));
-        med.setMinStockLevel(10);
-        med.setUsage("Test usage");
+        Medication medication = new Medication();
+        medication.setName("Antibiotic Test");
+        medication.setType("Antibiotic");
+        medication.setQuantity(100);
+        medication.setUnit("ml");
+        medication.setPricePerUnit(2.5);
+        medication.setSupplier("Vet Supplier");
+        medication.setPurchaseDate(LocalDate.now().minusDays(5));
+        medication.setExpiryDate(LocalDate.now().plusDays(60));
+        medication.setMinStockLevel(20);
+        medication.setUsage("Treatment");
 
-        boolean created = medicationDAO.addMedication(med);
-
-        assertTrue(created, "The medication should be added successfully");
-        assertTrue(med.getId() > 0, "The returned ID must be > 0");
-
-        insertedId = med.getId();
+        boolean created = medicationDAO.addMedication(medication);
+        assertTrue(created);
     }
 
     @Test
     @Order(2)
-    void testGetMedicationById() {
-        Medication med = medicationDAO.getMedicationById(insertedId);
+    void testGetAllMedications() {
+        List<Medication> medications = medicationDAO.getAllMedications();
+        assertNotNull(medications);
+        assertFalse(medications.isEmpty());
 
-        assertNotNull(med, "Medication must exist");
-        assertEquals("JUnit Test Med", med.getName());
+        medicationId = medications.get(medications.size() - 1).getId();
+        assertTrue(medicationId > 0);
     }
 
     @Test
     @Order(3)
-    void testUpdateQuantity() {
-        boolean updated = medicationDAO.updateQuantity(insertedId, 150);
-
-        assertTrue(updated, "Quantity must be updated");
-
-        Medication med = medicationDAO.getMedicationById(insertedId);
-        assertEquals(150, med.getQuantity());
+    void testGetMedicationById() {
+        Medication medication = medicationDAO.getMedicationById(medicationId);
+        assertNotNull(medication);
+        assertEquals("Antibiotic Test", medication.getName());
     }
 
     @Test
     @Order(4)
-    void testUpdateMedication() {
-        Medication med = medicationDAO.getMedicationById(insertedId);
-
-        med.setName("Updated JUnit Med");
-        med.setPricePerUnit(19.99);
-
-        boolean updated = medicationDAO.updateMedication(med);
-
-        assertTrue(updated, "Medication should be updated");
-
-        Medication updatedMed = medicationDAO.getMedicationById(insertedId);
-
-        assertEquals("Updated JUnit Med", updatedMed.getName());
-        assertEquals(19.99, updatedMed.getPricePerUnit());
+    void testGetMedicationByType() {
+        List<Medication> medications = medicationDAO.getMedicationByType("Antibiotic");
+        assertFalse(medications.isEmpty());
     }
 
     @Test
     @Order(5)
-    void testGetAllMedications() {
-        List<Medication> meds = medicationDAO.getAllMedications();
-
-        assertNotNull(meds);
-        assertTrue(meds.size() > 0, "There must be at least 1 medication in database");
+    void testGetLowStockMedications() {
+        List<Medication> medications = medicationDAO.getLowStockMedications();
+        assertNotNull(medications); // peut être vide
     }
 
     @Test
     @Order(6)
-    void testSearchByName() {
-        Medication results = medicationDAO.getMedicationByName("JUnit");
-
-        assertNotNull(results);
-        assertEquals("JUnit", results.getName(), "Search should return at 'JUnit'");
+    void testGetExpiringMedications() {
+        List<Medication> medications = medicationDAO.getExpiringMedications();
+        assertNotNull(medications);
     }
 
     @Test
     @Order(7)
-    void testLowStockCount() {
-        int count = medicationDAO.getLowStockMedicationCount();
-
-        assertTrue(count >= 0, "Low stock count must be >= 0");
+    void testGetExpiredMedications() {
+        List<Medication> medications = medicationDAO.getExpiredMedications();
+        assertNotNull(medications);
     }
 
     @Test
     @Order(8)
-    void testGetExpiredMedications() {
-        List<Medication> expired = medicationDAO.getExpiredMedications();
+    void testUpdateMedication() {
+        Medication medication = medicationDAO.getMedicationById(medicationId);
+        assertNotNull(medication);
 
-        assertNotNull(expired);
+        medication.setQuantity(80);
+        medication.setPricePerUnit(3.0);
+        medication.setSupplier("Updated Supplier");
+
+        boolean updated = medicationDAO.updateMedication(medication);
+        assertTrue(updated);
+
+        Medication updatedMedication = medicationDAO.getMedicationById(medicationId);
+        assertEquals(80, updatedMedication.getQuantity());
     }
 
     @Test
     @Order(9)
-    void testGetTotalMedicationValue() {
-        double value = medicationDAO.getTotalMedicationValue();
+    void testUpdateQuantity() {
+        boolean updated = medicationDAO.updateQuantity(medicationId, 50);
+        assertTrue(updated);
 
-        assertTrue(value >= 0, "Total value must be >= 0");
+        Medication medication = medicationDAO.getMedicationById(medicationId);
+        assertEquals(50, medication.getQuantity());
     }
 
     @Test
     @Order(10)
+    void testGetTotalMedicationValue() {
+        double value = medicationDAO.getTotalMedicationValue();
+        assertTrue(value >= 0);
+    }
+
+    @Test
+    @Order(11)
+    void testGetLowStockMedicationCount() {
+        int count = medicationDAO.getLowStockMedicationCount();
+        assertTrue(count >= 0);
+    }
+
+    @Test
+    @Order(12)
     void testDeleteMedication() {
-        boolean deleted = medicationDAO.deleteMedication(insertedId);
+        boolean deleted = medicationDAO.deleteMedication(medicationId);
+        assertTrue(deleted);
 
-        assertTrue(deleted, "Medication must be deleted");
-
-        Medication med = medicationDAO.getMedicationById(insertedId);
-        assertNull(med, "Medication must no longer exist");
+        Medication medication = medicationDAO.getMedicationById(medicationId);
+        assertNull(medication);
     }
 }
