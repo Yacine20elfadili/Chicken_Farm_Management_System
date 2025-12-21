@@ -8,6 +8,7 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
@@ -15,7 +16,7 @@
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600" prefWidth="950" stylesheets="@../css/style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ma.farm.controller.LoginController">
     <left>
         <!-- Left Side - Brand Section -->
-        <VBox fx:id="leftPanel" alignment="CENTER" prefHeight="700.0" prefWidth="389.0" style="-fx-background-radius: 0 10 10 0;" styleClass="brand-panel" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <VBox fx:id="leftPanel" alignment="CENTER" prefHeight="700.0" prefWidth="350.0" styleClass="brand-panel" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
             <children>
                 <ImageView fx:id="logoImage" fitHeight="120.0" fitWidth="120.0" pickOnBounds="true" preserveRatio="true" styleClass="brand-logo">
                     <image>
@@ -28,12 +29,12 @@
             </children>
         </VBox>
     </left>
-        <!-- Right Side - Login Form -->
+    <!-- Right Side - Login Form -->
     <center>
         <VBox fx:id="rightPanel" alignment="CENTER" prefHeight="700.0" prefWidth="609.0" styleClass="login-panel" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="390.66666666666663" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
             <children>
                 <!-- Login Form Container -->
-                <VBox maxWidth="440.0" prefHeight="451.0" prefWidth="440.0" styleClass="login-container">
+                <VBox maxWidth="440.0" prefHeight="585.0" prefWidth="440.0" styleClass="login-container">
                     <children>
                         <!-- Header -->
                         <VBox styleClass="login-header">
@@ -44,7 +45,7 @@
                         </VBox>
 
                         <!-- Form Fields -->
-                        <VBox maxWidth="368.0" minWidth="400.0" prefHeight="303.0" styleClass="form-container">
+                        <VBox maxWidth="400.0" minWidth="400.0" prefHeight="389.0" prefWidth="400.0" styleClass="form-container">
                             <children>
                                 <!-- Username Field -->
                                 <VBox styleClass="input-group">
@@ -59,16 +60,27 @@
                                 </VBox>
 
                                 <!-- Login Button -->
-                                <Button fx:id="loginButton" minWidth="150.0" prefWidth="150.0" styleClass="login-button" text="Se Connecter" onAction="#handleLogin" />
+                                <Button fx:id="loginButton" minWidth="150.0" onAction="#handleLogin" styleClass="login-button" text="Se Connecter" />
+                                <!-- Add after the Login Button, inside form-container -->
+                                <VBox alignment="CENTER" style="-fx-padding: 20 0 0 0;" styleClass="signup-link-container">
+                                    <children>
+                                        <HBox alignment="CENTER" spacing="5">
+                                            <children>
+                                                <Label styleClass="signup-link-text" text="Vous n'avez pas de compte?" />
+                                                <Button fx:id="signUpLinkButton" onAction="#handleSignUpLink" styleClass="link-button" text="S'inscrire" />
+                                            </children>
+                                        </HBox>
+                                    </children>
+                                </VBox>
                             </children>
                         </VBox>
 
                         <!-- Footer -->
-                        <VBox styleClass="error-message">
+                        <VBox alignment="CENTER">
                             <Label fx:id="errorLabel" styleClass="error-text" text="e-mail ou mot de passe incorrect." visible="false">
-                        <font>
-                           <Font name="System Bold Italic" size="11.0" />
-                        </font></Label>
+                                <font>
+                                    <Font name="System Bold Italic" size="11.0" />
+                                </font></Label>
                         </VBox>
                     </children>
                 </VBox>
