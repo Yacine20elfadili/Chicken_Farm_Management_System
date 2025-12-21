@@ -109,20 +109,37 @@ INSERT OR IGNORE INTO jobTitles (name, department, description) VALUES
     ('farmhand_subordinate', 'farm', 'Farmhand Subordinate - Works under farmhand supervisor');
 
 -- ============================================================
--- USERS TABLE
+-- USERS TABLE (Moroccan Business Registration)
 -- ============================================================
 
 CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name VARCHAR(100) NOT NULL,
     email VARCHAR(100) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
-    creationDate DATETIME DEFAULT CURRENT_TIMESTAMP
+    companyName VARCHAR(200) NOT NULL,
+    legalForm VARCHAR(50) NOT NULL,
+    capitalSocial INTEGER NOT NULL,
+    ice VARCHAR(15) NOT NULL UNIQUE,
+    rc VARCHAR(100) NOT NULL,
+    fiscalId VARCHAR(20) NOT NULL,
+    patente INTEGER NOT NULL,
+    cnss VARCHAR(20),
+    onssa VARCHAR(50) NOT NULL,
+    address VARCHAR(255) NOT NULL,
+    city VARCHAR(100) NOT NULL,
+    postalCode VARCHAR(5) NOT NULL,
+    bankRIB VARCHAR(24) NOT NULL UNIQUE,
+    bankName VARCHAR(100) NOT NULL,
+    phoneNumber VARCHAR(20) NOT NULL,
+    website VARCHAR(200),
+    creationDate DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
--- Insert default admin user if not exists
-INSERT OR IGNORE INTO users (name, email, password)
-VALUES ('Administrator', 'admin@farm.ma', 'admin123');
+CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
+CREATE INDEX IF NOT EXISTS idx_users_ice ON users(ice);
+CREATE INDEX IF NOT EXISTS idx_users_rib ON users(bankRIB);
+CREATE INDEX IF NOT EXISTS idx_users_phone ON users(phoneNumber);
 
 -- ============================================================
 -- Houses (Chicken Bays) Database Schema for SQLite
@@ -304,7 +321,7 @@ END;
 
 CREATE TABLE IF NOT EXISTS feed (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name VARCHAR(100) NOT NULL UNIQUE,
+    name VARCHAR(100) NOT NULL,
     type VARCHAR(50) NOT NULL,
     quantityKg REAL NOT NULL DEFAULT 0,
     pricePerKg REAL NOT NULL DEFAULT 0,
@@ -315,7 +332,7 @@ CREATE TABLE IF NOT EXISTS feed (
     created_at TEXT DEFAULT CURRENT_TIMESTAMP,
     updated_at TEXT DEFAULT CURRENT_TIMESTAMP
 );
-CREATE INDEX IF NOT EXISTS idx_feed_name ON feed(name);
+
 CREATE INDEX IF NOT EXISTS idx_feed_type ON feed(type);
 CREATE INDEX IF NOT EXISTS idx_feed_expiry ON feed(expiryDate);
 
@@ -334,7 +351,7 @@ END;
 
 CREATE TABLE IF NOT EXISTS medications (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name VARCHAR(100) NOT NULL UNIQUE,
+    name VARCHAR(100) NOT NULL,
     type VARCHAR(50) NOT NULL,
     quantity INTEGER NOT NULL DEFAULT 0,
     unit VARCHAR(20) NOT NULL,
@@ -348,7 +365,6 @@ CREATE TABLE IF NOT EXISTS medications (
     updated_at TEXT DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX IF NOT EXISTS idx_medications_name ON medications(name);
 CREATE INDEX IF NOT EXISTS idx_medications_type ON medications(type);
 CREATE INDEX IF NOT EXISTS idx_medications_expiry ON medications(expiryDate);
 
