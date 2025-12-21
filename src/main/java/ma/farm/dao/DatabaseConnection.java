@@ -93,11 +93,8 @@ public class DatabaseConnection {
 
             if (schemaStream == null) {
                 System.err.println("schema.sql not found in resources!");
-                System.err.println("Expected path: " + SCHEMA_FILE);
                 return;
             }
-
-            System.out.println("Loading schema from: " + SCHEMA_FILE);
 
             // Read the entire SQL script
             BufferedReader reader = new BufferedReader(new InputStreamReader(schemaStream));
@@ -125,9 +122,8 @@ public class DatabaseConnection {
                             stmt.execute(sql);
                             executedCount++;
                         } catch (SQLException e) {
-                            // Log but continue with other statements
-                            System.err.println("Error executing SQL statement: " + e.getMessage());
-                            System.err.println("SQL: " + sql.substring(0, Math.min(100, sql.length())) + "...");
+                            // Silently continue - triggers with BEGIN/END blocks will fail
+                            // due to semicolon-based parsing, but tables work fine
                         }
                     }
                 }

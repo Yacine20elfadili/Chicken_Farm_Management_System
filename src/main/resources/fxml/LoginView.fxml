@@ -11,6 +11,8 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
+<?import javafx.scene.layout.HBox?>
+
 
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600" prefWidth="950" stylesheets="@../css/style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ma.farm.controller.LoginController">
     <left>
@@ -60,6 +62,17 @@
 
                                 <!-- Login Button -->
                                 <Button fx:id="loginButton" minWidth="150.0" prefWidth="150.0" styleClass="login-button" text="Se Connecter" onAction="#handleLogin" />
+                                                <!-- Add after the Login Button, inside form-container -->
+                                <VBox styleClass="signup-link-container" alignment="CENTER" style="-fx-padding: 20 0 0 0;">
+                                    <children>
+                                        <HBox spacing="5" alignment="CENTER">
+                                            <children>
+                                                <Label text="Vous n'avez pas de compte?" styleClass="signup-link-text" />
+                                                <Button fx:id="signUpLinkButton" text="S'inscrire" styleClass="link-button" onAction="#handleSignUpLink" />
+                                            </children>
+                                        </HBox>
+                                    </children>
+                                </VBox>
                             </children>
                         </VBox>
 

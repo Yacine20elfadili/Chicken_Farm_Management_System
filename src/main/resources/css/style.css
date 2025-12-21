@@ -1,3 +1,26 @@
+/* Sign Up Link Container */
+.signup-link-container {
+    -fx-padding: 15 0 0 0;
+}
+
+.signup-link-text {
+    -fx-font-size: 13px;
+    -fx-text-fill: #7f8c8d;
+}
+
+.link-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: #3498db;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-underline: true;
+    -fx-cursor: hand;
+    -fx-padding: 0;
+}
+
+.link-button:hover {
+    -fx-text-fill: #2980b9;
+}
 /*=====================================================================================*/
 /*================================== LOGIN STYLE ==================================*/
 /*=====================================================================================*/
@@ -1496,4 +1519,289 @@
 .dialog-btn-cancel:hover {
     -fx-background-color: #7f8c8d;
     -fx-effect: dropshadow(gaussian, rgba(149,165,166,0.3), 10, 0, 0, 2);
+}
+
+/* ============================================
+   SIGN UP PAGE STYLES
+   ============================================ */
+
+/* Sign Up Scroll Pane */
+.signup-scroll-pane {
+    -fx-background-color: white;
+    -fx-background: white;
+}
+
+.signup-scroll-pane > .viewport {
+    -fx-background-color: white;
+}
+
+/* Sign Up Panel */
+.signup-panel {
+    -fx-background-color: white;
+    -fx-padding: 20;
+}
+
+/* Sign Up Header */
+.signup-header {
+    -fx-spacing: 10;
+    -fx-padding: 0 0 20 0;
+}
+
+.signup-title {
+    -fx-font-size: 32px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #2c3e50;
+}
+
+.signup-subtitle {
+    -fx-font-size: 14px;
+    -fx-text-fill: #7f8c8d;
+}
+
+/* Sign Up Form Container */
+.signup-form-container {
+    -fx-spacing: 25;
+    -fx-padding: 20;
+    -fx-background-color: white;
+}
+
+/* Form Section */
+.form-section {
+    -fx-spacing: 15;
+    -fx-padding: 20;
+    -fx-background-color: #f8f9fa;
+    -fx-background-radius: 10;
+    -fx-border-color: #e9ecef;
+    -fx-border-width: 1;
+    -fx-border-radius: 10;
+}
+
+/* Section Title */
+.section-title {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #2c3e50;
+    -fx-padding: 0 0 10 0;
+}
+
+/* Input Hint */
+.input-hint {
+    -fx-font-size: 11px;
+    -fx-text-fill: #6c757d;
+    -fx-padding: 5 0 0 0;
+    -fx-font-style: italic;
+}
+
+/* Sign Up Actions */
+.signup-actions {
+    -fx-spacing: 10;
+    -fx-padding: 20 0 0 0;
+}
+
+/* Sign Up Button */
+.signup-button {
+    -fx-background-color: #27ae60;
+    -fx-text-fill: white;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(39, 174, 96, 0.4), 10, 0, 0, 3);
+}
+
+.signup-button:hover {
+    -fx-background-color: #229954;
+    -fx-effect: dropshadow(gaussian, rgba(39, 174, 96, 0.6), 15, 0, 0, 5);
+}
+
+.signup-button:pressed {
+    -fx-background-color: #1e8449;
+    -fx-translate-y: 1;
+}
+
+/* Secondary Button */
+.secondary-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: #3498db;
+    -fx-font-size: 14px;
+    -fx-background-radius: 8;
+    -fx-border-color: #3498db;
+    -fx-border-width: 2;
+    -fx-border-radius: 8;
+    -fx-cursor: hand;
+}
+
+.secondary-button:hover {
+    -fx-background-color: #3498db;
+    -fx-text-fill: white;
+}
+
+.secondary-button:pressed {
+    -fx-background-color: #2980b9;
+    -fx-border-color: #2980b9;
+    -fx-translate-y: 1;
+}
+
+/* Message Container */
+.message-container {
+    -fx-padding: 10 0 0 0;
+}
+
+/* Success Message */
+.success-message {
+    -fx-text-fill: #27ae60;
+    -fx-font-size: 13px;
+    -fx-padding: 10;
+    -fx-background-color: #d4edda;
+    -fx-background-radius: 5;
+    -fx-border-color: #c3e6cb;
+    -fx-border-width: 1;
+    -fx-border-radius: 5;
+}
+
+/* Error Message (extend existing) */
+.error-message {
+    -fx-text-fill: #e74c3c;
+    -fx-font-size: 12px;
+    -fx-padding: 10;
+    -fx-background-color: #f8d7da;
+    -fx-background-radius: 5;
+    -fx-border-color: #f5c6cb;
+    -fx-border-width: 1;
+    -fx-border-radius: 5;
+}
+
+/*=====================================================================================*/
+/*================================== SIGN UP FORM STYLES ==============================*/
+/*=====================================================================================*/
+
+/* ComboBox Styling */
+.combo-box {
+    -fx-pref-height: 50px;
+    -fx-background-color: white;
+    -fx-background-radius: 10px;
+    -fx-border-radius: 10px;
+    -fx-border-color: #E0E0E0;
+    -fx-border-width: 2px;
+    -fx-padding: 0 10;
+    -fx-font-size: 14px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 5, 0, 0, 2);
+}
+
+.combo-box:hover {
+    -fx-border-color: #FFA800;
+}
+
+.combo-box:focused {
+    -fx-border-color: #FFA800;
+    -fx-effect: dropshadow(gaussian, rgba(255,168,0,0.2), 10, 0, 0, 3);
+}
+
+.combo-box .list-cell {
+    -fx-padding: 10 15;
+    -fx-font-size: 14px;
+}
+
+/* Critical Field Label (ICE, RIB, ONSSA) */
+.input-label-critical {
+    -fx-text-fill: #e74c3c;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-font-family: 'Segoe UI', Arial, sans-serif;
+}
+
+/* Critical Text Field (ICE, RIB, ONSSA) */
+.text-field-critical {
+    -fx-pref-height: 50px;
+    -fx-pref-width: 100%;
+    -fx-background-color: #fff5f5;
+    -fx-background-radius: 10px;
+    -fx-border-radius: 10px;
+    -fx-border-color: #fca5a5;
+    -fx-border-width: 2px;
+    -fx-padding: 0 15;
+    -fx-font-size: 14px;
+    -fx-effect: dropshadow(gaussian, rgba(220,38,38,0.1), 5, 0, 0, 2);
+}
+
+.text-field-critical:hover {
+    -fx-border-color: #e74c3c;
+}
+
+.text-field-critical:focused {
+    -fx-border-color: #e74c3c;
+    -fx-background-color: white;
+    -fx-effect: dropshadow(gaussian, rgba(220,38,38,0.3), 10, 0, 0, 3);
+}
+
+/* Critical Hint Label */
+.input-hint-critical {
+    -fx-text-fill: #e74c3c;
+    -fx-font-size: 11px;
+    -fx-font-style: italic;
+    -fx-padding: 2 0 0 5;
+}
+
+/* Section Title with Emoji */
+.section-title {
+    -fx-text-fill: #1e2939;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-font-family: 'Segoe UI', Arial, sans-serif;
+    -fx-padding: 10 0 5 0;
+    -fx-border-color: transparent transparent #e5e7eb transparent;
+    -fx-border-width: 0 0 1 0;
+}
+
+/* Form Section Container */
+.form-section {
+    -fx-background-color: white;
+    -fx-background-radius: 10;
+    -fx-padding: 20;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 8, 0, 0, 2);
+    -fx-border-color: #e5e7eb;
+    -fx-border-width: 1;
+    -fx-border-radius: 10;
+}
+
+/* Input Hint */
+.input-hint {
+    -fx-text-fill: #6b7280;
+    -fx-font-size: 11px;
+    -fx-font-style: italic;
+    -fx-padding: 2 0 0 5;
+}
+
+/* Sign Up Panel Background */
+.signup-panel {
+    -fx-background-color: #f5f1e8;
+}
+
+/* Signup Scroll Pane */
+.signup-scroll-pane {
+    -fx-background-color: transparent;
+    -fx-background: #f5f1e8;
+}
+
+.signup-scroll-pane > .viewport {
+    -fx-background-color: transparent;
+}
+
+/* Signup Header */
+.signup-header {
+    -fx-spacing: 5;
+    -fx-padding: 0 0 10 0;
+}
+
+.signup-title {
+    -fx-text-fill: #1e2939;
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+    -fx-font-family: 'Segoe UI', Arial, sans-serif;
+}
+
+.signup-subtitle {
+    -fx-text-fill: #6b7280;
+    -fx-font-size: 14px;
+    -fx-font-family: 'Segoe UI', Arial, sans-serif;
 }
