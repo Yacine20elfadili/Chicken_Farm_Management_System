@@ -1,0 +1,304 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
+            prefHeight="800" prefWidth="1200"
+            stylesheets="@../css/style.css"
+            xmlns="http://javafx.com/javafx/25"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="ma.farm.controller.SignUpController">
+    <left>
+        <VBox alignment="CENTER" prefHeight="800.0" prefWidth="350.0"
+              styleClass="brand-panel"
+              BorderPane.alignment="CENTER">
+            <children>
+                <ImageView fitHeight="120.0" fitWidth="120.0"
+                          pickOnBounds="true" preserveRatio="true"
+                          styleClass="brand-logo">
+                    <image>
+                        <Image url="@../images/logo.png" />
+                    </image>
+                </ImageView>
+                <Text styleClass="brand-title" text="Poultry Farm" />
+                <Text styleClass="brand-subtitle" text="Management" />
+                <Label styleClass="brand-tagline"
+                       text="Inscription Entreprise Marocaine" />
+            </children>
+        </VBox>
+    </left>
+    <center>
+        <ScrollPane fitToWidth="true" hbarPolicy="NEVER"
+                    prefHeight="800.0" prefWidth="850.0"
+                    styleClass="signup-scroll-pane"
+                    BorderPane.alignment="CENTER">
+            <content>
+                <VBox alignment="TOP_CENTER" spacing="0"
+                      styleClass="signup-panel">
+                    <padding>
+                        <Insets top="30" bottom="40" left="30" right="30" />
+                    </padding>
+                    <!-- Header Section -->
+                    <VBox styleClass="signup-header" alignment="CENTER">
+                        <children>
+                            <Label styleClass="signup-title" text="Créer un Compte Entreprise" />
+                            <Label styleClass="signup-subtitle"
+                                   text="Inscrivez votre entreprise avicole" />
+                        </children>
+                    </VBox>
+                    <!-- Form Container -->
+                    <VBox maxWidth="700.0" spacing="25" styleClass="signup-form-container">
+                        <padding>
+                            <Insets top="25" />
+                        </padding>
+
+                        <!-- ============ COMPANY INFORMATION ============ -->
+                        <VBox spacing="15" styleClass="form-section">
+                            <Label styleClass="section-title" text="📋 Informations de l'Entreprise" />
+                            
+                            <!-- Company Name -->
+                            <VBox styleClass="input-group">
+                                <Label styleClass="input-label" text="Nom de Société *" />
+                                <TextField fx:id="companyNameField"
+                                          promptText="Ex: Ferme Avicole Al Amal SARL"
+                                          styleClass="text-field" />
+                            </VBox>
+                            
+                            <!-- Legal Form and Capital (Two columns) -->
+                            <HBox spacing="15">
+                                <VBox styleClass="input-group" HBox.hgrow="ALWAYS">
+                                    <Label styleClass="input-label" text="Forme Juridique *" />
+                                    <ComboBox fx:id="legalFormCombo" styleClass="combo-box" maxWidth="Infinity" />
+                                </VBox>
+                                <VBox styleClass="input-group" HBox.hgrow="ALWAYS">
+                                    <Label styleClass="input-label" text="Capital Social (MAD) *" />
+                                    <TextField fx:id="capitalSocialField"
+                                              promptText="Ex: 100000"
+                                              styleClass="text-field" />
+                                    <Label styleClass="input-hint" text="Min: 10,000 (SARL) / 300,000 (SA)" />
+                                </VBox>
+                            </HBox>
+                        </VBox>
+
+                        <!-- ============ LEGAL IDENTIFIERS ============ -->
+                        <VBox spacing="15" styleClass="form-section">
+                            <Label styleClass="section-title" text="⚖️ Identifiants Légaux (Maroc)" />
+                            
+                            <!-- ICE (Critical) -->
+                            <VBox styleClass="input-group">
+                                <Label styleClass="input-label-critical" text="⚠️ ICE (Identifiant Commun Entreprise) *" />
+                                <TextField fx:id="iceField"
+                                          promptText="15 chiffres - Ex: 002532678000045"
+                                          styleClass="text-field-critical" />
+                                <Label styleClass="input-hint-critical" text="OBLIGATOIRE sur toutes les factures - 15 chiffres exactement" />
+                            </VBox>
+                            
+                            <!-- RC and IF -->
+                            <HBox spacing="15">
+                                <VBox styleClass="input-group" HBox.hgrow="ALWAYS">
+                                    <Label styleClass="input-label" text="Registre de Commerce (RC) *" />
+                                    <TextField fx:id="rcField"
+                                              promptText="Ex: RC 12345 Casablanca"
+                                              styleClass="text-field" />
+                                </VBox>
+                                <VBox styleClass="input-group" HBox.hgrow="ALWAYS">
+                                    <Label styleClass="input-label" text="Identifiant Fiscal (IF) *" />
+                                    <TextField fx:id="fiscalIdField"
+                                              promptText="7-8 chiffres"
+                                              styleClass="text-field" />
+                                </VBox>
+                            </HBox>
+                            
+                            <!-- Patente and CNSS -->
+                            <HBox spacing="15">
+                                <VBox styleClass="input-group" HBox.hgrow="ALWAYS">
+                                    <Label styleClass="input-label" text="Patente *" />
+                                    <TextField fx:id="patenteField"
+                                              promptText="Numéro de patente"
+                                              styleClass="text-field" />
+                                </VBox>
+                                <VBox styleClass="input-group" HBox.hgrow="ALWAYS">
+                                    <Label styleClass="input-label" text="CNSS (si employés)" />
+                                    <TextField fx:id="cnssField"
+                                              promptText="7-9 chiffres (optionnel)"
+                                              styleClass="text-field" />
+                                </VBox>
+                            </HBox>
+                            
+                            <!-- ONSSA (Critical for poultry) -->
+                            <VBox styleClass="input-group">
+                                <Label styleClass="input-label-critical" text="⚠️ Autorisation ONSSA *" />
+                                <TextField fx:id="onssaField"
+                                          promptText="Ex: ONSSA-AV-2024-0123"
+                                          styleClass="text-field-critical" />
+                                <Label styleClass="input-hint-critical" text="OBLIGATOIRE pour les fermes avicoles" />
+                            </VBox>
+                        </VBox>
+
+                        <!-- ============ ADDRESS ============ -->
+                        <VBox spacing="15" styleClass="form-section">
+                            <Label styleClass="section-title" text="📍 Adresse du Siège Social" />
+                            
+                            <!-- Address -->
+                            <VBox styleClass="input-group">
+                                <Label styleClass="input-label" text="Adresse Complète *" />
+                                <TextField fx:id="addressField"
+                                          promptText="Ex: 123 Avenue Mohammed V, Quartier Industriel"
+                                          styleClass="text-field" />
+                            </VBox>
+                            
+                            <!-- City and Postal Code -->
+                            <HBox spacing="15">
+                                <VBox styleClass="input-group" HBox.hgrow="ALWAYS">
+                                    <Label styleClass="input-label" text="Ville *" />
+                                    <TextField fx:id="cityField"
+                                              promptText="Ex: Casablanca"
+                                              styleClass="text-field" />
+                                </VBox>
+                                <VBox styleClass="input-group" prefWidth="150">
+                                    <Label styleClass="input-label" text="Code Postal *" />
+                                    <TextField fx:id="postalCodeField"
+                                              promptText="5 chiffres"
+                                              styleClass="text-field" />
+                                </VBox>
+                            </HBox>
+                        </VBox>
+
+                        <!-- ============ BANKING ============ -->
+                        <VBox spacing="15" styleClass="form-section">
+                            <Label styleClass="section-title" text="🏦 Informations Bancaires" />
+                            
+                            <!-- RIB (Critical) -->
+                            <VBox styleClass="input-group">
+                                <Label styleClass="input-label-critical" text="⚠️ RIB Bancaire *" />
+                                <TextField fx:id="bankRIBField"
+                                          promptText="24 chiffres - Ex: 230780000012345678901234"
+                                          styleClass="text-field-critical" />
+                                <Label styleClass="input-hint-critical" text="CRITIQUE pour les paiements - 24 chiffres exactement" />
+                            </VBox>
+                            
+                            <!-- Bank Name -->
+                            <VBox styleClass="input-group">
+                                <Label styleClass="input-label" text="Nom de la Banque *" />
+                                <TextField fx:id="bankNameField"
+                                          promptText="Ex: Attijariwafa Bank, BMCE, Banque Populaire"
+                                          styleClass="text-field" />
+                            </VBox>
+                        </VBox>
+
+                        <!-- ============ CONTACT ============ -->
+                        <VBox spacing="15" styleClass="form-section">
+                            <Label styleClass="section-title" text="📞 Contact" />
+                            
+                            <!-- Phone and Email -->
+                            <HBox spacing="15">
+                                <VBox styleClass="input-group" HBox.hgrow="ALWAYS">
+                                    <Label styleClass="input-label" text="Téléphone *" />
+                                    <TextField fx:id="phoneNumberField"
+                                              promptText="+212 522-123456"
+                                              styleClass="text-field" />
+                                </VBox>
+                                <VBox styleClass="input-group" HBox.hgrow="ALWAYS">
+                                    <Label styleClass="input-label" text="Email *" />
+                                    <TextField fx:id="emailField"
+                                              promptText="contact@ferme.ma"
+                                              styleClass="text-field" />
+                                </VBox>
+                            </HBox>
+                            
+                            <!-- Website (Optional) -->
+                            <VBox styleClass="input-group">
+                                <Label styleClass="input-label" text="Site Web (optionnel)" />
+                                <TextField fx:id="websiteField"
+                                          promptText="https://www.ferme-avicole.ma"
+                                          styleClass="text-field" />
+                            </VBox>
+                        </VBox>
+
+                        <!-- ============ ACCOUNT CREDENTIALS ============ -->
+                        <VBox spacing="15" styleClass="form-section">
+                            <Label styleClass="section-title" text="🔐 Informations de Connexion" />
+                            
+                            <!-- Password -->
+                            <HBox spacing="15">
+                                <VBox styleClass="input-group" HBox.hgrow="ALWAYS">
+                                    <Label styleClass="input-label" text="Mot de Passe *" />
+                                    <PasswordField fx:id="passwordField"
+                                                  promptText="Minimum 6 caractères"
+                                                  styleClass="password-field" />
+                                </VBox>
+                                <VBox styleClass="input-group" HBox.hgrow="ALWAYS">
+                                    <Label styleClass="input-label" text="Confirmer *" />
+                                    <PasswordField fx:id="confirmPasswordField"
+                                                  promptText="Retapez le mot de passe"
+                                                  styleClass="password-field" />
+                                </VBox>
+                            </HBox>
+                        </VBox>
+
+                        <!-- ============ ACTION BUTTONS ============ -->
+                        <VBox spacing="15" styleClass="signup-actions" alignment="CENTER">
+                            <padding>
+                                <Insets top="20" />
+                            </padding>
+                            <Button fx:id="signUpButton"
+                                    text="Créer le Compte"
+                                    styleClass="signup-button"
+                                    onAction="#handleSignUp"
+                                    prefWidth="280"
+                                    prefHeight="50" />
+                            <Button fx:id="backToLoginButton"
+                                    text="← Retour à la Connexion"
+                                    styleClass="secondary-button"
+                                    onAction="#handleBackToLogin"
+                                    prefWidth="280"
+                                    prefHeight="40" />
+                        </VBox>
+
+                        <!-- ============ MESSAGE LABELS ============ -->
+                        <VBox spacing="10" styleClass="message-container" alignment="CENTER">
+                            <padding>
+                                <Insets top="15" />
+                            </padding>
+                            <Label fx:id="successLabel"
+                                   styleClass="success-message"
+                                   text="Inscription réussie!"
+                                   visible="false"
+                                   wrapText="true"
+                                   maxWidth="600"
+                                   alignment="CENTER">
+                                <font>
+                                    <Font name="System Bold" size="13.0" />
+                                </font>
+                            </Label>
+                            <Label fx:id="errorLabel"
+                                   styleClass="error-message"
+                                   text="Erreur"
+                                   visible="false"
+                                   wrapText="true"
+                                   maxWidth="600"
+                                   alignment="CENTER">
+                                <font>
+                                    <Font name="System Bold" size="12.0" />
+                                </font>
+                            </Label>
+                        </VBox>
+                    </VBox>
+                </VBox>
+            </content>
+        </ScrollPane>
+    </center>
+</BorderPane>
