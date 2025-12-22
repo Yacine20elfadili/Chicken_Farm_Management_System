@@ -29,6 +29,9 @@ public class LoginController {
     private Button loginButton;
 
     @FXML
+    private Button signUpLinkButton;
+
+    @FXML
     private Label errorLabel;
 
     // DAO for database operations
@@ -56,6 +59,7 @@ public class LoginController {
 
     /**
      * Handles login button click
+     * 
      * @param event The action event
      */
     @FXML
@@ -78,7 +82,7 @@ public class LoginController {
 
             if (user != null) {
                 // Login successful
-                System.out.println("Login successful for user: " + user.getName());
+                System.out.println("Login successful for: " + user.getCompanyName());
                 navigateToDashboard();
             } else {
                 // This shouldn't happen as authenticate throws exception
@@ -99,7 +103,8 @@ public class LoginController {
 
     /**
      * Validates user inputs
-     * @param email The email to validate
+     * 
+     * @param email    The email to validate
      * @param password The password to validate
      * @return true if inputs are valid, false otherwise
      */
@@ -137,6 +142,7 @@ public class LoginController {
 
     /**
      * Shows error message to user
+     * 
      * @param message The error message to display
      */
     private void showError(String message) {
@@ -181,5 +187,34 @@ public class LoginController {
         passwordField.clear();
         errorLabel.setVisible(false);
         emailField.requestFocus();
+    }
+
+    /**
+     * Handles sign up link click - navigates to sign up page
+     * 
+     * @param event The action event
+     */
+    @FXML
+    private void handleSignUpLink(ActionEvent event) {
+        try {
+            // Load sign up page
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/SignUpView.fxml"));
+            Parent signUpRoot = loader.load();
+
+            // Get current stage
+            Stage stage = (Stage) loginButton.getScene().getWindow();
+
+            // Set sign up scene
+            Scene signUpScene = new Scene(signUpRoot);
+            stage.setScene(signUpScene);
+            stage.setTitle("Chicken Farm Management - Sign Up");
+
+            System.out.println("Navigated to sign up page successfully!");
+
+        } catch (IOException e) {
+            System.err.println("Error loading sign up page: " + e.getMessage());
+            e.printStackTrace();
+            showError("Erreur lors du chargement de la page d'inscription.");
+        }
     }
 }
