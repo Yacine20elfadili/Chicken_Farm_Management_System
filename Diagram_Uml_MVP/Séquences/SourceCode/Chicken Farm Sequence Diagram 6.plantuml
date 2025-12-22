@@ -1,0 +1,214 @@
+@startuml Sequence_Diagram_6_Create_Task
+
+title Sequence Diagram 6: Create Task & Assign to Worker (CREATE Operation)
+
+actor "Cashier" as Cashier
+participant "TasksView" as UI
+participant "TasksController" as Controller
+participant "ValidationUtil" as Validator
+participant "TaskDAO" as TaskDAO
+participant "PersonnelDAO" as PersonnelDAO
+participant "DatabaseConnection" as DB
+participant "DateUtil" as DateUtil
+
+== Create New Task ==
+
+Cashier -> UI: Click "Create Task" button
+
+UI -> Controller: handleCreateTask()
+activate Controller
+
+' Load personnel list for assignment
+Controller -> PersonnelDAO: getActivePersonnel()
+activate PersonnelDAO
+PersonnelDAO -> DB: getConnection()
+activate DB
+DB --> PersonnelDAO: Connection
+deactivate DB
+
+PersonnelDAO -> DB: executeQuery(\n"SELECT * FROM personnel\nWHERE isActive = 1")
+activate DB
+DB --> PersonnelDAO: List<Personnel>
+deactivate DB
+PersonnelDAO --> Controller: active workers list
+deactivate PersonnelDAO
+
+Controller -> UI: Show "Create Task" dialog\nwith worker dropdown
+UI -> Cashier: Display input form with\navailable workers
+
+Cashier -> UI: Fill in task details:\n• Description: "Clean House 1"\n• Category: Cleaning\n• Priority: High\n• Due Date: 10/12/2024\n• Assign To: Ahmed Elbagi\n• House: H1\n• Notes: "Deep cleaning required"
+
+Cashier -> UI: Click "Save" button
+
+UI -> Controller: submitCreateTask(taskData)
+
+' Validation
+Controller -> Validator: isEmpty(description)
+activate Validator
+Validator --> Controller: false (valid)
+deactivate Validator
+
+alt Invalid Input
+    Controller -> UI: Show error dialog
+    UI -> Cashier: Display validation error
+    
+else Valid Input
+    ' Validate due date
+    Controller -> DateUtil: isFuture(dueDate)
+    activate DateUtil
+    DateUtil --> Controller: true (valid)
+    deactivate DateUtil
+    
+    alt Due Date in Past
+        Controller -> UI: Show warning dialog\n"Due date is in the past.\nTask will be marked as MISSED"
+        UI -> Cashier: Display warning
+    end
+    
+    ' Validate worker exists
+    Controller -> PersonnelDAO: getPersonnelByName(assignedTo)
+    activate PersonnelDAO
+    PersonnelDAO -> DB: executeQuery(\n"SELECT * FROM personnel\nWHERE fullName = ?")
+    activate DB
+    DB --> PersonnelDAO: Personnel record
+    deactivate DB
+    PersonnelDAO --> Controller: Personnel object
+    deactivate PersonnelDAO
+    
+    alt Worker Not Found
+        Controller -> UI: Show error dialog\n"Selected worker not found"
+        UI -> Cashier: Display error
+        
+    else Worker Found
+        Controller -> DateUtil: getCurrentDate()
+        activate DateUtil
+        DateUtil --> Controller: today
+        deactivate DateUtil
+        
+        ' Determine initial status
+        Controller -> Controller: determineInitialStatus()
+        note right
+            <b>Status Logic:</b>
+            If dueDate >= today:
+                status = "Pending"
+            Else:
+                status = "Missed"
+        end note
+        
+        ' Create Task object
+        Controller -> Controller: createTaskObject()
+        note right
+            <b>Task Object:</b>
+            description = "Clean House 1"
+            status = "Pending"
+            dueDate = 2024-12-10
+            completedAt = null
+            assignedTo = "Ahmed Elbagi"
+            houseId = 1
+            category = "Cleaning"
+            crackedEggs = 0
+            notes = "Deep cleaning required"
+            priority = "High"
+        end note
+        
+        ' Save to database
+        Controller -> TaskDAO: createTask(task)
+        activate TaskDAO
+        
+        TaskDAO -> DB: getConnection()
+        activate DB
+        DB --> TaskDAO: Connection
+        deactivate DB
+        
+        TaskDAO -> DB: executeUpdate(\n"INSERT INTO tasks\n(description, status, dueDate,\nassignedTo, houseId, category,\ncrackedEggs, notes, priority)\nVALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)")
+        activate DB
+        
+        alt Insert Successful
+            DB --> TaskDAO: rowsAffected = 1
+            deactivate DB
+            
+            ' Get generated ID
+            TaskDAO -> DB: executeQuery(\n"SELECT last_insert_rowid() AS id")
+            activate DB
+            DB --> TaskDAO: id = 42
+            deactivate DB
+            
+            TaskDAO --> Controller: true (success)
+            deactivate TaskDAO
+            
+            ' Refresh view
+            Controller -> Controller: refreshView()
+            Controller -> Controller: loadTasks()
+            
+            Controller -> TaskDAO: getAllTasks()
+            activate TaskDAO
+            TaskDAO -> DB: executeQuery(\n"SELECT * FROM tasks\nORDER BY dueDate DESC")
+            activate DB
+            DB --> TaskDAO: List<Task>
+            deactivate DB
+            TaskDAO --> Controller: updated task list
+            deactivate TaskDAO
+            
+            Controller -> UI: Update tasks table
+            UI -> UI: Add new row with status badge:\n⏳ [PENDING] Clean House 1\nDue: 10/12/2024\nAssigned: Ahmed Elbagi\nPriority: 🔴 High
+            
+            Controller -> UI: Show success message
+            UI -> Cashier: Display "Task created successfully!\nAssigned to: Ahmed Elbagi"
+            
+        else Insert Failed
+            DB --> TaskDAO: SQLException
+            deactivate DB
+            TaskDAO --> Controller: false (failed)
+            deactivate TaskDAO
+            
+            Controller -> UI: Show error dialog
+            UI -> Cashier: Display "Failed to create task"
+        end
+    end
+end
+
+deactivate Controller
+
+note right of Admin
+    <b>After successful creation:</b>
+    
+    Task list now shows:
+    ┌─────────────────────────────┐
+    │ ⏳ PENDING                   │
+    │ Clean House 1               │
+    │ Due: 10/12/2024             │
+    │ Assigned: Ahmed Elbagi      │
+    │ Priority: 🔴 High            │
+    │ Category: Cleaning          │
+    │ House: H1                   │
+    │ Notes: Deep cleaning...     │
+    └─────────────────────────────┘
+    
+    <b>Worker Notification:</b>
+    Ahmed Elbagi will be informed
+    about the new task assignment
+    (through Admin communication)
+    
+    <b>Future Operations Available:</b>
+    • Edit task details
+    • Mark as done
+    • Reassign to another worker
+    • Delete task
+    • View task history
+end note
+
+note bottom of TaskDAO
+    <b>Task Status Lifecycle:</b>
+    
+    Created → Pending
+    ↓
+    On time completion → Done
+    ↓
+    Past due date → Missed
+    
+    <b>Status Colors:</b>
+    • Pending: 🟡 Yellow
+    • Done: 🟢 Green
+    • Missed: 🔴 Red
+end note
+
+@enduml

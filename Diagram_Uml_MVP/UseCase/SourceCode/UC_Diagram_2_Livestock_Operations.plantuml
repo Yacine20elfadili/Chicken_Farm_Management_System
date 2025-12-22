@@ -1,0 +1,141 @@
+@startuml UC_Diagram_2_Livestock_Operations
+
+title Use Case Diagram 2: Livestock & Farm Operations Management
+
+left to right direction
+
+' ============================================
+' ACTORS
+' ============================================
+actor "Cashier" as Cashier <<Primary Actor>>
+actor "Worker" as Worker <<Secondary Actor>>
+
+' ============================================
+' SYSTEM BOUNDARY
+' ============================================
+rectangle "Livestock & Farm Operations Module" {
+  
+  ' ============ HOUSE MANAGEMENT ============
+  package "House Management" {
+    usecase "Manage Houses" as UC_H
+    usecase "View House List" as UC_H1
+    usecase "Add House" as UC_H2
+    usecase "Update House Details" as UC_H3
+    usecase "Delete House" as UC_H4
+  }
+  
+  ' ============ CHICKEN BATCH MANAGEMENT ============
+  package "Chicken Batch Management" {
+    usecase "Manage Chicken Batches" as UC_C
+    usecase "View Chicken Batches" as UC_C1
+    usecase "Add Chicken Batch" as UC_C2
+    usecase "Update Batch Details" as UC_C3
+    usecase "Delete Chicken Batch" as UC_C4
+    usecase "Transfer Chickens\nBetween Houses" as UC_C5
+  }
+  
+  ' ============ MORTALITY MANAGEMENT ============
+  package "Mortality Management" {
+    usecase "Manage Mortality Records" as UC_M
+    usecase "View Mortality Records" as UC_M1
+    usecase "Record Mortality" as UC_M2
+    usecase "Update Mortality Record" as UC_M3
+    usecase "Delete Mortality Record" as UC_M4
+    usecase "View Mortality Statistics" as UC_M5
+  }
+  
+  ' ============ EGG PRODUCTION MANAGEMENT ============
+  package "Egg Production Management" {
+    usecase "Manage Egg Production" as UC_E
+    usecase "View Egg Inventory" as UC_E1
+    usecase "Record Egg Collection" as UC_E2
+    usecase "Update Production Record" as UC_E3
+    usecase "Delete Production Record" as UC_E4
+    usecase "Remove Eggs\nfrom Storage" as UC_E5
+    usecase "Record Cracked Eggs" as UC_E6
+  }
+  
+}
+
+' ============================================
+' ACTOR TO USE CASE RELATIONSHIPS
+' ============================================
+Cashier --> UC_H
+Cashier --> UC_C
+Cashier --> UC_M
+Cashier --> UC_E
+
+' Worker provides feedback to Cashier
+Worker .up.> Cashier : <<provides feedback>>\nmortality reports\negg counts\nhealth observations
+
+' ============================================
+' HOUSE MANAGEMENT RELATIONSHIPS
+' ============================================
+UC_H ..> UC_H1 : <<include>>
+UC_H <.. UC_H2 : <<extend>>
+UC_H <.. UC_H3 : <<extend>>
+UC_H <.. UC_H4 : <<extend>>
+
+' ============================================
+' CHICKEN BATCH RELATIONSHIPS
+' ============================================
+UC_C ..> UC_C1 : <<include>>
+UC_C <.. UC_C2 : <<extend>>
+UC_C <.. UC_C3 : <<extend>>
+UC_C <.. UC_C4 : <<extend>>
+UC_C <.. UC_C5 : <<extend>>
+
+' ============================================
+' MORTALITY RELATIONSHIPS
+' ============================================
+UC_M ..> UC_M1 : <<include>>
+UC_M ..> UC_M5 : <<include>>
+UC_M <.. UC_M2 : <<extend>>
+UC_M <.. UC_M3 : <<extend>>
+UC_M <.. UC_M4 : <<extend>>
+
+' ============================================
+' EGG PRODUCTION RELATIONSHIPS
+' ============================================
+UC_E ..> UC_E1 : <<include>>
+UC_E <.. UC_E2 : <<extend>>
+UC_E <.. UC_E3 : <<extend>>
+UC_E <.. UC_E4 : <<extend>>
+UC_E <.. UC_E5 : <<extend>>
+UC_E2 ..> UC_E6 : <<include>>
+
+' ============================================
+' NOTES
+' ============================================
+note right of UC_H
+  <b>House CRUD Operations</b>
+  Houses represent chicken bays
+  (H1, H2, H3, H4)
+  
+  Each house has:
+  • Type (Day-old, Layer, Meat)
+  • Capacity
+  • Current count
+  • Health status
+end note
+
+note bottom of UC_M
+  <b>Mortality Tracking</b>
+  Cashier enters data from
+  Worker observations
+  
+  Statistics show:
+  • Today's deaths
+  • This week's deaths
+  • This month's deaths
+end note
+
+note bottom of UC_E
+  <b>Egg Production</b>
+  Daily collection from
+  H2 (Egg Layers) and H3 (Meat Females)
+  
+  Worker counts → Cashier enters data
+end note
+
+@enduml

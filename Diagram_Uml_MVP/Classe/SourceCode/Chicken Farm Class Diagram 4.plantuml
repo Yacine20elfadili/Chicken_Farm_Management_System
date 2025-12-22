@@ -1,0 +1,308 @@
+@startuml Class_Diagram_4_Application_Layer
+
+title Class Diagram 4: Application Layer (Controllers + Utilities + App)
+
+skinparam classAttributeIconSize 0
+skinparam class {
+    BackgroundColor<<Controller>> LightSalmon
+    BorderColor<<Controller>> Red
+    BackgroundColor<<Utility>> LightGreen
+    BorderColor<<Utility>> DarkGreen
+    BackgroundColor<<App>> Gold
+    BorderColor<<App>> DarkOrange
+}
+
+class App <<App>> {
+    - primaryStage: Stage
+    __
+    + start(stage: Stage): void
+    + {static} main(args: String[]): void
+}
+
+class LoginController <<Controller>> {
+    - userDAO: UserDAO
+    __
+    @FXML - emailField: TextField
+    @FXML - passwordField: PasswordField
+    @FXML - loginButton: Button
+    @FXML - errorLabel: Label
+    __
+    + initialize(): void
+    + handleLogin(event: ActionEvent): void
+    - validateInputs(email: String, password: String): boolean
+    - showError(message: String): void
+    - navigateToDashboard(): void
+    - clearForm(): void
+}
+
+class MainWindowController <<Controller>> {
+    - currentView: String
+    __
+    @FXML - sidebarContainer: VBox
+    @FXML - contentArea: AnchorPane
+    @FXML - userNameLabel: Label
+    __
+    + initialize(): void
+    + loadView(viewName: String): void
+    + handleLogout(): void
+}
+
+class SidebarController <<Controller>> {
+    - mainWindowController: MainWindowController
+    __
+    @FXML - dashboardBtn: Button
+    @FXML - chickenBayBtn: Button
+    @FXML - eggsBayBtn: Button
+    @FXML - storageBtn: Button
+    @FXML - tasksBtn: Button
+    @FXML - personnelBtn: Button
+    __
+    + initialize(): void
+    + setMainWindowController(controller: MainWindowController): void
+    + handleDashboardClick(): void
+    + handleChickenBayClick(): void
+    + handleEggsBayClick(): void
+    + handleStorageClick(): void
+    + handleTasksClick(): void
+    + handlePersonnelClick(): void
+    - setActiveButton(button: Button): void
+}
+
+class DashboardController <<Controller>> {
+    - chickenDAO: ChickenDAO
+    - eggProductionDAO: EggProductionDAO
+    - mortalityDAO: MortalityDAO
+    __
+    @FXML - totalChickensLabel: Label
+    @FXML - eggsProducedTodayLabel: Label
+    @FXML - activeAlertsLabel: Label
+    @FXML - productionChart: BarChart
+    __
+    + initialize(): void
+    + loadDashboardData(): void
+    - loadTotalChickens(): void
+    - loadEggsProducedToday(): void
+    - loadActiveAlerts(): void
+    - load7DayProductionChart(): void
+    + refreshDashboard(): void
+}
+
+class ChickenBayController <<Controller>> {
+    - houseDAO: HouseDAO
+    - chickenDAO: ChickenDAO
+    - mortalityDAO: MortalityDAO
+    __
+    @FXML - houseCardsContainer: VBox
+    @FXML - mortalityStatsCard: VBox
+    __
+    + initialize(): void
+    + loadHouseCards(): void
+    + loadMortalityStats(): void
+    + handleAddChickens(): void
+    + handleUpdateBatch(): void
+    + handleDeleteBatch(): void
+    + handleRecordMortality(): void
+    + handleUpdateMortality(): void
+    + handleDeleteMortality(): void
+    + handleTransferChickens(): void
+    + refreshView(): void
+}
+
+class EggsBayController <<Controller>> {
+    - eggProductionDAO: EggProductionDAO
+    - houseDAO: HouseDAO
+    __
+    @FXML - house2ProductionCard: VBox
+    @FXML - house3ProductionCard: VBox
+    @FXML - totalStorageLabel: Label
+    @FXML - productionTableView: TableView<EggProduction>
+    __
+    + initialize(): void
+    + loadProductionCards(): void
+    + loadTotalStorage(): void
+    + loadProductionHistory(): void
+    + handleRecordCollection(): void
+    + handleUpdateProduction(): void
+    + handleDeleteProduction(): void
+    + handleRemoveEggs(): void
+    + refreshView(): void
+}
+
+class StorageController <<Controller>> {
+    - feedDAO: FeedDAO
+    - medicationDAO: MedicationDAO
+    - equipmentDAO: EquipmentDAO
+    __
+    @FXML - feedTableView: TableView<Feed>
+    @FXML - medicationTableView: TableView<Medication>
+    @FXML - equipmentTableView: TableView<Equipment>
+    __
+    + initialize(): void
+    + loadFeedData(): void
+    + loadMedicationData(): void
+    + loadEquipmentData(): void
+    + handleAddFeed(): void
+    + handleUpdateFeed(): void
+    + handleDeleteFeed(): void
+    + handleUseFeed(): void
+    + handleAddMedication(): void
+    + handleUpdateMedication(): void
+    + handleDeleteMedication(): void
+    + handleUseMedication(): void
+    + handleAddEquipment(): void
+    + handleUpdateEquipment(): void
+    + handleDeleteEquipment(): void
+    + handleUpdateEquipmentStatus(): void
+    + refreshView(): void
+}
+
+class TasksController <<Controller>> {
+    - taskDAO: TaskDAO
+    - personnelDAO: PersonnelDAO
+    __
+    @FXML - tasksTableView: TableView<Task>
+    @FXML - statusFilterComboBox: ComboBox<String>
+    __
+    + initialize(): void
+    + loadTasks(): void
+    + loadPersonnelForAssignment(): void
+    + handleCreateTask(): void
+    + handleEditTask(): void
+    + handleDeleteTask(): void
+    + handleMarkAsDone(): void
+    + handleFilterByStatus(): void
+    + refreshView(): void
+}
+
+class PersonnelController <<Controller>> {
+    - personnelDAO: PersonnelDAO
+    __
+    @FXML - personnelTableView: TableView<Personnel>
+    @FXML - jobTitleFilterComboBox: ComboBox<String>
+    __
+    + initialize(): void
+    + loadPersonnelData(): void
+    + handleAddPersonnel(): void
+    + handleEditPersonnel(): void
+    + handleDeletePersonnel(): void
+    + handleViewDetails(): void
+    + handleFilterByJobTitle(): void
+    + refreshView(): void
+}
+
+class ValidationUtil <<Utility>> {
+    - {static} EMAIL_REGEX: String
+    - {static} EMAIL_PATTERN: Pattern
+    __
+    + {static} isValidEmail(email: String): boolean
+    + {static} isEmpty(str: String): boolean
+    + {static} isValidPassword(password: String): boolean
+    + {static} sanitize(input: String): String
+}
+
+class DateUtil <<Utility>> {
+    - {static} DATE_FORMATTER: DateTimeFormatter
+    - {static} DATETIME_FORMATTER: DateTimeFormatter
+    - {static} TIME_FORMATTER: DateTimeFormatter
+    __
+    + {static} formatDate(date: LocalDate): String
+    + {static} formatDateTime(dateTime: LocalDateTime): String
+    + {static} formatTime(dateTime: LocalDateTime): String
+    + {static} parseDate(dateString: String): LocalDate
+    + {static} parseDateTime(dateTimeString: String): LocalDateTime
+    + {static} getCurrentDate(): LocalDate
+    + {static} getCurrentDateTime(): LocalDateTime
+    + {static} daysBetween(startDate: LocalDate, endDate: LocalDate): long
+    + {static} daysSince(date: LocalDate): long
+    + {static} daysUntil(date: LocalDate): long
+    + {static} addDays(date: LocalDate, days: int): LocalDate
+    + {static} subtractDays(date: LocalDate, days: int): LocalDate
+    + {static} isToday(date: LocalDate): boolean
+    + {static} isPast(date: LocalDate): boolean
+    + {static} isFuture(date: LocalDate): boolean
+    + {static} isThisWeek(date: LocalDate): boolean
+    + {static} isThisMonth(date: LocalDate): boolean
+    + {static} getStartOfWeek(): LocalDate
+    + {static} getEndOfWeek(): LocalDate
+    + {static} getStartOfMonth(): LocalDate
+    + {static} getEndOfMonth(): LocalDate
+    + {static} getDaysAgo(days: int): LocalDate
+    + {static} getLast7Days(): LocalDate[]
+    + {static} getLastNDays(days: int): LocalDate[]
+    + {static} formatForDisplay(date: LocalDate): String
+    + {static} calculateAgeInDays(arrivalDate: LocalDate): int
+    + {static} calculateTransferDate(arrivalDate: LocalDate, chickenType: String): LocalDate
+    + {static} isWithinRange(date: LocalDate, startDate: LocalDate, endDate: LocalDate): boolean
+    + {static} isValidDateFormat(dateString: String): boolean
+}
+
+class NavigationUtil <<Utility>> {
+    __
+    + {static} navigateTo(event: ActionEvent, fxmlPath: String, title: String): void
+    + {static} navigateTo(node: Node, fxmlPath: String, title: String): void
+    + {static} loadFXML(fxmlPath: String): Parent
+    + {static} getFXMLLoader(fxmlPath: String): FXMLLoader
+    + {static} openDialog(fxmlPath: String, title: String, owner: Stage): void
+    + {static} openWindow(fxmlPath: String, title: String): void
+    + {static} closeWindow(event: ActionEvent): void
+    + {static} closeWindow(node: Node): void
+    + {static} getStage(event: ActionEvent): Stage
+    + {static} getStage(node: Node): Stage
+    + {static} showAlert(title: String, header: String, content: String): void
+    + {static} showError(title: String, header: String, content: String): void
+    + {static} showSuccess(title: String, header: String, content: String): void
+    + {static} showConfirmation(title: String, header: String, content: String): boolean
+    + {static} navigateToLogin(event: ActionEvent): void
+    + {static} navigateToLogin(node: Node): void
+    + {static} navigateToDashboard(event: ActionEvent): void
+    + {static} navigateToDashboard(node: Node): void
+    + {static} navigateToMainWindow(event: ActionEvent): void
+    + {static} navigateToMainWindow(node: Node): void
+    + {static} refreshPage(node: Node, fxmlPath: String): void
+    + {static} setWindowSize(stage: Stage, width: double, height: double): void
+    + {static} centerWindow(stage: Stage): void
+    + {static} lockWindowSize(stage: Stage): void
+    + {static} unlockWindowSize(stage: Stage): void
+    + {static} setWindowIcon(stage: Stage, iconPath: String): void
+    - {static} handleNavigationError(e: IOException, pageName: String): void
+}
+
+' Relationships
+App ..> LoginController : starts with
+
+MainWindowController ..> SidebarController : contains
+SidebarController --> MainWindowController : controls
+
+LoginController --> UserDAO : uses
+DashboardController --> ChickenDAO : uses
+DashboardController --> EggProductionDAO : uses
+DashboardController --> MortalityDAO : uses
+ChickenBayController --> HouseDAO : uses
+ChickenBayController --> ChickenDAO : uses
+ChickenBayController --> MortalityDAO : uses
+EggsBayController --> EggProductionDAO : uses
+EggsBayController --> HouseDAO : uses
+StorageController --> FeedDAO : uses
+StorageController --> MedicationDAO : uses
+StorageController --> EquipmentDAO : uses
+TasksController --> TaskDAO : uses
+TasksController --> PersonnelDAO : uses
+PersonnelController --> PersonnelDAO : uses
+
+LoginController ..> ValidationUtil : uses
+LoginController ..> NavigationUtil : uses
+DashboardController ..> DateUtil : uses
+ChickenBayController ..> DateUtil : uses
+ChickenBayController ..> NavigationUtil : uses
+EggsBayController ..> DateUtil : uses
+EggsBayController ..> NavigationUtil : uses
+StorageController ..> ValidationUtil : uses
+StorageController ..> NavigationUtil : uses
+TasksController ..> DateUtil : uses
+TasksController ..> ValidationUtil : uses
+TasksController ..> NavigationUtil : uses
+PersonnelController ..> ValidationUtil : uses
+PersonnelController ..> NavigationUtil : uses
+MainWindowController ..> NavigationUtil : uses
+
+@enduml

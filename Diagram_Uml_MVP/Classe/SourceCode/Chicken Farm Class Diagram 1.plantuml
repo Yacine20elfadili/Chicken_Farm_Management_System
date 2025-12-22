@@ -1,0 +1,218 @@
+@startuml Class_Diagram_1_Core_Entities
+
+title Class Diagram 1: Domain Model - Core Entities (Livestock & Production)
+
+skinparam classAttributeIconSize 0
+skinparam class {
+    BackgroundColor<<Entity>> LightYellow
+    BorderColor<<Entity>> Orange
+}
+
+class House <<Entity>> {
+    - id: int
+    - name: String
+    - type: String
+    - chickenCount: int
+    - capacity: int
+    - healthStatus: String
+    - lastCleaningDate: LocalDate
+    - creationDate: LocalDate
+    __
+    + House()
+    + House(name: String, type: String, capacity: int)
+    + House(id: int, name: String, type: String, chickenCount: int, 
+            capacity: int, healthStatus: String, 
+            lastCleaningDate: LocalDate, creationDate: LocalDate)
+    __
+    + getId(): int
+    + setId(id: int): void
+    + getName(): String
+    + setName(name: String): void
+    + getType(): String
+    + setType(type: String): void
+    + getChickenCount(): int
+    + setChickenCount(chickenCount: int): void
+    + getCapacity(): int
+    + setCapacity(capacity: int): void
+    + getHealthStatus(): String
+    + setHealthStatus(healthStatus: String): void
+    + getLastCleaningDate(): LocalDate
+    + setLastCleaningDate(lastCleaningDate: LocalDate): void
+    + getCreationDate(): LocalDate
+    + setCreationDate(creationDate: LocalDate): void
+    __
+    + getOccupancyRate(): double
+    + isFull(): boolean
+    + equals(o: Object): boolean
+    + hashCode(): int
+    + toString(): String
+}
+
+class Chicken <<Entity>> {
+    - id: int
+    - houseId: int
+    - batchNumber: String
+    - quantity: int
+    - arrivalDate: LocalDate
+    - ageInDays: int
+    - gender: String
+    - healthStatus: String
+    - averageWeight: double
+    - nextTransferDate: LocalDate
+    __
+    + Chicken()
+    + Chicken(houseId: int, batchNumber: String, quantity: int, 
+              arrivalDate: LocalDate, gender: String)
+    + Chicken(id: int, houseId: int, batchNumber: String, quantity: int,
+              arrivalDate: LocalDate, ageInDays: int, gender: String,
+              healthStatus: String, averageWeight: double, 
+              nextTransferDate: LocalDate)
+    __
+    + getId(): int
+    + setId(id: int): void
+    + getHouseId(): int
+    + setHouseId(houseId: int): void
+    + getBatchNumber(): String
+    + setBatchNumber(batchNumber: String): void
+    + getQuantity(): int
+    + setQuantity(quantity: int): void
+    + getArrivalDate(): LocalDate
+    + setArrivalDate(arrivalDate: LocalDate): void
+    + getAgeInDays(): int
+    + setAgeInDays(ageInDays: int): void
+    + getGender(): String
+    + setGender(gender: String): void
+    + getHealthStatus(): String
+    + setHealthStatus(healthStatus: String): void
+    + getAverageWeight(): double
+    + setAverageWeight(averageWeight: double): void
+    + getNextTransferDate(): LocalDate
+    + setNextTransferDate(nextTransferDate: LocalDate): void
+    __
+    + getDaysUntilTransfer(): int
+    + isReadyForTransfer(): boolean
+    + equals(o: Object): boolean
+    + hashCode(): int
+    + toString(): String
+}
+
+class Mortality <<Entity>> {
+    - id: int
+    - houseId: int
+    - deathDate: LocalDate
+    - count: int
+    - cause: String
+    - symptoms: String
+    - isOutbreak: boolean
+    - recordedBy: String
+    - notes: String
+    __
+    + Mortality()
+    + Mortality(houseId: int, deathDate: LocalDate, count: int, cause: String)
+    + Mortality(id: int, houseId: int, deathDate: LocalDate, count: int,
+                cause: String, symptoms: String, isOutbreak: boolean,
+                recordedBy: String, notes: String)
+    __
+    + getId(): int
+    + setId(id: int): void
+    + getHouseId(): int
+    + setHouseId(houseId: int): void
+    + getDeathDate(): LocalDate
+    + setDeathDate(deathDate: LocalDate): void
+    + getCount(): int
+    + setCount(count: int): void
+    + getCause(): String
+    + setCause(cause: String): void
+    + getSymptoms(): String
+    + setSymptoms(symptoms: String): void
+    + isOutbreak(): boolean
+    + setOutbreak(outbreak: boolean): void
+    + getRecordedBy(): String
+    + setRecordedBy(recordedBy: String): void
+    + getNotes(): String
+    + setNotes(notes: String): void
+    __
+    + isConcerningRate(totalChickens: int): boolean
+    + equals(o: Object): boolean
+    + hashCode(): int
+    + toString(): String
+}
+
+class EggProduction <<Entity>> {
+    - id: int
+    - houseId: int
+    - productionDate: LocalDate
+    - eggsCollected: int
+    - crackedEggs: int
+    - goodEggs: int
+    - deadChickens: int
+    - collectedBy: String
+    - notes: String
+    __
+    + EggProduction()
+    + EggProduction(houseId: int, productionDate: LocalDate, 
+                    eggsCollected: int, crackedEggs: int, deadChickens: int)
+    + EggProduction(id: int, houseId: int, productionDate: LocalDate,
+                    eggsCollected: int, crackedEggs: int, goodEggs: int,
+                    deadChickens: int, collectedBy: String, notes: String)
+    __
+    + getId(): int
+    + setId(id: int): void
+    + getHouseId(): int
+    + setHouseId(houseId: int): void
+    + getProductionDate(): LocalDate
+    + setProductionDate(productionDate: LocalDate): void
+    + getEggsCollected(): int
+    + setEggsCollected(eggsCollected: int): void
+    + getCrackedEggs(): int
+    + setCrackedEggs(crackedEggs: int): void
+    + getGoodEggs(): int
+    + setGoodEggs(goodEggs: int): void
+    + getDeadChickens(): int
+    + setDeadChickens(deadChickens: int): void
+    + getCollectedBy(): String
+    + setCollectedBy(collectedBy: String): void
+    + getNotes(): String
+    + setNotes(notes: String): void
+    __
+    + calculateGoodEggs(): void
+    + getEfficiencyRate(): double
+    + equals(o: Object): boolean
+    + hashCode(): int
+    + toString(): String
+}
+
+class User <<Entity>> {
+    - id: int
+    - name: String
+    - email: String
+    - password: String
+    - creationDate: LocalDateTime
+    __
+    + User()
+    + User(name: String, email: String, password: String)
+    + User(id: int, name: String, email: String, 
+          password: String, creationDate: LocalDateTime)
+    __
+    + getId(): int
+    + setId(id: int): void
+    + getName(): String
+    + setName(name: String): void
+    + getEmail(): String
+    + setEmail(email: String): void
+    + getPassword(): String
+    + setPassword(password: String): void
+    + getCreationDate(): LocalDateTime
+    + setCreationDate(creationDate: LocalDateTime): void
+    __
+    + equals(o: Object): boolean
+    + hashCode(): int
+    + toString(): String
+}
+
+' Relationships
+House "1" -- "0..*" Chicken : contains >
+House "1" -- "0..*" EggProduction : produces >
+House "1" -- "0..*" Mortality : records >
+
+@enduml

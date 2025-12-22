@@ -1,0 +1,110 @@
+@startuml Sequence_Diagram_1_Login
+
+title Sequence Diagram 1: Login & Authentication
+
+actor "Cashier" as Cashier
+participant "LoginView\n(FXML)" as UI
+participant "LoginController" as Controller
+participant "ValidationUtil" as Validator
+participant "UserDAO" as DAO
+participant "DatabaseConnection" as DB
+participant "MainWindow\n(FXML)" as MainWindow
+
+== User Login Process ==
+
+Cashier -> UI: Enter email and password
+Cashier -> UI: Click "Login" button
+
+UI -> Controller: handleLogin(event)
+activate Controller
+
+Controller -> Validator: isValidEmail(email)
+activate Validator
+Validator --> Controller: boolean (true/false)
+deactivate Validator
+
+Controller -> Validator: isEmpty(password)
+activate Validator
+Validator --> Controller: boolean (true/false)
+deactivate Validator
+
+alt Invalid Input Format
+    Controller -> Controller: showError("Invalid email\nor password format")
+    Controller -> UI: Display error label
+    UI -> Cashier: Show error message
+    
+else Valid Input Format
+    Controller -> DAO: authenticate(email, password)
+    activate DAO
+    
+    DAO -> DB: getInstance()
+    activate DB
+    DB --> DAO: DatabaseConnection instance
+    deactivate DB
+    
+    DAO -> DB: getConnection()
+    activate DB
+    DB --> DAO: Connection object
+    deactivate DB
+    
+    DAO -> DB: executeQuery(\n"SELECT * FROM users\nWHERE email = ? AND password = ?")
+    activate DB
+    
+    alt User Found & Password Match
+        DB --> DAO: User record (ResultSet)
+        deactivate DB
+        
+        DAO -> DAO: Map ResultSet to User object
+        DAO --> Controller: User object
+        deactivate DAO
+        
+        ' Navigate to main window
+        Controller -> MainWindow: Load MainWindow.fxml
+        activate MainWindow
+        MainWindow -> MainWindow: Initialize dashboard view
+        MainWindow --> Controller: Window loaded
+        deactivate MainWindow
+        
+        Controller -> UI: Change scene to MainWindow
+        UI -> Cashier: Display Dashboard
+        
+    else User Not Found OR Password Incorrect
+        DB --> DAO: Empty ResultSet
+        deactivate DB
+        
+        DAO --> Controller: throw SecurityException(\n"Invalid credentials")
+        deactivate DAO
+        
+        Controller -> Controller: showError(\n"Email ou mot de passe incorrect")
+        Controller -> UI: Display error label
+        UI -> Cashier: Show error message
+    end
+end
+
+deactivate Controller
+
+note right of Admin
+    <b>Default Admin Credentials (MVP):</b>
+    Email: admin@farm.ma
+    Password: admin123
+    
+    <b>Security Note:</b>
+    In MVP, password stored as plain text.
+    Production version should use
+    password hashing (BCrypt).
+end note
+
+note right of Validator
+    <b>Validation Rules:</b>
+    
+    <b>Email:</b>
+    • Not empty
+    • Valid email format
+      (regex pattern)
+    
+    <b>Password:</b>
+    • Not empty
+    • Minimum 6 characters
+end note
+
+@enduml

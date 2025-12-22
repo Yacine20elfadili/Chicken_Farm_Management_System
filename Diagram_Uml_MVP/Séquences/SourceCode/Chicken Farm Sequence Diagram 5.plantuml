@@ -1,0 +1,162 @@
+@startuml Sequence_Diagram_5_Add_Feed
+
+title Sequence Diagram 5: Add Feed to Storage (CREATE Operation)
+
+actor "Cashier" as Cashier
+participant "StorageView" as UI
+participant "StorageController" as Controller
+participant "ValidationUtil" as Validator
+participant "FeedDAO" as DAO
+participant "DatabaseConnection" as DB
+participant "DateUtil" as DateUtil
+
+== Add New Feed to Storage ==
+
+Cashier -> UI: Click "Add Feed" button\nin Feed section
+
+UI -> Controller: handleAddFeed()
+activate Controller
+
+Controller -> UI: Show "Add Feed" dialog
+UI -> Cashier: Display input form
+
+Cashier -> UI: Fill in feed details:\n• Name: Premium Layer Feed\n• Type: Layer\n• Quantity: 500 kg\n• Price Per Kg: 8.5 MAD\n• Supplier: AgriSupply Co.\n• Expiry Date: 15/06/2025\n• Min Stock Level: 100 kg
+
+Cashier -> UI: Click "Save" button
+
+UI -> Controller: submitAddFeed(feedData)
+
+' Validation
+Controller -> Validator: isEmpty(name)
+activate Validator
+Validator --> Controller: false (valid)
+deactivate Validator
+
+Controller -> Validator: isPositiveNumber(quantityKg)
+activate Validator
+Validator --> Controller: true (valid)
+deactivate Validator
+
+Controller -> Validator: isPositiveNumber(pricePerKg)
+activate Validator
+Validator --> Controller: true (valid)
+deactivate Validator
+
+alt Invalid Input
+    Controller -> UI: Show error dialog
+    UI -> Cashier: Display validation error
+    
+else Valid Input
+    ' Get current date for restock date
+    Controller -> DateUtil: getCurrentDate()
+    activate DateUtil
+    DateUtil --> Controller: today (2024-12-08)
+    deactivate DateUtil
+    
+    ' Validate expiry date
+    Controller -> DateUtil: isFuture(expiryDate)
+    activate DateUtil
+    DateUtil --> Controller: true (valid)
+    deactivate DateUtil
+    
+    alt Expiry Date in Past
+        Controller -> UI: Show error dialog\n"Expiry date must be in future"
+        UI -> Cashier: Display error
+        
+    else Valid Expiry Date
+        ' Create Feed object
+        Controller -> Controller: createFeedObject()
+        note right
+            <b>Feed Object:</b>
+            name = "Premium Layer Feed"
+            type = "Layer"
+            quantityKg = 500.0
+            pricePerKg = 8.5
+            supplier = "AgriSupply Co."
+            lastRestockDate = 2024-12-08
+            expiryDate = 2025-06-15
+            minStockLevel = 100.0
+        end note
+        
+        ' Save to database
+        Controller -> DAO: addFeed(feed)
+        activate DAO
+        
+        DAO -> DB: getConnection()
+        activate DB
+        DB --> DAO: Connection
+        deactivate DB
+        
+        DAO -> DB: executeUpdate(\n"INSERT INTO feed\n(name, type, quantityKg, pricePerKg,\nsupplier, lastRestockDate,\nexpiryDate, minStockLevel)\nVALUES (?, ?, ?, ?, ?, ?, ?, ?)")
+        activate DB
+        
+        alt Insert Successful
+            DB --> DAO: rowsAffected = 1
+            deactivate DB
+            
+            ' Get generated ID
+            DAO -> DB: executeQuery(\n"SELECT last_insert_rowid() AS id")
+            activate DB
+            DB --> DAO: id = 15
+            deactivate DB
+            
+            DAO --> Controller: true (success)
+            deactivate DAO
+            
+            ' Refresh view
+            Controller -> Controller: refreshView()
+            Controller -> Controller: loadFeedData()
+            
+            Controller -> DAO: getAllFeed()
+            activate DAO
+            DAO -> DB: executeQuery("SELECT * FROM feed")
+            activate DB
+            DB --> DAO: List<Feed>
+            deactivate DB
+            DAO --> Controller: feed list
+            deactivate DAO
+            
+            Controller -> UI: Update feed table
+            UI -> UI: Add new row:\n[Premium Layer Feed | Layer | 500 kg | 8.5 MAD/kg]
+            
+            Controller -> UI: Show success message
+            UI -> Cashier: Display "Feed added successfully!\n• Total Value: 4,250 MAD\n• Stock Level: Sufficient"
+            
+        else Insert Failed
+            DB --> DAO: SQLException
+            deactivate DB
+            DAO --> Controller: false (failed)
+            deactivate DAO
+            
+            Controller -> UI: Show error dialog
+            UI -> Cashier: Display "Failed to add feed"
+        end
+    end
+end
+
+deactivate Controller
+
+note right of Admin
+    <b>After successful addition:</b>
+    
+    Feed table now shows new entry:
+    ┌─────────────────────────────┐
+    │ Premium Layer Feed          │
+    │ Type: Layer                 │
+    │ Quantity: 500 kg            │
+    │ Price: 8.5 MAD/kg           │
+    │ Total Value: 4,250 MAD      │
+    │ Supplier: AgriSupply Co.    │
+    │ Expires: 15/06/2025         │
+    │ Min Level: 100 kg           │
+    │ Status: ✅ Sufficient        │
+    └─────────────────────────────┘
+    
+    <b>Future Operations Available:</b>
+    • Update feed details
+    • Delete feed entry
+    • Use feed (decrease quantity)
+    • Restock (add more quantity)
+end note
+
+@enduml
