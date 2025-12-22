@@ -34,6 +34,16 @@
                style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2e7d32;"/>
     </HBox>
 
+    <!-- Validation Message -->
+    <VBox fx:id="validationBox" spacing="5.0" style="-fx-padding: 8; -fx-background-radius: 5; -fx-background-color: #fff3cd;"
+          visible="false" managed="false">
+        <HBox spacing="10.0" alignment="CENTER_LEFT">
+            <Label text="⚠️ Validation Warning" style="-fx-font-weight: bold; -fx-text-fill: #856404;"/>
+            <Label fx:id="daysRemainingLabel" text="days remaining" style="-fx-text-fill: #856404; -fx-font-size: 12px;"/>
+        </HBox>
+        <Label text="Transfer allowed for testing purposes." style="-fx-text-fill: #888; -fx-font-style: italic; -fx-font-size: 11px;"/>
+    </VBox>
+
     <Separator/>
 
     <!-- Destination House Selection -->

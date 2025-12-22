@@ -3,13 +3,16 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressIndicator?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.Spinner?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox prefWidth="950.0" prefHeight="550.0" spacing="15.0"
+<VBox prefWidth="1000.0" prefHeight="750.0" spacing="15.0"
       style="-fx-background-color: #ffffff;"
       xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="ma.farm.controller.dialogs.ConfigHousesDialogController">
@@ -19,13 +22,13 @@
 
     <!-- Header -->
     <VBox spacing="5.0">
-        <Label text="🏠 Configure Houses"
+        <Label text="🏠 Configure Farm Houses (LP Optimized)"
                style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #1e2939;"/>
-        <Label text="Set the number of houses and their capacities for each category."
+        <Label text="Enter capacities for all houses, then click 'Calculate Allocation' to optimize the distribution."
                style="-fx-font-size: 13px; -fx-text-fill: #666666;" wrapText="true"/>
     </VBox>
 
-    <!-- Warning Message (shown if houses have chickens) -->
+    <!-- Warning Message -->
     <HBox fx:id="warningBox" spacing="10.0" alignment="CENTER_LEFT"
           style="-fx-background-color: #fff3cd; -fx-padding: 12; -fx-background-radius: 5;"
           visible="false" managed="false">
@@ -37,118 +40,102 @@
 
     <Separator />
 
-    <!-- Main Content - Horizontal Layout with 4 columns -->
-    <ScrollPane fitToWidth="true" fitToHeight="true" VBox.vgrow="ALWAYS"
-                style="-fx-background-color: transparent; -fx-background: transparent; -fx-border-color: transparent;">
-        <HBox spacing="15.0" style="-fx-background-color: transparent;">
-            <padding>
-                <Insets top="5.0" bottom="5.0" left="5.0" right="5.0"/>
-            </padding>
-
-            <!-- DayOld Section -->
-            <VBox spacing="12.0" HBox.hgrow="ALWAYS"
-                  style="-fx-background-color: #ffffff; -fx-padding: 15; -fx-background-radius: 8; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 0, 2);">
-                <VBox spacing="3.0" alignment="CENTER">
-                    <Label text="🐣"
-                           style="-fx-font-size: 28px;"/>
-                    <Label text="DayOld"
-                           style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #2196F3;"/>
-                    <Label text="24 weeks" style="-fx-font-size: 10px; -fx-text-fill: #888888;"/>
-                </VBox>
-                <Separator/>
-                <VBox alignment="CENTER" spacing="5.0">
-                    <Label text="Houses:" style="-fx-text-fill: #333333; -fx-font-size: 12px;"/>
-                    <Spinner fx:id="dayOldSpinner" prefWidth="80.0"/>
-                </VBox>
-                <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" prefHeight="150.0"
-                            style="-fx-background-color: transparent; -fx-background: transparent; -fx-border-color: #e0e0e0; -fx-border-radius: 5;">
-                    <VBox fx:id="dayOldCapacityContainer" spacing="8.0" style="-fx-padding: 8;">
-                        <!-- Capacity fields will be added dynamically -->
-                    </VBox>
-                </ScrollPane>
-            </VBox>
-
-            <!-- FemaleEggLayer Section -->
-            <VBox spacing="12.0" HBox.hgrow="ALWAYS"
-                  style="-fx-background-color: #ffffff; -fx-padding: 15; -fx-background-radius: 8; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 0, 2);">
-                <VBox spacing="3.0" alignment="CENTER">
-                    <Label text="🥚"
-                           style="-fx-font-size: 28px;"/>
-                    <Label text="Egg Layer"
-                           style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #E91E63;"/>
-                    <Label text="48 weeks" style="-fx-font-size: 10px; -fx-text-fill: #888888;"/>
-                </VBox>
-                <Separator/>
-                <VBox alignment="CENTER" spacing="5.0">
-                    <Label text="Houses:" style="-fx-text-fill: #333333; -fx-font-size: 12px;"/>
-                    <Spinner fx:id="eggLayerSpinner" prefWidth="80.0"/>
-                </VBox>
-                <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" prefHeight="150.0"
-                            style="-fx-background-color: transparent; -fx-background: transparent; -fx-border-color: #e0e0e0; -fx-border-radius: 5;">
-                    <VBox fx:id="eggLayerCapacityContainer" spacing="8.0" style="-fx-padding: 8;">
-                        <!-- Capacity fields will be added dynamically -->
-                    </VBox>
-                </ScrollPane>
-            </VBox>
-
-            <!-- FemaleMeat Section -->
-            <VBox spacing="12.0" HBox.hgrow="ALWAYS"
-                  style="-fx-background-color: #ffffff; -fx-padding: 15; -fx-background-radius: 8; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 0, 2);">
-                <VBox spacing="3.0" alignment="CENTER">
-                    <Label text="🍗"
-                           style="-fx-font-size: 28px;"/>
-                    <Label text="Female Meat"
-                           style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #9C27B0;"/>
-                    <Label text="6 weeks" style="-fx-font-size: 10px; -fx-text-fill: #888888;"/>
-                </VBox>
-                <Separator/>
-                <VBox alignment="CENTER" spacing="5.0">
-                    <Label text="Houses:" style="-fx-text-fill: #333333; -fx-font-size: 12px;"/>
-                    <Spinner fx:id="femaleMeatSpinner" prefWidth="80.0"/>
-                </VBox>
-                <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" prefHeight="150.0"
-                            style="-fx-background-color: transparent; -fx-background: transparent; -fx-border-color: #e0e0e0; -fx-border-radius: 5;">
-                    <VBox fx:id="femaleMeatCapacityContainer" spacing="8.0" style="-fx-padding: 8;">
-                        <!-- Capacity fields will be added dynamically -->
-                    </VBox>
-                </ScrollPane>
-            </VBox>
-
-            <!-- MaleMeat Section -->
-            <VBox spacing="12.0" HBox.hgrow="ALWAYS"
-                  style="-fx-background-color: #ffffff; -fx-padding: 15; -fx-background-radius: 8; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 0, 2);">
-                <VBox spacing="3.0" alignment="CENTER">
-                    <Label text="🐔"
-                           style="-fx-font-size: 28px;"/>
-                    <Label text="Male Meat"
-                           style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #FF9800;"/>
-                    <Label text="8 weeks" style="-fx-font-size: 10px; -fx-text-fill: #888888;"/>
-                </VBox>
-                <Separator/>
-                <VBox alignment="CENTER" spacing="5.0">
-                    <Label text="Houses:" style="-fx-text-fill: #333333; -fx-font-size: 12px;"/>
-                    <Spinner fx:id="maleMeatSpinner" prefWidth="80.0"/>
-                </VBox>
-                <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" prefHeight="150.0"
-                            style="-fx-background-color: transparent; -fx-background: transparent; -fx-border-color: #e0e0e0; -fx-border-radius: 5;">
-                    <VBox fx:id="maleMeatCapacityContainer" spacing="8.0" style="-fx-padding: 8;">
-                        <!-- Capacity fields will be added dynamically -->
-                    </VBox>
-                </ScrollPane>
-            </VBox>
-
+    <!-- Configuration Section (Top) -->
+    <VBox spacing="10.0" VBox.vgrow="ALWAYS">
+        <HBox spacing="15.0" alignment="CENTER_LEFT">
+            <Label text="Step 1: Total Number of Houses:"
+                   style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #333;"/>
+            <Spinner fx:id="totalHousesSpinner" prefWidth="100.0" editable="true"/>
+            <Label text="(Min 4)" style="-fx-font-size: 11px; -fx-text-fill: #888;"/>
         </HBox>
-    </ScrollPane>
+
+        <Label text="Step 2: Enter Capacity for Each House:"
+               style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #555;"/>
+
+        <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent;"
+                    prefHeight="180.0" minHeight="120.0">
+            <FlowPane fx:id="inputsContainer" hgap="15.0" vgap="15.0"
+                      style="-fx-padding: 10;">
+                <!-- Inputs generated dynamically here -->
+            </FlowPane>
+        </ScrollPane>
+
+
+    </VBox>
 
     <Separator />
 
-    <!-- Buttons -->
+    <!-- Results Section (Bottom) -->
+    <VBox spacing="10.0" VBox.vgrow="ALWAYS">
+        <Label text="Optimization Results:"
+               style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #333;"/>
+
+        <ScrollPane fitToWidth="true" fitToHeight="true" VBox.vgrow="ALWAYS"
+                    style="-fx-background-color: transparent; -fx-background: transparent; -fx-border-color: transparent;">
+            <HBox spacing="15.0" style="-fx-background-color: transparent;">
+
+                <!-- DayOld Column -->
+                <VBox spacing="8.0" HBox.hgrow="ALWAYS"
+                      style="-fx-background-color: #f8f9fa; -fx-padding: 10; -fx-background-radius: 8; -fx-border-color: #e9ecef; -fx-border-radius: 8;">
+                    <Label text="🐣 DayOld" style="-fx-font-weight: bold; -fx-text-fill: #2196F3; -fx-font-size: 13px;"/>
+                    <Label fx:id="dayOldTotalLabel" text="Total: 0" style="-fx-font-size: 11px; -fx-text-fill: #666; -fx-font-style: italic;"/>
+                    <VBox fx:id="dayOldResultContainer" spacing="5.0"/>
+                </VBox>
+
+                <!-- EggLayer Column -->
+                <VBox spacing="8.0" HBox.hgrow="ALWAYS"
+                      style="-fx-background-color: #f8f9fa; -fx-padding: 10; -fx-background-radius: 8; -fx-border-color: #e9ecef; -fx-border-radius: 8;">
+                    <Label text="🥚 Egg Layer" style="-fx-font-weight: bold; -fx-text-fill: #E91E63; -fx-font-size: 13px;"/>
+                    <Label fx:id="eggLayerTotalLabel" text="Total: 0" style="-fx-font-size: 11px; -fx-text-fill: #666; -fx-font-style: italic;"/>
+                    <VBox fx:id="eggLayerResultContainer" spacing="5.0"/>
+                </VBox>
+
+                <!-- FemaleMeat Column -->
+                <VBox spacing="8.0" HBox.hgrow="ALWAYS"
+                      style="-fx-background-color: #f8f9fa; -fx-padding: 10; -fx-background-radius: 8; -fx-border-color: #e9ecef; -fx-border-radius: 8;">
+                    <Label text="🍗 Female Meat" style="-fx-font-weight: bold; -fx-text-fill: #9C27B0; -fx-font-size: 13px;"/>
+                    <Label fx:id="femaleMeatTotalLabel" text="Total: 0" style="-fx-font-size: 11px; -fx-text-fill: #666; -fx-font-style: italic;"/>
+                    <VBox fx:id="femaleMeatResultContainer" spacing="5.0"/>
+                </VBox>
+
+                <!-- MaleMeat Column -->
+                <VBox spacing="8.0" HBox.hgrow="ALWAYS"
+                      style="-fx-background-color: #f8f9fa; -fx-padding: 10; -fx-background-radius: 8; -fx-border-color: #e9ecef; -fx-border-radius: 8;">
+                    <Label text="🐔 Male Meat" style="-fx-font-weight: bold; -fx-text-fill: #FF9800; -fx-font-size: 13px;"/>
+                    <Label fx:id="maleMeatTotalLabel" text="Total: 0" style="-fx-font-size: 11px; -fx-text-fill: #666; -fx-font-style: italic;"/>
+                    <VBox fx:id="maleMeatResultContainer" spacing="5.0"/>
+                </VBox>
+
+            </HBox>
+        </ScrollPane>
+    </VBox>
+
+    <!-- Stats Footer -->
+    <HBox spacing="20.0" alignment="CENTER_LEFT" style="-fx-background-color: #e3f2fd; -fx-padding: 12; -fx-background-radius: 5;">
+        <VBox spacing="2.0">
+            <Label text="Max Import Limit (X)" style="-fx-font-size: 11px; -fx-text-fill: #1565c0;"/>
+            <Label fx:id="maxImportLabel" text="-" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #0d47a1;"/>
+        </VBox>
+        <Separator orientation="VERTICAL"/>
+        <VBox spacing="2.0">
+            <Label text="Bottleneck" style="-fx-font-size: 11px; -fx-text-fill: #1565c0;"/>
+            <Label fx:id="bottleneckLabel" text="-" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #0d47a1;"/>
+        </VBox>
+        <HBox fx:id="loadingBox" spacing="10.0" alignment="CENTER_LEFT" visible="false">
+            <ProgressIndicator prefWidth="20.0" prefHeight="20.0"/>
+            <Label text="Calculating..." style="-fx-font-size: 12px; -fx-text-fill: #666;"/>
+        </HBox>
+    </HBox>
+
+    <Separator />
+
+    <!-- Action Buttons -->
     <HBox alignment="CENTER_RIGHT" spacing="12.0">
         <Button fx:id="cancelButton" onAction="#handleCancel" text="Cancel"
                 style="-fx-background-color: #6c757d; -fx-text-fill: white; -fx-font-size: 13px; -fx-padding: 10 24; -fx-background-radius: 6; -fx-cursor: hand;"
                 prefWidth="100"/>
         <Button fx:id="saveButton" onAction="#handleSave" text="Save Configuration"
                 style="-fx-background-color: #28a745; -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold; -fx-padding: 10 24; -fx-background-radius: 6; -fx-cursor: hand;"
-                prefWidth="160"/>
+                prefWidth="180" disable="true"/>
     </HBox>
 </VBox>
