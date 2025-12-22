@@ -1,0 +1,129 @@
+@startuml UC_Diagram_3_Storage_Inventory
+
+title Use Case Diagram 3: Storage & Inventory Management
+
+left to right direction
+
+' ============================================
+' ACTORS
+' ============================================
+actor "Cashier" as Cashier <<Primary Actor>>
+actor "Worker" as Worker <<Secondary Actor>>
+
+' ============================================
+' SYSTEM BOUNDARY
+' ============================================
+rectangle "Storage & Inventory Management Module" {
+  
+  ' ============ FEED MANAGEMENT ============
+  package "Feed Management" {
+    usecase "Manage Feed" as UC_F
+    usecase "View Feed List" as UC_F1
+    usecase "Add Feed" as UC_F2
+    usecase "Update Feed Details" as UC_F3
+    usecase "Delete Feed" as UC_F4
+    usecase "Use Feed\n(Consume)" as UC_F5
+    usecase "Check Low Stock Alert" as UC_F6
+  }
+  
+  ' ============ MEDICATION MANAGEMENT ============
+  package "Medication Management" {
+    usecase "Manage Medications" as UC_Med
+    usecase "View Medication List" as UC_Med1
+    usecase "Add Medication" as UC_Med2
+    usecase "Update Medication Details" as UC_Med3
+    usecase "Delete Medication" as UC_Med4
+    usecase "Use Medication\n(Administer)" as UC_Med5
+    usecase "Check Expiry Date Alert" as UC_Med6
+  }
+  
+  ' ============ EQUIPMENT MANAGEMENT ============
+  package "Equipment Management" {
+    usecase "Manage Equipment" as UC_Eq
+    usecase "View Equipment List" as UC_Eq1
+    usecase "Add Equipment" as UC_Eq2
+    usecase "Update Equipment Details" as UC_Eq3
+    usecase "Update Equipment Status" as UC_Eq4
+    usecase "Delete Equipment" as UC_Eq5
+  }
+  
+}
+
+' ============================================
+' ACTOR TO USE CASE RELATIONSHIPS
+' ============================================
+Cashier --> UC_F
+Cashier --> UC_Med
+Cashier --> UC_Eq
+
+' Worker provides feedback to Cashier
+Worker .up.> Cashier : <<provides feedback>>\nfeed usage\nequipment issues\nmedication needs
+
+' ============================================
+' FEED MANAGEMENT RELATIONSHIPS
+' ============================================
+UC_F ..> UC_F1 : <<include>>
+UC_F <.. UC_F2 : <<extend>>
+UC_F <.. UC_F3 : <<extend>>
+UC_F <.. UC_F4 : <<extend>>
+UC_F <.. UC_F5 : <<extend>>
+UC_F1 ..> UC_F6 : <<include>>
+
+' ============================================
+' MEDICATION MANAGEMENT RELATIONSHIPS
+' ============================================
+UC_Med ..> UC_Med1 : <<include>>
+UC_Med <.. UC_Med2 : <<extend>>
+UC_Med <.. UC_Med3 : <<extend>>
+UC_Med <.. UC_Med4 : <<extend>>
+UC_Med <.. UC_Med5 : <<extend>>
+UC_Med1 ..> UC_Med6 : <<include>>
+
+' ============================================
+' EQUIPMENT MANAGEMENT RELATIONSHIPS
+' ============================================
+UC_Eq ..> UC_Eq1 : <<include>>
+UC_Eq <.. UC_Eq2 : <<extend>>
+UC_Eq <.. UC_Eq3 : <<extend>>
+UC_Eq <.. UC_Eq4 : <<extend>>
+UC_Eq <.. UC_Eq5 : <<extend>>
+
+' ============================================
+' NOTES
+' ============================================
+note right of UC_F
+  <b>Feed Inventory</b>
+  Types: Day-old, Layer, Meat Growth
+  
+  Worker reports usage →
+  Cashier enters data
+  
+  <b>Alerts when:</b>
+  • Stock < Min level
+  • Expiry date approaching
+end note
+
+note right of UC_Med
+  <b>Medication Inventory</b>
+  
+  Worker reports usage →
+  Cashier enters data
+  
+  <b>Alerts when:</b>
+  • Stock < Threshold
+  • Expired (7 days warning)
+end note
+
+note right of UC_Eq
+  <b>Equipment Inventory</b>
+  
+  Worker reports issues →
+  Cashier updates status
+  
+  Status options:
+  • Operational
+  • Needs Repair
+  • Broken
+end note
+
+@enduml

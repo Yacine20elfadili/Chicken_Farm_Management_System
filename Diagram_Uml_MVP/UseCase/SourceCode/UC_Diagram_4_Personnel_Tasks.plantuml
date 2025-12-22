@@ -1,0 +1,123 @@
+@startuml UC_Diagram_4_Personnel_Tasks
+
+title Use Case Diagram 4: Personnel & Task Management
+
+left to right direction
+
+' ============================================
+' ACTORS
+' ============================================
+actor "Cashier" as Cashier <<Primary Actor>>
+actor "Worker" as Worker <<Secondary Actor>>
+actor "Administration" as Admin <<Secondary Actor>>
+
+' ============================================
+' SYSTEM BOUNDARY
+' ============================================
+rectangle "Personnel & Task Management Module" {
+  
+  ' ============ PERSONNEL MANAGEMENT ============
+  package "Personnel Management" {
+    usecase "Manage Personnel" as UC_P
+    usecase "View Personnel List" as UC_P1
+    usecase "Add Worker" as UC_P2
+    usecase "Update Worker Info" as UC_P3
+    usecase "Delete Worker" as UC_P4
+    usecase "View Worker Details" as UC_P5
+  }
+  
+  ' ============ TASK MANAGEMENT ============
+  package "Task Management" {
+    usecase "Manage Tasks" as UC_T
+    usecase "View Task List" as UC_T1
+    usecase "Create Task" as UC_T2
+    usecase "Edit Task Details" as UC_T3
+    usecase "Delete Task" as UC_T4
+    usecase "Mark Task as Done" as UC_T5
+    usecase "Assign Task to Worker" as UC_T6
+    usecase "View Tasks by Status" as UC_T7
+    usecase "View Tasks by Worker" as UC_T8
+  }
+  
+}
+
+' ============================================
+' ACTOR TO USE CASE RELATIONSHIPS
+' ============================================
+Cashier --> UC_P
+Cashier --> UC_T
+
+' Worker relationships
+Worker .up.> Cashier : <<provides feedback>>\nreports task completion\nreports issues
+Worker <.. UC_T6 : <<receives assignment>>
+
+' Administration relationships
+Admin .down.> Cashier : <<requests reports>>\nstaff performance\ntask completion rates
+
+' ============================================
+' PERSONNEL MANAGEMENT RELATIONSHIPS
+' ============================================
+UC_P ..> UC_P1 : <<include>>
+UC_P <.. UC_P2 : <<extend>>
+UC_P <.. UC_P3 : <<extend>>
+UC_P <.. UC_P4 : <<extend>>
+UC_P1 ..> UC_P5 : <<include>>
+
+' ============================================
+' TASK MANAGEMENT RELATIONSHIPS
+' ============================================
+UC_T ..> UC_T1 : <<include>>
+UC_T <.. UC_T2 : <<extend>>
+UC_T <.. UC_T3 : <<extend>>
+UC_T <.. UC_T4 : <<extend>>
+UC_T <.. UC_T5 : <<extend>>
+UC_T2 ..> UC_T6 : <<include>>
+UC_T1 ..> UC_T7 : <<include>>
+UC_T1 ..> UC_T8 : <<include>>
+
+' Task assignment dependency
+UC_T6 ..> UC_P1 : <<uses>>\nselects from\npersonnel list
+
+' ============================================
+' NOTES
+' ============================================
+note right of UC_P
+  <b>Personnel Information</b>
+  
+  Worker details:
+  • Full name, Age
+  • Phone & Email
+  • Job title (Worker/Tracker)
+  • Hire date, Salary
+  • Shift (Morning/Evening/Night)
+  • Active status
+end note
+
+note right of UC_T
+  <b>Task Management</b>
+  
+  Task details:
+  • Description, Status
+  • Due date, Priority
+  • Assigned worker
+  • Category (Cleaning/
+    Feeding/Collection)
+  
+  <b>Workflow:</b>
+  Cashier creates task →
+  Worker completes task →
+  Worker reports to Cashier →
+  Cashier marks as done
+end note
+
+note bottom of Cashier
+  <b>Cashier Role</b>
+  
+  The link between:
+  • Administration (receives instructions)
+  • Workers (assigns tasks, enters data)
+  
+  Only person using the app
+end note
+
+@enduml

@@ -15,7 +15,7 @@
 
 <VBox fx:id="sidebar" prefHeight="642.0" prefWidth="180.0" styleClass="side" stylesheets="@../css/style.css" VBox.vgrow="ALWAYS" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ma.farm.controller.SidebarController">
     <children>
-        <HBox fx:id="sidebarHeader" alignment="CENTER_LEFT" prefHeight="300.0" spacing="10.0" styleClass="sidebar" VBox.vgrow="ALWAYS">
+        <HBox fx:id="sidebarHeader" alignment="CENTER_LEFT" prefWidth="180.0" spacing="10.0" styleClass="sidebar" VBox.vgrow="ALWAYS">
             <children>
                 <ImageView fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
                     <image>
@@ -29,17 +29,20 @@
                 </Text>
             </children>
             <padding>
-                <Insets left="10.0" />
+                <Insets bottom="10.0" left="10.0" top="10.0" />
             </padding>
+            <VBox.margin>
+                <Insets />
+            </VBox.margin>
         </HBox>
         <!-- Main Sidebar -->
         <VBox prefHeight="800.0" prefWidth="210.0" styleClass="sidebar" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
             <children>
 
                 <!-- Navigation Scrollable Area -->
-                <ScrollPane fx:id="sidebarScroll" fitToWidth="true" prefHeight="400.0" prefWidth="180.0" styleClass="sidebar">
+                <ScrollPane fx:id="sidebarScroll" fitToWidth="true" prefHeight="345.0" prefWidth="180.0" style="-fx-border-color: gray; -fx-border-width: 0.5 0 0.5 0;" styleClass="sidebar" VBox.vgrow="ALWAYS">
                     <content>
-                        <VBox fx:id="navContainer" fillWidth="true" styleClass="sidebar" VBox.vgrow="ALWAYS">
+                        <VBox fx:id="navContainer" fillWidth="true" prefHeight="292.0" prefWidth="177.0" styleClass="sidebar" VBox.vgrow="ALWAYS">
                             <children>
                                 <AnchorPane fx:id="dashboardBtn" prefHeight="35.0" styleClass="sidebar-item">
                                     <children>
@@ -165,9 +168,20 @@
                                 </AnchorPane>
 
                             </children>
+                            <padding>
+                                <Insets top="10.0" />
+                            </padding>
                         </VBox>
                     </content>
                 </ScrollPane>
+                <Button fx:id="sidebarMenu" mnemonicParsing="false" prefHeight="35.0" prefWidth="35.0" styleClass="menu-button" text="&lt;" textAlignment="CENTER">
+                    <VBox.margin>
+                        <Insets left="5.0" top="10.0" />
+                    </VBox.margin>
+                    <font>
+                        <Font name="Verdana" size="1.0" />
+                    </font>
+                </Button>
                 <AnchorPane fx:id="logoutBtn" prefHeight="35.0" styleClass="logout-button">
                     <children>
                         <Label layoutX="54.0" layoutY="9.0" prefHeight="17.0" prefWidth="110.0" text="Déconnexion" textAlignment="CENTER" textFill="WHITE">
@@ -188,14 +202,6 @@
                         <Insets top="10.0" />
                     </VBox.margin>
                 </AnchorPane>
-                <Button fx:id="sidebarMenu" mnemonicParsing="false" prefHeight="35.0" prefWidth="35.0" styleClass="menu-button" text="&lt;" textAlignment="CENTER">
-                    <VBox.margin>
-                        <Insets left="5.0" top="10.0" />
-                    </VBox.margin>
-               <font>
-                  <Font name="Verdana" size="1.0" />
-               </font>
-                </Button>
             </children>
         </VBox>
     </children>

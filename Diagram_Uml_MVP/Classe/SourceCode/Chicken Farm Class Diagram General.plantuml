@@ -1,0 +1,533 @@
+@startuml Class_Diagram_General
+
+title Chicken Farm Management System - Complete Class Diagram (MVP Version)
+
+skinparam classAttributeIconSize 0
+skinparam class {
+    BackgroundColor<<Entity>> LightYellow
+    BorderColor<<Entity>> Orange
+    BackgroundColor<<DAO>> LightBlue
+    BorderColor<<DAO>> DarkBlue
+    BackgroundColor<<Singleton>> Wheat
+    BorderColor<<Singleton>> Brown
+    BackgroundColor<<Controller>> LightSalmon
+    BorderColor<<Controller>> Red
+    BackgroundColor<<Utility>> LightGreen
+    BorderColor<<Utility>> DarkGreen
+    BackgroundColor<<App>> Gold
+    BorderColor<<App>> DarkOrange
+}
+
+' ============================================
+' MODEL LAYER - Core Entities
+' ============================================
+
+package "Model Layer" <<Rectangle>> {
+
+    class House <<Entity>> {
+        - id: int
+        - name: String
+        - type: String
+        - chickenCount: int
+        - capacity: int
+        - healthStatus: String
+        - lastCleaningDate: LocalDate
+        - creationDate: LocalDate
+        __
+        + getOccupancyRate(): double
+        + isFull(): boolean
+    }
+
+    class Chicken <<Entity>> {
+        - id: int
+        - houseId: int
+        - batchNumber: String
+        - quantity: int
+        - arrivalDate: LocalDate
+        - ageInDays: int
+        - gender: String
+        - healthStatus: String
+        - averageWeight: double
+        - nextTransferDate: LocalDate
+        __
+        + getDaysUntilTransfer(): int
+        + isReadyForTransfer(): boolean
+    }
+
+    class Mortality <<Entity>> {
+        - id: int
+        - houseId: int
+        - deathDate: LocalDate
+        - count: int
+        - cause: String
+        - symptoms: String
+        - isOutbreak: boolean
+        - recordedBy: String
+        - notes: String
+        __
+        + isConcerningRate(totalChickens: int): boolean
+    }
+
+    class EggProduction <<Entity>> {
+        - id: int
+        - houseId: int
+        - productionDate: LocalDate
+        - eggsCollected: int
+        - crackedEggs: int
+        - goodEggs: int
+        - deadChickens: int
+        - collectedBy: String
+        - notes: String
+        __
+        + calculateGoodEggs(): void
+        + getEfficiencyRate(): double
+    }
+
+    class User <<Entity>> {
+        - id: int
+        - name: String
+        - email: String
+        - password: String
+        - creationDate: LocalDateTime
+    }
+
+    class Feed <<Entity>> {
+        - id: int
+        - name: String
+        - type: String
+        - quantityKg: double
+        - pricePerKg: double
+        - supplier: String
+        - lastRestockDate: LocalDate
+        - expiryDate: LocalDate
+        - minStockLevel: double
+        __
+        + isLowStock(): boolean
+        + isExpiredOrNearExpiry(): boolean
+        + getTotalValue(): double
+    }
+
+    class Medication <<Entity>> {
+        - id: int
+        - name: String
+        - type: String
+        - quantity: int
+        - unit: String
+        - pricePerUnit: double
+        - supplier: String
+        - purchaseDate: LocalDate
+        - expiryDate: LocalDate
+        - minStockLevel: int
+        - usage: String
+        __
+        + isLowStock(): boolean
+        + isExpired(): boolean
+        + getTotalValue(): double
+    }
+
+    class Equipment <<Entity>> {
+        - id: int
+        - name: String
+        - category: String
+        - quantity: int
+        - status: String
+        - purchaseDate: LocalDate
+        - purchasePrice: double
+        - lastMaintenanceDate: LocalDate
+        - nextMaintenanceDate: LocalDate
+        - location: String
+        - notes: String
+        __
+        + needsMaintenance(): boolean
+        + isBroken(): boolean
+        + isOperational(): boolean
+    }
+
+    class Task <<Entity>> {
+        - id: int
+        - description: String
+        - status: String
+        - dueDate: LocalDate
+        - completedAt: LocalDateTime
+        - assignedTo: String
+        - houseId: int
+        - category: String
+        - crackedEggs: int
+        - notes: String
+        - priority: String
+        __
+        + isOverdue(): boolean
+        + isCompleted(): boolean
+        + markAsComplete(): void
+        + getStatusColor(): String
+    }
+
+    class Personnel <<Entity>> {
+        - id: int
+        - fullName: String
+        - age: int
+        - phone: String
+        - email: String
+        - jobTitle: String
+        - hireDate: LocalDate
+        - salary: double
+        - shift: String
+        - isActive: boolean
+        - address: String
+        - emergencyContact: String
+        __
+        + getYearsOfService(): int
+        + isTracker(): boolean
+        + isWorker(): boolean
+    }
+}
+
+' ============================================
+' DAO LAYER - Data Access Objects
+' ============================================
+
+package "DAO Layer" <<Rectangle>> {
+
+    class DatabaseConnection <<Singleton>> {
+        - {static} instance: DatabaseConnection
+        - connection: Connection
+        - {static} URL: String
+        - {static} DRIVER: String
+        __
+        + {static} getInstance(): DatabaseConnection
+        + getConnection(): Connection
+        + closeConnection(): void
+    }
+
+    class UserDAO <<DAO>> {
+        - dbConnection: DatabaseConnection
+        __
+        + createUser(user: User): boolean
+        + getUserById(id: int): User
+        + getUserByEmail(email: String): User
+        + getAllUsers(): List<User>
+        + updateUser(user: User): boolean
+        + deleteUser(id: int): boolean
+        + validate(email: String, password: String): boolean
+        + authenticate(email: String, password: String): User
+    }
+
+    class HouseDAO <<DAO>> {
+        - dbConnection: DatabaseConnection
+        __
+        + addHouse(house: House): boolean
+        + getHouseById(id: int): House
+        + getAllHouses(): List<House>
+        + updateHouse(house: House): boolean
+        + deleteHouse(id: int): boolean
+        + getHousesByType(type: String): List<House>
+    }
+
+    class ChickenDAO <<DAO>> {
+        - dbConnection: DatabaseConnection
+        __
+        + createChickenBatch(chicken: Chicken): boolean
+        + getChickenById(id: int): Chicken
+        + getAllChickens(): List<Chicken>
+        + updateChickenBatch(chicken: Chicken): boolean
+        + deleteChickenBatch(id: int): boolean
+        + getChickensByHouse(houseId: int): List<Chicken>
+    }
+
+    class MortalityDAO <<DAO>> {
+        - dbConnection: DatabaseConnection
+        __
+        + recordMortality(mortality: Mortality): boolean
+        + getMortalityById(id: int): Mortality
+        + getAllMortalities(): List<Mortality>
+        + updateMortality(mortality: Mortality): boolean
+        + deleteMortality(id: int): boolean
+        + getMortalityByHouse(houseId: int): List<Mortality>
+    }
+
+    class EggProductionDAO <<DAO>> {
+        - dbConnection: DatabaseConnection
+        __
+        + recordProduction(production: EggProduction): boolean
+        + getProductionById(id: int): EggProduction
+        + getAllProductions(): List<EggProduction>
+        + updateProduction(production: EggProduction): boolean
+        + deleteProduction(id: int): boolean
+        + getProductionByHouse(houseId: int): List<EggProduction>
+    }
+
+    class FeedDAO <<DAO>> {
+        - dbConnection: DatabaseConnection
+        __
+        + addFeed(feed: Feed): boolean
+        + getFeedById(id: int): Feed
+        + getAllFeed(): List<Feed>
+        + updateFeed(feed: Feed): boolean
+        + deleteFeed(id: int): boolean
+        + useFeed(feedId: int, quantityKg: double): boolean
+    }
+
+    class MedicationDAO <<DAO>> {
+        - dbConnection: DatabaseConnection
+        __
+        + addMedication(medication: Medication): boolean
+        + getMedicationById(id: int): Medication
+        + getAllMedications(): List<Medication>
+        + updateMedication(medication: Medication): boolean
+        + deleteMedication(id: int): boolean
+        + useMedication(medicationId: int, quantity: int): boolean
+    }
+
+    class EquipmentDAO <<DAO>> {
+        - dbConnection: DatabaseConnection
+        __
+        + addEquipment(equipment: Equipment): boolean
+        + getEquipmentById(id: int): Equipment
+        + getAllEquipment(): List<Equipment>
+        + updateEquipment(equipment: Equipment): boolean
+        + deleteEquipment(id: int): boolean
+    }
+
+    class TaskDAO <<DAO>> {
+        - dbConnection: DatabaseConnection
+        __
+        + createTask(task: Task): boolean
+        + getTaskById(id: int): Task
+        + getAllTasks(): List<Task>
+        + updateTask(task: Task): boolean
+        + deleteTask(id: int): boolean
+        + getOverdueTasks(): List<Task>
+        + markTaskAsDone(taskId: int): boolean
+    }
+
+    class PersonnelDAO <<DAO>> {
+        - dbConnection: DatabaseConnection
+        __
+        + addPersonnel(personnel: Personnel): boolean
+        + getPersonnelById(id: int): Personnel
+        + getAllPersonnel(): List<Personnel>
+        + updatePersonnel(personnel: Personnel): boolean
+        + deletePersonnel(id: int): boolean
+        + getActivePersonnel(): List<Personnel>
+    }
+}
+
+' ============================================
+' APPLICATION LAYER - Controllers
+' ============================================
+
+package "Controller Layer" <<Rectangle>> {
+
+    class App <<App>> {
+        + start(stage: Stage): void
+        + {static} main(args: String[]): void
+    }
+
+    class LoginController <<Controller>> {
+        - userDAO: UserDAO
+        __
+        + initialize(): void
+        + handleLogin(event: ActionEvent): void
+    }
+
+    class MainWindowController <<Controller>> {
+        + initialize(): void
+        + loadView(viewName: String): void
+        + handleLogout(): void
+    }
+
+    class SidebarController <<Controller>> {
+        - mainWindowController: MainWindowController
+        __
+        + initialize(): void
+        + setMainWindowController(controller: MainWindowController): void
+        + handleDashboardClick(): void
+        + handleChickenBayClick(): void
+        + handleEggsBayClick(): void
+        + handleStorageClick(): void
+        + handleTasksClick(): void
+        + handlePersonnelClick(): void
+    }
+
+    class DashboardController <<Controller>> {
+        - chickenDAO: ChickenDAO
+        - eggProductionDAO: EggProductionDAO
+        - mortalityDAO: MortalityDAO
+        __
+        + initialize(): void
+        + loadDashboardData(): void
+        + refreshDashboard(): void
+    }
+
+    class ChickenBayController <<Controller>> {
+        - houseDAO: HouseDAO
+        - chickenDAO: ChickenDAO
+        - mortalityDAO: MortalityDAO
+        __
+        + initialize(): void
+        + loadHouseCards(): void
+        + loadMortalityStats(): void
+        + handleAddChickens(): void
+        + handleRecordMortality(): void
+        + refreshView(): void
+    }
+
+    class EggsBayController <<Controller>> {
+        - eggProductionDAO: EggProductionDAO
+        - houseDAO: HouseDAO
+        __
+        + initialize(): void
+        + loadProductionCards(): void
+        + loadTotalStorage(): void
+        + handleRecordCollection(): void
+        + refreshView(): void
+    }
+
+    class StorageController <<Controller>> {
+        - feedDAO: FeedDAO
+        - medicationDAO: MedicationDAO
+        - equipmentDAO: EquipmentDAO
+        __
+        + initialize(): void
+        + loadFeedData(): void
+        + loadMedicationData(): void
+        + loadEquipmentData(): void
+        + handleAddFeed(): void
+        + handleAddMedication(): void
+        + handleAddEquipment(): void
+        + refreshView(): void
+    }
+
+    class TasksController <<Controller>> {
+        - taskDAO: TaskDAO
+        - personnelDAO: PersonnelDAO
+        __
+        + initialize(): void
+        + loadTasks(): void
+        + handleCreateTask(): void
+        + handleMarkAsDone(): void
+        + refreshView(): void
+    }
+
+    class PersonnelController <<Controller>> {
+        - personnelDAO: PersonnelDAO
+        __
+        + initialize(): void
+        + loadPersonnelData(): void
+        + handleAddPersonnel(): void
+        + handleEditPersonnel(): void
+        + refreshView(): void
+    }
+}
+
+' ============================================
+' UTILITY LAYER
+' ============================================
+
+package "Utility Layer" <<Rectangle>> {
+
+    class ValidationUtil <<Utility>> {
+        - {static} EMAIL_REGEX: String
+        - {static} EMAIL_PATTERN: Pattern
+        __
+        + {static} isValidEmail(email: String): boolean
+        + {static} isEmpty(str: String): boolean
+        + {static} isValidPassword(password: String): boolean
+        + {static} sanitize(input: String): String
+    }
+
+    class DateUtil <<Utility>> {
+        - {static} DATE_FORMATTER: DateTimeFormatter
+        - {static} DATETIME_FORMATTER: DateTimeFormatter
+        __
+        + {static} formatDate(date: LocalDate): String
+        + {static} formatDateTime(dateTime: LocalDateTime): String
+        + {static} parseDate(dateString: String): LocalDate
+        + {static} getCurrentDate(): LocalDate
+        + {static} daysBetween(start: LocalDate, end: LocalDate): long
+        + {static} isToday(date: LocalDate): boolean
+        + {static} isPast(date: LocalDate): boolean
+        + {static} getLast7Days(): LocalDate[]
+        + {static} calculateAgeInDays(arrivalDate: LocalDate): int
+    }
+
+    class NavigationUtil <<Utility>> {
+        + {static} navigateTo(event: ActionEvent, fxmlPath: String, title: String): void
+        + {static} loadFXML(fxmlPath: String): Parent
+        + {static} openDialog(fxmlPath: String, title: String, owner: Stage): void
+        + {static} closeWindow(event: ActionEvent): void
+        + {static} showAlert(title: String, header: String, content: String): void
+        + {static} showError(title: String, header: String, content: String): void
+        + {static} showConfirmation(title: String, header: String, content: String): boolean
+        + {static} navigateToLogin(event: ActionEvent): void
+        + {static} navigateToMainWindow(event: ActionEvent): void
+    }
+}
+
+' ============================================
+' RELATIONSHIPS - Model Layer
+' ============================================
+
+House "1" -- "0..*" Chicken : contains >
+House "1" -- "0..*" EggProduction : produces >
+House "1" -- "0..*" Mortality : records >
+Task "0..*" -- "0..1" Personnel : assigned to >
+
+' ============================================
+' RELATIONSHIPS - DAO Layer
+' ============================================
+
+UserDAO --> DatabaseConnection
+HouseDAO --> DatabaseConnection
+ChickenDAO --> DatabaseConnection
+MortalityDAO --> DatabaseConnection
+EggProductionDAO --> DatabaseConnection
+FeedDAO --> DatabaseConnection
+MedicationDAO --> DatabaseConnection
+EquipmentDAO --> DatabaseConnection
+TaskDAO --> DatabaseConnection
+PersonnelDAO --> DatabaseConnection
+
+' ============================================
+' RELATIONSHIPS - Controller to DAO
+' ============================================
+
+App ..> LoginController
+
+LoginController --> UserDAO
+DashboardController --> ChickenDAO
+DashboardController --> EggProductionDAO
+DashboardController --> MortalityDAO
+ChickenBayController --> HouseDAO
+ChickenBayController --> ChickenDAO
+ChickenBayController --> MortalityDAO
+EggsBayController --> EggProductionDAO
+EggsBayController --> HouseDAO
+StorageController --> FeedDAO
+StorageController --> MedicationDAO
+StorageController --> EquipmentDAO
+TasksController --> TaskDAO
+TasksController --> PersonnelDAO
+PersonnelController --> PersonnelDAO
+
+MainWindowController ..> SidebarController
+SidebarController --> MainWindowController
+
+' ============================================
+' RELATIONSHIPS - Controller to Utility
+' ============================================
+
+LoginController ..> ValidationUtil
+LoginController ..> NavigationUtil
+DashboardController ..> DateUtil
+ChickenBayController ..> DateUtil
+ChickenBayController ..> NavigationUtil
+EggsBayController ..> DateUtil
+EggsBayController ..> NavigationUtil
+StorageController ..> NavigationUtil
+TasksController ..> DateUtil
+TasksController ..> NavigationUtil
+PersonnelController ..> NavigationUtil
+MainWindowController ..> NavigationUtil
+
+@enduml

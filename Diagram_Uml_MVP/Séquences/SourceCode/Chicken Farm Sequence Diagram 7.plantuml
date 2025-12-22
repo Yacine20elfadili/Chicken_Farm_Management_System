@@ -1,0 +1,171 @@
+@startuml Sequence_Diagram_7_Add_Personnel
+
+title Sequence Diagram 7: Add Personnel/Worker (CREATE Operation)
+
+actor "Cashier" as Cashier
+participant "PersonnelView" as UI
+participant "PersonnelController" as Controller
+participant "ValidationUtil" as Validator
+participant "PersonnelDAO" as DAO
+participant "DatabaseConnection" as DB
+participant "DateUtil" as DateUtil
+
+== Add New Worker ==
+
+Cashier -> UI: Click "Add Worker" button
+
+UI -> Controller: handleAddPersonnel()
+activate Controller
+
+Controller -> UI: Show "Add Personnel" dialog
+UI -> Cashier: Display input form
+
+Cashier -> UI: Fill in personnel details:\n• Full Name: Mohamed Hassan\n• Age: 28\n• Phone: 0612345678\n• Email: mohamed.hassan@farm.ma\n• Job Title: Worker\n• Hire Date: 08/12/2024\n• Salary: 3500 MAD/month\n• Shift: Morning\n• Address: Casablanca, Morocco\n• Emergency Contact: Fatima (0687654321)
+
+Cashier -> UI: Click "Save" button
+
+UI -> Controller: submitAddPersonnel(personnelData)
+
+' Validation - Full Name
+Controller -> Validator: isEmpty(fullName)
+activate Validator
+Validator --> Controller: false (valid)
+deactivate Validator
+
+' Validation - Email
+Controller -> Validator: isValidEmail(email)
+activate Validator
+Validator --> Controller: true (valid)
+deactivate Validator
+
+' Validation - Age
+alt Invalid Input
+    Controller -> UI: Show error dialog
+    UI -> Cashier: Display validation error
+    
+else Valid Input
+    ' Check for duplicate email
+    Controller -> DAO: getPersonnelByEmail(email)
+    activate DAO
+    
+    DAO -> DB: getConnection()
+    activate DB
+    DB --> DAO: Connection
+    deactivate DB
+    
+    DAO -> DB: executeQuery(\n"SELECT * FROM personnel\nWHERE email = ?")
+    activate DB
+    
+    alt Email Already Exists
+        DB --> DAO: Personnel record found
+        deactivate DB
+        DAO --> Controller: Existing Personnel object
+        deactivate DAO
+        
+        Controller -> UI: Show error dialog\n"Email already registered.\nPlease use unique email."
+        UI -> Cashier: Display error
+        
+    else Email Unique
+        DB --> DAO: Empty ResultSet
+        deactivate DB
+        DAO --> Controller: null (email available)
+        deactivate DAO
+        
+        ' Validate age range
+        Controller -> Controller: validateAge(age)
+        note right
+            <b>Age Validation:</b>
+            Age must be between 18 and 65
+            28 is valid ✓
+        end note
+        
+        alt Age Invalid
+            Controller -> UI: Show error dialog\n"Age must be between 18 and 65"
+            UI -> Cashier: Display error
+            
+        else Age Valid
+            ' Get current date for hire date
+            Controller -> DateUtil: getCurrentDate()
+            activate DateUtil
+            DateUtil --> Controller: today (2024-12-08)
+            deactivate DateUtil
+            
+            ' Create Personnel object
+            Controller -> Controller: createPersonnelObject()
+            note right
+                <b>Personnel Object:</b>
+                fullName = "Mohamed Hassan"
+                age = 28
+                phone = "0612345678"
+                email = "mohamed.hassan@farm.ma"
+                jobTitle = "Worker"
+                hireDate = 2024-12-08
+                salary = 3500.0
+                shift = "Morning"
+                isActive = true (default)
+                address = "Casablanca, Morocco"
+                emergencyContact = "Fatima (0687654321)"
+            end note
+            
+            ' Save to database
+            Controller -> DAO: addPersonnel(personnel)
+            activate DAO
+            
+            DAO -> DB: getConnection()
+            activate DB
+            DB --> DAO: Connection
+            deactivate DB
+            
+            DAO -> DB: executeUpdate(\n"INSERT INTO personnel\n(fullName, age, phone, email,\njobTitle, hireDate, salary, shift,\nisActive, address, emergencyContact)\nVALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
+            activate DB
+            
+            alt Insert Successful
+                DB --> DAO: rowsAffected = 1
+                deactivate DB
+                
+                ' Get generated ID
+                DAO -> DB: executeQuery(\n"SELECT last_insert_rowid() AS id")
+                activate DB
+                DB --> DAO: id = 15
+                deactivate DB
+                
+                DAO --> Controller: true (success)
+                deactivate DAO
+                
+                ' Refresh view
+                Controller -> Controller: refreshView()
+                Controller -> Controller: loadPersonnelData()
+                
+                Controller -> DAO: getAllPersonnel()
+                activate DAO
+                DAO -> DB: executeQuery(\n"SELECT * FROM personnel")
+                activate DB
+                DB --> DAO: List<Personnel>
+                deactivate DB
+                DAO --> Controller: personnel list
+                deactivate DAO
+                
+                Controller -> UI: Update personnel table/cards
+                UI -> UI: Add new personnel card:\n┌─────────────────────────┐\n│ 👤 Mohamed Hassan       │\n│ 📅 Age: 28              │\n│ 📞 0612345678           │\n│ 📧 mohamed.hassan@...   │\n│ 💼 Worker               │\n│ 🌅 Morning Shift        │\n│ ✅ Active               │\n└─────────────────────────┘
+                
+                Controller -> UI: Show success message
+                UI -> Cashier: Display "Worker added successfully!\n• ID: 15\n• Name: Mohamed Hassan\n• Job: Worker\n• Shift: Morning"
+                
+            else Insert Failed
+                DB --> DAO: SQLException
+                deactivate DB
+                DAO --> Controller: false (failed)
+                deactivate DAO
+                
+                Controller -> UI: Show error dialog
+                UI -> Cashier: Display "Failed to add personnel.\nDatabase error occurred."
+            end
+        end
+    end
+end
+
+deactivate Controller
+
+
+
+@enduml

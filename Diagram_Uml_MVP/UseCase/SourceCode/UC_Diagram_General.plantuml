@@ -1,0 +1,251 @@
+@startuml UC_Diagram_General
+
+title Chicken Farm Management System - Complete Use Case Diagram (MVP)
+
+left to right direction
+
+' ============================================
+' ACTORS
+' ============================================
+actor "Cashier" as Cashier <<Primary Actor>>
+actor "Worker" as Worker <<Secondary Actor>>
+actor "Administration" as Admin <<Secondary Actor>>
+
+' ============================================
+' SYSTEM BOUNDARY
+' ============================================
+rectangle "Chicken Farm Management System - MVP" {
+  
+  ' ============ AUTHENTICATION ============
+  package "Authentication" {
+    usecase "Login" as UC_Auth1
+    usecase "Logout" as UC_Auth2
+  }
+  
+  ' ============ DASHBOARD ============
+  package "Dashboard" {
+    usecase "View Dashboard" as UC_Dash
+    usecase "View Total Chickens" as UC_Dash1
+    usecase "View Today's Egg Production" as UC_Dash2
+    usecase "View Active Alerts" as UC_Dash3
+    usecase "View 7-Day Production Chart" as UC_Dash4
+  }
+  
+  ' ============ HOUSE MANAGEMENT ============
+  package "House Management" {
+    usecase "Manage Houses" as UC_H
+    usecase "View House List" as UC_H1
+    usecase "Add House" as UC_H2
+    usecase "Update House" as UC_H3
+    usecase "Delete House" as UC_H4
+  }
+  
+  ' ============ CHICKEN MANAGEMENT ============
+  package "Chicken Batch Management" {
+    usecase "Manage Chicken Batches" as UC_C
+    usecase "View Chicken Batches" as UC_C1
+    usecase "Add Chicken Batch" as UC_C2
+    usecase "Update Batch" as UC_C3
+    usecase "Delete Batch" as UC_C4
+    usecase "Transfer Chickens" as UC_C5
+  }
+  
+  ' ============ MORTALITY MANAGEMENT ============
+  package "Mortality Management" {
+    usecase "Manage Mortality" as UC_M
+    usecase "View Mortality Records" as UC_M1
+    usecase "Record Mortality" as UC_M2
+    usecase "Update Mortality" as UC_M3
+    usecase "Delete Mortality" as UC_M4
+    usecase "View Mortality Stats" as UC_M5
+  }
+  
+  ' ============ EGG PRODUCTION ============
+  package "Egg Production" {
+    usecase "Manage Egg Production" as UC_E
+    usecase "View Egg Inventory" as UC_E1
+    usecase "Record Egg Collection" as UC_E2
+    usecase "Update Production" as UC_E3
+    usecase "Delete Production" as UC_E4
+    usecase "Remove Eggs" as UC_E5
+    usecase "Record Cracked Eggs" as UC_E6
+  }
+  
+  ' ============ FEED MANAGEMENT ============
+  package "Feed Management" {
+    usecase "Manage Feed" as UC_F
+    usecase "View Feed List" as UC_F1
+    usecase "Add Feed" as UC_F2
+    usecase "Update Feed" as UC_F3
+    usecase "Delete Feed" as UC_F4
+    usecase "Use Feed" as UC_F5
+    usecase "Check Low Stock Alert" as UC_F6
+  }
+  
+  ' ============ MEDICATION MANAGEMENT ============
+  package "Medication Management" {
+    usecase "Manage Medications" as UC_Med
+    usecase "View Medication List" as UC_Med1
+    usecase "Add Medication" as UC_Med2
+    usecase "Update Medication" as UC_Med3
+    usecase "Delete Medication" as UC_Med4
+    usecase "Use Medication" as UC_Med5
+    usecase "Check Expiry Alert" as UC_Med6
+  }
+  
+  ' ============ EQUIPMENT MANAGEMENT ============
+  package "Equipment Management" {
+    usecase "Manage Equipment" as UC_Eq
+    usecase "View Equipment List" as UC_Eq1
+    usecase "Add Equipment" as UC_Eq2
+    usecase "Update Equipment" as UC_Eq3
+    usecase "Update Status" as UC_Eq4
+    usecase "Delete Equipment" as UC_Eq5
+  }
+  
+  ' ============ PERSONNEL MANAGEMENT ============
+  package "Personnel Management" {
+    usecase "Manage Personnel" as UC_P
+    usecase "View Personnel List" as UC_P1
+    usecase "Add Worker" as UC_P2
+    usecase "Update Worker" as UC_P3
+    usecase "Delete Worker" as UC_P4
+    usecase "View Worker Details" as UC_P5
+  }
+  
+  ' ============ TASK MANAGEMENT ============
+  package "Task Management" {
+    usecase "Manage Tasks" as UC_T
+    usecase "View Task List" as UC_T1
+    usecase "Create Task" as UC_T2
+    usecase "Edit Task" as UC_T3
+    usecase "Delete Task" as UC_T4
+    usecase "Mark Task Done" as UC_T5
+    usecase "Assign Task" as UC_T6
+    usecase "Filter by Status" as UC_T7
+    usecase "Filter by Worker" as UC_T8
+  }
+  
+}
+
+' ============================================
+' CASHIER RELATIONSHIPS (PRIMARY ACTOR)
+' ============================================
+Cashier --> UC_Auth1
+Cashier --> UC_Auth2
+Cashier --> UC_Dash
+Cashier --> UC_H
+Cashier --> UC_C
+Cashier --> UC_M
+Cashier --> UC_E
+Cashier --> UC_F
+Cashier --> UC_Med
+Cashier --> UC_Eq
+Cashier --> UC_P
+Cashier --> UC_T
+
+' ============================================
+' SECONDARY ACTOR RELATIONSHIPS
+' ============================================
+Worker .up.> Cashier : <<provides feedback>>
+Worker <.. UC_T6 : <<receives assignment>>
+Admin .down.> Cashier : <<requests reports>>
+
+' ============================================
+' DASHBOARD RELATIONSHIPS
+' ============================================
+UC_Dash ..> UC_Dash1 : <<include>>
+UC_Dash ..> UC_Dash2 : <<include>>
+UC_Dash ..> UC_Dash3 : <<include>>
+UC_Dash ..> UC_Dash4 : <<include>>
+
+' ============================================
+' HOUSE MANAGEMENT RELATIONSHIPS
+' ============================================
+UC_H ..> UC_H1 : <<include>>
+UC_H <.. UC_H2 : <<extend>>
+UC_H <.. UC_H3 : <<extend>>
+UC_H <.. UC_H4 : <<extend>>
+
+' ============================================
+' CHICKEN MANAGEMENT RELATIONSHIPS
+' ============================================
+UC_C ..> UC_C1 : <<include>>
+UC_C <.. UC_C2 : <<extend>>
+UC_C <.. UC_C3 : <<extend>>
+UC_C <.. UC_C4 : <<extend>>
+UC_C <.. UC_C5 : <<extend>>
+
+' ============================================
+' MORTALITY RELATIONSHIPS
+' ============================================
+UC_M ..> UC_M1 : <<include>>
+UC_M ..> UC_M5 : <<include>>
+UC_M <.. UC_M2 : <<extend>>
+UC_M <.. UC_M3 : <<extend>>
+UC_M <.. UC_M4 : <<extend>>
+
+' ============================================
+' EGG PRODUCTION RELATIONSHIPS
+' ============================================
+UC_E ..> UC_E1 : <<include>>
+UC_E <.. UC_E2 : <<extend>>
+UC_E <.. UC_E3 : <<extend>>
+UC_E <.. UC_E4 : <<extend>>
+UC_E <.. UC_E5 : <<extend>>
+UC_E2 ..> UC_E6 : <<include>>
+
+' ============================================
+' FEED MANAGEMENT RELATIONSHIPS
+' ============================================
+UC_F ..> UC_F1 : <<include>>
+UC_F <.. UC_F2 : <<extend>>
+UC_F <.. UC_F3 : <<extend>>
+UC_F <.. UC_F4 : <<extend>>
+UC_F <.. UC_F5 : <<extend>>
+UC_F1 ..> UC_F6 : <<include>>
+
+' ============================================
+' MEDICATION MANAGEMENT RELATIONSHIPS
+' ============================================
+UC_Med ..> UC_Med1 : <<include>>
+UC_Med <.. UC_Med2 : <<extend>>
+UC_Med <.. UC_Med3 : <<extend>>
+UC_Med <.. UC_Med4 : <<extend>>
+UC_Med <.. UC_Med5 : <<extend>>
+UC_Med1 ..> UC_Med6 : <<include>>
+
+' ============================================
+' EQUIPMENT MANAGEMENT RELATIONSHIPS
+' ============================================
+UC_Eq ..> UC_Eq1 : <<include>>
+UC_Eq <.. UC_Eq2 : <<extend>>
+UC_Eq <.. UC_Eq3 : <<extend>>
+UC_Eq <.. UC_Eq4 : <<extend>>
+UC_Eq <.. UC_Eq5 : <<extend>>
+
+' ============================================
+' PERSONNEL MANAGEMENT RELATIONSHIPS
+' ============================================
+UC_P ..> UC_P1 : <<include>>
+UC_P <.. UC_P2 : <<extend>>
+UC_P <.. UC_P3 : <<extend>>
+UC_P <.. UC_P4 : <<extend>>
+UC_P1 ..> UC_P5 : <<include>>
+
+' ============================================
+' TASK MANAGEMENT RELATIONSHIPS
+' ============================================
+UC_T ..> UC_T1 : <<include>>
+UC_T <.. UC_T2 : <<extend>>
+UC_T <.. UC_T3 : <<extend>>
+UC_T <.. UC_T4 : <<extend>>
+UC_T <.. UC_T5 : <<extend>>
+UC_T2 ..> UC_T6 : <<include>>
+UC_T1 ..> UC_T7 : <<include>>
+UC_T1 ..> UC_T8 : <<include>>
+
+' Task uses personnel list for assignment
+UC_T6 ..> UC_P1 : <<uses>>
+
+@enduml

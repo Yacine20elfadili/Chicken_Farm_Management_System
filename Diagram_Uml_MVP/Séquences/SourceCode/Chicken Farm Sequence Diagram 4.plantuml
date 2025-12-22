@@ -1,0 +1,181 @@
+@startuml Sequence_Diagram_4_Record_Egg_Collection
+
+title Sequence Diagram 4: Record Egg Collection (CREATE Operation)
+
+actor "Cashier" as Cashier
+participant "EggsBayView" as UI
+participant "EggsBayController" as Controller
+participant "ValidationUtil" as Validator
+participant "EggProductionDAO" as DAO
+participant "MortalityDAO" as MortalityDAO
+participant "DatabaseConnection" as DB
+participant "DateUtil" as DateUtil
+
+== Record Daily Egg Collection ==
+
+Cashier -> UI: Click "Record Collection"\non House 2 (Egg Layers) card
+
+UI -> Controller: handleRecordCollection(houseId = 2)
+activate Controller
+
+Controller -> UI: Show "Record Egg Collection" dialog
+UI -> Cashier: Display input form
+
+Cashier -> UI: Fill in collection details:\n• House: H2 (Egg Layer)\n• Date: Today (08/12/2024)\n• Eggs Collected: 2,450\n• Cracked Eggs: 50\n• Dead Chickens: 1
+
+Cashier -> UI: Click "Save" button
+
+UI -> Controller: submitEggCollection(collectionData)
+
+' Validation
+Controller -> Validator: isPositiveNumber(eggsCollected)
+activate Validator
+Validator --> Controller: true (valid)
+deactivate Validator
+
+Controller -> Validator: isPositiveNumber(crackedEggs)
+activate Validator
+Validator --> Controller: true (valid)
+deactivate Validator
+
+alt Invalid Input
+    Controller -> UI: Show error dialog
+    UI -> Cashier: Display validation error
+    
+else Valid Input
+    Controller -> DateUtil: getCurrentDate()
+    activate DateUtil
+    DateUtil --> Controller: LocalDate.now()
+    deactivate DateUtil
+    
+    ' Check if already recorded today
+    Controller -> DAO: getProductionByDate(houseId, today)
+    activate DAO
+    DAO -> DB: getConnection()
+    activate DB
+    DB --> DAO: Connection
+    deactivate DB
+    
+    DAO -> DB: executeQuery(\n"SELECT * FROM egg_production\nWHERE houseId = ? AND collectionDate = ?")
+    activate DB
+    DB --> DAO: ResultSet
+    deactivate DB
+    deactivate DAO
+    
+    alt Already Recorded Today
+        Controller -> UI: Show confirmation dialog\n"Collection already recorded today.\nUpdate existing record?"
+        UI -> Cashier: Display confirmation
+        
+        alt User Cancels
+            Controller -> UI: Close dialog
+            UI -> Cashier: Return to main view
+            
+        else User Confirms Update
+            ' Will use UPDATE operation instead
+            note right of Controller: Use updateProduction() instead
+        end
+        
+    else No Record for Today
+        ' Create EggProduction object
+        Controller -> Controller: createEggProductionObject()
+        note right
+            <b>EggProduction Object:</b>
+            houseId = 2
+            collectionDate = 2024-12-08
+            eggsCollected = 2,450
+            crackedEggs = 50
+            cleanEggs = 2,400 (calculated)
+            notes = null
+        end note
+        
+        ' Save egg production
+        Controller -> DAO: recordProduction(eggProduction)
+        activate DAO
+        
+        DAO -> DB: getConnection()
+        activate DB
+        DB --> DAO: Connection
+        deactivate DB
+        
+        DAO -> DB: executeUpdate(\n"INSERT INTO egg_production\n(houseId, collectionDate,\neggsCollected, crackedEggs, notes)\nVALUES (?, ?, ?, ?, ?)")
+        activate DB
+        
+        alt Insert Successful
+            DB --> DAO: rowsAffected = 1
+            deactivate DB
+            DAO --> Controller: true (success)
+            deactivate DAO
+            
+            ' Record mortality if any deaths
+            alt Dead Chickens > 0
+                Controller -> MortalityDAO: recordMortality(mortality)
+                activate MortalityDAO
+                
+                note right of MortalityDAO
+                    <b>Mortality Object:</b>
+                    houseId = 2
+                    deathDate = 2024-12-08
+                    cause = "Natural"
+                    count = 1
+                    notes = "Found during collection"
+                end note
+                
+                MortalityDAO -> DB: executeUpdate(\n"INSERT INTO mortality\n(houseId, deathDate, cause, count, notes)\nVALUES (?, ?, ?, ?, ?)")
+                activate DB
+                DB --> MortalityDAO: success
+                deactivate DB
+                deactivate MortalityDAO
+            end
+            
+            ' Add eggs to storage
+            Controller -> DAO: addEggsToStorage(cleanEggs)
+            activate DAO
+            DAO -> DB: executeUpdate(\n"UPDATE egg_storage\nSET quantity = quantity + ?")
+            activate DB
+            DB --> DAO: success
+            deactivate DB
+            deactivate DAO
+            
+            ' Refresh view
+            Controller -> Controller: refreshView()
+            Controller -> UI: Reload production cards
+            UI -> UI: Update H2 card\nUpdate total storage
+            
+            Controller -> UI: Show success message
+            UI -> Cashier: Display "Collection recorded successfully!\n• Clean eggs: 2,400\n• Added to storage"
+            
+        else Insert Failed
+            DB --> DAO: SQLException
+            deactivate DB
+            DAO --> Controller: false (failed)
+            deactivate DAO
+            
+            Controller -> UI: Show error dialog
+            UI -> Cashier: Display "Failed to record collection"
+        end
+    end
+end
+
+deactivate Controller
+
+note right of Admin
+    <b>After successful recording:</b>
+    
+    House H2 card now shows:
+    • Today's Production: 2,450 eggs
+    • Cracked: 50 eggs
+    • Clean: 2,400 eggs
+    • Deaths Today: 1
+    
+    Total Storage updated:
+    • Previous: 12,050
+    • Added: 2,400
+    • New Total: 14,450 eggs
+    
+    <b>Future Operations Available:</b>
+    • Update this production record
+    • Delete this production record
+    • Remove eggs from storage (sales)
+end note
+
+@enduml

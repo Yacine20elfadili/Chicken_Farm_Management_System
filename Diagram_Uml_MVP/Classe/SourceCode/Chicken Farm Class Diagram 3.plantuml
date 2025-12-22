@@ -1,0 +1,193 @@
+@startuml Class_Diagram_3_DAO_Layer
+
+title Class Diagram 3: Data Access Layer (DAOs + DatabaseConnection)
+
+skinparam classAttributeIconSize 0
+skinparam class {
+    BackgroundColor<<DAO>> LightBlue
+    BorderColor<<DAO>> DarkBlue
+    BackgroundColor<<Singleton>> Wheat
+    BorderColor<<Singleton>> Brown
+}
+
+class DatabaseConnection <<Singleton>> {
+    - {static} instance: DatabaseConnection
+    - connection: Connection
+    - {static} URL: String = "jdbc:sqlite:database/farm.db"
+    - {static} DRIVER: String = "org.sqlite.JDBC"
+    __
+    - DatabaseConnection()
+    __
+    + {static} getInstance(): DatabaseConnection
+    + getConnection(): Connection
+    + closeConnection(): void
+}
+
+class UserDAO <<DAO>> {
+    - dbConnection: DatabaseConnection
+    __
+    + UserDAO()
+    __
+    + createUser(user: User): boolean
+    + getUserById(id: int): User
+    + getUserByEmail(email: String): User
+    + getAllUsers(): List<User>
+    + updateUser(user: User): boolean
+    + deleteUser(id: int): boolean
+    + validate(email: String, password: String): boolean
+    + getUserCount(): int
+    + authenticate(email: String, password: String): User
+}
+
+class HouseDAO <<DAO>> {
+    - dbConnection: DatabaseConnection
+    __
+    + HouseDAO()
+    __
+    + addHouse(house: House): boolean
+    + getHouseById(id: int): House
+    + getHouseByName(name: String): House
+    + getAllHouses(): List<House>
+    + updateHouse(house: House): boolean
+    + deleteHouse(id: int): boolean
+    + getHousesByType(type: String): List<House>
+    + updateChickenCount(houseId: int, newCount: int): boolean
+}
+
+class ChickenDAO <<DAO>> {
+    - dbConnection: DatabaseConnection
+    __
+    + ChickenDAO()
+    __
+    + createChickenBatch(chicken: Chicken): boolean
+    + getChickenById(id: int): Chicken
+    + getAllChickens(): List<Chicken>
+    + updateChickenBatch(chicken: Chicken): boolean
+    + deleteChickenBatch(id: int): boolean
+    + getChickensByHouse(houseId: int): List<Chicken>
+    + getChickensByBatch(batchNumber: String): List<Chicken>
+    + getTotalChickensInHouse(houseId: int): int
+}
+
+class MortalityDAO <<DAO>> {
+    - dbConnection: DatabaseConnection
+    __
+    + MortalityDAO()
+    __
+    + recordMortality(mortality: Mortality): boolean
+    + getMortalityById(id: int): Mortality
+    + getAllMortalities(): List<Mortality>
+    + updateMortality(mortality: Mortality): boolean
+    + deleteMortality(id: int): boolean
+    + getMortalityByHouse(houseId: int): List<Mortality>
+    + getDeathsToday(): int
+    + getDeathsThisWeek(): int
+    + getDeathsThisMonth(): int
+}
+
+class EggProductionDAO <<DAO>> {
+    - dbConnection: DatabaseConnection
+    __
+    + EggProductionDAO()
+    __
+    + recordProduction(production: EggProduction): boolean
+    + getProductionById(id: int): EggProduction
+    + getAllProductions(): List<EggProduction>
+    + updateProduction(production: EggProduction): boolean
+    + deleteProduction(id: int): boolean
+    + getProductionByHouse(houseId: int): List<EggProduction>
+    + getProductionByDate(date: LocalDate): List<EggProduction>
+    + getTodayProduction(): int
+    + getLast7DaysProduction(): List<EggProduction>
+}
+
+class FeedDAO <<DAO>> {
+    - dbConnection: DatabaseConnection
+    __
+    + FeedDAO()
+    __
+    + addFeed(feed: Feed): boolean
+    + getFeedById(id: int): Feed
+    + getAllFeed(): List<Feed>
+    + updateFeed(feed: Feed): boolean
+    + deleteFeed(id: int): boolean
+    + getFeedByType(type: String): List<Feed>
+    + useFeed(feedId: int, quantityKg: double): boolean
+    + getLowStockFeed(): List<Feed>
+    + getExpiredFeed(): List<Feed>
+}
+
+class MedicationDAO <<DAO>> {
+    - dbConnection: DatabaseConnection
+    __
+    + MedicationDAO()
+    __
+    + addMedication(medication: Medication): boolean
+    + getMedicationById(id: int): Medication
+    + getAllMedications(): List<Medication>
+    + updateMedication(medication: Medication): boolean
+    + deleteMedication(id: int): boolean
+    + useMedication(medicationId: int, quantity: int): boolean
+    + getLowStockMedications(): List<Medication>
+    + getExpiredMedications(): List<Medication>
+}
+
+class EquipmentDAO <<DAO>> {
+    - dbConnection: DatabaseConnection
+    __
+    + EquipmentDAO()
+    __
+    + addEquipment(equipment: Equipment): boolean
+    + getEquipmentById(id: int): Equipment
+    + getAllEquipment(): List<Equipment>
+    + updateEquipment(equipment: Equipment): boolean
+    + deleteEquipment(id: int): boolean
+    + getEquipmentByStatus(status: String): List<Equipment>
+    + updateEquipmentStatus(id: int, status: String): boolean
+}
+
+class TaskDAO <<DAO>> {
+    - dbConnection: DatabaseConnection
+    __
+    + TaskDAO()
+    __
+    + createTask(task: Task): boolean
+    + getTaskById(id: int): Task
+    + getAllTasks(): List<Task>
+    + updateTask(task: Task): boolean
+    + deleteTask(id: int): boolean
+    + getTasksByStatus(status: String): List<Task>
+    + getTasksByPersonnel(personnelName: String): List<Task>
+    + getOverdueTasks(): List<Task>
+    + getPendingTasks(): List<Task>
+    + markTaskAsDone(taskId: int): boolean
+}
+
+class PersonnelDAO <<DAO>> {
+    - dbConnection: DatabaseConnection
+    __
+    + PersonnelDAO()
+    __
+    + addPersonnel(personnel: Personnel): boolean
+    + getPersonnelById(id: int): Personnel
+    + getAllPersonnel(): List<Personnel>
+    + updatePersonnel(personnel: Personnel): boolean
+    + deletePersonnel(id: int): boolean
+    + getPersonnelByJobTitle(jobTitle: String): List<Personnel>
+    + getActivePersonnel(): List<Personnel>
+    + getPersonnelByShift(shift: String): List<Personnel>
+}
+
+' Relationships - All DAOs use DatabaseConnection
+UserDAO --> DatabaseConnection : uses
+HouseDAO --> DatabaseConnection : uses
+ChickenDAO --> DatabaseConnection : uses
+MortalityDAO --> DatabaseConnection : uses
+EggProductionDAO --> DatabaseConnection : uses
+FeedDAO --> DatabaseConnection : uses
+MedicationDAO --> DatabaseConnection : uses
+EquipmentDAO --> DatabaseConnection : uses
+TaskDAO --> DatabaseConnection : uses
+PersonnelDAO --> DatabaseConnection : uses
+
+@enduml

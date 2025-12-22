@@ -1,0 +1,168 @@
+@startuml Sequence_Diagram_3_Add_Chicken_Batch
+
+title Sequence Diagram 3: Add Chicken Batch (CREATE Operation)
+
+actor "Cashier" as Cashier
+participant "ChickenBayView" as UI
+participant "ChickenBayController" as Controller
+participant "ValidationUtil" as Validator
+participant "ChickenDAO" as DAO
+participant "HouseDAO" as HouseDAO
+participant "DatabaseConnection" as DB
+participant "DateUtil" as DateUtil
+
+== Add New Chicken Batch ==
+
+Cashier -> UI: Click "Add Chickens" button\non a house card
+
+UI -> Controller: handleAddChickens()
+activate Controller
+
+Controller -> UI: Show "Add Chicken Batch" dialog
+UI -> Cashier: Display input form
+
+Cashier -> UI: Fill in batch details:\n• House: H1 (Day-old)\n• Batch Number: BATCH-2024-001\n• Quantity: 5,000\n• Gender: Mixed\n• Health Status: Good\n• Average Weight: 0.05 kg
+
+Cashier -> UI: Click "Save" button
+
+UI -> Controller: submitAddChicken(batchData)
+
+' Validation
+Controller -> Validator: isEmpty(batchNumber)
+activate Validator
+Validator --> Controller: false (valid)
+deactivate Validator
+
+Controller -> Validator: isPositiveNumber(quantity)
+activate Validator
+Validator --> Controller: true (valid)
+deactivate Validator
+
+alt Invalid Input
+    Controller -> UI: Show error dialog
+    UI -> Cashier: Display validation error
+    
+else Valid Input
+    ' Check house capacity
+    Controller -> HouseDAO: getHouseById(houseId)
+    activate HouseDAO
+    HouseDAO -> DB: getConnection()
+    activate DB
+    DB --> HouseDAO: Connection
+    deactivate DB
+    
+    HouseDAO -> DB: executeQuery(\n"SELECT * FROM houses WHERE id = ?")
+    activate DB
+    DB --> HouseDAO: House record
+    deactivate DB
+    
+    HouseDAO --> Controller: House object
+    deactivate HouseDAO
+    
+    Controller -> Controller: checkCapacity()
+    note right
+        <b>Capacity Check:</b>
+        Current: 3,500
+        New batch: 5,000
+        Total: 8,500
+        Capacity: 10,000
+        
+        ✅ Within capacity
+    end note
+    
+    alt Exceeds Capacity
+        Controller -> UI: Show warning dialog\n"Exceeds house capacity!"
+        UI -> Cashier: Display warning
+        
+    else Within Capacity
+        ' Calculate dates
+        Controller -> DateUtil: getCurrentDate()
+        activate DateUtil
+        DateUtil --> Controller: arrivalDate (today)
+        deactivate DateUtil
+        
+        Controller -> DateUtil: addDays(arrivalDate, 168)
+        activate DateUtil
+        note right: 168 days = 24 weeks for transfer
+        DateUtil --> Controller: nextTransferDate
+        deactivate DateUtil
+        
+        ' Create Chicken object
+        Controller -> Controller: createChickenObject()
+        note right
+            <b>Chicken Object:</b>
+            houseId = 1
+            batchNumber = "BATCH-2024-001"
+            quantity = 5,000
+            arrivalDate = 2024-12-08
+            ageInDays = 0
+            gender = "Mixed"
+            healthStatus = "Good"
+            averageWeight = 0.05
+            nextTransferDate = 2024-05-25
+        end note
+        
+        ' Save to database
+        Controller -> DAO: createChickenBatch(chicken)
+        activate DAO
+        
+        DAO -> DB: getConnection()
+        activate DB
+        DB --> DAO: Connection
+        deactivate DB
+        
+        DAO -> DB: executeUpdate(\n"INSERT INTO chickens\n(houseId, batchNumber, quantity,\narrivalDate, ageInDays, gender,\nhealthStatus, averageWeight,\nnextTransferDate)\nVALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)")
+        activate DB
+        
+        alt Insert Successful
+            DB --> DAO: rowsAffected = 1
+            deactivate DB
+            DAO --> Controller: true (success)
+            deactivate DAO
+            
+            ' Update house chicken count
+            Controller -> HouseDAO: updateChickenCount(houseId, newCount)
+            activate HouseDAO
+            HouseDAO -> DB: executeUpdate(\n"UPDATE houses\nSET chickenCount = chickenCount + ?\nWHERE id = ?")
+            activate DB
+            DB --> HouseDAO: success
+            deactivate DB
+            deactivate HouseDAO
+            
+            ' Refresh view
+            Controller -> Controller: refreshView()
+            Controller -> UI: Reload house cards
+            UI -> UI: Update H1 card display
+            
+            Controller -> UI: Show success message
+            UI -> Cashier: Display "Batch added successfully!"
+            
+        else Insert Failed
+            DB --> DAO: SQLException
+            deactivate DB
+            DAO --> Controller: false (failed)
+            deactivate DAO
+            
+            Controller -> UI: Show error dialog
+            UI -> Cashier: Display "Failed to add batch"
+        end
+    end
+end
+
+deactivate Controller
+
+note right of Admin
+    <b>After successful addition:</b>
+    
+    House H1 card now shows:
+    • Current Count: 8,500 (+5,000)
+    • Occupancy: 85%
+    • New batch visible in list
+    
+    <b>Future Operations Available:</b>
+    • Update batch details
+    • Delete batch
+    • Transfer to another house
+end note
+
+@enduml

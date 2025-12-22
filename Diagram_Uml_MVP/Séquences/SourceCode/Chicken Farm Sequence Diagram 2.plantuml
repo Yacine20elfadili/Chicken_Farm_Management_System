@@ -1,0 +1,185 @@
+@startuml Sequence_Diagram_2_Dashboard
+
+title Sequence Diagram 2: View Dashboard (Parallel Data Loading)
+
+actor "Cashier" as Cashier
+participant "MainWindow" as MainWindow
+participant "DashboardView\n(FXML)" as UI
+participant "DashboardController" as Controller
+participant "ChickenDAO" as ChickenDAO
+participant "EggProductionDAO" as EggDAO
+participant "MortalityDAO" as MortalityDAO
+participant "DateUtil" as DateUtil
+participant "DatabaseConnection" as DB
+
+== Dashboard Initialization ==
+
+Cashier -> MainWindow: After successful login
+MainWindow -> UI: Load DashboardView.fxml
+UI -> Controller: initialize()
+activate Controller
+
+note right of Controller
+    <b>Dashboard loads 4 metrics:</b>
+    1. Total chickens (all houses)
+    2. Eggs produced today
+    3. Deaths today (for alerts)
+    4. 7-day egg production chart
+    
+    <b>Loading Strategy:</b>
+    All metrics loaded in parallel
+    for better performance
+end note
+
+== Load Total Chickens ==
+
+par Load Total Chickens Count
+    Controller -> ChickenDAO: getAllChickens()
+    activate ChickenDAO
+    
+    ChickenDAO -> DB: getConnection()
+    activate DB
+    DB --> ChickenDAO: Connection
+    deactivate DB
+    
+    ChickenDAO -> DB: executeQuery(\n"SELECT * FROM chickens")
+    activate DB
+    DB --> ChickenDAO: List<Chicken> (ResultSet)
+    deactivate DB
+    
+    ChickenDAO -> ChickenDAO: Map ResultSet to List<Chicken>
+    
+    loop For each chicken batch
+        ChickenDAO -> ChickenDAO: totalCount += batch.getQuantity()
+    end
+    
+    ChickenDAO --> Controller: totalCount (17,209 chickens)
+    deactivate ChickenDAO
+    
+    Controller -> UI: Update totalChickensLabel
+    UI -> UI: Display "17,209"
+
+== Load Today's Egg Production ==
+
+else Load Eggs Produced Today
+    Controller -> EggDAO: getTodayProduction()
+    activate EggDAO
+    
+    EggDAO -> DB: getConnection()
+    activate DB
+    DB --> EggDAO: Connection
+    deactivate DB
+    
+    EggDAO -> DateUtil: getCurrentDate()
+    activate DateUtil
+    DateUtil --> EggDAO: LocalDate.now()
+    deactivate DateUtil
+    
+    EggDAO -> DB: executeQuery(\n"SELECT SUM(eggsCollected)\nFROM egg_production\nWHERE collectionDate = ?")
+    activate DB
+    DB --> EggDAO: totalEggs (4,200)
+    deactivate DB
+    
+    EggDAO --> Controller: 4,200 eggs
+    deactivate EggDAO
+    
+    Controller -> UI: Update eggsProducedTodayLabel
+    UI -> UI: Display "4,200"
+
+== Load Active Alerts ==
+
+else Load Active Alerts
+    Controller -> MortalityDAO: getDeathsToday()
+    activate MortalityDAO
+    
+    MortalityDAO -> DB: getConnection()
+    activate DB
+    DB --> MortalityDAO: Connection
+    deactivate DB
+    
+    MortalityDAO -> DateUtil: getCurrentDate()
+    activate DateUtil
+    DateUtil --> MortalityDAO: LocalDate.now()
+    deactivate DateUtil
+    
+    MortalityDAO -> DB: executeQuery(\n"SELECT SUM(count)\nFROM mortality\nWHERE deathDate = ?")
+    activate DB
+    DB --> MortalityDAO: deathCount (11)
+    deactivate DB
+    
+    MortalityDAO --> Controller: 11 deaths
+    deactivate MortalityDAO
+    
+    Controller -> Controller: calculateAlerts()
+    note right
+        <b>Alert Logic:</b>
+        • Mortality rate > 5%: HIGH alert
+        • Low feed stock: MEDIUM alert
+        • Broken equipment: LOW alert
+        
+        Total alerts = 2
+    end note
+    
+    Controller -> UI: Update activeAlertsLabel
+    UI -> UI: Display "2 Active Alerts"
+
+== Load 7-Day Production Chart ==
+
+else Load 7-Day Production Chart
+    Controller -> DateUtil: getLast7Days()
+    activate DateUtil
+    DateUtil --> Controller: LocalDate[] (7 dates)
+    deactivate DateUtil
+    
+    Controller -> EggDAO: getLast7DaysProduction()
+    activate EggDAO
+    
+    EggDAO -> DB: getConnection()
+    activate DB
+    DB --> EggDAO: Connection
+    deactivate DB
+    
+    EggDAO -> DB: executeQuery(\n"SELECT collectionDate, SUM(eggsCollected)\nFROM egg_production\nWHERE collectionDate >= ?\nGROUP BY collectionDate")
+    activate DB
+    DB --> EggDAO: List<EggProduction> (7 days)
+    deactivate DB
+    
+    EggDAO --> Controller: production data
+    deactivate EggDAO
+    
+    Controller -> Controller: prepareChartData()
+    note right
+        Format data for BarChart:
+        X-axis: Dates (dd/MM format)
+        Y-axis: Egg count
+        
+        Data points:
+        08/12: 4,100
+        09/12: 4,200
+        10/12: 3,950
+        ...
+    end note
+    
+    Controller -> UI: Update productionChart
+    UI -> UI: Render 7-day bar chart
+    
+end
+
+deactivate Controller
+
+UI -> Cashier: Display complete dashboard\nwith all 4 metrics
+
+note bottom of Admin
+    <b>Dashboard Display:</b>
+    
+    ┌─────────────────────────────────┐
+    │  📊 Total Chickens: 17,209      │
+    │  🥚 Eggs Today: 4,200           │
+    │  ⚠️  Active Alerts: 2            │
+    │                                 │
+    │  📈 7-Day Egg Production        │
+    │  [Bar Chart showing trend]      │
+    └─────────────────────────────────┘
+end note
+
+@enduml
