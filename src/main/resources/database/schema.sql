@@ -155,6 +155,8 @@ CREATE TABLE IF NOT EXISTS houses (
     lastCleaningDate DATE,
     creationDate DATE DEFAULT CURRENT_DATE,
     arrivalDate DATE,
+    maxImportLimit INTEGER DEFAULT 0,
+    estimatedStayWeeks INTEGER DEFAULT 8,
     created_at TEXT DEFAULT CURRENT_TIMESTAMP,
     updated_at TEXT DEFAULT CURRENT_TIMESTAMP
 );
