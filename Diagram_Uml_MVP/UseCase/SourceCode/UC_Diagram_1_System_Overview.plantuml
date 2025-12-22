@@ -1,0 +1,110 @@
+@startuml UC_Diagram_1_System_Overview
+
+title Use Case Diagram 1: System Overview & Authentication
+
+left to right direction
+
+' ============================================
+' ACTORS
+' ============================================
+actor "Cashier" as Cashier <<Primary Actor>>
+actor "Worker" as Worker <<Secondary Actor>>
+actor "Administration" as Admin <<Secondary Actor>>
+
+' ============================================
+' SYSTEM BOUNDARY
+' ============================================
+rectangle "Chicken Farm Management System - MVP" {
+  
+  ' ============ AUTHENTICATION ============
+  package "Authentication" {
+    usecase "Login" as UC1
+    usecase "Logout" as UC2
+  }
+  
+  ' ============ DASHBOARD ============
+  package "Dashboard" {
+    usecase "View Dashboard" as UC3
+    usecase "View Total Chickens Count" as UC3.1
+    usecase "View Today's Egg Production" as UC3.2
+    usecase "View Active Alerts" as UC3.3
+    usecase "View 7-Day Production Chart" as UC3.4
+  }
+  
+  ' ============ MAIN MODULES ============
+  package "Main Modules" {
+    usecase "Manage Livestock & Farm" as UC4
+    usecase "Manage Storage & Inventory" as UC5
+    usecase "Manage Personnel & Tasks" as UC6
+  }
+  
+  ' ============ REPORTING ============
+  package "Reporting" {
+    usecase "Generate Reports" as UC7
+  }
+  
+}
+
+' ============================================
+' ACTOR RELATIONSHIPS
+' ============================================
+Cashier --> UC1
+Cashier --> UC2
+Cashier --> UC3
+Cashier --> UC4
+Cashier --> UC5
+Cashier --> UC6
+Cashier --> UC7
+
+' Secondary actors communicate with Cashier
+Worker .up.> Cashier : <<provides feedback>>\nmortality reports\negg counts\ntask completion
+Admin .down.> Cashier : <<requests reports>>\nfarm status\nproduction data
+
+' ============================================
+' USE CASE RELATIONSHIPS
+' ============================================
+
+' Dashboard includes (always shown)
+UC3 ..> UC3.1 : <<include>>
+UC3 ..> UC3.2 : <<include>>
+UC3 ..> UC3.3 : <<include>>
+UC3 ..> UC3.4 : <<include>>
+
+' ============================================
+' NOTES
+' ============================================
+note right of Cashier
+  <b>Primary Actor</b>
+  The only system user
+  
+  Responsibilities:
+  • Enters all data
+  • Manages farm operations
+  • Receives worker feedback
+  • Provides reports to Admin
+end note
+
+note left of Worker
+  <b>Secondary Actor</b>
+  Does NOT use the app
+  
+  Provides to Cashier:
+  • Task completion status
+  • Mortality reports
+  • Egg collection counts
+  • Feed usage updates
+  • Equipment issues
+end note
+
+note left of Admin
+  <b>Secondary Actor</b>
+  Farm Owner/Management
+  
+  Requests from Cashier:
+  • Farm status reports
+  • Production statistics
+  • Inventory levels
+  • Staff performance
+end note
+
+@enduml

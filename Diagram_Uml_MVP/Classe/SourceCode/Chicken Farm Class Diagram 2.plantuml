@@ -1,0 +1,267 @@
+@startuml Class_Diagram_2_Storage_Personnel
+
+title Class Diagram 2: Domain Model - Storage & Personnel
+
+skinparam classAttributeIconSize 0
+skinparam class {
+    BackgroundColor<<Entity>> LightCyan
+    BorderColor<<Entity>> Blue
+}
+
+class Feed <<Entity>> {
+    - id: int
+    - name: String
+    - type: String
+    - quantityKg: double
+    - pricePerKg: double
+    - supplier: String
+    - lastRestockDate: LocalDate
+    - expiryDate: LocalDate
+    - minStockLevel: double
+    __
+    + Feed()
+    + Feed(name: String, type: String, quantityKg: double, pricePerKg: double)
+    + Feed(id: int, name: String, type: String, quantityKg: double,
+           pricePerKg: double, supplier: String, lastRestockDate: LocalDate,
+           expiryDate: LocalDate, minStockLevel: double)
+    __
+    + getId(): int
+    + setId(id: int): void
+    + getName(): String
+    + setName(name: String): void
+    + getType(): String
+    + setType(type: String): void
+    + getQuantityKg(): double
+    + setQuantityKg(quantityKg: double): void
+    + getPricePerKg(): double
+    + setPricePerKg(pricePerKg: double): void
+    + getSupplier(): String
+    + setSupplier(supplier: String): void
+    + getLastRestockDate(): LocalDate
+    + setLastRestockDate(lastRestockDate: LocalDate): void
+    + getExpiryDate(): LocalDate
+    + setExpiryDate(expiryDate: LocalDate): void
+    + getMinStockLevel(): double
+    + setMinStockLevel(minStockLevel: double): void
+    __
+    + isLowStock(): boolean
+    + isExpiredOrNearExpiry(): boolean
+    + getTotalValue(): double
+    + equals(o: Object): boolean
+    + hashCode(): int
+    + toString(): String
+}
+
+class Medication <<Entity>> {
+    - id: int
+    - name: String
+    - type: String
+    - quantity: int
+    - unit: String
+    - pricePerUnit: double
+    - supplier: String
+    - purchaseDate: LocalDate
+    - expiryDate: LocalDate
+    - minStockLevel: int
+    - usage: String
+    __
+    + Medication()
+    + Medication(name: String, type: String, quantity: int, unit: String)
+    + Medication(id: int, name: String, type: String, quantity: int,
+                 unit: String, pricePerUnit: double, supplier: String,
+                 purchaseDate: LocalDate, expiryDate: LocalDate,
+                 minStockLevel: int, usage: String)
+    __
+    + getId(): int
+    + setId(id: int): void
+    + getName(): String
+    + setName(name: String): void
+    + getType(): String
+    + setType(type: String): void
+    + getQuantity(): int
+    + setQuantity(quantity: int): void
+    + getUnit(): String
+    + setUnit(unit: String): void
+    + getPricePerUnit(): double
+    + setPricePerUnit(pricePerUnit: double): void
+    + getSupplier(): String
+    + setSupplier(supplier: String): void
+    + getPurchaseDate(): LocalDate
+    + setPurchaseDate(purchaseDate: LocalDate): void
+    + getExpiryDate(): LocalDate
+    + setExpiryDate(expiryDate: LocalDate): void
+    + getMinStockLevel(): int
+    + setMinStockLevel(minStockLevel: int): void
+    + getUsage(): String
+    + setUsage(usage: String): void
+    __
+    + isLowStock(): boolean
+    + isExpired(): boolean
+    + getTotalValue(): double
+    + equals(o: Object): boolean
+    + hashCode(): int
+    + toString(): String
+}
+
+class Equipment <<Entity>> {
+    - id: int
+    - name: String
+    - category: String
+    - quantity: int
+    - status: String
+    - purchaseDate: LocalDate
+    - purchasePrice: double
+    - lastMaintenanceDate: LocalDate
+    - nextMaintenanceDate: LocalDate
+    - location: String
+    - notes: String
+    __
+    + Equipment()
+    + Equipment(name: String, category: String, quantity: int, status: String)
+    + Equipment(id: int, name: String, category: String, quantity: int,
+                status: String, purchaseDate: LocalDate, purchasePrice: double,
+                lastMaintenanceDate: LocalDate, nextMaintenanceDate: LocalDate,
+                location: String, notes: String)
+    __
+    + getId(): int
+    + setId(id: int): void
+    + getName(): String
+    + setName(name: String): void
+    + getCategory(): String
+    + setCategory(category: String): void
+    + getQuantity(): int
+    + setQuantity(quantity: int): void
+    + getStatus(): String
+    + setStatus(status: String): void
+    + getPurchaseDate(): LocalDate
+    + setPurchaseDate(purchaseDate: LocalDate): void
+    + getPurchasePrice(): double
+    + setPurchasePrice(purchasePrice: double): void
+    + getLastMaintenanceDate(): LocalDate
+    + setLastMaintenanceDate(lastMaintenanceDate: LocalDate): void
+    + getNextMaintenanceDate(): LocalDate
+    + setNextMaintenanceDate(nextMaintenanceDate: LocalDate): void
+    + getLocation(): String
+    + setLocation(location: String): void
+    + getNotes(): String
+    + setNotes(notes: String): void
+    __
+    + needsMaintenance(): boolean
+    + isBroken(): boolean
+    + isOperational(): boolean
+    + equals(o: Object): boolean
+    + hashCode(): int
+    + toString(): String
+}
+
+class Task <<Entity>> {
+    - id: int
+    - description: String
+    - status: String
+    - dueDate: LocalDate
+    - completedAt: LocalDateTime
+    - assignedTo: String
+    - houseId: int
+    - category: String
+    - crackedEggs: int
+    - notes: String
+    - priority: String
+    __
+    + Task()
+    + Task(description: String, dueDate: LocalDate, 
+           assignedTo: String, category: String)
+    + Task(id: int, description: String, status: String, dueDate: LocalDate,
+           completedAt: LocalDateTime, assignedTo: String, houseId: int,
+           category: String, crackedEggs: int, notes: String, priority: String)
+    __
+    + getId(): int
+    + setId(id: int): void
+    + getDescription(): String
+    + setDescription(description: String): void
+    + getStatus(): String
+    + setStatus(status: String): void
+    + getDueDate(): LocalDate
+    + setDueDate(dueDate: LocalDate): void
+    + getCompletedAt(): LocalDateTime
+    + setCompletedAt(completedAt: LocalDateTime): void
+    + getAssignedTo(): String
+    + setAssignedTo(assignedTo: String): void
+    + getHouseId(): int
+    + setHouseId(houseId: int): void
+    + getCategory(): String
+    + setCategory(category: String): void
+    + getCrackedEggs(): int
+    + setCrackedEggs(crackedEggs: int): void
+    + getNotes(): String
+    + setNotes(notes: String): void
+    + getPriority(): String
+    + setPriority(priority: String): void
+    __
+    + isOverdue(): boolean
+    + isCompleted(): boolean
+    + markAsComplete(): void
+    + getStatusColor(): String
+    + equals(o: Object): boolean
+    + hashCode(): int
+    + toString(): String
+}
+
+class Personnel <<Entity>> {
+    - id: int
+    - fullName: String
+    - age: int
+    - phone: String
+    - email: String
+    - jobTitle: String
+    - hireDate: LocalDate
+    - salary: double
+    - shift: String
+    - isActive: boolean
+    - address: String
+    - emergencyContact: String
+    __
+    + Personnel()
+    + Personnel(fullName: String, age: int, phone: String, 
+                email: String, jobTitle: String)
+    + Personnel(id: int, fullName: String, age: int, phone: String,
+                email: String, jobTitle: String, hireDate: LocalDate,
+                salary: double, shift: String, isActive: boolean,
+                address: String, emergencyContact: String)
+    __
+    + getId(): int
+    + setId(id: int): void
+    + getFullName(): String
+    + setFullName(fullName: String): void
+    + getAge(): int
+    + setAge(age: int): void
+    + getPhone(): String
+    + setPhone(phone: String): void
+    + getEmail(): String
+    + setEmail(email: String): void
+    + getJobTitle(): String
+    + setJobTitle(jobTitle: String): void
+    + getHireDate(): LocalDate
+    + setHireDate(hireDate: LocalDate): void
+    + getSalary(): double
+    + setSalary(salary: double): void
+    + getShift(): String
+    + setShift(shift: String): void
+    + isActive(): boolean
+    + setActive(active: boolean): void
+    + getAddress(): String
+    + setAddress(address: String): void
+    + getEmergencyContact(): String
+    + setEmergencyContact(emergencyContact: String): void
+    __
+    + getYearsOfService(): int
+    + isTracker(): boolean
+    + isWorker(): boolean
+    + equals(o: Object): boolean
+    + hashCode(): int
+    + toString(): String
+}
+
+' Relationships
+Task "0..*" -- "0..1" Personnel : assigned to >
+
+@enduml
