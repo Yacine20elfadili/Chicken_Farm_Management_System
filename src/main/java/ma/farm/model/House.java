@@ -18,14 +18,16 @@ public class House {
 
     // Fields
     private int id;
-    private String name;                    // e.g., "DayOld-House-1", "FemaleEggLayer-House-2"
-    private HouseType type;                 // DAY_OLD, EGG_LAYER, MEAT_FEMALE, MEAT_MALE
-    private int chickenCount;               // Current number of chickens
-    private int capacity;                   // Maximum capacity
-    private HealthStatus healthStatus;      // GOOD, FAIR, POOR
+    private String name; // e.g., "DayOld-House-1", "FemaleEggLayer-House-2"
+    private HouseType type; // DAY_OLD, EGG_LAYER, MEAT_FEMALE, MEAT_MALE
+    private int chickenCount; // Current number of chickens
+    private int capacity; // Maximum capacity
+    private HealthStatus healthStatus; // GOOD, FAIR, POOR
     private LocalDate lastCleaningDate;
     private LocalDate creationDate;
-    private LocalDate arrivalDate;          // Date when chickens arrived in this house
+    private LocalDate arrivalDate; // Date when chickens arrived in this house
+    private int maxImportLimit; // Calculated max import limit for DayOld houses
+    private int estimatedStayWeeks; // Expected stay duration in weeks
 
     // Default constructor
     public House() {
@@ -39,6 +41,8 @@ public class House {
         this.capacity = capacity;
         this.healthStatus = HealthStatus.GOOD;
         this.creationDate = LocalDate.now();
+        this.maxImportLimit = 0;
+        this.estimatedStayWeeks = 8;
     }
 
     // Constructor with capacity only (for Config Houses)
@@ -49,12 +53,14 @@ public class House {
         this.capacity = capacity;
         this.healthStatus = HealthStatus.GOOD;
         this.creationDate = LocalDate.now();
+        this.maxImportLimit = 0;
+        this.estimatedStayWeeks = 8;
     }
 
     // Full constructor
     public House(int id, String name, HouseType type, int chickenCount, int capacity,
-                 HealthStatus healthStatus, LocalDate lastCleaningDate, LocalDate creationDate,
-                 LocalDate arrivalDate) {
+            HealthStatus healthStatus, LocalDate lastCleaningDate, LocalDate creationDate,
+            LocalDate arrivalDate) {
         this.id = id;
         this.name = name;
         this.type = type;
@@ -64,6 +70,8 @@ public class House {
         this.lastCleaningDate = lastCleaningDate;
         this.creationDate = creationDate;
         this.arrivalDate = arrivalDate;
+        this.maxImportLimit = 0;
+        this.estimatedStayWeeks = 8;
     }
 
     // ==================== Getters and Setters ====================
@@ -140,10 +148,27 @@ public class House {
         this.arrivalDate = arrivalDate;
     }
 
+    public int getMaxImportLimit() {
+        return maxImportLimit;
+    }
+
+    public void setMaxImportLimit(int maxImportLimit) {
+        this.maxImportLimit = maxImportLimit;
+    }
+
+    public int getEstimatedStayWeeks() {
+        return estimatedStayWeeks;
+    }
+
+    public void setEstimatedStayWeeks(int estimatedStayWeeks) {
+        this.estimatedStayWeeks = estimatedStayWeeks;
+    }
+
     // ==================== Database Helper Methods ====================
 
     /**
      * Gets the house type as a String for database storage
+     * 
      * @return the type display name (e.g., "DayOld") or null
      */
     public String getTypeAsString() {
@@ -152,6 +177,7 @@ public class House {
 
     /**
      * Sets the house type from a String (from database)
+     * 
      * @param typeStr the type display name (e.g., "DayOld")
      */
     public void setTypeFromString(String typeStr) {
@@ -167,6 +193,7 @@ public class House {
 
     /**
      * Gets the health status as a String for database storage
+     * 
      * @return the status display name (e.g., "Good") or null
      */
     public String getHealthStatusAsString() {
@@ -175,6 +202,7 @@ public class House {
 
     /**
      * Sets the health status from a String (from database)
+     * 
      * @param statusStr the status display name (e.g., "Good")
      */
     public void setHealthStatusFromString(String statusStr) {
@@ -193,6 +221,7 @@ public class House {
     /**
      * Calculate the age of chickens in this house in days
      * Based on arrivalDate and current date
+     * 
      * @return age in days, or 0 if no chickens or no arrival date
      */
     public int getAgeInDays() {
@@ -204,6 +233,7 @@ public class House {
 
     /**
      * Get the formatted age string (e.g., "6w 3d")
+     * 
      * @return formatted age string
      */
     public String getFormattedAge() {
@@ -214,15 +244,19 @@ public class House {
     /**
      * Get the color status for the age display
      * Green: 0-50%, Orange: 50-75%, Red: 75-100%
+     * 
      * @return "green", "orange", or "red"
      */
     public String getAgeColorStatus() {
-        if (type == null) return "green";
+        if (type == null)
+            return "green";
         return type.getAgeColorStatus(getAgeInDays());
     }
 
     /**
-     * Calculate the estimated transfer/sell date based on arrival date and house type duration
+     * Calculate the estimated transfer/sell date based on arrival date and house
+     * type duration
+     * 
      * @return the estimated date, or null if no arrival date
      */
     public LocalDate getEstimatedEndDate() {
@@ -234,6 +268,7 @@ public class House {
 
     /**
      * Get the formatted estimated end date (DD/MM/YYYY)
+     * 
      * @return formatted date string or "N/A"
      */
     public String getFormattedEstimatedEndDate() {
@@ -242,29 +277,37 @@ public class House {
             return "N/A";
         }
         return String.format("%02d/%02d/%04d",
-            endDate.getDayOfMonth(),
-            endDate.getMonthValue(),
-            endDate.getYear());
+                endDate.getDayOfMonth(),
+                endDate.getMonthValue(),
+                endDate.getYear());
     }
 
     /**
      * Check if chickens have passed the sell threshold (60% of duration)
      * Only applicable for MEAT_FEMALE and MEAT_MALE
+     * 
      * @return true if past threshold, false otherwise
      */
     public boolean isPastSellThreshold() {
-        if (type == null || chickenCount == 0) {
-            return false;
-        }
-        int threshold = type.getSellThresholdDays();
-        if (threshold == 0) {
-            return false; // Not a meat house
-        }
-        return getAgeInDays() >= threshold;
+        // ==================== PRODUCTION LOGIC (COMMENTED FOR TESTING)
+        // ====================
+        // if (type == null || chickenCount == 0) {
+        // return false;
+        // }
+        // int threshold = type.getSellThresholdDays();
+        // if (threshold == 0) {
+        // return false; // Not a meat house
+        // }
+        // return getAgeInDays() >= threshold;
+        // ==================== END PRODUCTION LOGIC ====================
+
+        // TEMPORARY: Always allow sell for testing
+        return true;
     }
 
     /**
      * Check if chickens have reached the maximum duration
+     * 
      * @return true if at or past max duration
      */
     public boolean isAtMaxDuration() {
@@ -275,7 +318,47 @@ public class House {
     }
 
     /**
+     * Check if chickens can be transferred (stayed at least 60% of estimated time)
+     * 
+     * NOTE: For development/testing, this method always returns true.
+     * Uncomment the blocking logic below when ready for production.
+     * 
+     * @return true if transfer is allowed
+     */
+    public boolean canTransfer() {
+        // ==================== PRODUCTION LOGIC (COMMENTED FOR TESTING)
+        // ====================
+        // if (type == null || arrivalDate == null || chickenCount == 0) {
+        // return false;
+        // }
+        // int stayDays = getAgeInDays();
+        // int minStayDays = (int) (estimatedStayWeeks * 7 * 0.6); // 60% of estimated
+        // stay
+        // return stayDays >= minStayDays;
+        // ==================== END PRODUCTION LOGIC ====================
+
+        // TEMPORARY: Always allow transfer for testing
+        return true;
+    }
+
+    /**
+     * Get the number of days until transfer is allowed (60% stay requirement)
+     * 
+     * @return days remaining until transfer allowed, or 0 if already eligible
+     */
+    public int getDaysUntilTransferAllowed() {
+        if (type == null || arrivalDate == null) {
+            return 0;
+        }
+        int stayDays = getAgeInDays();
+        int minStayDays = (int) (estimatedStayWeeks * 7 * 0.6); // 60% of estimated stay
+        int remaining = minStayDays - stayDays;
+        return remaining > 0 ? remaining : 0;
+    }
+
+    /**
      * Get days remaining until estimated end date
+     * 
      * @return days remaining, or 0 if no arrival date or past due
      */
     public int getDaysRemaining() {
@@ -291,6 +374,7 @@ public class House {
 
     /**
      * Calculate occupancy percentage
+     * 
      * @return Percentage of house capacity used
      */
     public double getOccupancyRate() {
@@ -299,6 +383,7 @@ public class House {
 
     /**
      * Check if house is at or over capacity
+     * 
      * @return true if full or overcrowded
      */
     public boolean isFull() {
@@ -307,6 +392,7 @@ public class House {
 
     /**
      * Check if house is empty
+     * 
      * @return true if no chickens
      */
     public boolean isEmpty() {
@@ -315,6 +401,7 @@ public class House {
 
     /**
      * Get available capacity
+     * 
      * @return number of additional chickens that can fit
      */
     public int getAvailableCapacity() {
@@ -332,7 +419,8 @@ public class House {
 
     /**
      * Add chickens to this house
-     * @param count number of chickens to add
+     * 
+     * @param count   number of chickens to add
      * @param arrival the arrival date
      * @return true if successful (doesn't exceed capacity)
      */
@@ -352,6 +440,7 @@ public class House {
 
     /**
      * Remove chickens from this house (for mortality or partial sell)
+     * 
      * @param count number of chickens to remove
      * @return true if successful
      */
@@ -370,6 +459,7 @@ public class House {
 
     /**
      * Get a short display name for dropdowns
+     * 
      * @return name like "DayOld-House-1"
      */
     public String getDisplayName() {
@@ -378,10 +468,12 @@ public class House {
 
     /**
      * Get card title (just the house number part)
+     * 
      * @return title like "House-1"
      */
     public String getCardTitle() {
-        if (name == null) return "House";
+        if (name == null)
+            return "House";
         // Extract the House-X part from names like "DayOld-House-1"
         int lastDash = name.lastIndexOf("-House-");
         if (lastDash >= 0) {

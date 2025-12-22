@@ -35,7 +35,7 @@ public class HouseDAO {
      */
     public boolean addHouse(House house) {
         String sql = "INSERT INTO houses (name, type, chickenCount, capacity, healthStatus, " +
-                "lastCleaningDate, creationDate, arrivalDate) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+                "lastCleaningDate, creationDate, arrivalDate, maxImportLimit, estimatedStayWeeks) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (PreparedStatement stmt = dbConnection.getConnection().prepareStatement(sql)) {
             stmt.setString(1, house.getName());
@@ -43,19 +43,19 @@ public class HouseDAO {
             stmt.setInt(3, house.getChickenCount());
             stmt.setInt(4, house.getCapacity());
             stmt.setString(5, house.getHealthStatusAsString());
-            stmt.setString(6, house.getLastCleaningDate() != null ?
-                    house.getLastCleaningDate().toString() : null);
-            stmt.setString(7, house.getCreationDate() != null ?
-                    house.getCreationDate().toString() : LocalDate.now().toString());
-            stmt.setString(8, house.getArrivalDate() != null ?
-                    house.getArrivalDate().toString() : null);
+            stmt.setString(6, house.getLastCleaningDate() != null ? house.getLastCleaningDate().toString() : null);
+            stmt.setString(7,
+                    house.getCreationDate() != null ? house.getCreationDate().toString() : LocalDate.now().toString());
+            stmt.setString(8, house.getArrivalDate() != null ? house.getArrivalDate().toString() : null);
+            stmt.setInt(9, house.getMaxImportLimit());
+            stmt.setInt(10, house.getEstimatedStayWeeks());
 
             int rows = stmt.executeUpdate();
 
             if (rows > 0) {
                 // Get generated ID
                 try (Statement idStmt = dbConnection.getConnection().createStatement();
-                     ResultSet rs = idStmt.executeQuery("SELECT last_insert_rowid() AS id")) {
+                        ResultSet rs = idStmt.executeQuery("SELECT last_insert_rowid() AS id")) {
                     if (rs.next()) {
                         house.setId(rs.getInt("id"));
                     }
@@ -78,7 +78,7 @@ public class HouseDAO {
      */
     public boolean updateHouse(House house) {
         String sql = "UPDATE houses SET name = ?, type = ?, chickenCount = ?, capacity = ?, " +
-                "healthStatus = ?, lastCleaningDate = ?, arrivalDate = ? WHERE id = ?";
+                "healthStatus = ?, lastCleaningDate = ?, arrivalDate = ?, maxImportLimit = ?, estimatedStayWeeks = ? WHERE id = ?";
 
         try (PreparedStatement stmt = dbConnection.getConnection().prepareStatement(sql)) {
             stmt.setString(1, house.getName());
@@ -86,11 +86,11 @@ public class HouseDAO {
             stmt.setInt(3, house.getChickenCount());
             stmt.setInt(4, house.getCapacity());
             stmt.setString(5, house.getHealthStatusAsString());
-            stmt.setString(6, house.getLastCleaningDate() != null ?
-                    house.getLastCleaningDate().toString() : null);
-            stmt.setString(7, house.getArrivalDate() != null ?
-                    house.getArrivalDate().toString() : null);
-            stmt.setInt(8, house.getId());
+            stmt.setString(6, house.getLastCleaningDate() != null ? house.getLastCleaningDate().toString() : null);
+            stmt.setString(7, house.getArrivalDate() != null ? house.getArrivalDate().toString() : null);
+            stmt.setInt(8, house.getMaxImportLimit());
+            stmt.setInt(9, house.getEstimatedStayWeeks());
+            stmt.setInt(10, house.getId());
 
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
@@ -201,7 +201,7 @@ public class HouseDAO {
         List<House> houses = new ArrayList<>();
 
         try (Statement stmt = dbConnection.getConnection().createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
+                ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
                 houses.add(mapResultSetToHouse(rs));
             }
@@ -325,7 +325,7 @@ public class HouseDAO {
     public boolean hasAnyChickens() {
         String sql = "SELECT COUNT(*) FROM houses WHERE chickenCount > 0";
         try (Statement stmt = dbConnection.getConnection().createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
+                ResultSet rs = stmt.executeQuery(sql)) {
             if (rs.next()) {
                 return rs.getInt(1) > 0;
             }
@@ -338,7 +338,7 @@ public class HouseDAO {
     /**
      * Updates the chicken count for a house
      *
-     * @param houseId the house ID
+     * @param houseId  the house ID
      * @param newCount the new chicken count
      * @return true if successful
      */
@@ -357,7 +357,7 @@ public class HouseDAO {
     /**
      * Updates the arrival date for a house
      *
-     * @param houseId the house ID
+     * @param houseId     the house ID
      * @param arrivalDate the arrival date
      * @return true if successful
      */
@@ -376,8 +376,8 @@ public class HouseDAO {
     /**
      * Adds chickens to a house (for import or transfer operations)
      *
-     * @param houseId the house ID
-     * @param count number of chickens to add
+     * @param houseId     the house ID
+     * @param count       number of chickens to add
      * @param arrivalDate the arrival date
      * @return true if successful
      */
@@ -398,7 +398,7 @@ public class HouseDAO {
      * Removes chickens from a house (for mortality or sell operations)
      *
      * @param houseId the house ID
-     * @param count number of chickens to remove
+     * @param count   number of chickens to remove
      * @return true if successful
      */
     public boolean removeChickensFromHouse(int houseId, int count) {
@@ -455,7 +455,7 @@ public class HouseDAO {
      * Updates the health status for a house
      *
      * @param houseId the house ID
-     * @param status the new health status
+     * @param status  the new health status
      * @return true if successful
      */
     public boolean updateHealthStatus(int houseId, HealthStatus status) {
@@ -473,7 +473,7 @@ public class HouseDAO {
     /**
      * Updates the last cleaning date for a house
      *
-     * @param houseId the house ID
+     * @param houseId      the house ID
      * @param cleaningDate the cleaning date
      * @return true if successful
      */
@@ -497,7 +497,7 @@ public class HouseDAO {
     public int getTotalChickenCount() {
         String sql = "SELECT COALESCE(SUM(chickenCount), 0) AS total FROM houses";
         try (Statement stmt = dbConnection.getConnection().createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
+                ResultSet rs = stmt.executeQuery(sql)) {
             if (rs.next()) {
                 return rs.getInt("total");
             }
@@ -535,7 +535,7 @@ public class HouseDAO {
     public boolean areHousesConfigured() {
         String sql = "SELECT COUNT(*) FROM houses";
         try (Statement stmt = dbConnection.getConnection().createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
+                ResultSet rs = stmt.executeQuery(sql)) {
             if (rs.next()) {
                 return rs.getInt(1) > 0;
             }
@@ -604,6 +604,113 @@ public class HouseDAO {
             house.setArrivalDate(LocalDate.parse(arrivalStr));
         }
 
+        // New fields for allocation
+        house.setMaxImportLimit(rs.getInt("maxImportLimit"));
+        house.setEstimatedStayWeeks(rs.getInt("estimatedStayWeeks"));
+
         return house;
+    }
+
+    /**
+     * Gets the maximum import limit (minimum across all DayOld houses)
+     *
+     * @return max import limit, or 0 if no DayOld houses
+     */
+    public int getMaxImportLimit() {
+        String sql = "SELECT MIN(maxImportLimit) FROM houses WHERE type = ?";
+        try (PreparedStatement stmt = dbConnection.getConnection().prepareStatement(sql)) {
+            stmt.setString(1, HouseType.DAY_OLD.getDisplayName());
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error getting max import limit: " + e.getMessage());
+        }
+        return 0;
+    }
+
+    /**
+     * Updates the max import limit for all DayOld houses
+     *
+     * @param limit the max import limit
+     * @return true if successful
+     */
+    public boolean updateMaxImportLimitForDayOld(int limit) {
+        String sql = "UPDATE houses SET maxImportLimit = ? WHERE type = ?";
+        try (PreparedStatement stmt = dbConnection.getConnection().prepareStatement(sql)) {
+            stmt.setInt(1, limit);
+            stmt.setString(2, HouseType.DAY_OLD.getDisplayName());
+            return stmt.executeUpdate() >= 0;
+        } catch (SQLException e) {
+            System.err.println("Error updating max import limit: " + e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Distributes chicks across all empty DayOld houses
+     *
+     * @param totalChicks total number of chicks to distribute
+     * @param arrivalDate the arrival date
+     * @return true if successful, false if not enough capacity
+     */
+    public boolean distributeChicksAcrossDayOldHouses(int totalChicks, LocalDate arrivalDate) {
+        List<House> dayOldHouses = getEmptyHousesByType(HouseType.DAY_OLD);
+
+        if (dayOldHouses.isEmpty()) {
+            // Also try partially filled houses
+            dayOldHouses = getHousesByType(HouseType.DAY_OLD);
+        }
+
+        // Calculate total available capacity
+        int totalAvailable = 0;
+        for (House house : dayOldHouses) {
+            totalAvailable += house.getAvailableCapacity();
+        }
+
+        if (totalAvailable < totalChicks) {
+            System.err.println("Not enough capacity: need " + totalChicks + ", have " + totalAvailable);
+            return false;
+        }
+
+        // Distribute evenly across houses
+        int remaining = totalChicks;
+        for (House house : dayOldHouses) {
+            if (remaining <= 0)
+                break;
+
+            int available = house.getAvailableCapacity();
+            int toAdd = Math.min(remaining, available);
+
+            if (toAdd > 0) {
+                if (!addChickensToHouse(house.getId(), toAdd, arrivalDate)) {
+                    System.err.println("Failed to add chickens to house: " + house.getName());
+                    return false;
+                }
+                remaining -= toAdd;
+            }
+        }
+
+        return remaining == 0;
+    }
+
+    /**
+     * Gets the total capacity of all DayOld houses
+     *
+     * @return total DayOld capacity
+     */
+    public int getTotalDayOldCapacity() {
+        String sql = "SELECT COALESCE(SUM(capacity), 0) FROM houses WHERE type = ?";
+        try (PreparedStatement stmt = dbConnection.getConnection().prepareStatement(sql)) {
+            stmt.setString(1, HouseType.DAY_OLD.getDisplayName());
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error getting total DayOld capacity: " + e.getMessage());
+        }
+        return 0;
     }
 }
