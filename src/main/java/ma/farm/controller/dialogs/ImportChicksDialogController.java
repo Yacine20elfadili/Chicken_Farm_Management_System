@@ -1,15 +1,11 @@
 package ma.farm.controller.dialogs;
 
-import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 import ma.farm.dao.HouseDAO;
-import ma.farm.model.House;
-import ma.farm.model.HouseType;
 
 import java.time.LocalDate;
-import java.util.List;
 
 /**
  * Controller for the Import Chicks Dialog
@@ -18,40 +14,49 @@ import java.util.List;
 public class ImportChicksDialogController {
 
     @FXML
-    private ComboBox<House> houseComboBox;
-
+    private Label maxImportLabel;
     @FXML
-    private Label capacityInfoLabel;
+    private Label availableCapacityLabel;
 
     @FXML
     private TextField quantityField;
-
     @FXML
     private Label quantityErrorLabel;
 
     @FXML
     private TextField supplierField;
-
     @FXML
     private TextField priceField;
 
     @FXML
     private Label errorLabel;
+    @FXML
+    private Button importButton;
 
     private HouseDAO houseDAO;
     private boolean saved = false;
+    private int maxImportLimit = 0;
+    private int availableCapacity = 0;
 
     @FXML
     public void initialize() {
         houseDAO = new HouseDAO();
 
-        // Load empty DayOld houses
-        loadEmptyHouses();
+        // Get limits from database
+        maxImportLimit = houseDAO.getMaxImportLimit();
+        availableCapacity = houseDAO.getTotalEmptyCapacityByType(ma.farm.model.HouseType.DAY_OLD);
 
-        // Set up house selection listener
-        houseComboBox.setOnAction(e -> updateCapacityInfo());
+        // Also include capacity from partially filled houses if needed
+        // For now, let's stick to empty capacity or calculate explicitly
+        availableCapacity = houseDAO.getTotalDayOldCapacity() -
+                houseDAO.getTotalChickenCountByType(ma.farm.model.HouseType.DAY_OLD);
 
-        // Set up quantity field validation
+        // Update labels
+        maxImportLabel.setText(String.format("%,d", maxImportLimit));
+        availableCapacityLabel.setText("Available capacity in DayOld houses: " +
+                String.format("%,d", availableCapacity));
+
+        // Validation listeners
         quantityField.textProperty().addListener((obs, oldVal, newVal) -> {
             if (!newVal.matches("\\d*")) {
                 quantityField.setText(newVal.replaceAll("[^\\d]", ""));
@@ -59,7 +64,6 @@ public class ImportChicksDialogController {
             validateQuantity();
         });
 
-        // Set up price field validation (allow decimals)
         priceField.textProperty().addListener((obs, oldVal, newVal) -> {
             if (!newVal.matches("\\d*\\.?\\d*")) {
                 priceField.setText(oldVal);
@@ -67,130 +71,66 @@ public class ImportChicksDialogController {
         });
     }
 
-    private void loadEmptyHouses() {
-        List<House> emptyHouses = houseDAO.getEmptyHousesByType(HouseType.DAY_OLD);
-
-        // Also include houses with available capacity (not just empty)
-        List<House> allDayOldHouses = houseDAO.getHousesByType(HouseType.DAY_OLD);
-        for (House house : allDayOldHouses) {
-            if (!house.isFull() && !emptyHouses.contains(house)) {
-                emptyHouses.add(house);
-            }
-        }
-
-        houseComboBox.setItems(FXCollections.observableArrayList(emptyHouses));
-
-        // Custom cell factory to display house names
-        houseComboBox.setCellFactory(lv -> new ListCell<House>() {
-            @Override
-            protected void updateItem(House house, boolean empty) {
-                super.updateItem(house, empty);
-                if (empty || house == null) {
-                    setText(null);
-                } else {
-                    setText(house.getName() + " (Capacity: " + house.getCapacity() +
-                           ", Current: " + house.getChickenCount() + ")");
-                }
-            }
-        });
-
-        houseComboBox.setButtonCell(new ListCell<House>() {
-            @Override
-            protected void updateItem(House house, boolean empty) {
-                super.updateItem(house, empty);
-                if (empty || house == null) {
-                    setText(null);
-                } else {
-                    setText(house.getName());
-                }
-            }
-        });
-
-        if (emptyHouses.isEmpty()) {
-            capacityInfoLabel.setText("No available DayOld houses!");
-            capacityInfoLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: #dc3545;");
-        }
-    }
-
-    private void updateCapacityInfo() {
-        House selected = houseComboBox.getValue();
-        if (selected != null) {
-            int available = selected.getAvailableCapacity();
-            capacityInfoLabel.setText("Available capacity: " + available + " chicks");
-            capacityInfoLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: #28a745;");
-        } else {
-            capacityInfoLabel.setText("Available capacity: -");
-            capacityInfoLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: #666;");
-        }
-    }
-
     private boolean validateQuantity() {
-        House selected = houseComboBox.getValue();
-        String quantityText = quantityField.getText().trim();
+        String text = quantityField.getText().trim();
 
-        if (quantityText.isEmpty()) {
-            quantityErrorLabel.setVisible(false);
+        if (text.isEmpty()) {
+            quantityErrorLabel.setText("Please enter a quantity.");
+            quantityErrorLabel.setVisible(true);
+            importButton.setDisable(true);
             return false;
         }
 
         try {
-            int quantity = Integer.parseInt(quantityText);
+            int quantity = Integer.parseInt(text);
 
             if (quantity <= 0) {
-                showQuantityError("Quantity must be greater than 0");
+                quantityErrorLabel.setText("Quantity must be greater than 0.");
+                quantityErrorLabel.setVisible(true);
+                importButton.setDisable(true);
                 return false;
             }
 
-            if (selected != null) {
-                int available = selected.getAvailableCapacity();
-                if (quantity > available) {
-                    showQuantityError("Quantity exceeds available capacity (" + available + ")");
-                    return false;
-                }
+            if (quantity > maxImportLimit) {
+                quantityErrorLabel
+                        .setText("Cannot exceed max import limit (" + String.format("%,d", maxImportLimit) + ").");
+                quantityErrorLabel.setVisible(true);
+                importButton.setDisable(true);
+                return false;
+            }
+
+            if (quantity > availableCapacity) {
+                quantityErrorLabel
+                        .setText("Not enough capacity (Available: " + String.format("%,d", availableCapacity) + ").");
+                quantityErrorLabel.setVisible(true);
+                importButton.setDisable(true);
+                return false;
             }
 
             quantityErrorLabel.setVisible(false);
+            importButton.setDisable(false);
             return true;
 
         } catch (NumberFormatException e) {
-            showQuantityError("Please enter a valid number");
+            quantityErrorLabel.setText("Invalid number.");
+            quantityErrorLabel.setVisible(true);
+            importButton.setDisable(true);
             return false;
         }
     }
 
-    private void showQuantityError(String message) {
-        quantityErrorLabel.setText(message);
-        quantityErrorLabel.setVisible(true);
-    }
-
     @FXML
     public void handleConfirm() {
-        // Validate house selection
-        House selectedHouse = houseComboBox.getValue();
-        if (selectedHouse == null) {
-            showError("Please select a house.");
-            return;
-        }
-
-        // Validate quantity
-        String quantityText = quantityField.getText().trim();
-        if (quantityText.isEmpty()) {
-            showError("Please enter the quantity of chicks to import.");
-            return;
-        }
-
         if (!validateQuantity()) {
             return;
         }
 
-        int quantity = Integer.parseInt(quantityText);
+        int quantity = Integer.parseInt(quantityField.getText().trim());
 
-        // Perform the import
-        boolean success = houseDAO.addChickensToHouse(
-            selectedHouse.getId(),
-            quantity,
-            LocalDate.now()
-        );
+        // Auto-distribute across DayOld houses
+        boolean success = houseDAO.distributeChicksAcrossDayOldHouses(
+                quantity,
+                LocalDate.now());
 
         if (success) {
             saved = true;
@@ -207,7 +147,7 @@ public class ImportChicksDialogController {
     }
 
     private void closeDialog() {
-        Stage stage = (Stage) houseComboBox.getScene().getWindow();
+        Stage stage = (Stage) quantityField.getScene().getWindow();
         stage.close();
     }
 
