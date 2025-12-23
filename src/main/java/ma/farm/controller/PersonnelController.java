@@ -1,24 +1,44 @@
 package ma.farm.controller;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import javafx.application.Platform;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.scene.layout.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.ChoiceDialog;
+import javafx.scene.control.Label;
+import javafx.scene.control.Tooltip;
+import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import ma.farm.dao.PersonnelDAO;
 import ma.farm.model.AdminPosition;
 import ma.farm.model.Personnel;
 import ma.farm.model.PersonnelType;
-
-import java.io.IOException;
-import java.util.List;
+import ma.farm.util.IdentityCardGenerator;
 
 /**
  * PersonnelController - Controls the Personnel view
@@ -616,6 +636,87 @@ public class PersonnelController {
             e.printStackTrace();
             showErrorAlert("Erreur", "Impossible d'ouvrir le dialogue d'ajout.", e.getMessage());
         }
+    }
+
+    /**
+     * Generate an identity card image for a selected personnel
+     */
+    @FXML
+    public void generateCard() {
+        List<Personnel> all = personnelDAO.getAllPersonnel();
+        if (all.isEmpty()) {
+            showErrorAlert("Erreur", "Aucun personnel", "La liste du personnel est vide.");
+            return;
+        }
+
+        List<String> names = all.stream().map(Personnel::getFullName).collect(Collectors.toList());
+        ChoiceDialog<String> dialog = new ChoiceDialog<>(names.get(0), names);
+        dialog.setTitle("Générer carte d'identité");
+        dialog.setHeaderText("Sélectionner le personnel");
+        dialog.setContentText("Personnel:");
+
+        Optional<String> selected = dialog.showAndWait();
+        if (!selected.isPresent()) return;
+
+        String chosen = selected.get();
+        Personnel person = all.stream().filter(p -> chosen.equals(p.getFullName())).findFirst().orElse(null);
+        if (person == null) {
+            showErrorAlert("Erreur", "Personnel introuvable", "Impossible de trouver le personnel sélectionné.");
+            return;
+        }
+
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setInitialFileName(person.getFullName().replaceAll("\\s+","_") + "_id.png");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PNG Image", "*.png"));
+
+        File dest;
+        if (personnelGrid != null && personnelGrid.getScene() != null) {
+            dest = fileChooser.showSaveDialog(personnelGrid.getScene().getWindow());
+        } else if (adminCardsPane != null && adminCardsPane.getScene() != null) {
+            dest = fileChooser.showSaveDialog(adminCardsPane.getScene().getWindow());
+        } else {
+            dest = fileChooser.showSaveDialog(null);
+        }
+        if (dest == null) return;
+
+        Task<Void> task = new Task<>() {
+            @Override
+            protected Void call() throws Exception {
+                IdentityCardGenerator gen = new IdentityCardGenerator();
+                String barcode = "EMP-" + person.getId();
+                gen.saveAsPng(person.getFullName(), person.getJobTitle() != null ? person.getJobTitle() : "", barcode, Paths.get(dest.toURI()));
+                return null;
+            }
+        };
+
+        task.setOnSucceeded(e -> Platform.runLater(() -> showSuccessAlert("Succès", "Carte générée: " + dest.getAbsolutePath())));
+        task.setOnFailed(e -> Platform.runLater(() -> showErrorAlertWithStack("Erreur", "Échec de génération", task.getException())));
+
+        new Thread(task).start();
+    }
+
+    private void showErrorAlertWithStack(String title, String header, Throwable t) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(header);
+
+        StringWriter sw = new StringWriter();
+        t.printStackTrace(new PrintWriter(sw));
+        String exceptionText = sw.toString();
+
+        javafx.scene.control.TextArea textArea = new javafx.scene.control.TextArea(exceptionText);
+        textArea.setEditable(false);
+        textArea.setWrapText(true);
+        textArea.setMaxWidth(Double.MAX_VALUE);
+        textArea.setMaxHeight(Double.MAX_VALUE);
+
+        GridPane content = new GridPane();
+        content.setMaxWidth(Double.MAX_VALUE);
+        content.add(new Label("Exception stacktrace:"), 0, 0);
+        content.add(textArea, 0, 1);
+
+        alert.getDialogPane().setExpandableContent(content);
+        alert.showAndWait();
     }
 
     /**

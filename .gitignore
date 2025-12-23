@@ -120,6 +120,7 @@ $RECYCLE.BIN/
 *~.nib
 *.bak
 *.orig
+src/main/resources/qrcodes/*
 
 # ============================================
 # Logs

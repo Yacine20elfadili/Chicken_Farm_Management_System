@@ -993,4 +993,25 @@ Special thanks to all team members for their dedication and hard work:
 
 ---
 
+---
+
+## 🆔 Identity Card Generation (ID Card)
+
+Added feature to generate identity card images (PNG) for personnel.
+
+**How it works**
+
+- Uses **OpenHTMLToPDF** (Apache-2.0) to render `src/main/resources/templates/identity-card.html` with placeholders `{{name}}`, `{{role}}`, and `{{barcodeDataImg}}`.
+- Produces PNG by rasterizing the generated PDF using **Apache PDFBox**.
+- QR codes are generated using **ZXing** and embedded as data URIs in the template. The template has been updated to a portrait layout (large QR at top, caption, then name and role) to match the requested style.
+- **UI usage**: In the Personnel view, click the "➕ Generer carte" button, select a personnel, and save the PNG file.
+- **Programmatic API**: `ma.farm.util.IdentityCardGenerator#generateAsPng(String name, String role, String barcodeData)` and `#saveAsPng(...)`.
+
+**Licensing**
+
+- This feature uses Apache-licensed libraries (OpenHTMLToPDF, PDFBox, ZXing) and is safe for commercial use.
+- The project still contains an **iText (AGPL)** dependency; avoid using iText pdfHTML in production unless you accept AGPL obligations or obtain a commercial license.
+
+---
+
 **Built by the Farm Management Dev Team | University Java Project 2025**
