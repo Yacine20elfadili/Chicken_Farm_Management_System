@@ -16,29 +16,27 @@
 
     <children>
         <!-- Header -->
-        <VBox prefHeight="75.0" prefWidth="1000.0" styleClass="header" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <VBox styleClass="header" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <padding>
+                <Insets bottom="15.0" left="30.0" right="30.0" top="15.0" />
+            </padding>
             <children>
-                <HBox prefHeight="33.0" prefWidth="999.0">
+                <HBox alignment="CENTER_LEFT" spacing="10.0">
                     <children>
-                        <Label styleClass="header-title" text="Gestion du Stockage" textAlignment="CENTER" />
+                        <VBox spacing="2.0">
+                            <children>
+                                <Label styleClass="header-title" text="Gestion du Stockage" textAlignment="LEFT" />
+                                <Label styleClass="header-subtitle" text="Gérez vos stocks d'aliments, médicaments et équipements" textAlignment="LEFT" />
+                            </children>
+                        </VBox>
+                        <Region HBox.hgrow="ALWAYS" />
                     </children>
-                    <VBox.margin>
-                        <Insets top="10.0" />
-                    </VBox.margin>
-                </HBox>
-                <HBox prefHeight="100.0" prefWidth="200.0">
-                    <children>
-                        <Label prefHeight="30.0" prefWidth="450.0" styleClass="header-subtitle" text="Gérez vos stocks d'aliments, médicaments et équipements" textAlignment="CENTER" HBox.hgrow="ALWAYS" />
-                    </children>
-                    <VBox.margin>
-                        <Insets />
-                    </VBox.margin>
                 </HBox>
             </children>
         </VBox>
 
         <!-- Main Content -->
-        <VBox prefHeight="200.0" prefWidth="100.0" spacing="20.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="80.0">
+        <VBox spacing="20.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="60.0">
             <children>
                 <ScrollPane fitToHeight="true" fitToWidth="true" styleClass="main-content" VBox.vgrow="ALWAYS">
                     <content>
@@ -48,10 +46,10 @@
                             </padding>
                             <children>
                                 <!-- TOP SECTION: Feed and Medications Cards Side by Side -->
-                                <HBox prefHeight="380.0" spacing="20.0" VBox.vgrow="ALWAYS">
+                                <HBox spacing="20.0" VBox.vgrow="ALWAYS">
                                     <children>
                                         <!-- Feed Card -->
-                                        <VBox minHeight="500.0" prefHeight="500.0" styleClass="storage-clean-card" HBox.hgrow="ALWAYS">
+                                        <VBox minHeight="500.0" styleClass="storage-clean-card" HBox.hgrow="ALWAYS">
                                             <padding>
                                                 <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
                                             </padding>
@@ -93,7 +91,7 @@
                                         </VBox>
 
                                         <!-- Medications Card -->
-                                        <VBox minHeight="500.0" prefHeight="380.0" styleClass="storage-clean-card" HBox.hgrow="ALWAYS">
+                                        <VBox minHeight="500.0" styleClass="storage-clean-card" HBox.hgrow="ALWAYS">
                                             <padding>
                                                 <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
                                             </padding>
@@ -137,7 +135,7 @@
                                 </HBox>
 
                                 <!-- BOTTOM SECTION: Equipment Table -->
-                                <VBox minHeight="500.0" prefHeight="450.0" spacing="15.0" styleClass="storage-clean-card" VBox.vgrow="ALWAYS">
+                                <VBox minHeight="500.0" spacing="15.0" styleClass="storage-clean-card" VBox.vgrow="ALWAYS">
                                     <padding>
                                         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
                                     </padding>

@@ -15,27 +15,45 @@
 
 <AnchorPane prefHeight="700.0" prefWidth="950.0" styleClass="main-content" stylesheets="@../css/style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ma.farm.controller.TasksController">
     <children>
-              <!-- HEADER ROW -->
+        <!-- HEADER ROW -->
         <VBox styleClass="header" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <padding>
+                <Insets bottom="15.0" left="30.0" right="30.0" top="15.0" />
+            </padding>
             <children>
-                <HBox alignment="CENTER_LEFT" spacing="15.0">
+                <HBox alignment="CENTER_LEFT" spacing="10.0">
                     <children>
-                        <Label styleClass="header-title" text="Gestion des Tâches" />
+                        <VBox spacing="2.0">
+                            <children>
+                                <Label styleClass="header-title" text="Gestion des Tâches" textAlignment="LEFT" />
+                                <Label styleClass="header-subtitle" text="Suivez et gérez toutes les tâches quotidiennes de la ferme" textAlignment="LEFT" />
+                            </children>
+                        </VBox>
                         <Region HBox.hgrow="ALWAYS" />
-                        <Button fx:id="addTaskButton" onAction="#handleAddTask" style="-fx-background-color: #28a745; -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold; -fx-cursor: hand; -fx-padding: 10 20; -fx-background-radius: 5;" text="+ Nouvelle Tâche" />
-                        <Button fx:id="refreshButton" onAction="#refreshData" style="-fx-background-color: #17a2b8; -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold; -fx-cursor: hand; -fx-padding: 10 15; -fx-background-radius: 5;" text="Actualiser" />
+                        <HBox alignment="CENTER_RIGHT" spacing="15.0">
+                            <padding>
+                                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                            </padding>
+                            <children>
+                                <Button fx:id="addTaskButton" onAction="#handleAddTask" text="➕ Nouvelle Tâche">
+                                    <styleClass>
+                                        <String fx:value="btn" />
+                                        <String fx:value="btn-sell" />
+                                    </styleClass>
+                                </Button>
+                                <Button fx:id="refreshButton" onAction="#refreshData" text="🔄 Actualiser">
+                                    <styleClass>
+                                        <String fx:value="btn" />
+                                        <String fx:value="btn-save" />
+                                    </styleClass>
+                                </Button>
+                            </children>
+                        </HBox>
                     </children>
-               <padding>
-                  <Insets right="20.0" />
-               </padding>
-               <VBox.margin>
-                  <Insets top="10.0" />
-               </VBox.margin>
                 </HBox>
-                <Label styleClass="header-subtitle" text="Suivez et gérez toutes les tâches quotidiennes de la ferme" />
             </children>
         </VBox>
-        <VBox AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="80.0">
+        <VBox AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="60.0">
             <children>
                 <ScrollPane fitToHeight="true" fitToWidth="true" styleClass="main-content" VBox.vgrow="ALWAYS">
                     <content>
