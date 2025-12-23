@@ -1,104 +1,103 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.String?>
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
 
-<VBox xmlns="http://javafx.com/javafx"
-      xmlns:fx="http://javafx.com/fxml"
-      fx:controller="ma.farm.controller.dialogs.SellEggsDialogController"
-      prefWidth="750.0"
-      prefHeight="480.0"
-      spacing="15"
-      style="-fx-background-color: #ffffff;">
+<VBox prefHeight="500.0" prefWidth="750.0" spacing="15" styleClass="root" stylesheets="@../../css/dialogs.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ma.farm.controller.dialogs.SellEggsDialogController">
 
     <padding>
-        <Insets bottom="20.0" left="25.0" right="25.0" top="20.0"/>
+        <Insets bottom="20" left="25" right="25" top="20" />
     </padding>
 
-    <!-- Dialog Title -->
-    <VBox spacing="3.0">
-        <Label text="💰 Vendre des Œufs"
-               style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #1e2939;"/>
-        <Label text="Sélectionnez les quantités à vendre par maison"
-               style="-fx-font-size: 13px; -fx-text-fill: #666666;"/>
+    <!-- ================= HEADER ================= -->
+    <VBox spacing="3">
+        <Label styleClass="title" text="💰 Vendre des Œufs" />
+        <Label styleClass="subtitle" text="Sélectionnez les quantités à vendre par maison" />
     </VBox>
 
-    <Separator/>
+    <Separator />
 
-    <!-- Error Label -->
-    <Label fx:id="errorLabel"
-           style="-fx-text-fill: #dc3545; -fx-padding: 10; -fx-background-color: #f8d7da; -fx-border-color: #f5c6cb; -fx-border-radius: 5; -fx-background-radius: 5;"
-           text="Error message" visible="false" managed="false" wrapText="true"/>
+    <!-- ================= ERROR ================= -->
+    <Label fx:id="errorLabel" managed="false" style="-fx-text-fill: #dc3545;                   -fx-padding: 10;                   -fx-background-color: #f8d7da;                   -fx-border-color: #f5c6cb;                   -fx-border-radius: 5;                   -fx-background-radius: 5;" visible="false" wrapText="true" />
 
-    <!-- Main Content - Horizontal Layout -->
-    <HBox spacing="20.0" VBox.vgrow="ALWAYS">
+    <!-- ================= MAIN CONTENT ================= -->
+    <HBox spacing="20" VBox.vgrow="ALWAYS">
 
-        <!-- Left Side - Houses List -->
-        <VBox spacing="10.0" HBox.hgrow="ALWAYS"
-              style="-fx-background-color: #f8f9fa; -fx-padding: 15; -fx-background-radius: 8;">
-            <Label text="🏠 Maisons Pondeuses"
-                   style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #333333;"/>
-            <Label text="[Stock disponible] → Quantité à vendre"
-                   style="-fx-font-size: 11px; -fx-text-fill: #888888;"/>
+        <!-- Houses List -->
+        <VBox spacing="10" HBox.hgrow="ALWAYS">
 
-            <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS"
-                        style="-fx-background-color: transparent; -fx-background: transparent; -fx-border-color: transparent;">
-                <VBox fx:id="housesListContainer" spacing="10.0" style="-fx-padding: 5 10 5 0;">
-                    <!-- House rows will be added dynamically -->
-                    <!-- Each row: HouseName [available eggs] → [input field 0] -->
-                </VBox>
+            <Label styleClass="section-title" text="🏠 Maisons Pondeuses">
+            <VBox.margin>
+               <Insets left="15.0" />
+            </VBox.margin></Label>
+
+            <Label style="-fx-text-fill: #888;" styleClass="section-subtitle" text="[Stock disponible] → Quantité à vendre">
+            <VBox.margin>
+               <Insets left="15.0" />
+            </VBox.margin></Label>
+
+            <ScrollPane fitToWidth="true" styleClass="transparent-scroll" VBox.vgrow="ALWAYS">
+                <VBox fx:id="housesListContainer" spacing="10" style="-fx-padding: 5 10 5 0;" />
             </ScrollPane>
+         <padding>
+            <Insets top="15.0" />
+         </padding>
         </VBox>
 
-        <!-- Right Side - Form and Confirm -->
-        <VBox spacing="15.0" prefWidth="220.0"
-              style="-fx-background-color: #f8f9fa; -fx-padding: 15; -fx-background-radius: 8;">
+        <!-- Sale Info -->
+        <VBox prefWidth="240" spacing="15" style="-fx-background-color: #f8f9fa;                      -fx-padding: 15;                      -fx-background-radius: 8;">
 
-            <!-- Confirm Button (top) - disabled until qty > 0 -->
-            <Button fx:id="confirmButton" text="✓ Confirmer Vente" onAction="#handleConfirm"
-                    disable="true" maxWidth="Infinity"
-                    style="-fx-background-color: #28a745; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 12 20; -fx-background-radius: 6; -fx-cursor: hand;"/>
-
-            <!-- Total to sell display -->
-            <HBox alignment="CENTER" spacing="8.0"
-                  style="-fx-background-color: #e8f5e9; -fx-padding: 10; -fx-background-radius: 5;">
-                <Label text="Total:" style="-fx-font-size: 12px; -fx-text-fill: #2e7d32;"/>
-                <Label fx:id="totalToSellLabel" text="0"
-                       style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #1b5e20;"/>
-                <Label text="œufs" style="-fx-font-size: 12px; -fx-text-fill: #2e7d32;"/>
+            <!-- Total -->
+            <HBox alignment="CENTER" spacing="8" style="-fx-background-color: #e8f5e9;" styleClass="transfer-info-box">
+                <Label style="-fx-text-fill: #2e7d32;" styleClass="label-small-bold-warning" text="Total:" />
+                <Label fx:id="totalToSellLabel" style="-fx-text-fill: #1b5e20;" styleClass="footer-value" text="0" />
+                <Label style="-fx-text-fill: #2e7d32;" styleClass="label-small-bold-warning" text="œufs" />
             </HBox>
 
-            <Separator/>
-
-            <!-- Date de Vente -->
-            <VBox spacing="8.0">
-                <Label text="Date de Vente" style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #333333;"/>
-                <DatePicker fx:id="saleDatePicker" maxWidth="Infinity"/>
+            <!-- Date -->
+            <VBox spacing="6">
+                <Label style="-fx-font-weight: bold;" styleClass="section-title" text="Date de Vente" />
+                <DatePicker fx:id="saleDatePicker" maxWidth="Infinity" />
             </VBox>
 
-            <!-- Prix par Œuf (Optional) -->
-            <VBox spacing="8.0">
-                <Label text="Prix par Œuf (MAD)" style="-fx-font-size: 12px; -fx-text-fill: #666666;"/>
-                <TextField fx:id="priceField" promptText="Optionnel..."
-                           style="-fx-background-color: #ffffff; -fx-border-color: #ced4da; -fx-border-radius: 5; -fx-background-radius: 5; -fx-padding: 8 12;"/>
+            <!-- Price -->
+            <VBox spacing="6">
+                <Label style="-fx-text-fill: #666;" styleClass="section-subtitle" text="Prix par Œuf (MAD)" />
+                <TextField fx:id="priceField" promptText="Optionnel..." />
             </VBox>
 
-            <!-- Nom du Client (Optional) -->
-            <VBox spacing="8.0">
-                <Label text="Nom du Client" style="-fx-font-size: 12px; -fx-text-fill: #666666;"/>
-                <TextField fx:id="customerField" promptText="Optionnel..."
-                           style="-fx-background-color: #ffffff; -fx-border-color: #ced4da; -fx-border-radius: 5; -fx-background-radius: 5; -fx-padding: 8 12;"/>
+            <!-- Customer -->
+            <VBox spacing="6">
+                <Label style="-fx-text-fill: #666;" styleClass="section-subtitle" text="Nom du Client" />
+                <TextField fx:id="customerField" promptText="Optionnel..." />
             </VBox>
-
-            <!-- Spacer -->
-            <Region VBox.vgrow="ALWAYS"/>
-
-            <!-- Cancel Button (bottom) -->
-            <Button fx:id="cancelButton" text="Annuler" onAction="#handleCancel" maxWidth="Infinity"
-                    style="-fx-background-color: #6c757d; -fx-text-fill: white; -fx-font-size: 13px; -fx-padding: 10 20; -fx-background-radius: 6; -fx-cursor: hand;"/>
         </VBox>
 
+    </HBox>
+
+    <Separator />
+
+    <!-- ================= FOOTER ================= -->
+    <HBox alignment="CENTER_RIGHT" spacing="10">
+        <Button fx:id="cancelButton" onAction="#handleCancel" text="Annuler">
+         <styleClass>
+            <String fx:value="btn" />
+            <String fx:value="btn-cancel" />
+         </styleClass></Button>
+
+        <Button fx:id="confirmButton" disable="true" onAction="#handleConfirm" text="Confirmer Vente">
+         <styleClass>
+            <String fx:value="btn" />
+            <String fx:value="btn-sell" />
+         </styleClass></Button>
     </HBox>
 
 </VBox>

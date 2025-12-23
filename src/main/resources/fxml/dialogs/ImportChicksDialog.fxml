@@ -1,97 +1,87 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.String?>
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
 
-<VBox xmlns="http://javafx.com/javafx"
-      xmlns:fx="http://javafx.com/fxml"
-      fx:controller="ma.farm.controller.dialogs.ImportChicksDialogController"
-      prefWidth="520.0"
-      prefHeight="480.0"
-      spacing="15"
-      style="-fx-background-color: #ffffff;">
+<VBox prefHeight="480.0" prefWidth="520.0" spacing="15" styleClass="root" stylesheets="@../../css/dialogs.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ma.farm.controller.dialogs.ImportChicksDialogController">
 
     <padding>
-        <Insets bottom="20.0" left="25.0" right="25.0" top="20.0"/>
+        <Insets bottom="20.0" left="25.0" right="25.0" top="20.0" />
     </padding>
 
     <!-- Dialog Title -->
     <VBox spacing="5.0">
-        <Label text="🐣 Import Day-Old Chicks"
-               style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #1e2939;"/>
-        <Label text="Import chicks. They will be distributed across all available DayOld houses."
-               style="-fx-font-size: 13px; -fx-text-fill: #666666;" wrapText="true"/>
+        <Label styleClass="title" text="🐣 Import Day-Old Chicks" />
+        <Label prefHeight="22.0" prefWidth="487.0" styleClass="subtitle" text="Import chicks. They will be distributed across all available DayOld houses." wrapText="true" />
     </VBox>
 
-    <Separator/>
+    <Separator styleClass="separator" />
 
     <!-- Max Import Info Box -->
-    <VBox spacing="5.0" style="-fx-background-color: #e3f2fd; -fx-padding: 12; -fx-background-radius: 8;">
-        <HBox spacing="10.0" alignment="CENTER_LEFT">
-            <Label text="📊 Maximum Import Limit:" style="-fx-font-size: 13px; -fx-text-fill: #1565c0;"/>
-            <Label fx:id="maxImportLabel" text="-"
-                   style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #0d47a1;"/>
-            <Label text="chicks" style="-fx-font-size: 12px; -fx-text-fill: #1976d2;"/>
+    <VBox spacing="5.0" styleClass="footer">
+        <HBox alignment="CENTER_LEFT" spacing="10.0">
+            <Label styleClass="footer-label" text="📊 Maximum Import Limit:" />
+            <Label fx:id="maxImportLabel" styleClass="footer-value" text="-" />
+            <Label styleClass="footer-label-small" text="chicks" />
         </HBox>
-        <Label fx:id="availableCapacityLabel" text="Available capacity in DayOld houses: -"
-               style="-fx-font-size: 11px; -fx-text-fill: #42a5f5;"/>
+        <Label fx:id="availableCapacityLabel" styleClass="footer-label-small" text="Available capacity in DayOld houses: -" />
     </VBox>
 
     <!-- Form Content -->
     <VBox spacing="15.0" VBox.vgrow="ALWAYS">
         <!-- Quantity -->
         <VBox spacing="8.0">
-            <Label text="Total Quantity to Import *" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #333333;"/>
-            <TextField fx:id="quantityField" promptText="Enter number of chicks (3,000 - 20,000)..."
-                       style="-fx-background-color: #ffffff; -fx-border-color: #ced4da; -fx-border-radius: 5; -fx-background-radius: 5; -fx-padding: 10 12; -fx-font-size: 14px;"/>
-            <Label fx:id="quantityErrorLabel" text="" style="-fx-text-fill: #dc3545; -fx-font-size: 11px;" visible="false"/>
+            <Label styleClass="section-title" text="Total Quantity to Import *" />
+            <TextField fx:id="quantityField" promptText="Enter number of chicks (3,000 - 20,000)..." styleClass="text-field" />
+            <Label fx:id="quantityErrorLabel" styleClass="error-label" text="" visible="false" />
         </VBox>
 
-        <Separator/>
+        <Separator styleClass="separator" />
 
         <!-- Optional Fields Section -->
-        <VBox spacing="12.0"
-              style="-fx-background-color: #f8f9fa; -fx-padding: 15; -fx-background-radius: 8;">
-            <Label text="📋 Optional Fields (for record keeping)"
-                   style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #666666;"/>
+        <VBox spacing="12.0" styleClass="optional-fields">
+            <Label styleClass="section-subtitle" text="📋 Optional Fields (for record keeping)" />
 
             <!-- Supplier Name -->
             <VBox spacing="5.0">
-                <Label text="Supplier Name (optional)" style="-fx-text-fill: #555555; -fx-font-size: 12px;"/>
-                <TextField fx:id="supplierField" promptText="Enter supplier name..."
-                           style="-fx-background-color: #ffffff; -fx-border-color: #ced4da; -fx-border-radius: 5; -fx-background-radius: 5; -fx-padding: 8 12;"/>
-                <Label text="💡 Will be linked to Suppliers page in future update"
-                       style="-fx-font-size: 10px; -fx-text-fill: #888; -fx-font-style: italic;"/>
+                <Label styleClass="label-small" text="Supplier Name (optional)" />
+                <TextField fx:id="supplierField" promptText="Enter supplier name..." styleClass="text-field" />
+                <Label styleClass="hint" text="💡 Will be linked to Suppliers page in future update" />
             </VBox>
 
             <!-- Price per Chick -->
             <VBox spacing="5.0">
-                <Label text="Price per Chick (optional)" style="-fx-text-fill: #555555; -fx-font-size: 12px;"/>
-                <HBox spacing="8.0" alignment="CENTER_LEFT">
-                    <TextField fx:id="priceField" promptText="Price..." prefWidth="180"
-                               style="-fx-background-color: #ffffff; -fx-border-color: #ced4da; -fx-border-radius: 5; -fx-background-radius: 5; -fx-padding: 8 12;"/>
-                    <Label text="MAD" style="-fx-text-fill: #888888; -fx-font-weight: bold;"/>
+                <Label styleClass="label-small" text="Price per Chick (optional)" />
+                <HBox alignment="CENTER_LEFT" spacing="8.0">
+                    <TextField fx:id="priceField" prefWidth="180" promptText="Price..." styleClass="text-field" />
+                    <Label styleClass="label-small-bold" text="MAD" />
                 </HBox>
             </VBox>
         </VBox>
     </VBox>
 
     <!-- Error Label -->
-    <Label fx:id="errorLabel" style="-fx-text-fill: #dc3545;" wrapText="true" visible="false" managed="false"/>
+    <Label fx:id="errorLabel" styleClass="error-label" visible="false" wrapText="true" />
 
-    <Separator/>
+    <Separator styleClass="separator" />
 
     <!-- Button Bar -->
-    <HBox spacing="12.0" alignment="CENTER_RIGHT">
-        <padding>
-            <Insets top="5.0"/>
-        </padding>
-        <Button text="Cancel" onAction="#handleCancel"
-                style="-fx-background-color: #6c757d; -fx-text-fill: white; -fx-font-size: 13px; -fx-padding: 10 24; -fx-background-radius: 6; -fx-cursor: hand;"
-                prefWidth="100"/>
-        <Button fx:id="importButton" text="Import Chicks" onAction="#handleConfirm"
-                style="-fx-background-color: #28a745; -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold; -fx-padding: 10 24; -fx-background-radius: 6; -fx-cursor: hand;"
-                prefWidth="140"/>
+    <HBox alignment="CENTER_RIGHT" spacing="12.0" styleClass="button-bar">
+        <Button onAction="#handleCancel" prefWidth="100" text="Cancel">
+            <styleClass>
+                <String fx:value="btn" />
+                <String fx:value="btn-cancel" />
+            </styleClass></Button>
+        <Button fx:id="importButton" onAction="#handleConfirm" prefWidth="140" text="Import Chicks">
+            <styleClass>
+                <String fx:value="btn" />
+                <String fx:value="btn-save" />
+            </styleClass></Button>
     </HBox>
 </VBox>

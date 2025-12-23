@@ -1,38 +1,58 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.String?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Separator?>
-<?import javafx.scene.image.Image?>
-<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
 <AnchorPane prefHeight="700.0" prefWidth="950.0" styleClass="main-content" stylesheets="@../css/style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ma.farm.controller.PersonnelController">
     <children>
-        <VBox prefHeight="75.0" prefWidth="950.0" styleClass="header" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+        <VBox styleClass="header" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <padding>
+                <Insets bottom="15.0" left="30.0" right="30.0" top="15.0" />
+            </padding>
             <children>
-                <HBox prefHeight="33.0" prefWidth="950.0">
+                <HBox alignment="CENTER_LEFT" spacing="10.0">
                     <children>
-                        <Label styleClass="header-title" text="Gestion du Personnel" textAlignment="CENTER" />
-                    </children>
-                    <VBox.margin>
-                        <Insets top="10.0" />
-                    </VBox.margin>
-                </HBox>
-                <HBox prefHeight="100.0" prefWidth="200.0">
-                    <children>
-                        <Label prefHeight="28.0" prefWidth="500.0" styleClass="header-subtitle" text="Administration et Personnel de Ferme" textAlignment="CENTER" />
+                        <VBox spacing="2.0">
+                            <children>
+                                <Label styleClass="header-title" text="Gestion du Personnel" textAlignment="LEFT" />
+                                <Label styleClass="header-subtitle" text="Administration et Personnel de Ferme" textAlignment="LEFT" />
+                            </children>
+                        </VBox>
+                        <Region prefHeight="0.0" prefWidth="0.0" HBox.hgrow="ALWAYS" />
+                        <HBox alignment="CENTER_RIGHT" spacing="15.0">
+                            <padding>
+                                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                            </padding>
+                            <children>
+                                <Button onAction="#handleAddPersonnel" text="➕ Ajouter Personnel">
+                                    <styleClass>
+                                        <String fx:value="btn" />
+                                        <String fx:value="btn-sell" />
+                                    </styleClass>
+                                </Button>
+                                <Button onAction="#refreshData" text="🔄 Actualiser">
+                                    <styleClass>
+                                        <String fx:value="btn" />
+                                        <String fx:value="btn-save" />
+                                    </styleClass>
+                                </Button>
+                            </children>
+                        </HBox>
                     </children>
                 </HBox>
             </children>
         </VBox>
-        <VBox AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="80.0">
+        <VBox AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="60.0">
             <children>
                 <ScrollPane fitToHeight="true" fitToWidth="true" styleClass="main-content" VBox.vgrow="ALWAYS">
                     <content>
@@ -41,82 +61,75 @@
                                 <Insets bottom="20.0" left="30.0" right="30.0" top="20.0" />
                             </padding>
                             <children>
-                                <HBox prefHeight="120.0" spacing="20.0" alignment="CENTER">
+                                <HBox alignment="CENTER" prefHeight="120.0" spacing="20.0">
                                     <children>
-                                        <VBox alignment="CENTER" prefHeight="120.0" spacing="8.0" styleClass="personnel-card" HBox.hgrow="ALWAYS" style="-fx-background-color: white; -fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: #007bff; -fx-border-width: 2;">
+                                        <VBox alignment="CENTER" prefHeight="120.0" spacing="8.0" style="-fx-background-color: white; -fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: #007bff; -fx-border-width: 2;" styleClass="personnel-card" HBox.hgrow="ALWAYS">
                                             <padding><Insets bottom="12.0" left="15.0" right="15.0" top="12.0" /></padding>
                                             <children>
-                                                <HBox alignment="CENTER" spacing="8.0"><children><Label text="Admin" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #007bff;" /></children></HBox>
+                                                <HBox alignment="CENTER" spacing="8.0"><children><Label style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #007bff;" text="Admin" /></children></HBox>
                                                 <Label fx:id="adminStaffCountLabel" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #007bff;" text="0" />
                                                 <Label style="-fx-font-size: 11px; -fx-text-fill: #6c757d;" text="personnel admin" />
                                             </children>
                                         </VBox>
-                                        <VBox alignment="CENTER" prefHeight="120.0" spacing="8.0" styleClass="personnel-card" HBox.hgrow="ALWAYS" style="-fx-background-color: white; -fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: #17a2b8; -fx-border-width: 2;">
+                                        <VBox alignment="CENTER" prefHeight="120.0" spacing="8.0" style="-fx-background-color: white; -fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: #17a2b8; -fx-border-width: 2;" styleClass="personnel-card" HBox.hgrow="ALWAYS">
                                             <padding><Insets bottom="12.0" left="15.0" right="15.0" top="12.0" /></padding>
                                             <children>
-                                                <HBox alignment="CENTER" spacing="8.0"><children><Label text="Veterinaire" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #17a2b8;" /></children></HBox>
+                                                <HBox alignment="CENTER" spacing="8.0"><children><Label style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #17a2b8;" text="Veterinaire" /></children></HBox>
                                                 <Label fx:id="veterinaryCountLabel" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #17a2b8;" text="0/0" />
                                                 <Label style="-fx-font-size: 11px; -fx-text-fill: #6c757d;" text="superviseur/total" />
                                             </children>
                                         </VBox>
-                                        <VBox alignment="CENTER" prefHeight="120.0" spacing="8.0" styleClass="personnel-card" HBox.hgrow="ALWAYS" style="-fx-background-color: white; -fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: #6f42c1; -fx-border-width: 2;">
+                                        <VBox alignment="CENTER" prefHeight="120.0" spacing="8.0" style="-fx-background-color: white; -fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: #6f42c1; -fx-border-width: 2;" styleClass="personnel-card" HBox.hgrow="ALWAYS">
                                             <padding><Insets bottom="12.0" left="15.0" right="15.0" top="12.0" /></padding>
                                             <children>
-                                                <HBox alignment="CENTER" spacing="8.0"><children><Label text="Inventaire" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #6f42c1;" /></children></HBox>
+                                                <HBox alignment="CENTER" spacing="8.0"><children><Label style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #6f42c1;" text="Inventaire" /></children></HBox>
                                                 <Label fx:id="inventoryCountLabel" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #6f42c1;" text="0/0" />
                                                 <Label style="-fx-font-size: 11px; -fx-text-fill: #6c757d;" text="superviseur/total" />
                                             </children>
                                         </VBox>
-                                        <VBox alignment="CENTER" prefHeight="120.0" spacing="8.0" styleClass="personnel-card" HBox.hgrow="ALWAYS" style="-fx-background-color: white; -fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: #fd7e14; -fx-border-width: 2;">
+                                        <VBox alignment="CENTER" prefHeight="120.0" spacing="8.0" style="-fx-background-color: white; -fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: #fd7e14; -fx-border-width: 2;" styleClass="personnel-card" HBox.hgrow="ALWAYS">
                                             <padding><Insets bottom="12.0" left="15.0" right="15.0" top="12.0" /></padding>
                                             <children>
-                                                <HBox alignment="CENTER" spacing="8.0"><children><Label text="Ouvriers" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #fd7e14;" /></children></HBox>
+                                                <HBox alignment="CENTER" spacing="8.0"><children><Label style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #fd7e14;" text="Ouvriers" /></children></HBox>
                                                 <Label fx:id="farmhandCountLabel" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #fd7e14;" text="0/0" />
                                                 <Label style="-fx-font-size: 11px; -fx-text-fill: #6c757d;" text="superviseur/total" />
                                             </children>
                                         </VBox>
                                     </children>
                                 </HBox>
-                                <HBox spacing="15.0" alignment="CENTER_LEFT" prefHeight="50.0">
-                                    <padding><Insets bottom="5.0" left="5.0" right="5.0" top="5.0" /></padding>
-                                    <children>
-                                        <Button text="+ Ajouter Personnel" onAction="#handleAddPersonnel" style="-fx-background-color: #28a745; -fx-text-fill: white; -fx-padding: 10 25; -fx-background-radius: 5; -fx-font-size: 14px; -fx-cursor: hand;" />
-                                        <Button text="Actualiser" onAction="#refreshData" style="-fx-background-color: #17a2b8; -fx-text-fill: white; -fx-padding: 10 20; -fx-background-radius: 5; -fx-font-size: 14px; -fx-cursor: hand;" />
-                                    </children>
-                                </HBox>
                                 <VBox fx:id="administrationSection" spacing="15.0" style="-fx-background-color: #f8f9fa; -fx-background-radius: 10; -fx-padding: 15;">
                                     <children>
-                                        <HBox alignment="CENTER_LEFT" spacing="10.0"><children><Label text="Administration" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #007bff;" /></children></HBox>
+                                        <HBox alignment="CENTER_LEFT" spacing="10.0"><children><Label style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #007bff;" text="Administration" /></children></HBox>
                                         <Separator />
-                                        <FlowPane fx:id="adminCardsPane" hgap="20.0" vgap="20.0" prefWrapLength="900.0" />
+                                        <FlowPane fx:id="adminCardsPane" hgap="20.0" prefWrapLength="900.0" vgap="20.0" />
                                     </children>
                                 </VBox>
                                 <VBox fx:id="farmSection" spacing="20.0">
                                     <children>
                                         <VBox fx:id="veterinarySection" spacing="15.0" style="-fx-background-color: #e8f4f8; -fx-background-radius: 10; -fx-padding: 15;">
                                             <children>
-                                                <HBox alignment="CENTER_LEFT" spacing="10.0"><children><Label text="Equipe Veterinaire" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #17a2b8;" /></children></HBox>
+                                                <HBox alignment="CENTER_LEFT" spacing="10.0"><children><Label style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #17a2b8;" text="Equipe Veterinaire" /></children></HBox>
                                                 <Separator />
-                                                <FlowPane fx:id="veterinaryCardsPane" hgap="20.0" vgap="20.0" prefWrapLength="900.0" />
+                                                <FlowPane fx:id="veterinaryCardsPane" hgap="20.0" prefWrapLength="900.0" vgap="20.0" />
                                             </children>
                                         </VBox>
                                         <VBox fx:id="inventorySection" spacing="15.0" style="-fx-background-color: #f3eefa; -fx-background-radius: 10; -fx-padding: 15;">
                                             <children>
-                                                <HBox alignment="CENTER_LEFT" spacing="10.0"><children><Label text="Equipe Inventaire" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #6f42c1;" /></children></HBox>
+                                                <HBox alignment="CENTER_LEFT" spacing="10.0"><children><Label style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #6f42c1;" text="Equipe Inventaire" /></children></HBox>
                                                 <Separator />
-                                                <FlowPane fx:id="inventoryCardsPane" hgap="20.0" vgap="20.0" prefWrapLength="900.0" />
+                                                <FlowPane fx:id="inventoryCardsPane" hgap="20.0" prefWrapLength="900.0" vgap="20.0" />
                                             </children>
                                         </VBox>
                                         <VBox fx:id="farmhandSection" spacing="15.0" style="-fx-background-color: #fff3e6; -fx-background-radius: 10; -fx-padding: 15;">
                                             <children>
-                                                <HBox alignment="CENTER_LEFT" spacing="10.0"><children><Label text="Equipe Ouvriers Agricoles" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #fd7e14;" /></children></HBox>
+                                                <HBox alignment="CENTER_LEFT" spacing="10.0"><children><Label style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #fd7e14;" text="Equipe Ouvriers Agricoles" /></children></HBox>
                                                 <Separator />
-                                                <FlowPane fx:id="farmhandCardsPane" hgap="20.0" vgap="20.0" prefWrapLength="900.0" />
+                                                <FlowPane fx:id="farmhandCardsPane" hgap="20.0" prefWrapLength="900.0" vgap="20.0" />
                                             </children>
                                         </VBox>
                                     </children>
                                 </VBox>
-                                <GridPane fx:id="personnelGrid" hgap="25.0" vgap="25.0" visible="false" managed="false" />
+                                <GridPane fx:id="personnelGrid" hgap="25.0" managed="false" vgap="25.0" visible="false" />
                             </children>
                         </VBox>
                     </content>

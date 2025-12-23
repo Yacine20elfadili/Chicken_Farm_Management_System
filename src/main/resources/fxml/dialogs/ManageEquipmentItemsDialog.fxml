@@ -1,64 +1,104 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.String?>
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
 
-<VBox xmlns="http://javafx.com/javafx"
-      xmlns:fx="http://javafx.com/fxml"
-      fx:controller="ma.farm.controller.dialogs.ManageEquipmentItemsDialogController"
-      prefHeight="600.0" prefWidth="800.0" spacing="15.0" styleClass="dialog-container">
-    <padding>
-        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
-    </padding>
+<VBox prefHeight="600" prefWidth="800" spacing="15.0" style="-fx-background-color: #f8f9fa;" stylesheets="@../../css/dialogs.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ma.farm.controller.dialogs.ManageEquipmentItemsDialogController">
 
-    <!-- Dialog Title -->
-    <HBox alignment="CENTER_LEFT" spacing="10.0">
-        <Label styleClass="dialog-title" text="Gérer: " />
-        <Label fx:id="categoryNameLabel" styleClass="dialog-title-highlight" text="Catégorie" />
-    </HBox>
+    <!-- ================= HEADER ================= -->
+    <VBox spacing="5">
 
-    <!-- Stats Row -->
-    <HBox spacing="20.0" alignment="CENTER_LEFT" styleClass="stats-container">
-        <VBox alignment="CENTER" spacing="5.0" styleClass="stat-card">
-            <Label styleClass="stat-label" text="Total" />
-            <Label fx:id="itemCountLabel" styleClass="stat-value" text="0" />
-        </VBox>
+        <HBox spacing="8">
+            <Label styleClass="title" text="🛠 Gérer :" />
+            <Label fx:id="categoryNameLabel" style="-fx-text-fill: #0d6efd;" styleClass="title" text="Catégorie" />
+        </HBox>
 
-        <VBox alignment="CENTER" spacing="5.0" styleClass="stat-card stat-good">
-            <Label styleClass="stat-label" text="Bon État" />
-            <Label fx:id="goodCountLabel" styleClass="stat-value" text="0" />
-        </VBox>
-
-        <VBox alignment="CENTER" spacing="5.0" styleClass="stat-card stat-fair">
-            <Label styleClass="stat-label" text="État Moyen" />
-            <Label fx:id="fairCountLabel" styleClass="stat-value" text="0" />
-        </VBox>
-
-        <VBox alignment="CENTER" spacing="5.0" styleClass="stat-card stat-broken">
-            <Label styleClass="stat-label" text="Cassé" />
-            <Label fx:id="brokenCountLabel" styleClass="stat-value" text="0" />
-        </VBox>
-    </HBox>
-
-    <!-- Items List -->
-    <VBox spacing="10.0" VBox.vgrow="ALWAYS">
-        <Label styleClass="section-label" text="Équipements Individuels" />
-        <ListView fx:id="itemsListView" prefHeight="300.0" styleClass="items-list-view" VBox.vgrow="ALWAYS" />
+        <Label styleClass="subtitle" text="Gestion des équipements individuels de la catégorie" />
     </VBox>
 
-    <!-- Action Buttons -->
-    <HBox spacing="10.0">
-        <Button fx:id="addItemButton" onAction="#handleAddItem" styleClass="btn-success" text="➕ Ajouter" HBox.hgrow="ALWAYS" />
-        <Button fx:id="editItemButton" onAction="#handleEditItem" styleClass="btn-primary" text="✏️ Modifier" HBox.hgrow="ALWAYS" />
-        <Button fx:id="deleteItemButton" onAction="#handleDeleteItem" styleClass="btn-danger" text="✖ Supprimer" HBox.hgrow="ALWAYS" />
+    <Separator />
+
+    <!-- ================= STATS ================= -->
+    <HBox spacing="15" VBox.vgrow="ALWAYS">
+
+        <!-- Total -->
+        <VBox alignment="CENTER" spacing="5" style="-fx-background-color: white;" styleClass="result-card" HBox.hgrow="ALWAYS">
+            <Label style="-fx-text-fill: #6c757d;" styleClass="result-title" text="Total" />
+            <Label fx:id="itemCountLabel" style="-fx-font-size: 22; -fx-font-weight: bold;" text="0" />
+        </VBox>
+
+        <!-- Good -->
+        <VBox alignment="CENTER" spacing="5" style="-fx-background-color: #e6f4ea; -fx-border-color: #b7e1c1;" styleClass="result-card" HBox.hgrow="ALWAYS">
+            <Label style="-fx-text-fill: #198754;" styleClass="result-title" text="Bon État" />
+            <Label fx:id="goodCountLabel" style="-fx-font-size: 22; -fx-font-weight: bold; -fx-text-fill: #198754;" text="0" />
+        </VBox>
+
+        <!-- Fair -->
+        <VBox alignment="CENTER" spacing="5" style="-fx-background-color: #fff3cd; -fx-border-color: #ffe69c;" HBox.hgrow="ALWAYS">
+            <Label style="-fx-text-fill: #b58105;" styleClass="result-title" text="État Moyen" />
+            <Label fx:id="fairCountLabel" style="-fx-font-size: 22; -fx-font-weight: bold; -fx-text-fill: #b58105;" text="0" />
+         <styleClass>
+            <String fx:value="result-card" />
+            <String fx:value="female" />
+         </styleClass>
+        </VBox>
+
+        <!-- Broken -->
+        <VBox alignment="CENTER" spacing="5" style="-fx-background-color: #f8d7da; -fx-border-color: #f1aeb5;" styleClass="result-card" HBox.hgrow="ALWAYS">
+            <Label style="-fx-text-fill: #dc3545;" styleClass="result-title" text="Cassé" />
+            <Label fx:id="brokenCountLabel" style="-fx-font-size: 22; -fx-font-weight: bold; -fx-text-fill: #dc3545;" text="0" />
+        </VBox>
     </HBox>
 
-    <!-- Close Button -->
-    <HBox alignment="CENTER_RIGHT" spacing="10.0">
-        <VBox.margin>
-            <Insets top="10.0" />
-        </VBox.margin>
-        <Button onAction="#handleClose" styleClass="btn-secondary" text="Fermer" />
+    <!-- ================= LIST ================= -->
+    <VBox spacing="10.0" VBox.vgrow="ALWAYS">
+
+        <Label styleClass="section-title" text="Équipements Individuels" />
+
+        <ListView fx:id="itemsListView" VBox.vgrow="ALWAYS" />
+    </VBox>
+
+    <Separator />
+
+    <!-- ================= ACTION BUTTONS ================= -->
+    <HBox spacing="15.0">
+
+        <Button fx:id="addItemButton" onAction="#handleAddItem" text="➕ Ajouter" HBox.hgrow="ALWAYS">
+         <styleClass>
+            <String fx:value="btn" />
+            <String fx:value="btn-save" />
+         </styleClass></Button>
+
+        <Button fx:id="editItemButton" onAction="#handleEditItem" text="✏ Modifier" HBox.hgrow="ALWAYS">
+         <styleClass>
+            <String fx:value="btn" />
+            <String fx:value="btn-sell" />
+         </styleClass></Button>
+
+        <Button fx:id="deleteItemButton" onAction="#handleDeleteItem" text="✖ Supprimer" HBox.hgrow="ALWAYS">
+         <styleClass>
+            <String fx:value="btn" />
+            <String fx:value="btn-death" />
+         </styleClass></Button>
     </HBox>
+
+    <!-- ================= CLOSE ================= -->
+    <HBox alignment="CENTER_RIGHT">
+
+        <Button onAction="#handleClose" text="Fermer">
+         <styleClass>
+            <String fx:value="btn" />
+            <String fx:value="btn-cancel" />
+         </styleClass></Button>
+    </HBox>
+   <padding>
+      <Insets bottom="20.0" left="25.0" right="25.0" top="20.0" />
+   </padding>
+
 </VBox>

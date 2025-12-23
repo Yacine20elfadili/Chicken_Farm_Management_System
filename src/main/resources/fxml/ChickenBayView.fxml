@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.String?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
@@ -12,23 +13,44 @@
 
 <AnchorPane prefHeight="700.0" prefWidth="1000.0" styleClass="main-content" stylesheets="@../css/style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ma.farm.controller.ChickenBayController">
     <children>
-        <VBox prefWidth="1000.0" styleClass="header" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <VBox styleClass="header" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <padding>
+                <Insets bottom="15.0" left="30.0" right="30.0" top="15.0" />
+            </padding>
             <children>
                 <HBox alignment="CENTER_LEFT" spacing="10.0">
-                    <VBox.margin><Insets right="20.0" top="10.0" /></VBox.margin>
                     <children>
-                        <Label styleClass="header-title" text="Chicken Bay" />
+                        <VBox spacing="2.0">
+                            <children>
+                                <Label styleClass="header-title" text="Chicken Bay" textAlignment="LEFT" />
+                                <Label styleClass="header-subtitle" text="Manage chicken houses and lifecycle" textAlignment="LEFT" />
+                            </children>
+                        </VBox>
                         <Region HBox.hgrow="ALWAYS" />
-                        <Button fx:id="configHousesButton" onAction="#handleConfigHouses" style="-fx-background-color: #007bff; -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold; -fx-cursor: hand; -fx-padding: 8 15; -fx-background-radius: 5;" text="Config Houses" />
-                        <Button onAction="#handleRecordDeath" style="-fx-background-color: #dc3545; -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold; -fx-cursor: hand; -fx-padding: 8 15; -fx-background-radius: 5;" text="Record Death" />
+                        <HBox alignment="CENTER_RIGHT" spacing="15.0">
+                            <padding>
+                                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                            </padding>
+                            <children>
+                                <Button fx:id="configHousesButton" onAction="#handleConfigHouses" text="Config Houses">
+                                    <styleClass>
+                                        <String fx:value="btn" />
+                                        <String fx:value="btn-save" />
+                                    </styleClass>
+                                </Button>
+                                <Button onAction="#handleRecordDeath" text="Record Death">
+                                    <styleClass>
+                                        <String fx:value="btn" />
+                                        <String fx:value="btn-death" />
+                                    </styleClass>
+                                </Button>
+                            </children>
+                        </HBox>
                     </children>
-                </HBox>
-                <HBox><VBox.margin><Insets /></VBox.margin>
-                    <children><Label styleClass="header-subtitle" text="Manage chicken houses and lifecycle" /></children>
                 </HBox>
             </children>
         </VBox>
-        <VBox AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="80.0">
+        <VBox AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="60.0">
             <children>
                 <ScrollPane fitToWidth="true" styleClass="main-content" VBox.vgrow="ALWAYS">
                     <content>
@@ -49,7 +71,11 @@
                                 <VBox fx:id="dayOldSection" spacing="10.0">
                                     <children>
                                         <HBox alignment="CENTER_LEFT" spacing="10.0" style="-fx-background-color: #e3f2fd; -fx-padding: 10; -fx-background-radius: 5;">
-                                            <children><Label style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #1565c0;" text="DayOld-House(s)" /><Region HBox.hgrow="ALWAYS" /><Button fx:id="importButton" onAction="#handleImport" style="-fx-background-color: #4caf50; -fx-text-fill: white; -fx-cursor: hand;" text="Import" /></children>
+                                            <children><Label style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #1565c0;" text="🐣 DayOld-House(s)" /><Region HBox.hgrow="ALWAYS" /><Button fx:id="importButton" onAction="#handleImport" text="📥 Import">
+                                                <styleClass>
+                                                    <String fx:value="btn" />
+                                                    <String fx:value="btn-sell" />
+                                                </styleClass></Button></children>
                                         </HBox>
                                         <FlowPane fx:id="dayOldCardsContainer" hgap="15.0" vgap="15.0" />
                                         <Label fx:id="dayOldEmptyLabel" style="-fx-text-fill: #999; -fx-font-style: italic;" text="No houses configured" visible="false" />
@@ -58,7 +84,7 @@
                                 <VBox fx:id="eggLayerSection" spacing="10.0">
                                     <children>
                                         <HBox alignment="CENTER_LEFT" style="-fx-background-color: #fce4ec; -fx-padding: 10; -fx-background-radius: 5;">
-                                            <children><Label style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #c2185b;" text="FemaleEggLayer-House(s)" /></children>
+                                            <children><Label style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #c2185b;" text="🥚 FemaleEggLayer-House(s)" /></children>
                                         </HBox>
                                         <FlowPane fx:id="eggLayerCardsContainer" hgap="15.0" vgap="15.0" />
                                         <Label fx:id="eggLayerEmptyLabel" style="-fx-text-fill: #999; -fx-font-style: italic;" text="No houses configured" visible="false" />
@@ -67,7 +93,7 @@
                                 <VBox fx:id="femaleMeatSection" spacing="10.0">
                                     <children>
                                         <HBox alignment="CENTER_LEFT" style="-fx-background-color: #f3e5f5; -fx-padding: 10; -fx-background-radius: 5;">
-                                            <children><Label style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #7b1fa2;" text="FemaleMeat-House(s)" /></children>
+                                            <children><Label style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #7b1fa2;" text="🐓 FemaleMeat-House(s)" /></children>
                                         </HBox>
                                         <FlowPane fx:id="femaleMeatCardsContainer" hgap="15.0" vgap="15.0" />
                                         <Label fx:id="femaleMeatEmptyLabel" style="-fx-text-fill: #999; -fx-font-style: italic;" text="No houses configured" visible="false" />
@@ -76,7 +102,7 @@
                                 <VBox fx:id="maleMeatSection" spacing="10.0">
                                     <children>
                                         <HBox alignment="CENTER_LEFT" style="-fx-background-color: #fff3e0; -fx-padding: 10; -fx-background-radius: 5;">
-                                            <children><Label style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #e65100;" text="MaleMeat-House(s)" /></children>
+                                            <children><Label style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #e65100;" text="🐔 MaleMeat-House(s)" /></children>
                                         </HBox>
                                         <FlowPane fx:id="maleMeatCardsContainer" hgap="15.0" vgap="15.0" />
                                         <Label fx:id="maleMeatEmptyLabel" style="-fx-text-fill: #999; -fx-font-style: italic;" text="No houses configured" visible="false" />
