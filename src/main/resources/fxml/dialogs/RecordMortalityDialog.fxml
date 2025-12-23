@@ -32,7 +32,7 @@
         <content>
             <VBox spacing="20.0" styleClass="scroll-content">
                 <!-- Left Column - Primary Info -->
-                <VBox spacing="15.0" styleClass="optional-fields">
+                <VBox spacing="15.0" style="-fx-background-color: transparent;" styleClass="optional-fields">
                     <Label styleClass="section-title" text="📋 Primary Information" />
 
                     <!-- House Selection -->
@@ -61,7 +61,7 @@
                 </VBox>
 
                 <!-- Center Column - Details -->
-                <VBox spacing="15.0" styleClass="optional-fields">
+                <VBox spacing="15.0" style="-fx-background-color: transparent;" styleClass="optional-fields">
                     <Label styleClass="section-title" text="📝 Additional Details" />
 
                     <!-- Symptoms -->
@@ -83,7 +83,7 @@
                 </VBox>
 
                 <!-- Right Column - Notes & Warning -->
-                <VBox spacing="15.0" styleClass="optional-fields">
+                <VBox spacing="15.0" style="-fx-background-color: transparent;" styleClass="optional-fields">
                     <Label styleClass="section-title" text="💬 Notes" />
 
                     <!-- Notes -->
