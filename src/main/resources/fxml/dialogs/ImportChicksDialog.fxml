@@ -3,6 +3,7 @@
 <?import java.lang.String?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.TextField?>
@@ -38,28 +39,27 @@
         <!-- Quantity -->
         <VBox spacing="8.0">
             <Label styleClass="section-title" text="Total Quantity to Import *" />
-            <TextField fx:id="quantityField" promptText="Enter number of chicks (3,000 - 20,000)..." styleClass="text-field" />
+            <TextField fx:id="quantityField" promptText="Ex: 10000" styleClass="text-field" />
             <Label fx:id="quantityErrorLabel" styleClass="error-label" text="" visible="false" />
         </VBox>
 
         <Separator styleClass="separator" />
 
-        <!-- Optional Fields Section -->
+        <!-- Transaction Details Section -->
         <VBox spacing="12.0" styleClass="optional-fields">
-            <Label styleClass="section-subtitle" text="📋 Optional Fields (for record keeping)" />
+            <Label styleClass="section-subtitle" text="📋 Transaction Details" />
 
             <!-- Supplier Name -->
             <VBox spacing="5.0">
-                <Label styleClass="label-small" text="Supplier Name (optional)" />
-                <TextField fx:id="supplierField" promptText="Enter supplier name..." styleClass="text-field" />
-                <Label styleClass="hint" text="💡 Will be linked to Suppliers page in future update" />
+                <Label styleClass="label-small" text="Supplier Name *" />
+                <ComboBox fx:id="supplierCombo" promptText="Select Supplier..." prefWidth="250.0" />
             </VBox>
 
             <!-- Price per Chick -->
             <VBox spacing="5.0">
-                <Label styleClass="label-small" text="Price per Chick (optional)" />
+                <Label styleClass="label-small" text="Price per Chick *" />
                 <HBox alignment="CENTER_LEFT" spacing="8.0">
-                    <TextField fx:id="priceField" prefWidth="180" promptText="Price..." styleClass="text-field" />
+                    <TextField fx:id="priceField" prefWidth="180" promptText="Ex: 5.50" styleClass="text-field" />
                     <Label styleClass="label-small-bold" text="MAD" />
                 </HBox>
             </VBox>

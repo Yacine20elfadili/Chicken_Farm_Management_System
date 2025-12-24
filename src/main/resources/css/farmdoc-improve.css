@@ -1,0 +1,35 @@
+/* Farm Document View Improvements */
+
+/* General input field improvements for document page */
+.farmdoc-text-field, .farmdoc-text-area, .farmdoc-combo-box {
+    -fx-pref-height: 40px;
+    -fx-background-color: #f9fafb;
+    -fx-background-radius: 8px;
+    -fx-border-radius: 8px;
+    -fx-border-color: #d1d5db;
+    -fx-border-width: 1.5px;
+    -fx-padding: 0 12;
+    -fx-font-size: 14px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.04), 3, 0, 0, 1);
+    -fx-transition: border-color 0.2s;
+}
+.farmdoc-text-field:focused, .farmdoc-text-area:focused, .farmdoc-combo-box:focused {
+    -fx-border-color: #3498db;
+    -fx-effect: dropshadow(gaussian, rgba(52,152,219,0.12), 8, 0, 0, 2);
+}
+.farmdoc-label {
+    -fx-text-fill: #374151;
+    -fx-font-size: 13px;
+    -fx-font-weight: 600;
+    -fx-font-family: 'Segoe UI', Arial, sans-serif;
+}
+.farmdoc-section {
+    -fx-background-color: #fff;
+    -fx-background-radius: 12px;
+    -fx-padding: 18px 18px 12px 18px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.03), 6, 0, 0, 1);
+    -fx-border-color: #e5e7eb;
+    -fx-border-width: 1px;
+    -fx-border-radius: 12px;
+    -fx-spacing: 12px;
+}

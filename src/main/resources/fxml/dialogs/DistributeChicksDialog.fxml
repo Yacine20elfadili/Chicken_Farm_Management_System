@@ -43,12 +43,12 @@
                     <HBox spacing="20.0">
                         <VBox spacing="6.0" HBox.hgrow="ALWAYS">
                             <Label styleClass="section-subtitle" text="Female Count" />
-                            <TextField fx:id="femaleCountField" promptText="Number of females..." />
+                            <TextField fx:id="femaleCountField" promptText="Ex: 5000" />
                         </VBox>
 
                         <VBox spacing="6.0" HBox.hgrow="ALWAYS">
                             <Label styleClass="section-subtitle" text="Male Count" />
-                            <TextField fx:id="maleCountField" promptText="Number of males..." />
+                            <TextField fx:id="maleCountField" promptText="Ex: 200" />
                         </VBox>
 
                         <VBox spacing="6.0" HBox.hgrow="ALWAYS">

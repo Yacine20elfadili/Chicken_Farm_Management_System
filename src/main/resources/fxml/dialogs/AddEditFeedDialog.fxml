@@ -35,7 +35,7 @@
                 <!-- Name -->
                 <VBox spacing="5">
                     <Label styleClass="section-title" text="Nom de l'Aliment *" />
-                    <TextField fx:id="nameField" promptText="Ex: Aliment Couche" />
+                    <TextField fx:id="nameField" promptText="Ex: Aliment Démarrage" />
                     <Label fx:id="nameErrorLabel" styleClass="error-label" />
                 </VBox>
 
@@ -49,21 +49,21 @@
                 <!-- Quantity -->
                 <VBox spacing="5">
                     <Label styleClass="section-title" text="Quantité (kg) *" />
-                    <TextField fx:id="quantityField" promptText="Ex: 500" />
+                    <TextField fx:id="quantityField" promptText="Ex: 1000" />
                     <Label fx:id="quantityErrorLabel" styleClass="error-label" />
                 </VBox>
 
                 <!-- Price -->
                 <VBox spacing="5">
                     <Label styleClass="section-title" text="Prix par kg (DH) *" />
-                    <TextField fx:id="pricePerKgField" promptText="Ex: 18.50" />
+                    <TextField fx:id="pricePerKgField" promptText="Ex: 4.50" />
                     <Label fx:id="priceErrorLabel" styleClass="error-label" />
                 </VBox>
 
                 <!-- Supplier -->
                 <VBox spacing="5">
                     <Label styleClass="section-title" text="Fournisseur" />
-                    <TextField fx:id="supplierField" promptText="Nom du fournisseur" />
+                    <ComboBox fx:id="supplierCombo" promptText="Sélectionner un fournisseur" prefWidth="250.0" />
                 </VBox>
 
                 <!-- Expiry Date -->
@@ -75,7 +75,7 @@
                 <!-- Min Stock -->
                 <VBox spacing="5">
                     <Label styleClass="section-title" text="Stock Minimum (kg)" />
-                    <TextField fx:id="minStockField" promptText="Ex: 100" />
+                    <TextField fx:id="minStockField" promptText="Ex: 200" />
                     <Label fx:id="minStockErrorLabel" styleClass="error-label" />
                 </VBox>
 

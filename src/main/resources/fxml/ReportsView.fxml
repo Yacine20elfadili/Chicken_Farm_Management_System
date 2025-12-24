@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.String?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.chart.BarChart?>
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.chart.PieChart?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane prefHeight="700.0" styleClass="main-content" stylesheets="@../css/style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ma.farm.controller.ReportsController">
+
+    <!-- Header Section -->
+    <top>
+        <VBox spacing="20" styleClass="header-section">
+            <padding><Insets bottom="20" left="20" right="20" top="20" /></padding>
+            <Label fx:id="reportTitleLabel" styleClass="page-title" text="Rapports &amp; Analyses" />
+
+            <HBox alignment="CENTER_LEFT" spacing="15" styleClass="filter-bar">
+                <ComboBox fx:id="reportTypeCombo" prefWidth="200" promptText="Type de Rapport" stylesheets="@../css/dialogs.css" HBox.hgrow="ALWAYS" />
+            <Separator orientation="VERTICAL" />
+                <DatePicker fx:id="startDatePicker" minWidth="200.0" promptText="Date Début" stylesheets="@../css/dialogs.css" HBox.hgrow="ALWAYS" />
+                <Label text="à" />
+                <DatePicker fx:id="endDatePicker" minWidth="200.0" promptText="Date Fin" stylesheets="@../css/dialogs.css" HBox.hgrow="ALWAYS" />
+                <Button fx:id="generateBtn" text="Générer Analysis">
+               <styleClass>
+                  <String fx:value="btn" />
+                  <String fx:value="btn-save" />
+               </styleClass></Button>
+                <Region prefHeight="0.0" prefWidth="0.0" HBox.hgrow="ALWAYS" />
+                <Button fx:id="exportPdfBtn" text="Exporter PDF">
+               <styleClass>
+                  <String fx:value="btn" />
+                  <String fx:value="btn-cancel" />
+               </styleClass></Button>
+            </HBox>
+        </VBox>
+    </top>
+
+    <!-- Main Content -->
+    <center>
+      <ScrollPane styleClass="form-scroll">
+         <content>
+              <TabPane prefHeight="1007.0" prefWidth="1105.0" tabClosingPolicy="UNAVAILABLE">
+                  <!-- Dashboard Tab -->
+                  <Tab text="Tableau de Bord">
+                      <SplitPane dividerPositions="0.6" orientation="VERTICAL" style="-fx-background-color: transparent;">
+                          <!-- Upper Chart Section -->
+                          <HBox spacing="20" style="-fx-padding: 10;">
+                              <VBox styleClass="metric-card" HBox.hgrow="ALWAYS">
+                                  <Label styleClass="card-title" text="Tendances" />
+                                  <BarChart fx:id="trendChart" VBox.vgrow="ALWAYS">
+                                      <xAxis>
+                                 <CategoryAxis label="Période" />
+                              </xAxis>
+                                      <yAxis>
+                                 <NumberAxis label="Valeur" />
+                              </yAxis>
+                                  </BarChart>
+                              </VBox>
+                              <VBox styleClass="metric-card" HBox.hgrow="ALWAYS">
+                                  <Label styleClass="card-title" text="Répartition" />
+                                  <PieChart fx:id="distributionChart" VBox.vgrow="ALWAYS" />
+                              </VBox>
+                          </HBox>
+      
+                          <!-- Lower Data Table Section -->
+                          <VBox styleClass="metric-card">
+                              <Label styleClass="card-title" text="Détails Chiffrés" />
+                              <TableView fx:id="reportDataTable" VBox.vgrow="ALWAYS">
+                                  <columns>
+                                      <TableColumn fx:id="colMetric" prefWidth="250" text="Métrique" />
+                                      <TableColumn fx:id="colValue" prefWidth="150" text="Valeur" />
+                                      <TableColumn fx:id="colUnit" prefWidth="100" text="Unité" />
+                                      <TableColumn fx:id="colChange" prefWidth="100" text="Var." />
+                                  </columns>
+                              </TableView>
+                          </VBox>
+                      </SplitPane>
+                  </Tab>
+      
+                  <!-- History Tab -->
+                  <Tab text="Historique des Rapports">
+                      <VBox styleClass="metric-card">
+                          <TableView fx:id="historyTable" VBox.vgrow="ALWAYS">
+                              <columns>
+                                  <TableColumn fx:id="colHistId" prefWidth="50" text="#" />
+                                  <TableColumn fx:id="colHistTitle" prefWidth="200" text="Titre" />
+                                  <TableColumn fx:id="colHistType" prefWidth="100" text="Type" />
+                                  <TableColumn fx:id="colHistPeriod" prefWidth="200" text="Période" />
+                                  <TableColumn fx:id="colHistDate" prefWidth="150" text="Généré le" />
+                              </columns>
+                          </TableView>
+                      </VBox>
+                  </Tab>
+               <padding>
+                  <Insets bottom="20.0" left="20.0" right="20.0" />
+               </padding>
+              </TabPane>
+         </content>
+      </ScrollPane>
+    </center>
+</BorderPane>

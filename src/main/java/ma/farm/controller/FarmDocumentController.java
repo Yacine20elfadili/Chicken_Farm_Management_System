@@ -28,7 +28,7 @@ import javafx.util.StringConverter;
  * - Editable fields: Document-specific data (items, dates, notes)
  * 
  * PDFs are saved to:
- * C:\Users\elfad\Desktop\Chicken_Farm_Management_System\Documents\
+ * [User Home]/Chicken_Farm_Management_System/Documents/
  */
 public class FarmDocumentController {
 

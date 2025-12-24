@@ -41,14 +41,14 @@
                         <VBox spacing="35.0" styleClass="main-content">
                             <children>
                                 <!-- TOP HALF: Three Cards in a Row -->
-                                <HBox prefHeight="150.0" spacing="40.0" VBox.vgrow="NEVER">
+                                <HBox spacing="40.0" VBox.vgrow="NEVER">
                                     <children>
                                         <!-- Card 1: Total Chickens -->
                                         <VBox prefHeight="150.0" styleClass="metric-card" HBox.hgrow="ALWAYS">
                                             <children>
                                                 <HBox alignment="CENTER_LEFT" VBox.vgrow="ALWAYS">
                                                     <children>
-                                                        <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                                                        <VBox alignment="CENTER_LEFT" spacing="5.0" HBox.hgrow="ALWAYS">
                                                             <children>
                                                                 <Label styleClass="label-cards" text="Effectif total" />
                                                                 <Label fx:id="totalChickensLabel" styleClass="label-cards-stats" text="0" />
@@ -73,7 +73,7 @@
                                             <children>
                                                 <HBox alignment="CENTER_LEFT" VBox.vgrow="ALWAYS">
                                                     <children>
-                                                        <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                                                        <VBox alignment="CENTER_LEFT" spacing="5.0" HBox.hgrow="ALWAYS">
                                                             <children>
                                                                 <Label styleClass="label-cards" text="Œufs du jour" />
                                                                 <Label fx:id="eggsTodayLabel" styleClass="label-cards-stats" text="0" />
@@ -93,21 +93,22 @@
                                             </children>
                                         </VBox>
 
-                                        <!-- Card 3: Alerts -->
+                                        <!-- Card 3: Finances -->
                                         <VBox prefHeight="150.0" styleClass="metric-card" HBox.hgrow="ALWAYS">
                                             <children>
                                                 <HBox alignment="CENTER_LEFT" VBox.vgrow="ALWAYS">
                                                     <children>
-                                                        <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                                                        <VBox alignment="CENTER_LEFT" spacing="5.0" HBox.hgrow="ALWAYS">
                                                             <children>
-                                                                <Label styleClass="label-cards" text="Alertes en cours" />
-                                                                <Label fx:id="alertsCountLabel" styleClass="label-cards-stats" text="0" />
+                                                                <Label styleClass="label-cards" text="Finances (Global)" />
+                                                                <Label fx:id="totalIncomeLabel" style="-fx-text-fill: #27ae60;" styleClass="label-cards" text="Rec: 0 DH" />
+                                                                <Label fx:id="totalExpenseLabel" style="-fx-text-fill: #c0392b;" styleClass="label-cards" text="Dép: 0 DH" />
                                                             </children>
                                                         </VBox>
                                                         <Region HBox.hgrow="ALWAYS" />
                                                         <ImageView fitHeight="60.0" fitWidth="60.0" pickOnBounds="true" preserveRatio="true" styleClass="card-icon">
                                                             <image>
-                                                                <Image url="@../images/icons/alerts.png" />
+                                                                <Image url="@../images/icons/trackers.png" />
                                                             </image>
                                                         </ImageView>
                                                     </children>

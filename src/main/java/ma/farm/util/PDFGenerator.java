@@ -39,7 +39,8 @@ import java.time.format.DateTimeFormatter;
 public class PDFGenerator {
 
     // Directory to save all generated PDFs
-    public static final String DOCUMENTS_DIR = "C:\\Users\\elfad\\Desktop\\Chicken_Farm_Management_System\\Documents\\";
+    public static final String DOCUMENTS_DIR = System.getProperty("user.dir") + File.separator + "Documents"
+            + File.separator;
 
     // Colors
     private static final DeviceRgb HEADER_BG = new DeviceRgb(52, 73, 94); // Dark blue-gray
