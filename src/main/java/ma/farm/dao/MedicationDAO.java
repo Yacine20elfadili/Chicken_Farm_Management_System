@@ -8,7 +8,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-import ma.farm.model.Feed;
 import ma.farm.model.Medication;
 
 /**

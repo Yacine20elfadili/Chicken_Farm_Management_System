@@ -37,8 +37,9 @@ public class User {
     private String bankName;
 
     // Contact
-    private String phoneNumber; // +212 format
+    private String phone; // +212 format
     private String website; // Optional
+    private String logo; // Base64 encoded logo image
 
     // Timestamps
     private LocalDateTime creationDate;
@@ -54,7 +55,7 @@ public class User {
     public User(String email, String password, String companyName, String legalForm, int capitalSocial,
             String ice, String rc, String fiscalId, int patente, String cnss, String onssa,
             String address, String city, String postalCode,
-            String bankRIB, String bankName, String phoneNumber, String website) {
+            String bankRIB, String bankName, String phone, String website, String logo) {
         this.email = email;
         this.password = password;
         this.companyName = companyName;
@@ -71,8 +72,9 @@ public class User {
         this.postalCode = postalCode;
         this.bankRIB = bankRIB;
         this.bankName = bankName;
-        this.phoneNumber = phoneNumber;
+        this.phone = phone;
         this.website = website;
+        this.logo = logo;
         this.creationDate = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
     }
@@ -83,7 +85,7 @@ public class User {
     public User(int id, String email, String password, String companyName, String legalForm, int capitalSocial,
             String ice, String rc, String fiscalId, int patente, String cnss, String onssa,
             String address, String city, String postalCode,
-            String bankRIB, String bankName, String phoneNumber, String website,
+            String bankRIB, String bankName, String phone, String website, String logo,
             LocalDateTime creationDate, LocalDateTime updatedAt) {
         this.id = id;
         this.email = email;
@@ -102,8 +104,9 @@ public class User {
         this.postalCode = postalCode;
         this.bankRIB = bankRIB;
         this.bankName = bankName;
-        this.phoneNumber = phoneNumber;
+        this.phone = phone;
         this.website = website;
+        this.logo = logo;
         this.creationDate = creationDate;
         this.updatedAt = updatedAt;
     }
@@ -245,12 +248,12 @@ public class User {
         this.bankName = bankName;
     }
 
-    public String getPhoneNumber() {
-        return phoneNumber;
+    public String getPhone() {
+        return phone;
     }
 
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 
     public String getWebsite() {
@@ -259,6 +262,14 @@ public class User {
 
     public void setWebsite(String website) {
         this.website = website;
+    }
+
+    public String getLogo() {
+        return logo;
+    }
+
+    public void setLogo(String logo) {
+        this.logo = logo;
     }
 
     public LocalDateTime getCreationDate() {

@@ -1,21 +1,60 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <link rel="stylesheet" href="identity-card.css" />
   <title>Identity Card</title>
 </head>
+
 <body>
   <div class="card">
-    <div class="qr-area">
-      <div class="qr"><img src="{{barcodeDataImg}}" alt="qr"/></div>
+    <!-- Header with Farm Branding -->
+    <div class="header">
+      <div class="brand">CHICKEN FARM</div>
+      <div class="sub-brand">MANAGEMENT SYSTEM</div>
     </div>
 
-    <div class="identity">
-      <div class="name">{{name}}</div>
-      <div class="role">{{role}}</div>
+    <!-- Main Content Area -->
+    <div class="content">
+      <!-- QR / Photo Section -->
+      <div class="qr-container">
+        <img src="{{barcodeDataImg}}" class="qr-code" alt="QR Code" />
+      </div>
+
+      <!-- Personnel Details -->
+      <div class="person-info">
+        <div class="name">{{name}}</div>
+        <div class="role">{{role}}</div>
+
+        <table class="details-table">
+          <tr>
+            <td class="label">ID</td>
+            <td class="value">{{id}}</td>
+          </tr>
+          <tr>
+            <td class="label">DEPT</td>
+            <td class="value">{{department}}</td>
+          </tr>
+          <tr>
+            <td class="label">PHONE</td>
+            <td class="value">{{phone}}</td>
+          </tr>
+          <tr>
+            <td class="label">EMAIL</td>
+            <td class="value">{{email}}</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+      <div class="footer-text">AUTHORIZED PERSONNEL</div>
+      <div class="validity">VALID FOR 2025</div>
     </div>
   </div>
 </body>
+
 </html>
