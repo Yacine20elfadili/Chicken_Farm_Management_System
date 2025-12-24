@@ -37,8 +37,9 @@ public class UserDAOTest {
                 "CIH",
                 "0612345678",
                 "www.test.ma",
-                null,
-                null
+                null, // logo
+                (java.time.LocalDateTime) null, // creationDate
+                (java.time.LocalDateTime) null // updatedAt
         );
     }
 

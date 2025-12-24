@@ -163,3 +163,174 @@ lib/
 # Don't ignore schema.sql (we need this!)
 # ============================================
 !src/main/resources/database/schema.sql
+
+# ============================================
+# Chicken Farm Management System - .gitignore
+# ============================================
+
+# ============================================
+# Maven
+# ============================================
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.propertiesnormally
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+
+# ============================================
+# IntelliJ IDEA
+# ============================================
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+.idea_modules/
+atlassian-ide-plugin.xml
+
+# ============================================
+# Eclipse
+# ============================================
+.classpath
+.project
+.settings/
+bin/
+.metadata
+.recommenders
+*.launch
+
+# ============================================
+# VS Code
+# ============================================
+.vscode/
+*.code-workspace
+
+# ============================================
+# NetBeans
+# ============================================
+nbproject/private/
+nbbuild/
+dist/
+nbdist/
+.nb-gradle/
+build/
+
+# ============================================
+# Java
+# ============================================
+*.class
+*.log
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+hs_err_pid*
+replay_pid*
+
+# ============================================
+# SQLite Database (IMPORTANT!)
+# ============================================
+database/farm.db
+database/*.db
+database/*.db-journal
+database/*.db-shm
+database/*.db-wal
+*.sqlite
+*.sqlite3
+*.db
+
+# ============================================
+# Operating System
+# ============================================
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+
+# Linux
+*~
+.directory
+.Trash-*
+
+# ============================================
+# Temporary Files
+# ============================================
+*.tmp
+*.temp
+*.swp
+*.swo
+*~.nib
+*.bak
+*.orig
+src/main/resources/qrcodes/*
+
+# ============================================
+# Logs
+# ============================================
+logs/
+*.log
+*.log.*
+
+# ============================================
+# JavaFX (if using Scene Builder)
+# ============================================
+*.fxbuild
+
+# ============================================
+# Package Files
+# ============================================
+*.7z
+*.dmg
+*.gz
+*.iso
+*.tar
+*.zip
+
+# ============================================
+# Test Coverage Reports
+# ============================================
+.coverage
+*.cover
+coverage/
+htmlcov/
+
+# ============================================
+# Build and Distribution
+# ============================================
+build/
+dist/
+lib/
+
+# ============================================
+# Don't ignore schema.sql (we need this!)
+# ============================================
+!src/main/resources/database/schema.sql
+
+# ============================================
+# Project Documents (UML, docs, etc.)
+# ============================================
+Documents/

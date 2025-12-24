@@ -15,11 +15,28 @@ public class MortalityDAOTest {
 
     private static MortalityDAO mortalityDAO;
     private static int mortalityId;
-    private static final int HOUSE_ID = 1;
+    private static int HOUSE_ID;
 
     @BeforeAll
     static void setup() {
         mortalityDAO = new MortalityDAO();
+
+        // Create a test house to satisfy FK constraint
+        try (var stmt = DatabaseConnection.getInstance()
+                .getConnection()
+                .createStatement()) {
+            stmt.executeUpdate("""
+                        INSERT INTO houses (name, type, chickenCount, capacity, healthStatus, creationDate)
+                        VALUES ('TEST-HOUSE-MORTALITY', 'Broiler', 100, 1000, 'Good', DATE('now'))
+                    """);
+            var rs = stmt.executeQuery("SELECT last_insert_rowid()");
+            if (rs.next()) {
+                HOUSE_ID = rs.getInt(1);
+            }
+        } catch (Exception e) {
+            // House might already exist, try to get existing house
+            HOUSE_ID = 1;
+        }
     }
 
     @Test
@@ -51,8 +68,7 @@ public class MortalityDAOTest {
     @Test
     @Order(3)
     void testGetMortalityByDate() {
-        List<Mortality> records =
-                mortalityDAO.getMortalityByDate(LocalDate.now());
+        List<Mortality> records = mortalityDAO.getMortalityByDate(LocalDate.now());
 
         assertFalse(records.isEmpty());
     }
@@ -81,8 +97,7 @@ public class MortalityDAOTest {
     @Test
     @Order(7)
     void testGetMortalityByHouse() {
-        List<Mortality> records =
-                mortalityDAO.getMortalityByHouse(HOUSE_ID);
+        List<Mortality> records = mortalityDAO.getMortalityByHouse(HOUSE_ID);
 
         assertNotNull(records);
         assertFalse(records.isEmpty());
@@ -91,12 +106,10 @@ public class MortalityDAOTest {
     @Test
     @Order(8)
     void testGetMortalityByHouseWithDateRange() {
-        List<Mortality> records =
-                mortalityDAO.getMortalityByHouse(
-                        HOUSE_ID,
-                        LocalDate.now().minusDays(7),
-                        LocalDate.now()
-                );
+        List<Mortality> records = mortalityDAO.getMortalityByHouse(
+                HOUSE_ID,
+                LocalDate.now().minusDays(7),
+                LocalDate.now());
 
         assertNotNull(records);
     }
@@ -104,11 +117,9 @@ public class MortalityDAOTest {
     @Test
     @Order(9)
     void testGetMortalityByDateRange() {
-        List<Mortality> records =
-                mortalityDAO.getMortalityByDateRange(
-                        LocalDate.now().minusDays(7),
-                        LocalDate.now()
-                );
+        List<Mortality> records = mortalityDAO.getMortalityByDateRange(
+                LocalDate.now().minusDays(7),
+                LocalDate.now());
 
         assertNotNull(records);
     }
@@ -116,8 +127,7 @@ public class MortalityDAOTest {
     @Test
     @Order(10)
     void testGetMortalityByCause() {
-        List<Mortality> records =
-                mortalityDAO.getMortalityByCause("Test Disease");
+        List<Mortality> records = mortalityDAO.getMortalityByCause("Test Disease");
 
         assertNotNull(records);
         assertFalse(records.isEmpty());
@@ -126,8 +136,7 @@ public class MortalityDAOTest {
     @Test
     @Order(11)
     void testGetOutbreakRecords() {
-        List<Mortality> records =
-                mortalityDAO.getOutbreakRecords();
+        List<Mortality> records = mortalityDAO.getOutbreakRecords();
 
         assertNotNull(records);
     }
@@ -135,8 +144,7 @@ public class MortalityDAOTest {
     @Test
     @Order(12)
     void testUpdateMortality() {
-        List<Mortality> records =
-                mortalityDAO.getMortalityByHouse(HOUSE_ID);
+        List<Mortality> records = mortalityDAO.getMortalityByHouse(HOUSE_ID);
 
         Mortality mortality = records.get(0);
         mortality.setCount(8);
@@ -149,8 +157,7 @@ public class MortalityDAOTest {
     @Test
     @Order(13)
     void testGetMortalityStatistics() {
-        MortalityStatistics stats =
-                mortalityDAO.getMortalityStatistics();
+        MortalityStatistics stats = mortalityDAO.getMortalityStatistics();
 
         assertNotNull(stats);
         assertTrue(stats.getTotalRecords() >= 0);
@@ -160,8 +167,7 @@ public class MortalityDAOTest {
     @Test
     @Order(14)
     void testDeleteMortality() {
-        boolean deleted =
-                mortalityDAO.deleteMortality(mortalityId);
+        boolean deleted = mortalityDAO.deleteMortality(mortalityId);
 
         assertTrue(deleted);
     }
