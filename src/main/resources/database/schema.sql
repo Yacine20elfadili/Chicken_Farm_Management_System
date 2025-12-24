@@ -132,6 +132,7 @@ CREATE TABLE IF NOT EXISTS users (
     bankName VARCHAR(100) NOT NULL,
     phoneNumber VARCHAR(20) NOT NULL,
     website VARCHAR(200),
+    logo TEXT, -- Base64 encoded logo image
     creationDate DATETIME DEFAULT CURRENT_TIMESTAMP,
     updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP
 );
@@ -248,8 +249,10 @@ CREATE TABLE IF NOT EXISTS chickens (
     healthStatus TEXT NOT NULL,
     averageWeight REAL,
     nextTransferDate TEXT,
+    supplierId INTEGER, 
     created_at TEXT DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (houseId) REFERENCES houses(id) ON DELETE CASCADE
+    FOREIGN KEY (houseId) REFERENCES houses(id) ON DELETE CASCADE,
+    FOREIGN KEY (supplierId) REFERENCES suppliers(id) ON DELETE SET NULL
 );
 
 CREATE INDEX IF NOT EXISTS idx_chickens_house ON chickens(houseId);
@@ -327,7 +330,8 @@ CREATE TABLE IF NOT EXISTS feed (
     type VARCHAR(50) NOT NULL,
     quantityKg REAL NOT NULL DEFAULT 0,
     pricePerKg REAL NOT NULL DEFAULT 0,
-    supplier VARCHAR(100),
+    supplier VARCHAR(100), -- Legacy string column, kept for backward compatibility if needed
+    supplierId INTEGER, -- New Foreign Key
     lastRestockDate DATE,
     expiryDate DATE,
     minStockLevel REAL NOT NULL DEFAULT 100,
@@ -358,7 +362,8 @@ CREATE TABLE IF NOT EXISTS medications (
     quantity INTEGER NOT NULL DEFAULT 0,
     unit VARCHAR(20) NOT NULL,
     pricePerUnit REAL NOT NULL DEFAULT 0,
-    supplier VARCHAR(100),
+    supplier VARCHAR(100), -- Legacy
+    supplierId INTEGER, -- New FK
     purchaseDate DATE,
     expiryDate DATE,
     minStockLevel INTEGER NOT NULL DEFAULT 10,
@@ -406,9 +411,11 @@ CREATE TABLE IF NOT EXISTS equipment_items (
     purchasePrice REAL NOT NULL DEFAULT 0.00 CHECK (purchasePrice >= 0),
     lastMaintenanceDate DATE,
     nextMaintenanceDate DATE,
+    supplierId INTEGER,
     created_at TEXT DEFAULT CURRENT_TIMESTAMP,
     updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (categoryId) REFERENCES equipment_categories(id) ON DELETE CASCADE ON UPDATE CASCADE
+    FOREIGN KEY (categoryId) REFERENCES equipment_categories(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (supplierId) REFERENCES suppliers(id) ON DELETE SET NULL
 );
 
 CREATE INDEX IF NOT EXISTS idx_equipment_categories_category ON equipment_categories(category);
@@ -520,3 +527,214 @@ BEGIN
     SET updated_at = CURRENT_TIMESTAMP
     WHERE id = NEW.id;
 END;
+
+-- ============================================================
+-- Suppliers Table
+-- ============================================================
+
+CREATE TABLE IF NOT EXISTS suppliers (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name VARCHAR(100) NOT NULL,
+    companyName VARCHAR(200),
+    legalForm VARCHAR(50),
+    category VARCHAR(50) CHECK (category IN ('Feed', 'Medication', 'Equipment', 'Mixed', 'Other', 'Chicks')),
+    subCategories TEXT, -- Comma-separated or JSON list of provided products
+    contactPerson VARCHAR(100),
+    email VARCHAR(100),
+    phone VARCHAR(20),
+    address VARCHAR(255),
+    ice VARCHAR(20),
+    rc VARCHAR(50),
+    website VARCHAR(200),
+    
+    -- Secondary Contact
+    secondaryContactName VARCHAR(100),
+    secondaryContactPhone VARCHAR(20),
+    secondaryContactEmail VARCHAR(100),
+
+    -- Banking Info
+    bankName VARCHAR(100),
+    rib VARCHAR(50),
+    swift VARCHAR(50),
+
+    -- Commercial Terms
+    paymentTerms VARCHAR(100), -- e.g. "Net 30 days"
+    preferredPaymentMethod VARCHAR(100),
+    minOrderAmount DECIMAL(15, 2),
+    avgDeliveryTime INTEGER, -- in days
+    
+    notes TEXT,
+    isActive BOOLEAN DEFAULT 1,
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+    updated_at TEXT DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_suppliers_category ON suppliers(category);
+CREATE INDEX IF NOT EXISTS idx_suppliers_name ON suppliers(name);
+
+CREATE TRIGGER IF NOT EXISTS trg_suppliers_updated_at
+    AFTER UPDATE ON suppliers
+    FOR EACH ROW
+BEGIN
+    UPDATE suppliers
+    SET updated_at = CURRENT_TIMESTAMP
+    WHERE id = NEW.id;
+END;
+
+-- ============================================================
+-- Customers Table
+-- ============================================================
+
+CREATE TABLE IF NOT EXISTS customers (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name VARCHAR(100) NOT NULL,
+    companyName VARCHAR(200),
+    type VARCHAR(50) NOT NULL CHECK (type IN ('Company', 'Individual')),
+    legalForm VARCHAR(50), -- SARL, SA, etc. (Company only)
+    contactPerson VARCHAR(100),
+    email VARCHAR(100),
+    phone VARCHAR(20),
+    address VARCHAR(255),
+    ice VARCHAR(20), -- Required for Company
+    rc VARCHAR(50), -- Registre de Commerce (Company only)
+    website VARCHAR(200),
+    
+    -- Secondary Contact
+    secondaryContactName VARCHAR(100),
+    secondaryContactPhone VARCHAR(20),
+    
+    -- Banking Info (for receiving payments from us, rare but possible)
+    bankName VARCHAR(100),
+    rib VARCHAR(50),
+    
+    -- Commercial Terms
+    paymentTerms VARCHAR(50) DEFAULT 'Immediate', -- Immediate, Net 15, Net 30, Net 60
+    usualPurchases TEXT, -- What they typically buy (Eggs, Chickens, etc.)
+    deliverySchedule VARCHAR(100), -- e.g., "Every Tuesday, Thursday"
+    
+    -- Financial
+    outstandingBalance REAL DEFAULT 0.00,
+    
+    -- Loyalty Tracking
+    totalPurchases REAL DEFAULT 0.00, -- Total revenue from this customer
+    visitCount INTEGER DEFAULT 0, -- Number of transactions
+    lastVisitDate DATE,
+    
+    -- Status
+    isActive BOOLEAN DEFAULT 1, -- Soft Delete
+    notes TEXT,
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+    updated_at TEXT DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_customers_type ON customers(type);
+CREATE INDEX IF NOT EXISTS idx_customers_name ON customers(name);
+CREATE INDEX IF NOT EXISTS idx_customers_ice ON customers(ice);
+CREATE INDEX IF NOT EXISTS idx_customers_active ON customers(isActive);
+
+CREATE TRIGGER IF NOT EXISTS trg_customers_updated_at
+    AFTER UPDATE ON customers
+    FOR EACH ROW
+BEGIN
+    UPDATE customers
+    SET updated_at = CURRENT_TIMESTAMP
+    WHERE id = NEW.id;
+END;
+
+-- ============================================================
+-- Financial Transactions Table
+-- ============================================================
+
+CREATE TABLE IF NOT EXISTS financial_transactions (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    transactionDate DATE NOT NULL,
+    type VARCHAR(20) NOT NULL CHECK (type IN ('Income', 'Expense')),
+    category VARCHAR(100) NOT NULL,
+    amount REAL NOT NULL CHECK (amount >= 0),
+    paymentMethod VARCHAR(50) DEFAULT 'Cash',
+    description TEXT,
+    relatedEntityType VARCHAR(50) CHECK (relatedEntityType IN ('Supplier', 'Customer', 'Personnel', 'Other', NULL)),
+    relatedEntityId INTEGER,
+    receiptImage TEXT, -- Base64
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+    updated_at TEXT DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_finance_date ON financial_transactions(transactionDate);
+CREATE INDEX IF NOT EXISTS idx_finance_type ON financial_transactions(type);
+CREATE INDEX IF NOT EXISTS idx_finance_category ON financial_transactions(category);
+
+CREATE TRIGGER IF NOT EXISTS trg_finance_updated_at
+    AFTER UPDATE ON financial_transactions
+    FOR EACH ROW
+BEGIN
+    UPDATE financial_transactions
+    SET updated_at = CURRENT_TIMESTAMP
+    WHERE id = NEW.id;
+END;
+
+-- ============================================================
+-- Reports Table
+-- ============================================================
+
+CREATE TABLE IF NOT EXISTS reports (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    title VARCHAR(100) NOT NULL,
+    type VARCHAR(50) NOT NULL CHECK (type IN ('Financial', 'Production', 'Inventory', 'Consumption', 'Summary')),
+    periodStart DATE NOT NULL,
+    periodEnd DATE NOT NULL,
+    generatedDate DATE NOT NULL DEFAULT CURRENT_DATE,
+    format VARCHAR(20) DEFAULT 'View' CHECK (format IN ('View', 'PDF', 'Excel')),
+    filePath TEXT,
+    createdBy INTEGER REFERENCES users(id) ON DELETE SET NULL,
+    notes TEXT,
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_reports_type ON reports(type);
+CREATE INDEX IF NOT EXISTS idx_reports_date ON reports(generatedDate);
+
+-- ============================================================
+-- Documents Table
+-- ============================================================
+
+CREATE TABLE IF NOT EXISTS documents (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    type VARCHAR(50) NOT NULL,
+    referenceNumber VARCHAR(50) NOT NULL UNIQUE,
+    generatedDate DATE NOT NULL,
+    relatedEntityType VARCHAR(50),
+    relatedEntityId INTEGER,
+    totalAmount REAL DEFAULT 0,
+    status VARCHAR(20) DEFAULT 'Draft',
+    pdfContent TEXT, -- Base64
+    metadata TEXT, -- JSON
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+    updated_at TEXT DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_documents_ref ON documents(referenceNumber);
+CREATE INDEX IF NOT EXISTS idx_documents_type ON documents(type);
+
+CREATE TRIGGER IF NOT EXISTS trg_documents_updated_at
+    AFTER UPDATE ON documents
+    FOR EACH ROW
+BEGIN
+    UPDATE documents
+    SET updated_at = CURRENT_TIMESTAMP
+    WHERE id = NEW.id;
+END;
+
+-- ============================================================
+-- Document Versions Table
+-- ============================================================
+
+CREATE TABLE IF NOT EXISTS document_versions (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    documentId INTEGER NOT NULL,
+    versionNumber INTEGER NOT NULL,
+    pdfContent TEXT,
+    formData TEXT, -- JSON
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (documentId) REFERENCES documents(id) ON DELETE CASCADE
+);

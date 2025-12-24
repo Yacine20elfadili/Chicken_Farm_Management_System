@@ -12,12 +12,13 @@ public class EquipmentItem {
 
     // Fields
     private int id;
-    private int categoryId;                 // Foreign key to EquipmentCategory
-    private String status;                  // Good, Fair, Broken
-    private LocalDate purchaseDate;         // When purchased
-    private double purchasePrice;           // Original cost
-    private LocalDate lastMaintenanceDate;  // Last maintenance
-    private LocalDate nextMaintenanceDate;  // Scheduled maintenance
+    private int categoryId; // Foreign key to EquipmentCategory
+    private String status; // Good, Fair, Broken
+    private LocalDate purchaseDate; // When purchased
+    private double purchasePrice; // Original cost
+    private LocalDate lastMaintenanceDate; // Last maintenance
+    private LocalDate nextMaintenanceDate; // Scheduled maintenance
+    private int supplierId; // Foreign key to Suppliers
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -43,9 +44,9 @@ public class EquipmentItem {
      * Full constructor (all fields)
      */
     public EquipmentItem(int id, int categoryId, String status, LocalDate purchaseDate,
-                         double purchasePrice, LocalDate lastMaintenanceDate,
-                         LocalDate nextMaintenanceDate, LocalDateTime createdAt,
-                         LocalDateTime updatedAt) {
+            double purchasePrice, LocalDate lastMaintenanceDate,
+            LocalDate nextMaintenanceDate, int supplierId, LocalDateTime createdAt,
+            LocalDateTime updatedAt) {
         this.id = id;
         this.categoryId = categoryId;
         this.status = status;
@@ -53,6 +54,7 @@ public class EquipmentItem {
         this.purchasePrice = purchasePrice;
         this.lastMaintenanceDate = lastMaintenanceDate;
         this.nextMaintenanceDate = nextMaintenanceDate;
+        this.supplierId = supplierId; // Added
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
@@ -113,6 +115,14 @@ public class EquipmentItem {
 
     public void setNextMaintenanceDate(LocalDate nextMaintenanceDate) {
         this.nextMaintenanceDate = nextMaintenanceDate;
+    }
+
+    public int getSupplierId() {
+        return supplierId;
+    }
+
+    public void setSupplierId(int supplierId) {
+        this.supplierId = supplierId;
     }
 
     public LocalDateTime getCreatedAt() {
@@ -180,7 +190,7 @@ public class EquipmentItem {
         }
         LocalDate weekFromNow = LocalDate.now().plusDays(7);
         return nextMaintenanceDate.isBefore(weekFromNow) &&
-               nextMaintenanceDate.isAfter(LocalDate.now().minusDays(1));
+                nextMaintenanceDate.isAfter(LocalDate.now().minusDays(1));
     }
 
     /**
@@ -200,13 +210,16 @@ public class EquipmentItem {
                 ", categoryId=" + categoryId +
                 ", status='" + status + '\'' +
                 ", purchasePrice=" + purchasePrice +
+                ", supplierId=" + supplierId +
                 '}';
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         EquipmentItem that = (EquipmentItem) o;
         return id == that.id;
     }

@@ -83,7 +83,7 @@ public class DatabaseConnection {
 
     /**
      * Initializes the database by executing the schema.sql file
-     * This creates all tables, triggers, views, and inserts default data
+     * Uses a robust parser to handle Triggers correctly (which contain semicolons).
      */
     private void initDatabase() {
         try {
@@ -101,33 +101,29 @@ public class DatabaseConnection {
 
             // Read the entire SQL script
             BufferedReader reader = new BufferedReader(new InputStreamReader(schemaStream));
-            StringBuilder sqlScript = new StringBuilder();
+            StringBuilder scriptBuilder = new StringBuilder();
             String line;
-
             while ((line = reader.readLine()) != null) {
-                line = line.trim();
-                // Skip empty lines and comments
-                if (!line.isEmpty() && !line.startsWith("--")) {
-                    sqlScript.append(line).append(" ");
-                }
+                scriptBuilder.append(line).append("\n");
             }
             reader.close();
 
-            // Split by semicolon and execute each statement
-            String[] statements = sqlScript.toString().split(";");
+            String[] statements = splitSqlScript(scriptBuilder.toString());
 
             try (Statement stmt = connection.createStatement()) {
                 int executedCount = 0;
                 for (String sql : statements) {
                     sql = sql.trim();
-                    if (!sql.isEmpty()) {
+                    if (!sql.isEmpty() && !sql.startsWith("--")) {
                         try {
                             stmt.execute(sql);
                             executedCount++;
                         } catch (SQLException e) {
-                            // Log but continue with other statements
-                            System.err.println("Error executing SQL statement: " + e.getMessage());
-                            System.err.println("SQL: " + sql.substring(0, Math.min(100, sql.length())) + "...");
+                            // Suppress "table already exists" or "index already exists" errors quietly
+                            if (!e.getMessage().contains("already exists")) {
+                                System.err.println("Error executing SQL: " + e.getMessage());
+                                System.err.println("Statement start: " + sql.substring(0, Math.min(50, sql.length())));
+                            }
                         }
                     }
                 }
@@ -139,6 +135,65 @@ public class DatabaseConnection {
             System.err.println("Error initializing database: " + e.getMessage());
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Splits SQL script into statements, preserving semicolons inside BEGIN...END
+     * blocks (Triggers) and handling comments correctly.
+     */
+    private String[] splitSqlScript(String script) {
+        java.util.List<String> statements = new java.util.ArrayList<>();
+        StringBuilder currentStatement = new StringBuilder();
+
+        // We track the depth of blocks (BEGIN/CASE/IF) to prevent splitting triggers
+        // prematurely.
+        int blockDepth = 0;
+
+        // Normalize line endings
+        String[] lines = script.split("\n");
+
+        for (String line : lines) {
+            String trimmedLine = line.trim();
+
+            // Skip purely empty lines or full-line comments
+            if (trimmedLine.isEmpty() || trimmedLine.startsWith("--")) {
+                continue;
+            }
+
+            // Append line with a newline to preserve comment structure (important!)
+            currentStatement.append(line).append("\n");
+
+            // Analyze the line for semantic blocks (only if it's impactful)
+            // We do a simple token scan using normalized uppercase version
+            String upper = trimmedLine.toUpperCase();
+
+            // Count occurrences of keywords that start a block
+            if (containsKeyword(upper, "BEGIN"))
+                blockDepth++;
+            if (containsKeyword(upper, "CASE"))
+                blockDepth++;
+
+            // Count occurrences of END
+            if (containsKeyword(upper, "END"))
+                blockDepth--;
+
+            // Safety: clamp depth to 0
+            if (blockDepth < 0)
+                blockDepth = 0;
+
+            // Check for statement terminator
+            if (trimmedLine.endsWith(";") && blockDepth == 0) {
+                statements.add(currentStatement.toString());
+                currentStatement.setLength(0);
+            }
+        }
+
+        return statements.toArray(new String[0]);
+    }
+
+    private boolean containsKeyword(String line, String keyword) {
+        // Simple regex check for whole word
+        return java.util.regex.Pattern.compile("\\b" + keyword + "\\b").matcher(line).find();
     }
 
     /**
@@ -187,6 +242,58 @@ public class DatabaseConnection {
                 System.err.println("Error closing connection: " + e.getMessage());
                 e.printStackTrace();
             }
+        }
+    }
+
+    /**
+     * Resets the database by dropping all tables.
+     * Effectively Wipes the database similar to deleting the file.
+     * 
+     * @return true if successful, false otherwise.
+     */
+    public boolean resetDatabase() {
+        // Get all table names
+        java.util.List<String> tables = new java.util.ArrayList<>();
+        String query = "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%';";
+
+        try (Statement stmt = getConnection().createStatement();
+                java.sql.ResultSet rs = stmt.executeQuery(query)) {
+
+            while (rs.next()) {
+                tables.add(rs.getString("name"));
+            }
+
+            // Disable FKs temporarily to avoid constraint issues during drop
+            stmt.execute("PRAGMA foreign_keys = OFF;");
+
+            for (String table : tables) {
+                stmt.execute("DROP TABLE IF EXISTS " + table);
+            }
+
+            stmt.execute("PRAGMA foreign_keys = ON;");
+
+            System.out.println("All tables dropped. Database reset.");
+
+            // Re-initialize schema immediately so the app can restart cleanly if needed,
+            // or leave it empty if the intention is a clean slate that needs
+            // initialization.
+            // The user said "same effect when I delete the database file".
+            // If we delete the file, the next 'new DatabaseConnection()' re-inits it.
+            // So we should probably call initDatabase() again to recreate tables?
+            // "Drop all the tables... same effect as deleting file".
+            // If I delete file, the app usually recreates tables on next launch.
+            // If I redirect to Login page, the app expects tables to exist (e.g. Users
+            // table to check login).
+            // But if I want to "delete account", I assume the user means "WIPE EVERYTHING".
+            // So I should Re-Init the blank schema so it's fresh.
+
+            initDatabase();
+
+            return true;
+        } catch (SQLException e) {
+            System.err.println("Error resetting database: " + e.getMessage());
+            e.printStackTrace();
+            return false;
         }
     }
 

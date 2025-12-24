@@ -29,39 +29,57 @@ import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
 
 /**
  * Utility to generate identity card PNG images from an HTML template.
- * Uses OpenHTMLToPDF to render HTML -> PDF, then PDFBox to rasterize PDF -> PNG.
+ * Uses OpenHTMLToPDF to render HTML -> PDF, then PDFBox to rasterize PDF ->
+ * PNG.
  */
 public class IdentityCardGenerator {
 
     private static final String TEMPLATE_PATH = "/templates/identity-card.html";
     private static final int RENDER_DPI = 300;
 
-    public byte[] generateAsPng(String name, String role, String barcodeData) throws IOException {
-        if (name == null || name.isBlank()) throw new IllegalArgumentException("name is required");
-        if (role == null) role = "";
-        if (barcodeData == null) barcodeData = "";
+    public byte[] generateAsPng(ma.farm.model.Personnel personnel) throws IOException {
+        if (personnel == null)
+            throw new IllegalArgumentException("personnel is required");
+
+        String name = personnel.getFullName();
+        String role = personnel.getJobTitle();
+        // Fallback checks
+        if (name == null)
+            name = "";
+        if (role == null)
+            role = "";
+
+        // Construct barcode content: ID, Name, Role
+        String barcodeData = "ID:" + personnel.getId() + ";" + name + ";" + role;
 
         // 1) Generate QR image (PNG byte[])
         byte[] qrPng = generateBarcodePng(barcodeData);
 
-        // Save QR image under src/main/resources/images/qrcodes and compute an absolute file URI for the template
-        Path qrcodePath = saveQrcodeToResources(qrPng, barcodeData); // returns the path to the saved file
+        // Save QR image under src/main/resources/images/qrcodes and compute an absolute
+        // file URI for the template
+        Path qrcodePath = saveQrcodeToResources(qrPng, barcodeData);
         String qrcodeFileUri = qrcodePath.toUri().toString();
 
         // 2) Load HTML template and replace placeholders
         String html = loadTemplate();
         html = html.replace("{{name}}", escapeHtml(name))
-                   .replace("{{role}}", escapeHtml(role))
-                   .replace("{{barcodeDataImg}}", qrcodeFileUri);
+                .replace("{{role}}", escapeHtml(role))
+                .replace("{{department}}",
+                        escapeHtml(personnel.getDepartment() != null ? personnel.getDepartment() : ""))
+                .replace("{{phone}}", escapeHtml(personnel.getPhone() != null ? personnel.getPhone() : ""))
+                .replace("{{email}}", escapeHtml(personnel.getEmail() != null ? personnel.getEmail() : ""))
+                .replace("{{id}}", String.valueOf(personnel.getId()))
+                .replace("{{barcodeDataImg}}", qrcodeFileUri);
 
         // 3) Render HTML to PDF using OpenHTMLToPDF
-        // Sanitize HTML (remove any characters before the first '<' to avoid XML parser errors)
+        // Sanitize HTML (remove any characters before the first '<' to avoid XML parser
+        // errors)
         int firstLt = html.indexOf('<');
         if (firstLt > 0) {
             html = html.substring(firstLt);
         }
 
-        // Write debug copy of HTML to target/identity-debug.html to help diagnose parsing issues
+        // Write debug copy of HTML to target/identity-debug.html
         try {
             Path debug = Path.of("target", "identity-debug.html");
             Files.createDirectories(debug.getParent());
@@ -84,9 +102,11 @@ public class IdentityCardGenerator {
         try {
             builder.run();
         } catch (Exception e) {
-            // ensure we attempt to delete the temporary QR file if present
             if (qrcodePath != null) {
-                try { Files.deleteIfExists(qrcodePath); } catch (Exception ignore) {}
+                try {
+                    Files.deleteIfExists(qrcodePath);
+                } catch (Exception ignore) {
+                }
             }
             throw new IOException("Failed to render HTML to PDF: " + e.getMessage(), e);
         }
@@ -96,38 +116,55 @@ public class IdentityCardGenerator {
             PDFRenderer renderer = new PDFRenderer(doc);
             BufferedImage image = renderer.renderImageWithDPI(0, RENDER_DPI, ImageType.RGB);
 
-            // Overlay a high-resolution QR directly onto the rendered image only if the template did NOT include an image
-            boolean templateHasQr = html != null && html.contains("{{barcodeDataImg}}") == false && html.contains("qrcodes/") ;
+            // Overlay logic (simplified invocation if needed, keeping existing logic block
+            // if we want to retain it)
+            // ... (keeping existing logic for overlaying QR code on top of image if
+            // template handles it in specific way)
+            // The existing overlay logic relies on `barcodeData` variable which we
+            // constructed.
+            // Let's re-use the overlay logic block by extracting it or just keeping it
+            // here.
+            // For brevity in this replacement, I'll invoke the overlay helper if I had one,
+            // but since I'm replacing the whole method, I must include the overlay logic or
+            // decide if it's still needed.
+            // The user wants "improve field infos", so the HTML template update is key.
+            // I will retain the overlay logic as it adds a nice high-res QR code.
+
+            boolean templateHasQr = html != null && html.contains("{{barcodeDataImg}}") == false
+                    && html.contains("qrcodes/");
             if (!templateHasQr && barcodeData != null && !barcodeData.isBlank()) {
                 try {
-                    // create a large square QR BitMatrix and scale down to the top-center area
+                    // ... (same overlay logic as before) ...
                     int requestedSide = Math.max(1200, Math.min(image.getWidth() / 2, image.getHeight() / 2));
                     Map<EncodeHintType, Object> hints = new HashMap<>();
                     hints.put(com.google.zxing.EncodeHintType.CHARACTER_SET, "UTF-8");
-                    hints.put(com.google.zxing.EncodeHintType.ERROR_CORRECTION, com.google.zxing.qrcode.decoder.ErrorCorrectionLevel.H);
+                    hints.put(com.google.zxing.EncodeHintType.ERROR_CORRECTION,
+                            com.google.zxing.qrcode.decoder.ErrorCorrectionLevel.H);
                     hints.put(com.google.zxing.EncodeHintType.MARGIN, 1);
 
-                    BitMatrix matrix = new MultiFormatWriter().encode(barcodeData, BarcodeFormat.QR_CODE, requestedSide, requestedSide, hints);
+                    BitMatrix matrix = new MultiFormatWriter().encode(barcodeData, BarcodeFormat.QR_CODE, requestedSide,
+                            requestedSide, hints);
                     BufferedImage barcodeImg = MatrixToImageWriter.toBufferedImage(matrix);
 
-                    // Compute destination rectangle at the TOP CENTER area (portrait layout)
                     int imgW = image.getWidth();
                     int imgH = image.getHeight();
-                    int padding = Math.max(24, imgW/40);
-                    int areaW = imgW - padding*2;
-                    int maxH = imgH / 2; // top half reserved for QR and caption
+                    int padding = Math.max(24, imgW / 40);
+                    int areaW = imgW - padding * 2;
+                    int maxH = imgH / 2;
 
-                    double scale = Math.min((double) areaW / barcodeImg.getWidth(), (double) maxH / barcodeImg.getHeight());
+                    double scale = Math.min((double) areaW / barcodeImg.getWidth(),
+                            (double) maxH / barcodeImg.getHeight());
                     int finalW = (int) Math.round(barcodeImg.getWidth() * scale);
                     int finalH = (int) Math.round(barcodeImg.getHeight() * scale);
                     int x = (imgW - finalW) / 2;
                     int y = padding;
 
                     java.awt.Graphics2D g = image.createGraphics();
-                    g.setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION, java.awt.RenderingHints.VALUE_INTERPOLATION_BICUBIC);
-                    g.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING, java.awt.RenderingHints.VALUE_ANTIALIAS_ON);
+                    g.setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION,
+                            java.awt.RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+                    g.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING,
+                            java.awt.RenderingHints.VALUE_ANTIALIAS_ON);
 
-                    // draw subtle drop shadow rectangle behind QR (slightly offset)
                     int shadowOffset = Math.max(6, image.getWidth() / 200);
                     int pad = Math.max(12, image.getWidth() / 80);
                     int rectX = Math.max(0, x - pad);
@@ -135,21 +172,17 @@ public class IdentityCardGenerator {
                     int rectW = Math.min(image.getWidth(), finalW + pad * 2);
                     int rectH = Math.min(image.getHeight(), finalH + pad * 2);
 
-                    // shadow (semi-transparent rounded rect)
                     g.setColor(new java.awt.Color(0, 0, 0, 30));
                     g.fillRoundRect(rectX + shadowOffset, rectY + shadowOffset, rectW, rectH, 16, 16);
 
-                    // white rounded panel
                     g.setColor(java.awt.Color.WHITE);
                     g.fillRoundRect(rectX, rectY, rectW, rectH, 16, 16);
-                    g.setColor(new java.awt.Color(0,0,0,20));
+                    g.setColor(new java.awt.Color(0, 0, 0, 20));
                     g.drawRoundRect(rectX, rectY, rectW, rectH, 16, 16);
 
-                    // finally draw the QR centered in that panel
                     g.drawImage(barcodeImg, x, y, finalW, finalH, null);
                     g.dispose();
                 } catch (Exception e) {
-                    // If overlay fails, ignore and continue with originally embedded image
                     System.err.println("Warning: failed to overlay QR code: " + e.getMessage());
                 }
             }
@@ -157,26 +190,30 @@ public class IdentityCardGenerator {
             ByteArrayOutputStream pngBaos = new ByteArrayOutputStream();
             ImageIO.write(image, "png", pngBaos);
 
-            // delete the temporary QR file now that the card image has been produced
             if (qrcodePath != null) {
-                try { Files.deleteIfExists(qrcodePath); } catch (Exception ignore) { System.err.println("Warning: failed to delete temporary qrcode: " + ignore.getMessage()); }
+                try {
+                    Files.deleteIfExists(qrcodePath);
+                } catch (Exception ignore) {
+                }
             }
 
             return pngBaos.toByteArray();
         }
     }
 
-    public void saveAsPng(String name, String role, String barcodeData, Path dest) throws IOException {
-        byte[] png = generateAsPng(name, role, barcodeData);
+    public void saveAsPng(ma.farm.model.Personnel personnel, Path dest) throws IOException {
+        byte[] png = generateAsPng(personnel);
         Files.write(dest, png);
     }
 
     private byte[] generateBarcodePng(String data) throws IOException {
-        if (data == null) data = "";
+        if (data == null)
+            data = "";
         // Generate a QR code (square) with high error correction and UTF-8 charset
         Map<com.google.zxing.EncodeHintType, Object> hints = new HashMap<>();
         hints.put(com.google.zxing.EncodeHintType.CHARACTER_SET, "UTF-8");
-        hints.put(com.google.zxing.EncodeHintType.ERROR_CORRECTION, com.google.zxing.qrcode.decoder.ErrorCorrectionLevel.H);
+        hints.put(com.google.zxing.EncodeHintType.ERROR_CORRECTION,
+                com.google.zxing.qrcode.decoder.ErrorCorrectionLevel.H);
         hints.put(com.google.zxing.EncodeHintType.MARGIN, 1);
         int size = 800; // square size (px)
         try {
@@ -192,18 +229,21 @@ public class IdentityCardGenerator {
     private String loadTemplate() throws IOException {
         // Load HTML template
         InputStream in = IdentityCardGenerator.class.getResourceAsStream(TEMPLATE_PATH);
-        if (in == null) throw new FileNotFoundException("Template not found: " + TEMPLATE_PATH);
+        if (in == null)
+            throw new FileNotFoundException("Template not found: " + TEMPLATE_PATH);
         String html = new String(in.readAllBytes(), StandardCharsets.UTF_8);
 
         // Inline CSS (replace <link href="identity-card.css"> with <style>...</style>)
         try (InputStream cssIn = IdentityCardGenerator.class.getResourceAsStream("/templates/identity-card.css")) {
             if (cssIn != null) {
                 String css = new String(cssIn.readAllBytes(), StandardCharsets.UTF_8);
-                html = html.replaceFirst("<link[^>]*href=[\"']identity-card.css[\"'][^>]*>", "<style>" + css + "</style>");
+                html = html.replaceFirst("<link[^>]*href=[\"']identity-card.css[\"'][^>]*>",
+                        "<style>" + css + "</style>");
             }
         }
 
-        // Inline logo file as data URI so OpenHTMLToPDF doesn't need to resolve jar paths
+        // Inline logo file as data URI so OpenHTMLToPDF doesn't need to resolve jar
+        // paths
         try (InputStream logoIn = IdentityCardGenerator.class.getResourceAsStream("/images/id-card/logo.svg")) {
             if (logoIn != null) {
                 String svg = new String(logoIn.readAllBytes(), StandardCharsets.UTF_8);
@@ -217,23 +257,26 @@ public class IdentityCardGenerator {
     }
 
     private String escapeHtml(String input) {
-        return input.replace("&","&amp;")
-                .replace("<","&lt;")
-                .replace(">","&gt;")
-                .replace("\"","&quot;")
-                .replace("'","&#39;");
+        return input.replace("&", "&amp;")
+                .replace("<", "&lt;")
+                .replace(">", "&gt;")
+                .replace("\"", "&quot;")
+                .replace("'", "&#39;");
     }
 
     /**
-     * Save QR PNG bytes to src/main/resources/images/qrcodes and return the Path used.
+     * Save QR PNG bytes to src/main/resources/images/qrcodes and return the Path
+     * used.
      * Uses a sanitized timestamp-based filename to avoid collisions.
      */
     private Path saveQrcodeToResources(byte[] pngBytes, String contentHint) throws IOException {
         Path imagesDir = Path.of("src", "main", "resources", "images", "qrcodes");
         Files.createDirectories(imagesDir);
         // use timestamp + short hash of content to avoid collisions
-        String safe = (contentHint == null || contentHint.isBlank()) ? "qr" : contentHint.replaceAll("[^a-zA-Z0-9-_]","_");
-        String filename = String.format("qrcode_%d_%s.png", System.currentTimeMillis(), safe.length() > 20 ? safe.substring(0,20) : safe);
+        String safe = (contentHint == null || contentHint.isBlank()) ? "qr"
+                : contentHint.replaceAll("[^a-zA-Z0-9-_]", "_");
+        String filename = String.format("qrcode_%d_%s.png", System.currentTimeMillis(),
+                safe.length() > 20 ? safe.substring(0, 20) : safe);
         Path out = imagesDir.resolve(filename);
         Files.write(out, pngBytes);
         // return the Path so callers can convert to a URI safely on all platforms

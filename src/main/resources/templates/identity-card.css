@@ -1,24 +1,167 @@
-:root{--w:420px;--h:540px}
-body{margin:0;padding:24px;background:#f6f4ef;font-family:Arial,Helvetica,sans-serif;display:flex;align-items:center;justify-content:center}
-.card{
-    width:var(--w);
-    height:var(--h);
-    display:flex;
-    flex-direction: column;
-    border-radius:16px;
-    border:1px solid #e9e6e1;
-    overflow:hidden;
-    background:linear-gradient(180deg,#ffffff 0%, #fbfbfb 100%);
-    box-shadow:0 8px 20px rgba(0,0,0,0.08);
+@page {
+    size: 420px 540px;
+    margin: 0;
 }
-.qr-area{padding:28px 24px 8px 24px;
-    display:flex;flex-direction:column;align-items:center}
-.qr{width:100%;display:flex;align-items:center;justify-content:center}
-.qr img{width:68%;height:auto;display:block;border-radius:12px;background:white;padding:16px;box-shadow:0 6px 18px rgba(0,0,0,0.08);border:1px solid rgba(0,0,0,0.04)}
-.caption{font-family: 'Segoe Script', 'Brush Script MT', cursive;font-size:16px;color:#8a8a8a;margin-top:12px}
-.identity{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px}
-.name{font-weight:900;font-size:26px;color:#111;margin-top:20px;text-transform:uppercase;letter-spacing:1px}
-.role{font-size:14px;color:#8a8a8a;margin-top:8px;text-transform:lowercase}
 
-/* inner panel: subtle rounded container around top area (visual only for HTML; generator draws similar box) */
-.card::before{content:"";position:absolute;left:24px;right:24px;top:24px;height:48%;border-radius:10px;background:transparent;border:1px solid rgba(0,0,0,0.02)}
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    background-color: #f6f4ef;
+    width: 420px;
+    height: 540px;
+}
+
+/* Card Container */
+.card {
+    width: 420px;
+    height: 540px;
+    background-color: #ffffff;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid #dcdcdc;
+    /* Subtle border for print definition */
+}
+
+/* HEADER SECTION */
+.header {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 90px;
+    background-color: #1a2a3a;
+    /* Deep Navy Blue */
+    color: #ffffff;
+    text-align: center;
+    border-bottom: 4px solid #c5a059;
+    /* Gold Accent */
+}
+
+.brand {
+    font-size: 24px;
+    font-weight: bold;
+    letter-spacing: 2px;
+    margin-top: 22px;
+    text-transform: uppercase;
+}
+
+.sub-brand {
+    font-size: 10px;
+    letter-spacing: 4px;
+    color: #c5a059;
+    /* Gold */
+    margin-top: 4px;
+    text-transform: uppercase;
+}
+
+/* MAIN CONTENT */
+.content {
+    position: absolute;
+    top: 90px;
+    bottom: 50px;
+    width: 100%;
+    text-align: center;
+}
+
+/* QR Code */
+.qr-container {
+    margin-top: 20px;
+    /* Reduced from 30px */
+    text-align: center;
+}
+
+.qr-code {
+    width: 140px;
+    height: 140px;
+    border: 4px solid #ffffff;
+    /* simulated shadow using border since box-shadow is unsupported */
+    border-top: 1px solid #eee;
+    background: #fff;
+    padding: 10px;
+}
+
+/* Personnel Info */
+.person-info {
+    margin-top: 15px;
+    /* Reduced from 20px */
+    padding: 0 20px;
+}
+
+.name {
+    font-size: 22px;
+    font-weight: 900;
+    color: #1a2a3a;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+}
+
+.role {
+    font-size: 14px;
+    color: #c5a059;
+    /* Gold */
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 15px;
+    /* Reduced from 25px */
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+    display: inline-block;
+    /* to make border hug text */
+}
+
+/* Details Table */
+.details-table {
+    width: 90%;
+    margin: 0 auto;
+    border-collapse: collapse;
+    font-size: 12px;
+}
+
+.details-table td {
+    padding: 6px 0;
+    vertical-align: top;
+}
+
+.details-table .label {
+    text-align: left;
+    color: #888;
+    font-weight: 600;
+    width: 30%;
+    text-transform: uppercase;
+    font-size: 10px;
+}
+
+.details-table .value {
+    text-align: right;
+    color: #333;
+    font-weight: bold;
+    width: 70%;
+}
+
+/* FOOTER SECTION */
+.footer {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 50px;
+    background-color: #1a2a3a;
+    color: #ffffff;
+    text-align: center;
+    border-top: 2px solid #c5a059;
+}
+
+.footer-text {
+    font-size: 12px;
+    letter-spacing: 2px;
+    margin-top: 12px;
+    font-weight: bold;
+}
+
+.validity {
+    font-size: 9px;
+    color: #7a8a9a;
+    margin-top: 4px;
+}
