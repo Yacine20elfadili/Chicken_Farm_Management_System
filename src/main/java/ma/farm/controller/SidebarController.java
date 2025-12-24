@@ -16,22 +16,46 @@ import javafx.util.Duration;
 
 public class SidebarController {
 
-    @FXML private VBox sidebar;
-    @FXML private HBox sidebarHeader;
+    @FXML
+    private VBox sidebar;
+    @FXML
+    private HBox sidebarHeader;
 
-    @FXML private Text titleText;
+    @FXML
+    private Text titleText;
 
-    @FXML private ScrollPane sidebarScroll;
+    @FXML
+    private ScrollPane sidebarScroll;
 
-    @FXML private AnchorPane dashboardBtn;
-    @FXML private AnchorPane chickenBtn;
-    @FXML private AnchorPane eggsBtn;
-    @FXML private AnchorPane storageBtn;
-    @FXML private AnchorPane taskBtn;
-    @FXML private AnchorPane personnelBtn;
-    @FXML private AnchorPane logoutBtn;
+    @FXML
+    private AnchorPane dashboardBtn;
+    @FXML
+    private AnchorPane chickenBtn;
+    @FXML
+    private AnchorPane eggsBtn;
+    @FXML
+    private AnchorPane storageBtn;
+    @FXML
+    private AnchorPane taskBtn;
+    @FXML
+    private AnchorPane personnelBtn;
+    @FXML
+    private AnchorPane suppliersBtn;
+    @FXML
+    private AnchorPane customersBtn;
+    @FXML
+    private AnchorPane farmDocumentBtn;
+    @FXML
+    private AnchorPane financialTrackingBtn;
+    @FXML
+    private AnchorPane reportsBtn;
+    @FXML
+    private AnchorPane logoutBtn;
+    @FXML
+    private AnchorPane settingsBtn;
 
-    @FXML private Button sidebarMenu;
+    @FXML
+    private Button sidebarMenu;
 
     private final List<AnchorPane> modules = new ArrayList<>();
     private boolean isCollapsed = false;
@@ -61,9 +85,15 @@ public class SidebarController {
         modules.add(dashboardBtn);
         modules.add(chickenBtn);
         modules.add(eggsBtn);
+        modules.add(suppliersBtn);
+        modules.add(customersBtn);
         modules.add(storageBtn);
+        modules.add(farmDocumentBtn);
+        modules.add(financialTrackingBtn);
+        modules.add(reportsBtn);
         modules.add(taskBtn);
         modules.add(personnelBtn);
+        modules.add(settingsBtn);
         modules.add(logoutBtn);
 
         for (AnchorPane module : modules) {
@@ -80,13 +110,10 @@ public class SidebarController {
         this.mainController = mainController;
     }
 
-
     private void animateSidebar(double targetWidth) {
         Timeline timeline = new Timeline(
                 new KeyFrame(Duration.millis(250),
-                        new KeyValue(sidebarWidth, targetWidth, Interpolator.EASE_BOTH)
-                )
-        );
+                        new KeyValue(sidebarWidth, targetWidth, Interpolator.EASE_BOTH)));
         timeline.play();
     }
 
@@ -120,9 +147,9 @@ public class SidebarController {
         isCollapsed = !isCollapsed;
     }
 
-
     private void activate(AnchorPane module) {
-        if (module == null) return;
+        if (module == null)
+            return;
 
         for (AnchorPane ap : modules) {
             if (ap != null) {
@@ -137,9 +164,15 @@ public class SidebarController {
                 case "dashboardBtn" -> mainController.showDashboard();
                 case "chickenBtn" -> mainController.showChickenBay();
                 case "eggsBtn" -> mainController.showEggsBay();
+                case "suppliersBtn" -> mainController.showSuppliers();
+                case "customersBtn" -> mainController.showCustomers();
                 case "storageBtn" -> mainController.showStorage();
+                case "farmDocumentBtn" -> mainController.showFarmDocument();
+                case "financialTrackingBtn" -> mainController.showFinancialTracking();
+                case "reportsBtn" -> mainController.showReports();
                 case "taskBtn" -> mainController.showTasks();
                 case "personnelBtn" -> mainController.showPersonnel();
+                case "settingsBtn" -> mainController.showSettings();
                 case "logoutBtn" -> mainController.handleLogout();
             }
         }

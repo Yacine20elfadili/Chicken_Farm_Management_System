@@ -1,5 +1,6 @@
 package ma.farm.controller.dialogs;
 
+import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -9,9 +10,14 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.util.StringConverter;
+import ma.farm.dao.CustomerDAO;
 import ma.farm.dao.EggProductionDAO;
+import ma.farm.dao.FinancialDAO;
 import ma.farm.dao.HouseDAO;
+import ma.farm.model.Customer;
 import ma.farm.model.EggProduction;
+import ma.farm.model.FinancialTransaction;
 import ma.farm.model.House;
 import ma.farm.model.HouseType;
 
@@ -40,7 +46,7 @@ public class SellEggsDialogController {
     private TextField priceField;
 
     @FXML
-    private TextField customerField;
+    private ComboBox<Customer> customerCombo;
 
     @FXML
     private Button confirmButton;
@@ -54,11 +60,13 @@ public class SellEggsDialogController {
     // DAOs
     private EggProductionDAO eggProductionDAO;
     private HouseDAO houseDAO;
+    private CustomerDAO customerDAO;
+    private FinancialDAO financialDAO;
 
     // Track houses and their input fields
     private List<House> eggLayingHouses;
     private Map<Integer, TextField> houseQuantityFields; // houseId -> TextField
-    private Map<Integer, Integer> houseAvailableEggs;    // houseId -> available eggs
+    private Map<Integer, Integer> houseAvailableEggs; // houseId -> available eggs
 
     private boolean saved = false;
     private int totalSoldQuantity = 0;
@@ -69,6 +77,8 @@ public class SellEggsDialogController {
 
         eggProductionDAO = new EggProductionDAO();
         houseDAO = new HouseDAO();
+        customerDAO = new CustomerDAO();
+        financialDAO = new FinancialDAO();
 
         houseQuantityFields = new HashMap<>();
         houseAvailableEggs = new HashMap<>();
@@ -88,10 +98,28 @@ public class SellEggsDialogController {
         // Load egg-laying houses
         loadEggLayingHouses();
 
+        // Load customers
+        loadCustomers();
+
         // Set up price field validation (allow decimals)
         priceField.textProperty().addListener((obs, oldVal, newVal) -> {
             if (!newVal.matches("\\d*\\.?\\d*")) {
                 priceField.setText(oldVal);
+            }
+        });
+    }
+
+    private void loadCustomers() {
+        customerCombo.setItems(FXCollections.observableArrayList(customerDAO.getActiveCustomers()));
+        customerCombo.setConverter(new StringConverter<>() {
+            @Override
+            public String toString(Customer c) {
+                return c != null ? c.getName() : "";
+            }
+
+            @Override
+            public Customer fromString(String string) {
+                return null;
             }
         });
     }
@@ -134,7 +162,8 @@ public class SellEggsDialogController {
     }
 
     /**
-     * Calculate available eggs for a house (sum of all goodEggs from egg_production)
+     * Calculate available eggs for a house (sum of all goodEggs from
+     * egg_production)
      */
     private int calculateAvailableEggs(int houseId) {
         try {
@@ -156,7 +185,8 @@ public class SellEggsDialogController {
         row.setAlignment(Pos.CENTER_LEFT);
         row.setSpacing(10);
         row.setPadding(new Insets(8, 10, 8, 10));
-        row.setStyle("-fx-background-color: #ffffff; -fx-background-radius: 5; -fx-border-color: #e0e0e0; -fx-border-radius: 5;");
+        row.setStyle(
+                "-fx-background-color: #ffffff; -fx-background-radius: 5; -fx-border-color: #e0e0e0; -fx-border-radius: 5;");
 
         // Calculate available eggs for this house
         int availableEggs = calculateAvailableEggs(house.getId());
@@ -188,12 +218,14 @@ public class SellEggsDialogController {
         TextField quantityField = new TextField("0");
         quantityField.setPrefWidth(80);
         quantityField.setAlignment(Pos.CENTER);
-        quantityField.setStyle("-fx-background-color: #ffffff; -fx-border-color: #ced4da; -fx-border-radius: 5; -fx-background-radius: 5; -fx-padding: 5 8; -fx-font-size: 13px;");
+        quantityField.setStyle(
+                "-fx-background-color: #ffffff; -fx-border-color: #ced4da; -fx-border-radius: 5; -fx-background-radius: 5; -fx-padding: 5 8; -fx-font-size: 13px;");
 
         // Disable field if no eggs available
         if (availableEggs <= 0) {
             quantityField.setDisable(true);
-            quantityField.setStyle("-fx-background-color: #f0f0f0; -fx-border-color: #ced4da; -fx-border-radius: 5; -fx-background-radius: 5; -fx-padding: 5 8; -fx-font-size: 13px;");
+            quantityField.setStyle(
+                    "-fx-background-color: #f0f0f0; -fx-border-color: #ced4da; -fx-border-radius: 5; -fx-background-radius: 5; -fx-padding: 5 8; -fx-font-size: 13px;");
         }
 
         // Store reference
@@ -271,6 +303,32 @@ public class SellEggsDialogController {
             return;
         }
 
+        // Customer is REQUIRED
+        Customer selectedCustomer = customerCombo.getValue();
+        if (selectedCustomer == null) {
+            showError("Veuillez sélectionner un client.");
+            return;
+        }
+
+        // Price is REQUIRED
+        String priceText = priceField.getText().trim();
+        if (priceText.isEmpty()) {
+            showError("Veuillez entrer un prix unitaire.");
+            return;
+        }
+
+        double price = 0.0;
+        try {
+            price = Double.parseDouble(priceText);
+            if (price <= 0) {
+                showError("Le prix doit être supérieur à 0.");
+                return;
+            }
+        } catch (NumberFormatException e) {
+            showError("Le prix est invalide.");
+            return;
+        }
+
         // Collect all houses with quantities > 0 and validate
         Map<Integer, Integer> houseSales = new HashMap<>(); // houseId -> quantity to sell
         totalSoldQuantity = 0;
@@ -286,7 +344,8 @@ public class SellEggsDialogController {
                         // Validate against available
                         int available = houseAvailableEggs.get(house.getId());
                         if (qty > available) {
-                            showError("Quantité pour " + house.getName() + " dépasse le stock disponible (" + available + ")");
+                            showError("Quantité pour " + house.getName() + " dépasse le stock disponible (" + available
+                                    + ")");
                             return;
                         }
 
@@ -318,8 +377,28 @@ public class SellEggsDialogController {
         }
 
         if (allSuccess) {
+            // Log Income transaction linked to customer
+            double totalAmount = totalSoldQuantity * price;
+
+            FinancialTransaction tx = new FinancialTransaction();
+            tx.setTransactionDate(saleDate);
+            tx.setType("Income");
+            tx.setCategory("Vente Œufs");
+            tx.setAmount(totalAmount);
+            tx.setPaymentMethod("Cash");
+            tx.setDescription("Vente " + totalSoldQuantity + " œufs à " + selectedCustomer.getName());
+
+            tx.setRelatedEntityType("Customer");
+            tx.setRelatedEntityId(selectedCustomer.getId());
+
+            // Update customer loyalty
+            customerDAO.recordVisit(selectedCustomer.getId(), totalAmount);
+
+            financialDAO.addTransaction(tx);
+
             saved = true;
-            System.out.println("Egg sales recorded successfully: " + totalSoldQuantity + " eggs from " + houseSales.size() + " houses");
+            System.out.println(
+                    "Egg sales recorded successfully: " + totalSoldQuantity + " eggs, Amount: " + totalAmount + " DH");
             closeDialog();
         } else {
             showError("Certaines ventes n'ont pas pu être enregistrées. Veuillez réessayer.");
@@ -332,7 +411,8 @@ public class SellEggsDialogController {
      */
     private boolean reduceEggsFromHouse(int houseId, int quantityToSell) {
         try {
-            // Get all production records for this house, ordered by date DESC (most recent first)
+            // Get all production records for this house, ordered by date DESC (most recent
+            // first)
             List<EggProduction> productions = eggProductionDAO.getProductionByHouse(houseId);
 
             if (productions.isEmpty()) {
@@ -370,8 +450,9 @@ public class SellEggsDialogController {
                 boolean updated = eggProductionDAO.updateProduction(prod);
                 if (updated) {
                     remainingToSell -= reduceFromThisRecord;
-                    System.out.println("Reduced " + reduceFromThisRecord + " eggs from production record " + prod.getId() +
-                                     " (house " + houseId + "). New eggsCollected: " + newEggsCollected);
+                    System.out.println(
+                            "Reduced " + reduceFromThisRecord + " eggs from production record " + prod.getId() +
+                                    " (house " + houseId + "). New eggsCollected: " + newEggsCollected);
                 } else {
                     System.err.println("Failed to update production record " + prod.getId());
                 }
@@ -379,7 +460,7 @@ public class SellEggsDialogController {
 
             if (remainingToSell > 0) {
                 System.err.println("Warning: Could not fully reduce " + quantityToSell + " eggs from house " + houseId +
-                                 ". Remaining: " + remainingToSell);
+                        ". Remaining: " + remainingToSell);
                 return false;
             }
 

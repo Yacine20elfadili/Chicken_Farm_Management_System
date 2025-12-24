@@ -1,9 +1,15 @@
 package ma.farm.controller.dialogs;
 
+import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
+import javafx.util.StringConverter;
+import ma.farm.dao.CustomerDAO;
+import ma.farm.dao.FinancialDAO;
 import ma.farm.dao.HouseDAO;
+import ma.farm.model.Customer;
+import ma.farm.model.FinancialTransaction;
 import ma.farm.model.House;
 
 import java.time.LocalDate;
@@ -33,7 +39,7 @@ public class SellChickensDialogController {
     private TextField priceField;
 
     @FXML
-    private TextField customerField;
+    private ComboBox<Customer> customerCombo;
 
     @FXML
     private Label errorLabel;
@@ -42,15 +48,22 @@ public class SellChickensDialogController {
     private Button confirmButton;
 
     private HouseDAO houseDAO;
+    private CustomerDAO customerDAO;
+    private FinancialDAO financialDAO;
     private House sourceHouse;
     private boolean saved = false;
 
     @FXML
     public void initialize() {
         houseDAO = new HouseDAO();
+        customerDAO = new CustomerDAO();
+        financialDAO = new FinancialDAO();
 
         // Set default date to today
         saleDatePicker.setValue(LocalDate.now());
+
+        // Load active customers
+        loadCustomers();
 
         // Set up number-only validation for quantity field
         quantityField.textProperty().addListener((obs, oldVal, newVal) -> {
@@ -64,6 +77,21 @@ public class SellChickensDialogController {
         priceField.textProperty().addListener((obs, oldVal, newVal) -> {
             if (!newVal.matches("\\d*\\.?\\d*")) {
                 priceField.setText(oldVal);
+            }
+        });
+    }
+
+    private void loadCustomers() {
+        customerCombo.setItems(FXCollections.observableArrayList(customerDAO.getActiveCustomers()));
+        customerCombo.setConverter(new StringConverter<>() {
+            @Override
+            public String toString(Customer c) {
+                return c != null ? c.getName() : "";
+            }
+
+            @Override
+            public Customer fromString(String string) {
+                return null;
             }
         });
     }
@@ -140,6 +168,32 @@ public class SellChickensDialogController {
             return;
         }
 
+        // Customer is REQUIRED
+        Customer selectedCustomer = customerCombo.getValue();
+        if (selectedCustomer == null) {
+            showError("Veuillez sélectionner un client.");
+            return;
+        }
+
+        // Price is REQUIRED
+        String priceText = priceField.getText().trim();
+        if (priceText.isEmpty()) {
+            showError("Veuillez entrer un prix unitaire.");
+            return;
+        }
+
+        double price = 0.0;
+        try {
+            price = Double.parseDouble(priceText);
+            if (price <= 0) {
+                showError("Le prix doit être supérieur à 0.");
+                return;
+            }
+        } catch (NumberFormatException e) {
+            showError("Le prix est invalide.");
+            return;
+        }
+
         int quantity = Integer.parseInt(quantityText);
 
         // Validate date
@@ -160,6 +214,26 @@ public class SellChickensDialogController {
         }
 
         if (success) {
+            // Log Income transaction linked to customer
+            double totalAmount = quantity * price;
+
+            FinancialTransaction tx = new FinancialTransaction();
+            tx.setTransactionDate(saleDate);
+            tx.setType("Income");
+            tx.setCategory("Vente Poulets");
+            tx.setAmount(totalAmount);
+            tx.setPaymentMethod("Cash");
+            tx.setDescription("Vente " + quantity + " poulets à " + selectedCustomer.getName());
+
+            tx.setRelatedEntityType("Customer");
+            tx.setRelatedEntityId(selectedCustomer.getId());
+
+            // Update customer loyalty
+            customerDAO.recordVisit(selectedCustomer.getId(), totalAmount);
+
+            financialDAO.addTransaction(tx);
+
+            System.out.println("Sale successful. Qty: " + quantity + ", Amount: " + totalAmount + " DH");
             saved = true;
             closeDialog();
         } else {

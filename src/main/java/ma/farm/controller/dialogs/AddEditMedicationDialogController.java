@@ -1,10 +1,15 @@
 package ma.farm.controller.dialogs;
 
+import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
+import ma.farm.dao.FinancialDAO;
 import ma.farm.dao.MedicationDAO;
+import ma.farm.dao.SupplierDAO;
+import ma.farm.model.FinancialTransaction;
 import ma.farm.model.Medication;
+import ma.farm.model.Supplier;
 
 import java.time.LocalDate;
 
@@ -16,108 +21,88 @@ public class AddEditMedicationDialogController {
 
     @FXML
     private Label dialogTitle;
-
     @FXML
     private TextField nameField;
-
     @FXML
     private Label nameErrorLabel;
-
     @FXML
     private ComboBox<String> typeComboBox;
-
     @FXML
     private Label typeErrorLabel;
-
     @FXML
     private TextField quantityField;
-
     @FXML
     private Label quantityErrorLabel;
-
     @FXML
     private ComboBox<String> unitComboBox;
-
     @FXML
     private Label unitErrorLabel;
-
     @FXML
     private TextField pricePerUnitField;
-
     @FXML
     private Label priceErrorLabel;
 
     @FXML
-    private TextField supplierField;
+    private ComboBox<Supplier> supplierCombo;
 
     @FXML
     private DatePicker purchaseDatePicker;
-
     @FXML
     private DatePicker expiryDatePicker;
-
     @FXML
     private TextField minStockField;
-
     @FXML
     private Label minStockErrorLabel;
-
     @FXML
     private TextArea usageTextArea;
 
     private MedicationDAO medicationDAO;
+    private SupplierDAO supplierDAO;
+    private FinancialDAO financialDAO;
     private Medication currentMedication;
     private boolean isEditMode = false;
     private Stage dialogStage;
 
-    /**
-     * Initialize method called after FXML loads
-     */
     @FXML
     public void initialize() {
         medicationDAO = new MedicationDAO();
+        supplierDAO = new SupplierDAO();
+        financialDAO = new FinancialDAO();
 
-        // Populate type ComboBox
-        typeComboBox.getItems().addAll(
-                "Vaccine",
-                "Antibiotic",
-                "Supplement"
-        );
+        typeComboBox.getItems().addAll("Vaccine", "Antibiotic", "Supplement");
+        unitComboBox.getItems().addAll("ml", "tablets", "doses", "bottles", "units");
 
-        // Populate unit ComboBox
-        unitComboBox.getItems().addAll(
-                "ml",
-                "tablets",
-                "doses",
-                "bottles",
-                "units"
-        );
+        // Load Suppliers
+        supplierCombo
+                .setItems(FXCollections.observableArrayList(supplierDAO.getActiveSuppliersByCategory("Medication")));
     }
 
-    /**
-     * Set dialog stage (for closing)
-     */
     public void setDialogStage(Stage dialogStage) {
         this.dialogStage = dialogStage;
     }
 
-    /**
-     * Set medication for editing
-     */
     public void setMedication(Medication medication) {
         this.currentMedication = medication;
         this.isEditMode = true;
 
-        // Update dialog title
         dialogTitle.setText("Modifier Médicament");
 
-        // Populate form with existing medication data
         nameField.setText(medication.getName());
         typeComboBox.setValue(medication.getType());
         quantityField.setText(String.valueOf(medication.getQuantity()));
         unitComboBox.setValue(medication.getUnit());
         pricePerUnitField.setText(String.valueOf(medication.getPricePerUnit()));
-        supplierField.setText(medication.getSupplier() != null ? medication.getSupplier() : "");
+
+        // Set Supplier in ComboBox
+        if (medication.getSupplier() != null) {
+            for (Supplier s : supplierCombo.getItems()) {
+                if (s.getName().equals(medication.getSupplier())) {
+                    supplierCombo.setValue(s);
+                    break;
+                }
+            }
+        }
+
         if (medication.getPurchaseDate() != null) {
             purchaseDatePicker.setValue(medication.getPurchaseDate());
         }
@@ -128,38 +113,34 @@ public class AddEditMedicationDialogController {
         usageTextArea.setText(medication.getUsage() != null ? medication.getUsage() : "");
     }
 
-    /**
-     * Handle save button click
-     */
     @FXML
     public void handleSave() {
-        // Clear previous error messages
         clearErrorLabels();
 
-        // Validate inputs
         if (!validateInputs()) {
             return;
         }
 
         try {
-            // Create or update medication object
             if (!isEditMode) {
                 currentMedication = new Medication();
             }
 
-            // Set values from form
             currentMedication.setName(nameField.getText().trim());
             currentMedication.setType(typeComboBox.getValue());
             currentMedication.setQuantity(Integer.parseInt(quantityField.getText().trim()));
             currentMedication.setUnit(unitComboBox.getValue());
             currentMedication.setPricePerUnit(Double.parseDouble(pricePerUnitField.getText().trim()));
-            currentMedication.setSupplier(supplierField.getText().trim().isEmpty() ? null : supplierField.getText().trim());
+
+            Supplier selectedSupplier = supplierCombo.getValue();
+            currentMedication.setSupplier(selectedSupplier != null ? selectedSupplier.getName() : null);
+
             currentMedication.setPurchaseDate(purchaseDatePicker.getValue());
             currentMedication.setExpiryDate(expiryDatePicker.getValue());
             currentMedication.setMinStockLevel(Integer.parseInt(minStockField.getText().trim()));
-            currentMedication.setUsage(usageTextArea.getText().trim().isEmpty() ? null : usageTextArea.getText().trim());
+            currentMedication
+                    .setUsage(usageTextArea.getText().trim().isEmpty() ? null : usageTextArea.getText().trim());
 
-            // Save to database
             boolean success;
             if (isEditMode) {
                 success = medicationDAO.updateMedication(currentMedication);
@@ -172,6 +153,35 @@ public class AddEditMedicationDialogController {
             } else {
                 success = medicationDAO.addMedication(currentMedication);
                 if (success) {
+                    // Log financial transaction for new medication purchases
+                    try {
+                        FinancialTransaction tx = new FinancialTransaction();
+                        tx.setTransactionDate(LocalDate.now());
+                        tx.setType("Expense");
+                        tx.setCategory("Achat Médicaments");
+
+                        double qty = currentMedication.getQuantity(); // Dosage/Units
+                        // Note: Medication might not have pricePerUnit directly or it might be price.
+                        // Assuming price field exists and logic holds.
+                        double price = currentMedication.getPricePerUnit(); // Use pricePerUnit for calculation
+                        double total = qty * price;
+
+                        tx.setAmount(total);
+                        tx.setPaymentMethod("Cash"); // Default, could be made configurable
+                        tx.setDescription("Achat Médicaments: " + currentMedication.getName() + " (" + qty + " "
+                                + currentMedication.getUnit() + ")");
+
+                        if (selectedSupplier != null) {
+                            tx.setRelatedEntityType("Supplier");
+                            tx.setRelatedEntityId(selectedSupplier.getId());
+                        }
+
+                        financialDAO.addTransaction(tx);
+                        System.out.println("Logged expense for medication: " + total + " DH");
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        System.err.println("Failed to log financial transaction for medication");
+                    }
                     showSuccessMessage("Médicament ajouté avec succès!");
                 } else {
                     showErrorMessage("Erreur lors de l'ajout du médicament.");
@@ -179,7 +189,6 @@ public class AddEditMedicationDialogController {
                 }
             }
 
-            // Close dialog
             if (dialogStage != null) {
                 dialogStage.close();
             }
@@ -187,31 +196,24 @@ public class AddEditMedicationDialogController {
         } catch (NumberFormatException e) {
             showErrorMessage("Erreur: Vérifiez les valeurs numériques.");
         } catch (Exception e) {
-            System.err.println("Error saving medication: " + e.getMessage());
             e.printStackTrace();
             showErrorMessage("Erreur: " + e.getMessage());
         }
     }
 
-    /**
-     * Validate all input fields
-     */
     private boolean validateInputs() {
         boolean isValid = true;
 
-        // Validate name
         if (nameField.getText().trim().isEmpty()) {
             nameErrorLabel.setText("Le nom est requis");
             isValid = false;
         }
 
-        // Validate type
         if (typeComboBox.getValue() == null || typeComboBox.getValue().isEmpty()) {
             typeErrorLabel.setText("Le type est requis");
             isValid = false;
         }
 
-        // Validate quantity
         try {
             int quantity = Integer.parseInt(quantityField.getText().trim());
             if (quantity <= 0) {
@@ -223,16 +225,13 @@ public class AddEditMedicationDialogController {
             isValid = false;
         }
 
-        // Validate unit
         if (unitComboBox.getValue() == null || unitComboBox.getValue().isEmpty()) {
             unitErrorLabel.setText("L'unité est requise");
             isValid = false;
         }
 
-        // Validate price per unit
         try {
-            double price = Double.parseDouble(pricePerUnitField.getText().trim());
-            if (price < 0) {
+            if (Double.parseDouble(pricePerUnitField.getText().trim()) < 0) {
                 priceErrorLabel.setText("Le prix ne peut pas être négatif");
                 isValid = false;
             }
@@ -241,10 +240,8 @@ public class AddEditMedicationDialogController {
             isValid = false;
         }
 
-        // Validate min stock level
         try {
-            int minStock = Integer.parseInt(minStockField.getText().trim());
-            if (minStock < 0) {
+            if (Integer.parseInt(minStockField.getText().trim()) < 0) {
                 minStockErrorLabel.setText("Le stock minimum ne peut pas être négatif");
                 isValid = false;
             }
@@ -256,9 +253,6 @@ public class AddEditMedicationDialogController {
         return isValid;
     }
 
-    /**
-     * Clear all error labels
-     */
     private void clearErrorLabels() {
         nameErrorLabel.setText("");
         typeErrorLabel.setText("");
@@ -268,31 +262,22 @@ public class AddEditMedicationDialogController {
         minStockErrorLabel.setText("");
     }
 
-    /**
-     * Show success message
-     */
     private void showSuccessMessage(String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Succès");
-        alert.setHeaderText("Opération Réussie");
+        alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
     }
 
-    /**
-     * Show error message
-     */
     private void showErrorMessage(String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Erreur");
-        alert.setHeaderText("Une erreur s'est produite");
+        alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
     }
 
-    /**
-     * Handle cancel button click
-     */
     @FXML
     public void handleCancel() {
         if (dialogStage != null) {

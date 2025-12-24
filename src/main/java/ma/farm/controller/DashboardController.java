@@ -28,7 +28,9 @@ public class DashboardController {
     private Label eggsTodayLabel;
 
     @FXML
-    private Label alertsCountLabel;
+    private Label totalIncomeLabel;
+    @FXML
+    private Label totalExpenseLabel;
 
     // FXML Components - Chart
     @FXML
@@ -37,6 +39,7 @@ public class DashboardController {
     // DAOs
     private HouseDAO houseDAO;
     private EggProductionDAO eggProductionDAO;
+    private ma.farm.dao.FinancialDAO financialDAO;
 
     /**
      * Initialize method - called automatically after FXML loads
@@ -51,6 +54,7 @@ public class DashboardController {
             // Initialize DAOs
             houseDAO = new HouseDAO();
             eggProductionDAO = new EggProductionDAO();
+            financialDAO = new ma.farm.dao.FinancialDAO();
 
             System.out.println("DashboardController: DAOs initialized");
 
@@ -60,13 +64,70 @@ public class DashboardController {
             // Load all dashboard data
             loadTotalChickens();
             loadEggsToday();
-            loadAlertsCount();
+            loadFinancialSummary();
             load7DayChart();
 
             System.out.println("=== DashboardController: All data loaded successfully ===\n");
 
         } catch (Exception e) {
             System.err.println("Error initializing dashboard: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    // ... (configureChart remains same) ...
+
+    /**
+     * Load and display financial summary (Income vs Expense)
+     */
+    private void loadFinancialSummary() {
+        try {
+            double totalIncome = 0;
+            double totalExpense = 0;
+
+            // Fetch all transactions
+            // Note: For better performance in large DBs, add efficient SUM aggregation
+            // methods to DAO.
+            List<ma.farm.model.FinancialTransaction> transactions = financialDAO.getAllTransactions();
+
+            for (ma.farm.model.FinancialTransaction tx : transactions) {
+                if ("Income".equalsIgnoreCase(String.valueOf(tx.getType()))) {
+                    totalIncome += tx.getAmount();
+                } else {
+                    totalExpense += tx.getAmount();
+                }
+            }
+
+            if (totalIncomeLabel != null) {
+                totalIncomeLabel.setText(String.format("Rec: %.2f DH", totalIncome));
+            }
+            if (totalExpenseLabel != null) {
+                totalExpenseLabel.setText(String.format("Dép: %.2f DH", totalExpense));
+            }
+
+            System.out.println("✓ Financial summary loaded: In=" + totalIncome + ", Out=" + totalExpense);
+
+        } catch (Exception e) {
+            System.err.println("✗ Error loading financial summary: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    // ...
+
+    @FXML
+    public void refreshDashboard() {
+        System.out.println("\n=== Refreshing dashboard ===");
+
+        try {
+            loadTotalChickens();
+            loadEggsToday();
+            loadFinancialSummary();
+            load7DayChart();
+
+            System.out.println("=== Dashboard refreshed successfully ===\n");
+        } catch (Exception e) {
+            System.err.println("✗ Error refreshing dashboard: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -112,8 +173,7 @@ public class DashboardController {
                         "-fx-border-color: #dee2e6;" +
                         "-fx-border-width: 1px;" +
                         "-fx-border-radius: 8px;" +
-                        "-fx-background-radius: 8px;"
-        );
+                        "-fx-background-radius: 8px;");
 
         System.out.println("✓ Chart configured");
     }
@@ -154,7 +214,8 @@ public class DashboardController {
             int eggsToday = 0;
             for (EggProduction production : todayProduction) {
                 eggsToday += production.getGoodEggs();
-                System.out.println("  House " + production.getHouseId() + ": " + production.getGoodEggs() + " good eggs");
+                System.out
+                        .println("  House " + production.getHouseId() + ": " + production.getGoodEggs() + " good eggs");
             }
 
             if (eggsTodayLabel != null) {
@@ -173,34 +234,6 @@ public class DashboardController {
                 eggsTodayLabel.setText("Error");
             }
             e.printStackTrace();
-        }
-    }
-
-    /**
-     * Load and display active alerts count
-     * MVP version: Calculates based on low stock and overdue tasks
-     */
-    private void loadAlertsCount() {
-        try {
-            // For MVP: Calculate alerts based on:
-            // 1. Low stock feed/medications
-            // 2. Overdue tasks
-            // 3. Houses needing cleaning
-
-            int alertCount = 0;
-
-            // TODO: Add actual alert logic when implemented
-            // For now, show 0
-
-            if (alertsCountLabel != null) {
-                alertsCountLabel.setText(String.valueOf(alertCount));
-            }
-            System.out.println("✓ Alerts count: " + alertCount + " (MVP - not yet implemented)");
-        } catch (Exception e) {
-            System.err.println("✗ Error loading alerts: " + e.getMessage());
-            if (alertsCountLabel != null) {
-                alertsCountLabel.setText("Error");
-            }
         }
     }
 
@@ -257,7 +290,8 @@ public class DashboardController {
                 // Add data point to series
                 series.getData().add(dataPoint);
 
-                System.out.println("  " + date + " (" + dateLabel + "): " + totalEggs + " eggs (" + dayProduction.size() + " records)");
+                System.out.println("  " + date + " (" + dateLabel + "): " + totalEggs + " eggs (" + dayProduction.size()
+                        + " records)");
 
                 if (totalEggs > 0) {
                     totalDataPoints++;
@@ -293,24 +327,4 @@ public class DashboardController {
         }
     }
 
-    /**
-     * Refresh all dashboard data
-     * Called on manual refresh or auto-refresh timer
-     */
-    @FXML
-    public void refreshDashboard() {
-        System.out.println("\n=== Refreshing dashboard ===");
-
-        try {
-            loadTotalChickens();
-            loadEggsToday();
-            loadAlertsCount();
-            load7DayChart();
-
-            System.out.println("=== Dashboard refreshed successfully ===\n");
-        } catch (Exception e) {
-            System.err.println("✗ Error refreshing dashboard: " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
 }
