@@ -4,7 +4,14 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 import ma.farm.dao.EquipmentItemDAO;
+import ma.farm.dao.FinancialDAO;
+import ma.farm.dao.SupplierDAO;
 import ma.farm.model.EquipmentItem;
+import ma.farm.model.FinancialTransaction;
+import ma.farm.model.Supplier;
+import javafx.util.StringConverter;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import java.time.LocalDate;
 
@@ -36,6 +43,9 @@ public class AddEditEquipmentItemDialogController {
     private Label priceErrorLabel;
 
     @FXML
+    private ComboBox<Supplier> supplierComboBox; // Added
+
+    @FXML
     private DatePicker lastMaintenanceDatePicker;
 
     @FXML
@@ -45,6 +55,8 @@ public class AddEditEquipmentItemDialogController {
     private Label maintenanceErrorLabel;
 
     private EquipmentItemDAO itemDAO;
+    private SupplierDAO supplierDAO;
+    private FinancialDAO financialDAO;
     private EquipmentItem currentItem;
     private int categoryId;
     private boolean isEditMode = false;
@@ -57,14 +69,46 @@ public class AddEditEquipmentItemDialogController {
     @FXML
     public void initialize() {
         itemDAO = new EquipmentItemDAO();
+        supplierDAO = new SupplierDAO();
+        financialDAO = new FinancialDAO();
 
         // Populate status ComboBox
         statusComboBox.getItems().addAll(
                 "Good",
                 "Fair",
-                "Broken"
-        );
+                "Broken",
+                "Active", "Maintenance", "Retired");
         statusComboBox.setValue("Good"); // Default value
+
+        // Initialize and load suppliers
+        supplierDAO = new SupplierDAO();
+        loadSuppliers();
+    }
+
+    private void loadSuppliers() {
+        List<Supplier> allSuppliers = supplierDAO.getAllSuppliers();
+        // Filter for Equipment or Mixed or Other
+        List<Supplier> equipmentSuppliers = allSuppliers.stream()
+                .filter(s -> "Equipment".equalsIgnoreCase(s.getCategory()) ||
+                        "Mixed".equalsIgnoreCase(s.getCategory()) ||
+                        "Other".equalsIgnoreCase(s.getCategory()))
+                .filter(Supplier::isActive)
+                .collect(Collectors.toList());
+
+        supplierComboBox.getItems().setAll(equipmentSuppliers);
+
+        // String Converter for Display
+        supplierComboBox.setConverter(new StringConverter<>() {
+            @Override
+            public String toString(Supplier s) {
+                return s != null ? s.getName() : "";
+            }
+
+            @Override
+            public Supplier fromString(String string) {
+                return null;
+            }
+        });
     }
 
     /**
@@ -106,6 +150,14 @@ public class AddEditEquipmentItemDialogController {
         if (item.getNextMaintenanceDate() != null) {
             nextMaintenanceDatePicker.setValue(item.getNextMaintenanceDate());
         }
+
+        // Set Supplier
+        if (item.getSupplierId() > 0) {
+            supplierComboBox.getItems().stream()
+                    .filter(s -> s.getId() == item.getSupplierId())
+                    .findFirst()
+                    .ifPresent(s -> supplierComboBox.setValue(s));
+        }
     }
 
     /**
@@ -139,6 +191,13 @@ public class AddEditEquipmentItemDialogController {
             currentItem.setStatus(statusComboBox.getValue());
             currentItem.setPurchaseDate(purchaseDatePicker.getValue());
 
+            // Set Supplier
+            if (supplierComboBox.getValue() != null) {
+                currentItem.setSupplierId(supplierComboBox.getValue().getId());
+            } else {
+                currentItem.setSupplierId(0);
+            }
+
             try {
                 double price = Double.parseDouble(purchasePriceField.getText().trim());
                 currentItem.setPurchasePrice(price);
@@ -162,6 +221,29 @@ public class AddEditEquipmentItemDialogController {
             } else {
                 success = itemDAO.addItem(currentItem);
                 if (success) {
+                    // Log financial transaction for new equipment purchase
+                    try {
+                        FinancialTransaction tx = new FinancialTransaction();
+                        tx.setTransactionDate(LocalDate.now());
+                        tx.setType("Expense");
+                        tx.setCategory("Achat Équipement");
+
+                        double amount = currentItem.getPurchasePrice();
+                        tx.setAmount(amount);
+                        tx.setPaymentMethod("Cash");
+                        tx.setDescription("Achat Équipement"); // Can be refined if category name known
+
+                        if (currentItem.getSupplierId() > 0) {
+                            tx.setRelatedEntityType("Supplier");
+                            tx.setRelatedEntityId(currentItem.getSupplierId());
+                        }
+
+                        financialDAO.addTransaction(tx);
+                        System.out.println("Logged expense for equipment: " + amount + " DH");
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        System.err.println("Failed to log financial transaction for equipment");
+                    }
                     showSuccessMessage("Équipement ajouté avec succès!");
                 } else {
                     showErrorMessage("Erreur lors de l'ajout de l'équipement.");

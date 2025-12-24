@@ -1,9 +1,14 @@
 package ma.farm.controller.dialogs;
 
+import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
+import ma.farm.dao.FinancialDAO;
 import ma.farm.dao.HouseDAO;
+import ma.farm.dao.SupplierDAO;
+import ma.farm.model.FinancialTransaction;
+import ma.farm.model.Supplier;
 
 import java.time.LocalDate;
 
@@ -24,7 +29,7 @@ public class ImportChicksDialogController {
     private Label quantityErrorLabel;
 
     @FXML
-    private TextField supplierField;
+    private ComboBox<Supplier> supplierCombo;
     @FXML
     private TextField priceField;
 
@@ -34,6 +39,8 @@ public class ImportChicksDialogController {
     private Button importButton;
 
     private HouseDAO houseDAO;
+    private SupplierDAO supplierDAO;
+    private FinancialDAO financialDAO;
     private boolean saved = false;
     private int maxImportLimit = 0;
     private int availableCapacity = 0;
@@ -41,22 +48,25 @@ public class ImportChicksDialogController {
     @FXML
     public void initialize() {
         houseDAO = new HouseDAO();
+        supplierDAO = new SupplierDAO();
+        financialDAO = new FinancialDAO();
 
         // Get limits from database
         maxImportLimit = houseDAO.getMaxImportLimit();
         availableCapacity = houseDAO.getTotalEmptyCapacityByType(ma.farm.model.HouseType.DAY_OLD);
 
-        // Also include capacity from partially filled houses if needed
-        // For now, let's stick to empty capacity or calculate explicitly
         availableCapacity = houseDAO.getTotalDayOldCapacity() -
                 houseDAO.getTotalChickenCountByType(ma.farm.model.HouseType.DAY_OLD);
 
-        // Update labels
         maxImportLabel.setText(String.format("%,d", maxImportLimit));
         availableCapacityLabel.setText("Available capacity in DayOld houses: " +
                 String.format("%,d", availableCapacity));
 
-        // Validation listeners
+        // Load Suppliers (Category = Chicks or similar logic if implemented)
+        // For now loading all active suppliers or assume user selects appropriate one
+        // Ideally should filter by "Chicks" but category might be "Poussin" or mixed
+        supplierCombo.setItems(FXCollections.observableArrayList(supplierDAO.getActiveSuppliersByCategory("Chicks")));
+
         quantityField.textProperty().addListener((obs, oldVal, newVal) -> {
             if (!newVal.matches("\\d*")) {
                 quantityField.setText(newVal.replaceAll("[^\\d]", ""));
@@ -125,14 +135,55 @@ public class ImportChicksDialogController {
             return;
         }
 
-        int quantity = Integer.parseInt(quantityField.getText().trim());
+        // Supplier is REQUIRED
+        if (supplierCombo.getValue() == null) {
+            showError("Veuillez sélectionner un fournisseur.");
+            return;
+        }
 
-        // Auto-distribute across DayOld houses
+        // Price is REQUIRED
+        String priceText = priceField.getText().trim();
+        if (priceText.isEmpty()) {
+            showError("Veuillez entrer un prix unitaire.");
+            return;
+        }
+
+        double price = 0.0;
+        try {
+            price = Double.parseDouble(priceText);
+            if (price <= 0) {
+                showError("Le prix doit être supérieur à 0.");
+                return;
+            }
+        } catch (NumberFormatException e) {
+            showError("Le prix est invalide.");
+            return;
+        }
+
+        int quantity = Integer.parseInt(quantityField.getText().trim());
+        Supplier selectedSupplier = supplierCombo.getValue();
+
         boolean success = houseDAO.distributeChicksAcrossDayOldHouses(
                 quantity,
                 LocalDate.now());
 
         if (success) {
+            // Log expense transaction linked to supplier
+            double totalAmount = quantity * price;
+
+            FinancialTransaction tx = new FinancialTransaction();
+            tx.setTransactionDate(LocalDate.now());
+            tx.setType("Expense");
+            tx.setCategory("Achat Poussins");
+            tx.setAmount(totalAmount);
+            tx.setPaymentMethod("Cash");
+            tx.setDescription("Import " + quantity + " poussins de " + selectedSupplier.getName());
+            tx.setRelatedEntityType("Supplier");
+            tx.setRelatedEntityId(selectedSupplier.getId());
+            financialDAO.addTransaction(tx);
+
+            System.out.println("Import successful. Supplier: " + selectedSupplier.getName() + ", Qty: " + quantity
+                    + ", Amount: " + totalAmount + " DH");
             saved = true;
             closeDialog();
         } else {

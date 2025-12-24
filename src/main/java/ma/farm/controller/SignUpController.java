@@ -254,7 +254,7 @@ public class SignUpController {
 				email, password, companyName, legalForm, capitalSocial,
 				ice, rc, fiscalId, patente, cnss.isEmpty() ? null : cnss, onssa,
 				address, city, postalCode, bankRIB, bankName, phoneNumber,
-				website.isEmpty() ? null : website);
+				website.isEmpty() ? null : website, null);
 
 		// Attempt to create user
 		try {

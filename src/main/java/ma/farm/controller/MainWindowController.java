@@ -19,7 +19,6 @@ public class MainWindowController {
     @FXML
     private SidebarController sidebarController;
 
-
     /**
      * Initialize method - called automatically after FXML is loaded
      */
@@ -78,6 +77,36 @@ public class MainWindowController {
         loadPage("/fxml/PersonnelView.fxml");
     }
 
+    @FXML
+    public void showSuppliers() {
+        loadPage("/fxml/SuppliersView.fxml");
+    }
+
+    @FXML
+    public void showCustomers() {
+        loadPage("/fxml/CustomersView.fxml");
+    }
+
+    @FXML
+    public void showFarmDocument() {
+        loadPage("/fxml/FarmDocumentView.fxml");
+    }
+
+    @FXML
+    public void showFinancialTracking() {
+        loadPage("/fxml/FinancialTrackingView.fxml");
+    }
+
+    @FXML
+    public void showReports() {
+        loadPage("/fxml/ReportsView.fxml");
+    }
+
+    @FXML
+    public void showSettings() {
+        loadPage("/fxml/SettingsView.fxml");
+    }
+
     /**
      * Handle logout - return to login page
      */
@@ -106,6 +135,7 @@ public class MainWindowController {
 
     /**
      * Load a page into the content area
+     * 
      * @param fxmlPath Path to the FXML file
      */
     private void loadPage(String fxmlPath) {
