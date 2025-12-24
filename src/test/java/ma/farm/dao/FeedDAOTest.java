@@ -48,7 +48,13 @@ public class FeedDAOTest {
         assertNotNull(feeds);
         assertFalse(feeds.isEmpty());
 
-        feedId = feeds.get(feeds.size() - 1).getId();
+        // Find our test feed by name instead of assuming it's the last one
+        Feed testFeed = feeds.stream()
+                .filter(f -> "Maïs Test".equals(f.getName()))
+                .findFirst()
+                .orElse(null);
+        assertNotNull(testFeed, "Test feed should exist");
+        feedId = testFeed.getId();
         assertTrue(feedId > 0);
     }
 

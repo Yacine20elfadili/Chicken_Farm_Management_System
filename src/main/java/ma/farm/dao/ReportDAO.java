@@ -22,11 +22,14 @@ public class ReportDAO {
      * Save a new report record.
      */
     public int saveReport(Report report) {
-        String sql = "INSERT INTO reports (title, type, periodStart, periodEnd, generatedDate, format, filePath, createdBy, notes) "
-                +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = """
+        INSERT INTO reports
+        (title, type, periodStart, periodEnd, generatedDate, format, filePath, createdBy, notes)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """;
 
-        try (PreparedStatement stmt = dbConnection.getConnection().prepareStatement(sql)) {
+        try (PreparedStatement stmt = dbConnection.getConnection()
+                .prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             stmt.setString(1, report.getTitle());
             stmt.setString(2, report.getType().name());
@@ -35,22 +38,30 @@ public class ReportDAO {
             stmt.setString(5, report.getGeneratedDate().toString());
             stmt.setString(6, report.getFormat().name());
             stmt.setString(7, report.getFilePath());
+
             if (report.getCreatedBy() != null) {
                 stmt.setInt(8, report.getCreatedBy());
             } else {
                 stmt.setNull(8, Types.INTEGER);
             }
+
             stmt.setString(9, report.getNotes());
 
             stmt.executeUpdate();
 
-            ResultSet rs = stmt.getGeneratedKeys();
-            if (rs.next()) {
-                return rs.getInt(1);
+            // ✅ SQLite way to get generated ID
+            try (Statement s = dbConnection.getConnection().createStatement();
+                 ResultSet rs = s.executeQuery("SELECT last_insert_rowid()")) {
+
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
             }
+
         } catch (SQLException e) {
             System.err.println("Error saving report: " + e.getMessage());
         }
+
         return -1;
     }
 
@@ -62,7 +73,7 @@ public class ReportDAO {
         String sql = "SELECT * FROM reports ORDER BY generatedDate DESC";
 
         try (Statement stmt = dbConnection.getConnection().createStatement();
-                ResultSet rs = stmt.executeQuery(sql)) {
+             ResultSet rs = stmt.executeQuery(sql)) {
 
             while (rs.next()) {
                 reports.add(extractReportFromResultSet(rs));

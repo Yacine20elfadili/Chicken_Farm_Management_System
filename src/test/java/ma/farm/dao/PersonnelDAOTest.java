@@ -17,12 +17,14 @@ class PersonnelDAOTest {
     }
 
     private Personnel createTestPersonnel(String email) {
+        // Add timestamp to ensure uniqueness with mock data
+        String uniqueEmail = System.currentTimeMillis() + "_" + email;
         Personnel p = new Personnel(
                 0,
                 "JUnit User",
                 30,
                 "0600000000",
-                email,
+                uniqueEmail,
                 0,
                 "admin_staff",
                 "administration",
@@ -34,8 +36,7 @@ class PersonnelDAOTest {
                 "0611111111",
                 null,
                 null,
-                null
-        );
+                null);
         assertTrue(personnelDAO.createPersonnel(p));
         return p;
     }
@@ -60,7 +61,7 @@ class PersonnelDAOTest {
     void testGetPersonnelByEmail() {
         Personnel created = createTestPersonnel("email@test.com");
 
-        Personnel found = personnelDAO.getPersonnelByEmail("email@test.com");
+        Personnel found = personnelDAO.getPersonnelByEmail(created.getEmail());
         assertNotNull(found);
         assertEquals(created.getId(), found.getId());
     }

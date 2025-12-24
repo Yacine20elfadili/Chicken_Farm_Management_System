@@ -25,22 +25,22 @@ class EquipmentItemDAOTest {
         categoryDAO = new EquipmentCategoryDAO();
 
         // ---------- CREATE CATEGORY ----------
+        String uniqueName = "JUnit Item Category " + System.currentTimeMillis();
         EquipmentCategory category = new EquipmentCategory(
                 0,
-                "JUnit Item Category",
+                uniqueName,
                 "Other",
                 "Storage",
                 "Category for EquipmentItem tests",
                 0,
                 LocalDateTime.now(),
-                LocalDateTime.now()
-        );
+                LocalDateTime.now());
 
         assertTrue(categoryDAO.addCategory(category));
 
         categoryId = categoryDAO.getAllCategories()
                 .stream()
-                .filter(c -> "JUnit Item Category".equals(c.getName()))
+                .filter(c -> c.getName().startsWith("JUnit Item Category"))
                 .findFirst()
                 .orElseThrow()
                 .getId();
@@ -49,14 +49,14 @@ class EquipmentItemDAOTest {
         testItem = new EquipmentItem(
                 0,
                 categoryId,
-                "Good",                        // ✅ VALIDE
+                "Good", // ✅ VALIDE
                 LocalDate.now().minusDays(10),
                 1500.0,
                 LocalDate.now().minusDays(5),
                 LocalDate.now().plusDays(10),
+                0, // supplierId (0 = no supplier)
                 LocalDateTime.now(),
-                LocalDateTime.now()
-        );
+                LocalDateTime.now());
     }
 
     @Test
@@ -93,8 +93,7 @@ class EquipmentItemDAOTest {
     @Test
     @Order(4)
     void testGetItemsByCategory() {
-        List<EquipmentItem> items =
-                itemDAO.getItemsByCategory(categoryId);
+        List<EquipmentItem> items = itemDAO.getItemsByCategory(categoryId);
 
         assertFalse(items.isEmpty());
     }
@@ -102,8 +101,7 @@ class EquipmentItemDAOTest {
     @Test
     @Order(5)
     void testGetItemsByStatus() {
-        List<EquipmentItem> items =
-                itemDAO.getItemsByStatus("Good");
+        List<EquipmentItem> items = itemDAO.getItemsByStatus("Good");
 
         assertFalse(items.isEmpty());
     }
@@ -111,12 +109,11 @@ class EquipmentItemDAOTest {
     @Test
     @Order(6)
     void testUpdateItem() {
-        testItem.setStatus("Broken");   // ✅ VALIDE
+        testItem.setStatus("Broken"); // ✅ VALIDE
 
         assertTrue(itemDAO.updateItem(testItem));
 
-        EquipmentItem updated =
-                itemDAO.getItemById(testItem.getId());
+        EquipmentItem updated = itemDAO.getItemById(testItem.getId());
 
         assertEquals("Broken", updated.getStatus());
     }
@@ -124,8 +121,7 @@ class EquipmentItemDAOTest {
     @Test
     @Order(7)
     void testGetItemCountByStatus() {
-        int count =
-                itemDAO.getItemCountByStatus(categoryId, "Broken");
+        int count = itemDAO.getItemCountByStatus(categoryId, "Broken");
 
         assertTrue(count >= 1);
     }
