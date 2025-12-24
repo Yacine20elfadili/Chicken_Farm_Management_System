@@ -55,6 +55,12 @@
                         </VBox>
                         <VBox spacing="5.0">
                             <children>
+                                <Label styleClass="section-title" text="Fournisseur" />
+                                <ComboBox fx:id="supplierComboBox" prefWidth="300.0" promptText="Sélectionner un fournisseur" styleClass="form-input" />
+                            </children>
+                        </VBox>
+                        <VBox spacing="5.0">
+                            <children>
                                 <Label styleClass="section-title" text="Dernière Maintenance" />
                                 <DatePicker fx:id="lastMaintenanceDatePicker" styleClass="form-input" />
                             </children>

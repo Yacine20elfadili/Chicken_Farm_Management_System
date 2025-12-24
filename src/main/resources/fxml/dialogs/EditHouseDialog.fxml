@@ -59,7 +59,7 @@
                 <Font name="System Bold" size="13.0"/>
             </font>
         </Label>
-        <TextField fx:id="capacityField" promptText="Maximum number of chickens"
+        <TextField fx:id="capacityField" promptText="Ex: 10000"
                    GridPane.columnIndex="1" GridPane.rowIndex="2"/>
 
         <!-- Current Chicken Count (Now editable) -->
@@ -68,7 +68,7 @@
                 <Font name="System Bold" size="13.0"/>
             </font>
         </Label>
-        <TextField fx:id="chickenCountField" promptText="Current number of chickens"
+        <TextField fx:id="chickenCountField" promptText="Ex: 5000"
                    GridPane.columnIndex="1" GridPane.rowIndex="3"/>
 
         <!-- Health Status -->

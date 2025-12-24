@@ -7,6 +7,7 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
@@ -38,7 +39,7 @@
         <VBox spacing="8.0">
             <Label styleClass="section-title" text="Quantity to Sell" />
             <HBox alignment="CENTER_LEFT" spacing="12.0" VBox.vgrow="ALWAYS">
-                <TextField fx:id="quantityField" prefWidth="200" promptText="Enter quantity..." HBox.hgrow="ALWAYS" />
+                <TextField fx:id="quantityField" prefWidth="200" promptText="Ex: 100" HBox.hgrow="ALWAYS" />
                 <Button onAction="#handleSellAll" prefHeight="41.0" prefWidth="113.0" text="Sell All">
                <styleClass>
                   <String fx:value="btn" />
@@ -57,23 +58,23 @@
 
     <Separator />
 
-    <!-- Optional Fields Section -->
+    <!-- Transaction Details Section -->
     <VBox spacing="12.0" style="-fx-background-color: #f8f9fa; -fx-padding: 15; -fx-background-radius: 8;">
-        <Label style="-fx-text-fill: #666666;" styleClass="section-title" text="📋 Optional Fields (for record keeping)" />
+        <Label style="-fx-text-fill: #666666;" styleClass="section-title" text="📋 Transaction Details" />
 
         <!-- Price per Piece -->
         <VBox spacing="5.0">
-            <Label style="-fx-text-fill: #555555;" styleClass="section-subtitle" text="Price per Piece" />
+            <Label style="-fx-text-fill: #555555;" styleClass="section-subtitle" text="Price per Piece *" />
             <HBox alignment="CENTER_LEFT" spacing="8.0">
-                <TextField fx:id="priceField" prefWidth="180" promptText="(Optional) Price..." />
+                <TextField fx:id="priceField" prefWidth="180" promptText="Ex: 15.00" />
                 <Label styleClass="label-small-bold" text="MAD" />
             </HBox>
         </VBox>
 
         <!-- Customer Name -->
         <VBox spacing="5.0">
-            <Label style="-fx-text-fill: #555555;" styleClass="section-subtitle" text="Customer Name" />
-            <TextField fx:id="customerField" promptText="(Optional) Customer name..." />
+            <Label style="-fx-text-fill: #555555;" styleClass="section-subtitle" text="Client *" />
+            <ComboBox fx:id="customerCombo" prefWidth="300.0" promptText="Sélectionner un client" />
         </VBox>
     </VBox>
 

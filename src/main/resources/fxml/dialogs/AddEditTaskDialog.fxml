@@ -37,7 +37,7 @@
                     <VBox spacing="5.0">
                         <children>
                             <Label styleClass="section-title" text="Description *" />
-                            <TextArea fx:id="descriptionField" prefRowCount="3" promptText="Décrivez la tâche à effectuer..." wrapText="true" />
+                            <TextArea fx:id="descriptionField" prefRowCount="3" promptText="Ex: Réparer la mangeoire du Bâtiment A" wrapText="true" />
                             <Label fx:id="descriptionErrorLabel" managed="false" styleClass="error-label" text="La description est requise" visible="false" />
                         </children>
                     </VBox>
@@ -88,7 +88,7 @@
                     <VBox spacing="5.0">
                         <children>
                             <Label styleClass="section-title" text="Notes" />
-                            <TextArea fx:id="notesField" prefRowCount="2" promptText="Notes supplémentaires (optionnel)..." wrapText="true" />
+                            <TextArea fx:id="notesField" prefRowCount="2" promptText="Ex: Pièce de rechange nécessaire" wrapText="true" />
                         </children>
                     </VBox>
 

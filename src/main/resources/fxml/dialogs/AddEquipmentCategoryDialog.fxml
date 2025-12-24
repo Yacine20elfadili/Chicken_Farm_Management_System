@@ -56,7 +56,7 @@
                 <!-- Notes -->
                 <VBox spacing="5">
                     <Label styleClass="section-title" text="Notes" />
-                    <TextArea fx:id="notesTextArea" prefRowCount="3" promptText="Informations supplémentaires..." wrapText="true" />
+                    <TextArea fx:id="notesTextArea" prefRowCount="3" promptText="Ex: Utilisé pour le nettoyage quotidien" wrapText="true" />
                 </VBox>
 
                 <!-- Info Text -->

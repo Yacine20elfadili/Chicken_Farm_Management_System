@@ -50,7 +50,7 @@
                     <!-- Death Count -->
                     <VBox spacing="8.0">
                         <Label styleClass="section-subtitle" text="Number of Deaths" />
-                        <TextField fx:id="deathCountField" promptText="e.g., 5" />
+                        <TextField fx:id="deathCountField" promptText="Ex: 5" />
                     </VBox>
 
                     <!-- Cause of Death -->
@@ -67,7 +67,7 @@
                     <!-- Symptoms -->
                     <VBox spacing="5.0">
                         <Label styleClass="section-subtitle" text="Symptoms (Optional)" />
-                        <TextArea fx:id="symptomsArea" prefRowCount="3" promptText="Describe symptoms observed..." styleClass="text-area" wrapText="true" />
+                        <TextArea fx:id="symptomsArea" prefRowCount="3" promptText="Ex: Respiration difficile" styleClass="text-area" wrapText="true" />
                     </VBox>
 
                     <!-- Outbreak Status -->
@@ -78,7 +78,7 @@
                     <!-- Recorded By -->
                     <VBox spacing="5.0">
                         <Label styleClass="section-subtitle" text="Recorded By" />
-                        <TextField fx:id="recordedByField" promptText="Worker name..." />
+                        <TextField fx:id="recordedByField" promptText="Ex: Ahmed" />
                     </VBox>
                 </VBox>
 
@@ -89,7 +89,7 @@
                     <!-- Notes -->
                     <VBox spacing="5.0">
                         <Label styleClass="section-subtitle" text="Additional Notes (Optional)" />
-                        <TextArea fx:id="notesArea" prefRowCount="5" promptText="Additional notes..." styleClass="text-area" wrapText="true" />
+                        <TextArea fx:id="notesArea" prefRowCount="5" promptText="Ex: Isolé le lot affecté" styleClass="text-area" wrapText="true" />
                     </VBox>
 
                     <!-- Warning Label -->

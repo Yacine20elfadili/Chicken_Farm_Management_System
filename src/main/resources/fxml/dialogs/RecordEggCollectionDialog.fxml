@@ -41,13 +41,13 @@
         <!-- Eggs Collected -->
         <VBox spacing="8.0">
             <Label styleClass="section-title" text="Oeufs Collectes" />
-            <TextField fx:id="eggsCollectedField" promptText="Nombre d oeufs collectes..." />
+            <TextField fx:id="eggsCollectedField" promptText="Ex: 2500" />
         </VBox>
 
         <!-- Cracked Eggs -->
         <VBox spacing="8.0">
             <Label styleClass="section-title" text="Oeufs Casses" />
-            <TextField fx:id="crackedEggsField" promptText="Nombre d oeufs casses..." />
+            <TextField fx:id="crackedEggsField" promptText="Ex: 5" />
         </VBox>
 
         <!-- Date Picker -->
@@ -59,7 +59,7 @@
         <!-- Notes -->
         <VBox spacing="8.0">
             <Label styleClass="section-title" text="Notes (Optionnel)" />
-            <TextArea fx:id="notesArea" prefRowCount="3" promptText="Ajouter des notes..." wrapText="true" />
+            <TextArea fx:id="notesArea" prefRowCount="3" promptText="Ex: Plumes remarquées" wrapText="true" />
         </VBox>
 
     </VBox>
