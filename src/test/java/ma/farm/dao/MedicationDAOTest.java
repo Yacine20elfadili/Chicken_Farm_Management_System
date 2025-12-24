@@ -46,7 +46,13 @@ public class MedicationDAOTest {
         assertNotNull(medications);
         assertFalse(medications.isEmpty());
 
-        medicationId = medications.get(medications.size() - 1).getId();
+        // Find our test medication by name instead of assuming it's the last one
+        Medication testMed = medications.stream()
+                .filter(m -> "Antibiotic Test".equals(m.getName()))
+                .findFirst()
+                .orElse(null);
+        assertNotNull(testMed, "Test medication should exist");
+        medicationId = testMed.getId();
         assertTrue(medicationId > 0);
     }
 

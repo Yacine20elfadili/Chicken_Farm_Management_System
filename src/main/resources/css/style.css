@@ -487,38 +487,6 @@
     -fx-font-family: 'Segoe UI';
 }
 
-/* Record Collection Button */
-#recordCollectionButton {
-    -fx-background-color: #ff781a;
-    -fx-effect: dropshadow(gaussian, rgba(255,168,0,0.3), 8, 0, 0, 2);
-}
-
-#recordCollectionButton:hover {
-    -fx-background-color: #ff6900;
-    -fx-effect: dropshadow(gaussian, rgba(255,168,0,0.4), 12, 0, 0, 4);
-}
-
-#recordCollectionButton:pressed {
-    -fx-background-color: #e55a00;
-    -fx-effect: dropshadow(gaussian, rgba(255,168,0,0.2), 5, 0, 0, 1);
-}
-
-/* Refresh Button */
-#refreshButton {
-    -fx-background-color: #4e73df;
-    -fx-effect: dropshadow(gaussian, rgba(78,115,223,0.3), 8, 0, 0, 2);
-}
-
-#refreshButton:hover {
-    -fx-background-color: #3d5fc9;
-    -fx-effect: dropshadow(gaussian, rgba(78,115,223,0.4), 12, 0, 0, 4);
-}
-
-#refreshButton:pressed {
-    -fx-background-color: #2c48b3;
-    -fx-effect: dropshadow(gaussian, rgba(78,115,223,0.2), 5, 0, 0, 1);
-}
-
 /* ============= STATISTICS CARDS STYLE ============= */
 .production-stats-card {
     -fx-background-color: #f0f9ff;
@@ -1479,48 +1447,6 @@
     -fx-text-fill: #1e40af;
 }
 
-/*=====================================================================================*/
-/*========================== DIALOG BUTTONS ==========================================*/
-/*=====================================================================================*/
-
-.dialog-button-container {
-    -fx-spacing: 10px;
-    -fx-alignment: center-right;
-    -fx-padding: 15px 0 0 0;
-}
-
-.dialog-btn-save {
-    -fx-background-color: #27ae60;
-    -fx-text-fill: white;
-    -fx-font-size: 13px;
-    -fx-font-weight: bold;
-    -fx-padding: 10px 24px;
-    -fx-background-radius: 6px;
-    -fx-cursor: hand;
-    -fx-effect: dropshadow(gaussian, rgba(39,174,96,0.2), 6, 0, 0, 1);
-}
-
-.dialog-btn-save:hover {
-    -fx-background-color: #229954;
-    -fx-effect: dropshadow(gaussian, rgba(39,174,96,0.3), 10, 0, 0, 2);
-}
-
-.dialog-btn-cancel {
-    -fx-background-color: #95a5a6;
-    -fx-text-fill: white;
-    -fx-font-size: 13px;
-    -fx-font-weight: bold;
-    -fx-padding: 10px 24px;
-    -fx-background-radius: 6px;
-    -fx-cursor: hand;
-    -fx-effect: dropshadow(gaussian, rgba(149,165,166,0.2), 6, 0, 0, 1);
-}
-
-.dialog-btn-cancel:hover {
-    -fx-background-color: #7f8c8d;
-    -fx-effect: dropshadow(gaussian, rgba(149,165,166,0.3), 10, 0, 0, 2);
-}
-
 /* ============================================
    SIGN UP PAGE STYLES
    ============================================ */
@@ -1804,4 +1730,198 @@
     -fx-text-fill: #6b7280;
     -fx-font-size: 14px;
     -fx-font-family: 'Segoe UI', Arial, sans-serif;
+}
+
+/* Buttons */
+.btn {
+    -fx-font-family: "Calibri";
+    -fx-font-size: 15px;
+    -fx-font-weight: 500;
+    -fx-padding: 10 25;
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
+    -fx-cursor: hand;
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+}
+
+.btn-cancel {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #d1d5db;
+    -fx-text-fill: #374151;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 3, 0.5, 0, 1);
+}
+
+.btn-cancel:hover {
+    -fx-background-color: #f9fafb;
+    -fx-border-color: #9ca3af;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.12), 4, 0.5, 0, 2);
+}
+
+.btn-save {
+    -fx-background-color: #2563eb;
+    -fx-border-color: #2563eb;
+    -fx-text-fill: #ffffff;
+    -fx-effect: dropshadow(gaussian, rgba(37,99,235,0.3), 3, 0.5, 0, 1);
+}
+
+.btn-save:hover {
+    -fx-background-color: #1d4ed8;
+    -fx-border-color: #1d4ed8;
+    -fx-effect: dropshadow(gaussian, rgba(37,99,235,0.45), 5, 0.5, 0, 2);
+}
+
+.btn-save:pressed {
+    -fx-background-color: #1e40af;
+    -fx-border-color: #1e40af;
+    -fx-effect: dropshadow(gaussian, rgba(37,99,235,0.2), 2, 0.5, 0, 1);
+}
+.btn-death {
+    -fx-background-color: #dc3545;
+    -fx-border-color: #dc3545;
+    -fx-text-fill: #ffffff;
+    -fx-effect: dropshadow(gaussian, rgba(220,53,69,0.3), 3, 0.5, 0, 1);
+}
+
+.btn-death:hover {
+    -fx-background-color: #c82333;
+    -fx-border-color: #c82333;
+    -fx-effect: dropshadow(gaussian, rgba(220,53,69,0.45), 5, 0.5, 0, 2);
+}
+
+.btn-death:pressed {
+    -fx-background-color: #bd2130;
+    -fx-border-color: #bd2130;
+    -fx-effect: dropshadow(gaussian, rgba(220,53,69,0.2), 2, 0.5, 0, 1);
+}
+
+.btn-sell {
+    -fx-background-color: #16a34a;     /* Green – sell / success */
+    -fx-border-color: transparent;
+    -fx-text-fill: #ffffff;
+    -fx-effect: dropshadow(gaussian, rgba(22,163,74,0.30), 3, 0.5, 0, 1);
+}
+
+/* Hover */
+.btn-sell:hover {
+    -fx-background-color: #15803d;     /* Darker green */
+    -fx-border-color: #15803d;
+    -fx-effect: dropshadow(gaussian, rgba(22,163,74,0.45), 5, 0.5, 0, 2);
+}
+
+/* Pressed */
+.btn-sell:pressed {
+    -fx-background-color: #166534;     /* Deep green */
+    -fx-border-color: #166534;
+    -fx-effect: dropshadow(gaussian, rgba(22,163,74,0.20), 2, 0.5, 0, 1);
+}
+
+/* Focused (keyboard navigation) */
+.btn-sell:focused {
+    -fx-border-color: #22c55e;
+}
+
+.btn:disabled {
+    -fx-opacity: 0.5;
+    -fx-effect: none;
+}
+
+/* ===============================
+   GLOBAL TABPANE STYLE
+   =============================== */
+
+/* Make TabPane background transparent */
+.tab-pane {
+    -fx-background-color: transparent;
+}
+
+/* Remove default header background */
+.tab-pane > .tab-header-area {
+    -fx-background-color: transparent;
+    -fx-padding: 5 0 5 0;
+}
+
+/* Header background */
+.tab-pane > .tab-header-area > .tab-header-background {
+    -fx-background-color: transparent;
+}
+
+/* ===============================
+   TAB BUTTONS
+   =============================== */
+
+.tab {
+    -fx-background-color: #e9ecef;
+    -fx-background-radius: 8 8 0 0;
+    -fx-border-radius: 8 8 0 0;
+    -fx-padding: 8 16;
+    -fx-font-family: "Comic Sans MS";
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #495057;
+    -fx-border-color: transparent;
+}
+
+/* Hover effect */
+.tab:hover {
+    -fx-background-color: #dee2e6;
+}
+
+/* ===============================
+   SELECTED TAB
+   =============================== */
+
+.tab:selected {
+    -fx-background-color: #ffffff;
+    -fx-text-fill: #2f855a; /* farm green */
+    -fx-border-color: #cfe8dc;
+    -fx-border-width: 0 0 3 0;
+}
+
+/* ===============================
+   TAB CONTENT AREA
+   =============================== */
+
+.tab-pane > .tab-content-area {
+    -fx-background-color: transparent;
+    -fx-padding: 15;
+}
+/* Remove blue focus border on tabs */
+.tab:focused {
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+}
+
+/* Also remove focus ring from TabPane itself */
+.tab-pane:focused {
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+}
+
+/* Prevent inner focus outline */
+.tab:selected:focused {
+    -fx-background-insets: 0;
+}
+
+/* SplitPane base */
+.split-pane {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+}
+
+/* Divider (the separator) */
+.split-pane-divider {
+    -fx-background-color: #d1d5db; /* soft neutral gray */
+    -fx-padding: 0 1 0 1;          /* thin divider */
+}
+
+/* Divider hover effect */
+.split-pane-divider:hover {
+    -fx-background-color: #9ca3af;
+}
+
+/* Remove ugly focus outline */
+.split-pane:focused {
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
 }

@@ -62,6 +62,48 @@
             <version>5.10.1</version>
             <scope>test</scope>
         </dependency>
+
+        <!--
+            iText7 PDF Library
+            LICENSE WARNING: iText7 uses AGPL license.
+            If you plan to sell or distribute this application commercially,
+            you MUST either:
+            1. Purchase a commercial iText license (~€1000+), OR
+            2. Switch to Apache PDFBox (Apache 2.0 license - 100% free for commercial use)
+            See: https://itextpdf.com/products/itext-7/community
+        -->
+        <dependency>
+            <groupId>com.itextpdf</groupId>
+            <artifactId>itext7-core</artifactId>
+            <version>7.2.5</version>
+            <type>pom</type>
+        </dependency>
+
+        <!-- OpenHTMLToPDF (Apache-2.0) - render HTML/CSS to PDF using PDFBox renderer -->
+        <dependency>
+            <groupId>com.openhtmltopdf</groupId>
+            <artifactId>openhtmltopdf-pdfbox</artifactId>
+            <version>1.0.10</version>
+        </dependency>
+
+        <!-- Apache PDFBox - rasterize PDF to PNG if needed -->
+        <dependency>
+            <groupId>org.apache.pdfbox</groupId>
+            <artifactId>pdfbox</artifactId>
+            <version>2.0.29</version>
+        </dependency>
+
+        <!-- ZXing - barcode generation/decoding (Apache-2.0) -->
+        <dependency>
+            <groupId>com.google.zxing</groupId>
+            <artifactId>core</artifactId>
+            <version>3.5.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.zxing</groupId>
+            <artifactId>javase</artifactId>
+            <version>3.5.1</version>
+        </dependency>
     </dependencies>
 
     <build>

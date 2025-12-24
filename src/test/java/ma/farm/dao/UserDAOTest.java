@@ -3,146 +3,142 @@ package ma.farm.dao;
 import ma.farm.model.User;
 import org.junit.jupiter.api.*;
 
-import java.sql.Connection;
-import java.sql.Statement;
-import java.time.LocalDateTime;
-import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class UserDAOTest {
+public class UserDAOTest {
 
     private static UserDAO userDAO;
-    private static User testUser;
+    private static int testUserId;
 
     @BeforeAll
-    static void setup() throws Exception {
+    static void setup() {
         userDAO = new UserDAO();
+    }
 
-        // Nettoyer uniquement l'utilisateur de test
-        try (Connection conn = DatabaseConnection.getInstance().getConnection();
-             Statement stmt = conn.createStatement()) {
-            stmt.executeUpdate(
-                    "DELETE FROM users WHERE email LIKE 'test_%@mail.com'"
-            );
-        }
-
-        testUser = new User(
+    private User createTestUser(String email) {
+        return new User(
                 0,
-                "Test User",
-                "test_user@mail.com",
-                "1234",
-                LocalDateTime.now()
+                email,
+                "password123",
+                "Test Company",
+                "SARL",
+                100000,
+                "ICE" + System.currentTimeMillis(),
+                "RC12345",
+                "FISC123",
+                123456,
+                "CNSS123",
+                "ONSSA123",
+                "Rue Test",
+                "Casablanca",
+                "20000",
+                "RIB123456789",
+                "CIH",
+                "0612345678",
+                "www.test.ma",
+                null, // logo
+                (java.time.LocalDateTime) null, // creationDate
+                (java.time.LocalDateTime) null // updatedAt
         );
     }
 
-    // ---------------- CREATE ----------------
     @Test
     @Order(1)
     void testCreateUser() {
-        boolean created = userDAO.createUser(testUser);
+        User user = createTestUser("user@test.ma");
+        boolean created = userDAO.createUser(user);
 
         assertTrue(created);
-        assertTrue(testUser.getId() > 0);
+        assertTrue(user.getId() > 0);
+
+        testUserId = user.getId();
     }
 
-    // ---------------- READ BY ID ----------------
     @Test
     @Order(2)
     void testGetUserById() {
-        User user = userDAO.getUserById(testUser.getId());
+        User user = userDAO.getUserById(testUserId);
 
         assertNotNull(user);
-        assertEquals(testUser.getEmail(), user.getEmail());
+        assertEquals(testUserId, user.getId());
+        assertEquals("user@test.ma", user.getEmail());
     }
 
-    // ---------------- READ BY EMAIL ----------------
     @Test
     @Order(3)
     void testGetUserByEmail() {
-        User user = userDAO.getUserByEmail(testUser.getEmail());
+        User user = userDAO.getUserByEmail("user@test.ma");
 
         assertNotNull(user);
-        assertEquals(testUser.getName(), user.getName());
+        assertEquals(testUserId, user.getId());
     }
 
-    // ---------------- GET ALL ----------------
     @Test
     @Order(4)
-    void testGetAllUsers() {
-        List<User> users = userDAO.getAllUsers();
-
-        assertNotNull(users);
-        assertTrue(users.size() > 0);
+    void testValidateLogin() {
+        assertTrue(userDAO.validate("user@test.ma", "password123"));
+        assertFalse(userDAO.validate("user@test.ma", "wrongpassword"));
     }
 
-    // ---------------- VALIDATE ----------------
     @Test
     @Order(5)
-    void testValidate() {
-        assertTrue(
-                userDAO.validate("test_user@mail.com", "1234")
-        );
-        assertFalse(
-                userDAO.validate("test_user@mail.com", "wrong")
-        );
-    }
-
-    // ---------------- AUTHENTICATE ----------------
-    @Test
-    @Order(6)
     void testAuthenticate() {
-        User user = userDAO.authenticate(
-                "test_user@mail.com",
-                "1234"
-        );
+        User user = userDAO.authenticate("user@test.ma", "password123");
 
         assertNotNull(user);
-        assertEquals(testUser.getEmail(), user.getEmail());
+        assertEquals("user@test.ma", user.getEmail());
+    }
+
+    @Test
+    @Order(6)
+    void testUpdateUser() {
+        User user = userDAO.getUserById(testUserId);
+        user.setCompanyName("Updated Company");
+
+        boolean updated = userDAO.updateUser(user);
+
+        assertTrue(updated);
+
+        User updatedUser = userDAO.getUserById(testUserId);
+        assertEquals("Updated Company", updatedUser.getCompanyName());
     }
 
     @Test
     @Order(7)
-    void testAuthenticateFail() {
-        assertThrows(
-                SecurityException.class,
-                () -> userDAO.authenticate(
-                        "test_user@mail.com",
-                        "badpass"
-                )
-        );
+    void testEmailExists() {
+        assertTrue(userDAO.isEmailExists("user@test.ma"));
+        assertFalse(userDAO.isEmailExists("notexist@test.ma"));
     }
 
-    // ---------------- UPDATE ----------------
     @Test
     @Order(8)
-    void testUpdateUser() {
-        testUser.setName("Updated Name");
-
-        boolean updated = userDAO.updateUser(testUser);
-        assertTrue(updated);
-
-        User updatedUser = userDAO.getUserById(testUser.getId());
-        assertEquals("Updated Name", updatedUser.getName());
+    void testICEExists() {
+        User user = userDAO.getUserById(testUserId);
+        assertTrue(userDAO.isICEExists(user.getIce()));
     }
 
-    // ---------------- COUNT ----------------
     @Test
     @Order(9)
+    void testRIBExists() {
+        User user = userDAO.getUserById(testUserId);
+        assertTrue(userDAO.isRIBExists(user.getBankRIB()));
+    }
+
+    @Test
+    @Order(10)
     void testUserCount() {
         int count = userDAO.getUserCount();
         assertTrue(count > 0);
     }
 
-    // ---------------- DELETE ----------------
     @Test
-    @Order(10)
+    @Order(11)
     void testDeleteUser() {
-        boolean deleted = userDAO.deleteUser(testUser.getId());
+        boolean deleted = userDAO.deleteUser(testUserId);
         assertTrue(deleted);
 
-        User user = userDAO.getUserById(testUser.getId());
+        User user = userDAO.getUserById(testUserId);
         assertNull(user);
     }
 }

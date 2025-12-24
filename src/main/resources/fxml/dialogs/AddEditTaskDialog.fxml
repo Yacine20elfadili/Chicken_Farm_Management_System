@@ -1,112 +1,118 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.String?>
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.Spinner?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
 
-<AnchorPane prefHeight="550.0" prefWidth="550.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ma.farm.controller.dialogs.AddEditTaskDialogController" style="-fx-background-color: #f8f9fa;">
+<VBox prefHeight="650.0" prefWidth="550.0" spacing="15.0" styleClass="root" stylesheets="@../../css/dialogs.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ma.farm.controller.dialogs.AddEditTaskDialogController">
 
-    <children>
-        <!-- Header -->
-        <VBox prefWidth="550.0" style="-fx-background-color: #007bff;" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-            <padding><Insets bottom="15.0" left="20.0" right="20.0" top="15.0" /></padding>
-            <children>
-                <Label fx:id="dialogTitle" text="Nouvelle Tâche" style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: white;" />
-                <Label text="Remplissez les champs pour créer une tâche" style="-fx-font-size: 12px; -fx-text-fill: #e3f2fd;" />
-            </children>
-        </VBox>
+    <padding>
+        <Insets bottom="20.0" left="25.0" right="25.0" top="20.0" />
+    </padding>
 
-        <!-- Form Content -->
-        <ScrollPane fitToWidth="true" AnchorPane.bottomAnchor="70.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="75.0" style="-fx-background: transparent; -fx-background-color: transparent;">
-            <content>
-                <VBox spacing="15.0" style="-fx-background-color: transparent;">
-                    <padding><Insets bottom="20.0" left="25.0" right="25.0" top="15.0" /></padding>
-                    <children>
+    <!-- Header -->
+    <VBox spacing="5.0">
+        <Label fx:id="dialogTitle" styleClass="title" text="📝 Nouvelle Tâche" />
+        <Label styleClass="subtitle" text="Remplissez les champs pour créer une tâche" />
+    </VBox>
 
-                        <!-- Description -->
-                        <VBox spacing="5.0">
-                            <children>
-                                <Label text="Description *" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #495057;" />
-                                <TextArea fx:id="descriptionField" promptText="Décrivez la tâche à effectuer..." prefRowCount="3" wrapText="true" style="-fx-font-size: 13px;" />
-                                <Label fx:id="descriptionErrorLabel" text="La description est requise" style="-fx-text-fill: #dc3545; -fx-font-size: 11px;" visible="false" managed="false" />
-                            </children>
-                        </VBox>
+    <Separator />
 
-                        <!-- Category and Priority Row -->
-                        <HBox spacing="15.0">
-                            <children>
-                                <VBox spacing="5.0" HBox.hgrow="ALWAYS">
-                                    <children>
-                                        <Label text="Catégorie *" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #495057;" />
-                                        <ComboBox fx:id="categoryComboBox" promptText="Sélectionner..." prefWidth="250.0" style="-fx-font-size: 13px;" />
-                                        <Label fx:id="categoryErrorLabel" text="La catégorie est requise" style="-fx-text-fill: #dc3545; -fx-font-size: 11px;" visible="false" managed="false" />
-                                    </children>
-                                </VBox>
-                                <VBox spacing="5.0" HBox.hgrow="ALWAYS">
-                                    <children>
-                                        <Label text="Priorité *" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #495057;" />
-                                        <ComboBox fx:id="priorityComboBox" promptText="Sélectionner..." prefWidth="250.0" style="-fx-font-size: 13px;" />
-                                    </children>
-                                </VBox>
-                            </children>
-                        </HBox>
+    <!-- Form Content -->
+    <ScrollPane fitToWidth="true" styleClass="transparent-scroll" VBox.vgrow="ALWAYS">
+        <content>
+            <VBox spacing="15.0" style="-fx-background-color: transparent;">
+                <children>
 
-                        <!-- Due Date and House Row -->
-                        <HBox spacing="15.0">
-                            <children>
-                                <VBox spacing="5.0" HBox.hgrow="ALWAYS">
-                                    <children>
-                                        <Label text="Date Échéance *" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #495057;" />
-                                        <DatePicker fx:id="dueDatePicker" promptText="JJ/MM/AAAA" prefWidth="250.0" style="-fx-font-size: 13px;" />
-                                        <Label fx:id="dueDateErrorLabel" text="La date est requise" style="-fx-text-fill: #dc3545; -fx-font-size: 11px;" visible="false" managed="false" />
-                                    </children>
-                                </VBox>
-                                <VBox fx:id="houseSection" spacing="5.0" HBox.hgrow="ALWAYS">
-                                    <children>
-                                        <Label text="Bâtiment" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #495057;" />
-                                        <ComboBox fx:id="houseComboBox" promptText="Sélectionner..." prefWidth="250.0" style="-fx-font-size: 13px;" />
-                                    </children>
-                                </VBox>
-                            </children>
-                        </HBox>
+                    <!-- Description -->
+                    <VBox spacing="5.0">
+                        <children>
+                            <Label styleClass="section-title" text="Description *" />
+                            <TextArea fx:id="descriptionField" prefRowCount="3" promptText="Ex: Réparer la mangeoire du Bâtiment A" wrapText="true" />
+                            <Label fx:id="descriptionErrorLabel" managed="false" styleClass="error-label" text="La description est requise" visible="false" />
+                        </children>
+                    </VBox>
+                      <VBox spacing="5.0">
+                          <children>
+                              <Label styleClass="section-title" text="Catégorie *" />
+                              <ComboBox fx:id="categoryComboBox" promptText="Sélectionner..." />
+                              <Label fx:id="categoryErrorLabel" managed="false" styleClass="error-label" text="La catégorie est requise" visible="false" />
+                          </children>
+                      </VBox>
+                      <VBox spacing="5.0">
+                          <children>
+                              <Label styleClass="section-title" text="Priorité *" />
+                              <ComboBox fx:id="priorityComboBox" promptText="Sélectionner..." />
+                          </children>
+                      </VBox>
+                      <VBox spacing="5.0">
+                          <children>
+                              <Label styleClass="section-title" text="Date Échéance *" />
+                              <DatePicker fx:id="dueDatePicker" promptText="JJ/MM/AAAA" />
+                              <Label fx:id="dueDateErrorLabel" managed="false" styleClass="error-label" text="La date est requise" visible="false" />
+                          </children>
+                      </VBox>
+                      <VBox fx:id="houseSection" spacing="5.0">
+                          <children>
+                              <Label styleClass="section-title" text="Bâtiment" />
+                              <ComboBox fx:id="houseComboBox" promptText="Sélectionner..." />
+                          </children>
+                      </VBox>
 
-                        <!-- Assigned To -->
-                        <VBox spacing="5.0">
-                            <children>
-                                <Label text="Assigner à" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #495057;" />
-                                <ComboBox fx:id="assignedToComboBox" promptText="Sélectionner un employé..." prefWidth="500.0" style="-fx-font-size: 13px;" />
-                            </children>
-                        </VBox>
+                    <!-- Assigned To -->
+                    <VBox spacing="5.0">
+                        <children>
+                            <Label styleClass="section-title" text="Assigner à" />
+                            <ComboBox fx:id="assignedToComboBox" promptText="Sélectionner un employé..." />
+                        </children>
+                    </VBox>
 
-                        <!-- Cracked Eggs (only for Collection) -->
-                        <VBox fx:id="crackedEggsSection" spacing="5.0" visible="false" managed="false">
-                            <children>
-                                <Label text="Œufs cassés" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #495057;" />
-                                <Spinner fx:id="crackedEggsSpinner" prefWidth="150.0" style="-fx-font-size: 13px;" />
-                            </children>
-                        </VBox>
+                    <!-- Cracked Eggs (only for Collection) -->
+                    <VBox fx:id="crackedEggsSection" managed="false" spacing="5.0" visible="false">
+                        <children>
+                            <Label style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #495057;" text="Œufs cassés" />
+                            <Spinner fx:id="crackedEggsSpinner" prefWidth="150.0" style="-fx-font-size: 13px;" />
+                        </children>
+                    </VBox>
 
-                        <!-- Notes -->
-                        <VBox spacing="5.0">
-                            <children>
-                                <Label text="Notes" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #495057;" />
-                                <TextArea fx:id="notesField" promptText="Notes supplémentaires (optionnel)..." prefRowCount="2" wrapText="true" style="-fx-font-size: 13px;" />
-                            </children>
-                        </VBox>
+                    <!-- Notes -->
+                    <VBox spacing="5.0">
+                        <children>
+                            <Label styleClass="section-title" text="Notes" />
+                            <TextArea fx:id="notesField" prefRowCount="2" promptText="Ex: Pièce de rechange nécessaire" wrapText="true" />
+                        </children>
+                    </VBox>
 
-                    </children>
-                </VBox>
-            </content>
-        </ScrollPane>
+                </children>
+            </VBox>
+        </content>
+    </ScrollPane>
 
-        <!-- Footer Buttons -->
-        <HBox spacing="15.0" alignment="CENTER_RIGHT" style="-fx-background-color: #f8f9fa; -fx-border-color: #dee2e6; -fx-border-width: 1 0 0 0;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" prefHeight="70.0">
-            <padding><Insets bottom="15.0" left="25.0" right="25.0" top="15.0" /></padding>
-            <children>
-                <Button fx:id="cancelButton" text="Annuler" onAction="#handleCancel" prefWidth="120.0" prefHeight="38.0" style="-fx-background-color: #6c757d; -fx-text-fill: white; -fx-font-size: 13px; -fx-background-radius: 5; -fx-cursor: hand;" />
-                <Button fx:id="saveButton" text="Enregistrer" onAction="#handleSave" prefWidth="120.0" prefHeight="38.0" style="-fx-background-color: #28a745; -fx-text-fill: white; -fx-font-size: 13px; -fx-background-radius: 5; -fx-cursor: hand;" />
-            </children>
-        </HBox>
+    <Separator />
 
-    </children>
-</AnchorPane>
+    <!-- Footer Buttons -->
+    <HBox alignment="CENTER_RIGHT" spacing="15.0">
+        <children>
+            <Button fx:id="cancelButton" onAction="#handleCancel" text="Annuler">
+            <styleClass>
+               <String fx:value="btn" />
+               <String fx:value="btn-cancel" />
+            </styleClass></Button>
+            <Button fx:id="saveButton" onAction="#handleSave" text="Enregistrer">
+            <styleClass>
+               <String fx:value="btn" />
+               <String fx:value="btn-save" />
+            </styleClass></Button>
+        </children>
+    </HBox>
+
+</VBox>

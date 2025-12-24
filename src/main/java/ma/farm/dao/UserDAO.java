@@ -29,8 +29,8 @@ public class UserDAO {
         String sql = """
                 INSERT INTO users (email, password, companyName, legalForm, capitalSocial,
                     ice, rc, fiscalId, patente, cnss, onssa,
-                    address, city, postalCode, bankRIB, bankName, phoneNumber, website)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    address, city, postalCode, bankRIB, bankName, phoneNumber, website, logo)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """;
         try (
                 Connection conn = dbConnection.getConnection();
@@ -51,8 +51,9 @@ public class UserDAO {
             stmt.setString(14, user.getPostalCode());
             stmt.setString(15, user.getBankRIB());
             stmt.setString(16, user.getBankName());
-            stmt.setString(17, user.getPhoneNumber());
+            stmt.setString(17, user.getPhone());
             stmt.setString(18, user.getWebsite());
+            stmt.setString(19, user.getLogo());
 
             int rows = stmt.executeUpdate();
             if (rows == 0)
@@ -156,7 +157,7 @@ public class UserDAO {
         String sql = """
                 UPDATE users SET email=?, password=?, companyName=?, legalForm=?, capitalSocial=?,
                     ice=?, rc=?, fiscalId=?, patente=?, cnss=?, onssa=?,
-                    address=?, city=?, postalCode=?, bankRIB=?, bankName=?, phoneNumber=?, website=?,
+                    address=?, city=?, postalCode=?, bankRIB=?, bankName=?, phoneNumber=?, website=?, logo=?,
                     updatedAt=CURRENT_TIMESTAMP
                 WHERE id=?
                 """;
@@ -178,9 +179,10 @@ public class UserDAO {
             stmt.setString(14, user.getPostalCode());
             stmt.setString(15, user.getBankRIB());
             stmt.setString(16, user.getBankName());
-            stmt.setString(17, user.getPhoneNumber());
+            stmt.setString(17, user.getPhone());
             stmt.setString(18, user.getWebsite());
-            stmt.setInt(19, user.getId());
+            stmt.setString(19, user.getLogo());
+            stmt.setInt(20, user.getId());
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
             System.err.println("Error updating user: " + e.getMessage());
@@ -282,6 +284,13 @@ public class UserDAO {
         Timestamp creationTs = rs.getTimestamp("creationDate");
         Timestamp updatedTs = rs.getTimestamp("updatedAt");
 
+        String logo = null;
+        try {
+            logo = rs.getString("logo");
+        } catch (SQLException e) {
+            // Ignore if column doesn't exist yet
+        }
+
         return new User(
                 rs.getInt("id"),
                 rs.getString("email"),
@@ -300,8 +309,9 @@ public class UserDAO {
                 rs.getString("postalCode"),
                 rs.getString("bankRIB"),
                 rs.getString("bankName"),
-                rs.getString("phoneNumber"),
+                rs.getString("phoneNumber"), // DB column
                 rs.getString("website"),
+                logo,
                 creationTs != null ? creationTs.toLocalDateTime() : null,
                 updatedTs != null ? updatedTs.toLocalDateTime() : null);
     }

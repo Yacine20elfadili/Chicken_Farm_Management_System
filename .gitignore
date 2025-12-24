@@ -120,6 +120,7 @@ $RECYCLE.BIN/
 *~.nib
 *.bak
 *.orig
+src/main/resources/qrcodes/*
 
 # ============================================
 # Logs
@@ -162,3 +163,8 @@ lib/
 # Don't ignore schema.sql (we need this!)
 # ============================================
 !src/main/resources/database/schema.sql
+
+# ============================================
+# Project Documents (UML, docs, etc.)
+# ============================================
+Documents/

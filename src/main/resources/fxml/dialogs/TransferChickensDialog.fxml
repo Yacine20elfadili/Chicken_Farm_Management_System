@@ -1,89 +1,96 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.String?>
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
 
-<VBox xmlns="http://javafx.com/javafx"
-      xmlns:fx="http://javafx.com/fxml"
-      fx:controller="ma.farm.controller.dialogs.TransferChickensDialogController"
-      prefWidth="550.0"
-      prefHeight="600.0"
-      spacing="15"
-      style="-fx-background-color: #ffffff;">
+<VBox prefHeight="600.0" prefWidth="550.0" spacing="15" styleClass="root" stylesheets="@../../css/dialogs.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ma.farm.controller.dialogs.TransferChickensDialogController">
 
     <padding>
-        <Insets bottom="20.0" left="25.0" right="25.0" top="20.0"/>
+        <Insets bottom="20.0" left="25.0" right="25.0" top="20.0" />
     </padding>
 
     <!-- Dialog Title -->
     <VBox spacing="5.0">
-        <Label text="🔄 Transfer Chickens"
-               style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #1e2939;"/>
-        <Label fx:id="sourceHouseLabel" text="Transferring from: FemaleEggLayer-House-1"
-               style="-fx-font-size: 13px; -fx-text-fill: #666666;"/>
+        <Label styleClass="title" text="🔄 Transfer Chickens" />
+        <Label fx:id="sourceHouseLabel" styleClass="subtitle" text="Transferring from: FemaleEggLayer-House-1" />
     </VBox>
 
-    <Separator/>
+    <Separator styleClass="separator" />
 
     <!-- Transfer Info -->
-    <HBox alignment="CENTER_LEFT" spacing="12.0"
-          style="-fx-background-color: #e8f5e9; -fx-padding: 12; -fx-background-radius: 5;">
-        <Label text="Total chickens to transfer:" style="-fx-font-weight: bold; -fx-text-fill: #2e7d32;"/>
-        <Label fx:id="totalChickensLabel" text="0"
-               style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2e7d32;"/>
+    <HBox alignment="CENTER_LEFT" spacing="12.0" styleClass="transfer-info-box">
+        <Label style="-fx-text-fill: #2e7d32;" styleClass="label-small-bold" text="Total chickens to transfer:" />
+        <Label fx:id="totalChickensLabel" style="-fx-text-fill: #2e7d32;" styleClass="footer-value" text="0" />
     </HBox>
 
-    <Separator/>
+    <!-- Validation Message -->
+    <VBox fx:id="validationBox" managed="false" spacing="5.0" styleClass="validation-box" visible="false">
+        <HBox alignment="CENTER_LEFT" spacing="10.0">
+            <Label styleClass="label-small-bold-warning" text="⚠️ Validation Warning" />
+            <Label fx:id="daysRemainingLabel" styleClass="label-small-warning" text="days remaining" />
+        </HBox>
+        <Label styleClass="hint" text="Transfer allowed for testing purposes." />
+    </VBox>
+
+    <Separator styleClass="separator" />
 
     <!-- Destination House Selection -->
-    <VBox spacing="12.0" VBox.vgrow="ALWAYS"
-          style="-fx-background-color: #f3e5f5; -fx-padding: 15; -fx-background-radius: 8;">
+    <VBox spacing="12.0" VBox.vgrow="ALWAYS">
         <HBox alignment="CENTER_LEFT" spacing="10.0">
-            <Label text="🍗 Select Destination Female Meat Houses"
-                   style="-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #7b1fa2;"/>
+            <Label styleClass="result-title" text="🍗 Select Destination Female Meat Houses" />
         </HBox>
-        <Label fx:id="capacityInfoLabel" text="Total available capacity: 0 chickens"
-               style="-fx-font-size: 11px; -fx-text-fill: #666666;"/>
-        <Label text="Select one or more houses to receive the chickens:"
-               style="-fx-font-size: 12px; -fx-text-fill: #555555;"/>
+        <Label fx:id="capacityInfoLabel" style="-fx-text-fill: #444444;" styleClass="result-total" text="Total available capacity: 0 chickens" />
+        <Label styleClass="label-small-info" text="Select one or more houses to receive the chickens:" />
 
-        <ScrollPane fitToWidth="true" prefHeight="180" VBox.vgrow="ALWAYS"
-                    style="-fx-background-color: transparent; -fx-background: transparent; -fx-border-color: transparent;">
-            <VBox fx:id="destinationHousesContainer" spacing="8.0" style="-fx-padding: 5;">
+        <ScrollPane fitToWidth="true" prefHeight="180" styleClass="transparent-scroll" VBox.vgrow="ALWAYS">
+            <VBox fx:id="destinationHousesContainer" spacing="8.0" styleClass="scroll-content">
                 <!-- Destination house checkboxes will be added dynamically -->
             </VBox>
         </ScrollPane>
 
-        <HBox alignment="CENTER_LEFT" spacing="10.0"
-              style="-fx-background-color: #ffffff; -fx-padding: 10; -fx-background-radius: 5; -fx-border-color: #e0e0e0; -fx-border-radius: 5;">
-            <Label text="Selected capacity:" style="-fx-font-weight: bold; -fx-text-fill: #333333;"/>
-            <Label fx:id="selectedCapacityLabel" text="0"
-                   style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #7b1fa2;"/>
-            <Label text="/" style="-fx-text-fill: #999999; -fx-font-size: 14px;"/>
-            <Label text="Needed:" style="-fx-text-fill: #666666;"/>
-            <Label fx:id="neededCapacityLabel" text="0"
-                   style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #333333;"/>
+        <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="capacity-box">
+            <Label style="-fx-text-fill: #333333;" styleClass="label-small-bold" text="Selected capacity:" />
+            <Label fx:id="selectedCapacityLabel" style="-fx-text-fill: #7b1fa2;" styleClass="footer-value" text="0" />
+            <Label styleClass="label-small-secondary" text="/" />
+            <Label style="-fx-text-fill: #666666;" styleClass="label-small-secondary" text="Needed:" />
+            <Label fx:id="neededCapacityLabel" styleClass="footer-value" text="0" />
         </HBox>
 
-        <Label fx:id="capacityErrorLabel" text="" style="-fx-text-fill: #dc3545; -fx-font-size: 11px;" visible="false"/>
+        <Label fx:id="capacityErrorLabel" styleClass="error-label" text="" visible="false" />
+
+        <VBox styleClass="result-card female">
+            <!-- optional: content dynamically added -->
+        </VBox>
+        <styleClass>
+            <String fx:value="result-card" />
+            <String fx:value="female" />
+        </styleClass>
     </VBox>
 
     <!-- Error Label -->
-    <Label fx:id="errorLabel" style="-fx-text-fill: #dc3545;" wrapText="true" visible="false" managed="false"/>
+    <Label fx:id="errorLabel" managed="false" styleClass="error-label" visible="false" wrapText="true" />
 
-    <Separator/>
+    <Separator styleClass="separator" />
 
     <!-- Button Bar -->
-    <HBox spacing="12.0" alignment="CENTER_RIGHT">
-        <padding>
-            <Insets top="10.0"/>
-        </padding>
-        <Button text="Cancel" onAction="#handleCancel"
-                style="-fx-background-color: #6c757d; -fx-text-fill: white; -fx-font-size: 13px; -fx-padding: 10 24; -fx-background-radius: 6; -fx-cursor: hand;"
-                prefWidth="100"/>
-        <Button fx:id="confirmButton" text="Confirm Transfer" onAction="#handleConfirm"
-                style="-fx-background-color: #9c27b0; -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold; -fx-padding: 10 24; -fx-background-radius: 6; -fx-cursor: hand;"
-                prefWidth="160"/>
+    <HBox alignment="CENTER_RIGHT" spacing="12.0">
+        <Button onAction="#handleCancel" prefWidth="100" text="Cancel">
+            <styleClass>
+                <String fx:value="btn" />
+                <String fx:value="btn-cancel" />
+            </styleClass>
+        </Button>
+        <Button fx:id="confirmButton" onAction="#handleConfirm" prefWidth="160" text="Confirm Transfer">
+            <styleClass>
+                <String fx:value="btn" />
+                <String fx:value="btn-save" />
+            </styleClass>
+        </Button>
     </HBox>
 </VBox>

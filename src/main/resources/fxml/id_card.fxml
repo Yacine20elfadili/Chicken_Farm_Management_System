@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+
+<VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="ma.farm.controller.EggsBayController"
+      prefWidth="400" prefHeight="250"
+      style="-fx-background-color: white; -fx-border-color: #333; -fx-border-radius: 15; -fx-background-radius: 15; -fx-border-width: 2;">
+
+    <HBox style="-fx-background-color: #0044cc; -fx-padding: 10; -fx-background-radius: 13 13 0 0;">
+        <Label text="CORPORATE ID" style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 18;"/>
+    </HBox>
+
+    <HBox spacing="20" style="-fx-padding: 20;">
+        <ImageView fx:id="photoBox" fitHeight="120" fitWidth="100" style="-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 5, 0, 0, 0);"/>
+        <VBox spacing="10">
+            <Label fx:id="nameLabel" style="-fx-font-size: 20; -fx-font-weight: bold;"/>
+            <Label fx:id="roleLabel" style="-fx-font-size: 14; -fx-text-fill: #666;"/>
+            <Label fx:id="idLabel" style="-fx-font-family: 'Courier New'; -fx-font-size: 12;"/>
+        </VBox>
+    </HBox>
+</VBox>

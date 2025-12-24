@@ -1,113 +1,124 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.String?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox prefHeight="650.0" prefWidth="600.0" style="-fx-background-color: #f8f9fa;" styleClass="dialog-container" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ma.farm.controller.dialogs.AddEditMedicationDialogController">
+<VBox prefHeight="650.0" prefWidth="600.0" spacing="15.0" styleClass="root" stylesheets="@../../css/dialogs.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ma.farm.controller.dialogs.AddEditMedicationDialogController">
 
-    <!-- Dialog Title -->
-    <Label fx:id="dialogTitle" style="-fx-font-size: 24; -fx-font-weight: bold;" styleClass="dialog-title" text="Ajouter Médicament">
-      <VBox.margin>
-         <Insets bottom="10.0" left="20.0" />
-      </VBox.margin></Label>
+    <!-- ================= HEADER ================= -->
+    <VBox spacing="5">
+        <Label fx:id="dialogTitle" styleClass="title" text="💊 Ajouter Médicament" />
 
-    <!-- Form Content -->
-    <ScrollPane fitToHeight="true" fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent;">
+        <Label styleClass="subtitle" text="Créer un médicament du stock" />
+    </VBox>
+
+    <Separator />
+
+    <!-- ================= MAIN CONTENT ================= -->
+    <ScrollPane fitToHeight="true" fitToWidth="true" styleClass="transparent-scroll" VBox.vgrow="ALWAYS">
+
         <content>
             <VBox spacing="15.0">
-                <padding>
-                    <Insets bottom="10.0" right="10.0" />
-                </padding>
 
                 <!-- Name -->
-                <VBox spacing="5.0">
-                    <Label style="-fx-font-size: 13; -fx-font-weight: bold; -fx-text-fill: #495057;" styleClass="form-label" text="Nom du Médicament *" />
-                    <TextField fx:id="nameField" promptText="Ex: Vitamine Complexe" style="-fx-font-size: 13; -fx-padding: 10;" styleClass="form-input" />
-                    <Label fx:id="nameErrorLabel" styleClass="error-label" text="" />
+                <VBox spacing="5">
+                    <Label styleClass="section-title" text="Nom du Médicament *" />
+                    <TextField fx:id="nameField" promptText="Ex: Bio-Vita Plus" />
+                    <Label fx:id="nameErrorLabel" styleClass="error-label" />
                 </VBox>
 
                 <!-- Type -->
-                <VBox spacing="5.0">
-                    <Label style="-fx-font-size: 13; -fx-font-weight: bold; -fx-text-fill: #495057;" styleClass="form-label" text="Type *" />
-                    <ComboBox fx:id="typeComboBox" prefWidth="200.0" promptText="Sélectionner le type" style="-fx-background-color: #ffffff; -fx-border-color: #ced4da; -fx-background-radius: 5; -fx-border-radius: 5;" styleClass="form-input" />
-                    <Label fx:id="typeErrorLabel" styleClass="error-label" text="" />
+                <VBox spacing="5">
+                    <Label styleClass="section-title" text="Type *" />
+                    <ComboBox fx:id="typeComboBox" promptText="Sélectionner le type" />
+                    <Label fx:id="typeErrorLabel" styleClass="error-label" />
                 </VBox>
 
                 <!-- Quantity -->
-                <VBox spacing="5.0">
-                    <Label style="-fx-font-size: 13; -fx-font-weight: bold; -fx-text-fill: #495057;" styleClass="form-label" text="Quantité *" />
-                    <TextField fx:id="quantityField" promptText="Ex: 100" style="-fx-font-size: 13; -fx-padding: 10;" styleClass="form-input" />
-                    <Label fx:id="quantityErrorLabel" styleClass="error-label" text="" />
+                <VBox spacing="5">
+                    <Label styleClass="section-title" text="Quantité *" />
+                    <TextField fx:id="quantityField" promptText="Ex: 50" />
+                    <Label fx:id="quantityErrorLabel" styleClass="error-label" />
                 </VBox>
 
                 <!-- Unit -->
-                <VBox spacing="5.0">
-                    <Label style="-fx-font-size: 13; -fx-font-weight: bold; -fx-text-fill: #495057;" styleClass="form-label" text="Unité *" />
-                    <ComboBox fx:id="unitComboBox" prefWidth="200.0" promptText="Sélectionner l'unité" style="-fx-background-color: #ffffff; -fx-border-color: #ced4da; -fx-background-radius: 5; -fx-border-radius: 5;" styleClass="form-input" />
-                    <Label fx:id="unitErrorLabel" styleClass="error-label" text="" />
+                <VBox spacing="5">
+                    <Label styleClass="section-title" text="Unité *" />
+                    <ComboBox fx:id="unitComboBox" promptText="Sélectionner l'unité" />
+                    <Label fx:id="unitErrorLabel" styleClass="error-label" />
                 </VBox>
 
-                <!-- Price Per Unit -->
-                <VBox spacing="5.0">
-                    <Label style="-fx-font-size: 13; -fx-font-weight: bold; -fx-text-fill: #495057;" styleClass="form-label" text="Prix par Unité ($) *" />
-                    <TextField fx:id="pricePerUnitField" promptText="Ex: 5.50" style="-fx-font-size: 13; -fx-padding: 10;" styleClass="form-input" />
-                    <Label fx:id="priceErrorLabel" styleClass="error-label" text="" />
+                <!-- Price -->
+                <VBox spacing="5">
+                    <Label styleClass="section-title" text="Prix par Unité (DH) *" />
+                    <TextField fx:id="pricePerUnitField" promptText="Ex: 150.00" />
+                    <Label fx:id="priceErrorLabel" styleClass="error-label" />
                 </VBox>
 
                 <!-- Supplier -->
-                <VBox spacing="5.0">
-                    <Label style="-fx-font-size: 13; -fx-font-weight: bold; -fx-text-fill: #495057;" styleClass="form-label" text="Fournisseur" />
-                    <TextField fx:id="supplierField" promptText="Nom du fournisseur" style="-fx-font-size: 13; -fx-padding: 10;" styleClass="form-input" />
+                <VBox spacing="5">
+                    <Label styleClass="section-title" text="Fournisseur" />
+                    <ComboBox fx:id="supplierCombo" promptText="Sélectionner un fournisseur" prefWidth="250.0" />
                 </VBox>
 
                 <!-- Purchase Date -->
-                <VBox spacing="5.0">
-                    <Label style="-fx-font-size: 13; -fx-font-weight: bold; -fx-text-fill: #495057;" styleClass="form-label" text="Date d'Achat" />
-                    <DatePicker fx:id="purchaseDatePicker" styleClass="form-input" />
+                <VBox spacing="5">
+                    <Label styleClass="section-title" text="Date d'Achat" />
+                    <DatePicker fx:id="purchaseDatePicker" />
                 </VBox>
 
                 <!-- Expiry Date -->
-                <VBox spacing="5.0">
-                    <Label style="-fx-font-size: 13; -fx-font-weight: bold; -fx-text-fill: #495057;" styleClass="form-label" text="Date d'Expiration" />
-                    <DatePicker fx:id="expiryDatePicker" styleClass="form-input" />
+                <VBox spacing="5">
+                    <Label styleClass="section-title" text="Date d'Expiration" />
+                    <DatePicker fx:id="expiryDatePicker" />
                 </VBox>
 
-                <!-- Min Stock Level -->
-                <VBox spacing="5.0">
-                    <Label style="-fx-font-size: 13; -fx-font-weight: bold; -fx-text-fill: #495057;" styleClass="form-label" text="Stock Minimum" />
-                    <TextField fx:id="minStockField" promptText="Ex: 20" style="-fx-font-size: 13; -fx-padding: 10;" styleClass="form-input" />
-                    <Label fx:id="minStockErrorLabel" styleClass="error-label" text="" />
+                <!-- Min Stock -->
+                <VBox spacing="5">
+                    <Label styleClass="section-title" text="Stock Minimum" />
+                    <TextField fx:id="minStockField" promptText="Ex: 10" />
+                    <Label fx:id="minStockErrorLabel" styleClass="error-label" />
                 </VBox>
 
-                <!-- Usage Instructions -->
-                <VBox spacing="5.0">
-                    <Label style="-fx-font-size: 13; -fx-font-weight: bold; -fx-text-fill: #495057;" styleClass="form-label" text="Instructions d'Utilisation" />
-                    <TextArea fx:id="usageTextArea" prefRowCount="3" promptText="Ex: 1 comprimé par 10 oiseaux par jour" style="-fx-font-size: 13;" styleClass="form-input" wrapText="true" />
+                <!-- Usage -->
+                <VBox spacing="5">
+                    <Label styleClass="section-title" text="Instructions d'Utilisation" />
+                    <TextArea fx:id="usageTextArea" prefRowCount="3" promptText="Ex: 1ml par litre d'eau pendant 3 jours" styleClass="error-label" wrapText="true" />
                 </VBox>
+
             </VBox>
         </content>
-      <VBox.margin>
-         <Insets left="20.0" />
-      </VBox.margin>
     </ScrollPane>
 
-    <!-- Buttons -->
-    <HBox alignment="CENTER_RIGHT" spacing="15.0" style="-fx-background-color: #f8f9fa; -fx-border-color: #dee2e6; -fx-border-width: 1px 0 0 0;" VBox.vgrow="ALWAYS">
-        <Button onAction="#handleCancel" prefHeight="50.0" prefWidth="130.0" style="-fx-background-color: #6c757d; -fx-text-fill: white; -fx-font-size: 14; -fx-background-radius: 5; -fx-cursor: hand;" styleClass="btn-secondary" text="Annuler" />
-        <Button onAction="#handleSave" prefHeight="50.0" prefWidth="130.0" style="-fx-background-color: #28a745; -fx-text-fill: white; -fx-font-size: 14; -fx-background-radius: 5; -fx-cursor: hand;" styleClass="btn-primary" text="Enregistrer" />
-      <padding>
-         <Insets bottom="15.0" left="25.0" right="25.0" top="15.0" />
-      </padding>
+    <Separator />
+
+    <!-- ================= BUTTON BAR ================= -->
+    <HBox alignment="CENTER_RIGHT" spacing="15">
+
+        <Button onAction="#handleCancel" text="Annuler">
+         <styleClass>
+            <String fx:value="btn" />
+            <String fx:value="btn-cancel" />
+         </styleClass></Button>
+
+        <Button onAction="#handleSave" text="Enregistrer">
+         <styleClass>
+            <String fx:value="btn" />
+            <String fx:value="btn-save" />
+         </styleClass></Button>
     </HBox>
    <padding>
-      <Insets top="20.0" />
+      <Insets bottom="20.0" left="25.0" right="25.0" top="20.0" />
    </padding>
+
 </VBox>

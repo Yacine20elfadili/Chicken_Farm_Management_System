@@ -1,162 +1,209 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.String?>
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
 
-<AnchorPane prefHeight="700.0" prefWidth="700.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ma.farm.controller.dialogs.PersonnelDetailDialogController" style="-fx-background-color: #f8f9fa;">
-    <children>
-        <VBox prefHeight="80.0" prefWidth="700.0" style="-fx-background-color: #17a2b8;" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-            <padding><Insets bottom="15.0" left="25.0" right="25.0" top="15.0" /></padding>
-            <children>
-                <Label text="Details du Personnel" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: white;" />
-                <Label text="Informations completes" style="-fx-font-size: 13px; -fx-text-fill: #e3f2fd;" />
-            </children>
-        </VBox>
-        <ScrollPane fitToWidth="true" AnchorPane.bottomAnchor="70.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="80.0" style="-fx-background: transparent; -fx-background-color: transparent;">
-            <content>
-                <VBox spacing="20.0" style="-fx-background-color: transparent;">
-                    <padding><Insets bottom="20.0" left="25.0" right="25.0" top="20.0" /></padding>
-                    <children>
-                        <VBox spacing="15.0" style="-fx-background-color: white; -fx-background-radius: 8px; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);">
-                            <padding><Insets bottom="20.0" left="25.0" right="25.0" top="20.0" /></padding>
-                            <children>
-                                <Label text="Informations Personnelles" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #343a40;" />
-                                <Separator />
-                                <HBox spacing="15.0" alignment="CENTER_LEFT">
-                                    <children>
-                                        <VBox spacing="5.0" HBox.hgrow="ALWAYS">
-                                            <children>
-                                                <Label text="Nom Complet" style="-fx-font-size: 12px; -fx-text-fill: #6c757d; -fx-font-weight: bold;" />
-                                                <Label fx:id="nameLabel" text="Ahmed Hassan" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #212529;" />
-                                            </children>
-                                        </VBox>
-                                        <Label fx:id="departmentLabel" text="Administration" style="-fx-background-color: #007bff; -fx-text-fill: white; -fx-padding: 5 12; -fx-background-radius: 15px; -fx-font-size: 12px; -fx-font-weight: bold;" />
-                                        <Label fx:id="statusLabel" text="Actif" style="-fx-background-color: #d4edda; -fx-text-fill: #155724; -fx-padding: 8 15; -fx-background-radius: 20px; -fx-font-size: 13px; -fx-font-weight: bold;" />
-                                    </children>
-                                </HBox>
-                                <HBox spacing="30.0">
-                                    <children>
-                                        <VBox spacing="5.0">
-                                            <children>
-                                                <Label text="Age" style="-fx-font-size: 12px; -fx-text-fill: #6c757d; -fx-font-weight: bold;" />
-                                                <Label fx:id="ageLabel" text="30 ans" style="-fx-font-size: 15px; -fx-text-fill: #212529;" />
-                                            </children>
-                                        </VBox>
-                                        <VBox spacing="5.0">
-                                            <children>
-                                                <Label text="Telephone" style="-fx-font-size: 12px; -fx-text-fill: #6c757d; -fx-font-weight: bold;" />
-                                                <Label fx:id="phoneLabel" text="+212 6XX XXX XXX" style="-fx-font-size: 15px; -fx-text-fill: #212529;" />
-                                            </children>
-                                        </VBox>
-                                        <VBox spacing="5.0">
-                                            <children>
-                                                <Label text="Email" style="-fx-font-size: 12px; -fx-text-fill: #6c757d; -fx-font-weight: bold;" />
-                                                <Label fx:id="emailLabel" text="ahmed@farm.ma" style="-fx-font-size: 15px; -fx-text-fill: #212529;" />
-                                            </children>
-                                        </VBox>
-                                    </children>
-                                </HBox>
-                                <VBox spacing="5.0">
-                                    <children>
-                                        <Label text="Adresse" style="-fx-font-size: 12px; -fx-text-fill: #6c757d; -fx-font-weight: bold;" />
-                                        <Label fx:id="addressLabel" text="123 Rue Farm, Rabat" wrapText="true" style="-fx-font-size: 15px; -fx-text-fill: #212529;" />
-                                    </children>
-                                </VBox>
-                                <VBox spacing="5.0">
-                                    <children>
-                                        <Label text="Contact Urgence" style="-fx-font-size: 12px; -fx-text-fill: #6c757d; -fx-font-weight: bold;" />
-                                        <Label fx:id="emergencyContactLabel" text="Fatima Hassan +212 6XX XXX XXX" style="-fx-font-size: 15px; -fx-text-fill: #212529;" />
-                                    </children>
-                                </VBox>
-                            </children>
-                        </VBox>
-                        <VBox spacing="15.0" style="-fx-background-color: white; -fx-background-radius: 8px; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);">
-                            <padding><Insets bottom="20.0" left="25.0" right="25.0" top="20.0" /></padding>
-                            <children>
-                                <Label text="Informations Emploi" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #343a40;" />
-                                <Separator />
-                                <HBox spacing="30.0">
-                                    <children>
-                                        <VBox spacing="5.0">
-                                            <children>
-                                                <Label text="Titre du Poste" style="-fx-font-size: 12px; -fx-text-fill: #6c757d; -fx-font-weight: bold;" />
-                                                <Label fx:id="jobTitleLabel" text="Superviseur" style="-fx-font-size: 15px; -fx-text-fill: #212529; -fx-font-weight: bold;" />
-                                            </children>
-                                        </VBox>
-                                        <VBox spacing="5.0">
-                                            <children>
-                                                <Label text="Date Embauche" style="-fx-font-size: 12px; -fx-text-fill: #6c757d; -fx-font-weight: bold;" />
-                                                <Label fx:id="hireDateLabel" text="2025-01-01" style="-fx-font-size: 15px; -fx-text-fill: #212529;" />
-                                            </children>
-                                        </VBox>
-                                        <VBox spacing="5.0">
-                                            <children>
-                                                <Label text="Annees Service" style="-fx-font-size: 12px; -fx-text-fill: #6c757d; -fx-font-weight: bold;" />
-                                                <Label fx:id="yearsOfServiceLabel" text="0 ans" style="-fx-font-size: 15px; -fx-text-fill: #212529;" />
-                                            </children>
-                                        </VBox>
-                                        <VBox spacing="5.0">
-                                            <children>
-                                                <Label text="Salaire Mensuel" style="-fx-font-size: 12px; -fx-text-fill: #6c757d; -fx-font-weight: bold;" />
-                                                <Label fx:id="salaryLabel" text="5000.00 MAD" style="-fx-font-size: 15px; -fx-text-fill: #212529; -fx-font-weight: bold;" />
-                                            </children>
-                                        </VBox>
-                                    </children>
-                                </HBox>
-                                <Label fx:id="shiftLabel" visible="false" managed="false" />
-                            </children>
-                        </VBox>
-                        <VBox fx:id="positionsSection" spacing="15.0" style="-fx-background-color: white; -fx-background-radius: 8px; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);" visible="false" managed="false">
-                            <padding><Insets bottom="20.0" left="25.0" right="25.0" top="20.0" /></padding>
-                            <children>
-                                <Label text="Positions Administratives" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #343a40;" />
-                                <Separator />
-                                <FlowPane fx:id="positionsPane" hgap="10.0" vgap="10.0" />
-                            </children>
-                        </VBox>
-                        <VBox fx:id="supervisorSection" spacing="15.0" style="-fx-background-color: white; -fx-background-radius: 8px; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);" visible="false" managed="false">
-                            <padding><Insets bottom="20.0" left="25.0" right="25.0" top="20.0" /></padding>
-                            <children>
-                                <Label text="Superviseur" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #343a40;" />
-                                <Separator />
-                                <HBox spacing="15.0" alignment="CENTER_LEFT">
-                                    <children>
-                                        <VBox spacing="5.0" HBox.hgrow="ALWAYS">
-                                            <children>
-                                                <Label text="Rapporte a" style="-fx-font-size: 12px; -fx-text-fill: #6c757d; -fx-font-weight: bold;" />
-                                                <Label fx:id="supervisorNameLabel" text="Mohammed Al-Rashid" style="-fx-font-size: 16px; -fx-text-fill: #212529; -fx-font-weight: bold;" />
-                                            </children>
-                                        </VBox>
-                                        <Button fx:id="viewSupervisorButton" text="Voir Profil" style="-fx-background-color: #007bff; -fx-text-fill: white; -fx-padding: 8 20; -fx-background-radius: 5px; -fx-font-size: 13px; -fx-cursor: hand;" />
-                                    </children>
-                                </HBox>
-                            </children>
-                        </VBox>
-                        <VBox fx:id="subordinatesSection" spacing="15.0" style="-fx-background-color: white; -fx-background-radius: 8px; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);" visible="false" managed="false">
-                            <padding><Insets bottom="20.0" left="25.0" right="25.0" top="20.0" /></padding>
-                            <children>
-                                <HBox spacing="10.0" alignment="CENTER_LEFT">
-                                    <children>
-                                        <Label text="Subordonnes" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #343a40;" />
-                                        <Label fx:id="subordinateCountLabel" text="0 subordonne(s)" style="-fx-background-color: #e7f3ff; -fx-text-fill: #004085; -fx-padding: 5 12; -fx-background-radius: 15px; -fx-font-size: 12px; -fx-font-weight: bold;" />
-                                    </children>
-                                </HBox>
-                                <Separator />
-                                <Label text="Double-cliquez sur un nom pour voir les details" style="-fx-font-size: 12px; -fx-text-fill: #6c757d; -fx-font-style: italic;" />
-                                <ListView fx:id="subordinatesListView" prefHeight="150.0" style="-fx-background-color: #f8f9fa; -fx-border-color: #dee2e6; -fx-border-width: 1px; -fx-border-radius: 5px; -fx-background-radius: 5px;" />
-                            </children>
-                        </VBox>
-                    </children>
-                </VBox>
-            </content>
-        </ScrollPane>
-        <HBox spacing="15.0" alignment="CENTER_RIGHT" style="-fx-background-color: #f8f9fa; -fx-border-color: #dee2e6; -fx-border-width: 1px 0 0 0;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" prefHeight="70.0">
-            <padding><Insets bottom="15.0" left="25.0" right="25.0" top="15.0" /></padding>
-            <children>
-                <Button fx:id="editButton" text="Modifier" onAction="#handleEdit" prefWidth="130.0" prefHeight="40.0" style="-fx-background-color: #ffc107; -fx-text-fill: #212529; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 5px; -fx-cursor: hand;" />
-                <Button fx:id="closeButton" text="Fermer" onAction="#handleClose" prefWidth="130.0" prefHeight="40.0" style="-fx-background-color: #6c757d; -fx-text-fill: white; -fx-font-size: 14px; -fx-background-radius: 5px; -fx-cursor: hand;" />
-            </children>
-        </HBox>
-    </children>
-</AnchorPane>
+<VBox prefHeight="650.0" prefWidth="700.0" spacing="15.0" styleClass="root" stylesheets="@../../css/dialogs.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ma.farm.controller.dialogs.PersonnelDetailDialogController">
+    <padding>
+        <Insets bottom="20.0" left="25.0" right="25.0" top="20.0" />
+    </padding>
+
+    <!-- Header -->
+    <VBox spacing="5.0">
+        <Label styleClass="title" text="👤 Détails du Personnel" />
+        <Label styleClass="subtitle" text="Informations complètes sur le membre du personnel" />
+    </VBox>
+
+    <Separator />
+
+    <!-- Main Content -->
+    <ScrollPane fitToWidth="true" styleClass="transparent-scroll" VBox.vgrow="ALWAYS">
+        <content>
+            <VBox spacing="15.0" styleClass="scroll-content">
+                <children>
+                    <!-- Personal Information Section -->
+                    <VBox spacing="15.0" styleClass="info-card">
+                        <padding>
+                            <Insets bottom="20.0" left="25.0" right="25.0" top="20.0" />
+                        </padding>
+                        <children>
+                            <Label styleClass="section-title" text="Informations Personnelles" />
+                            <Separator />
+                            <HBox alignment="CENTER_LEFT" spacing="15.0">
+                                <children>
+                                    <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                                        <children>
+                                            <Label styleClass="section-subtitle" text="Nom Complet" />
+                                            <Label fx:id="nameLabel" styleClass="detail-value-large" text="Ahmed Hassan" />
+                                        </children>
+                                    </VBox>
+                                    <Label fx:id="departmentLabel" text="Administration" />
+                                    <Label fx:id="statusLabel" text="Actif" />
+                                </children>
+                            </HBox>
+                            <HBox spacing="30.0">
+                                <children>
+                                    <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                                        <children>
+                                            <Label styleClass="section-subtitle" text="Age" />
+                                            <Label fx:id="ageLabel" styleClass="detail-value" text="30 ans" />
+                                        </children>
+                                    </VBox>
+                                    <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                                        <children>
+                                            <Label styleClass="section-subtitle" text="Telephone" />
+                                            <Label fx:id="phoneLabel" styleClass="detail-value" text="+212 6XX XXX XXX" />
+                                        </children>
+                                    </VBox>
+                                    <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                                        <children>
+                                            <Label styleClass="section-subtitle" text="Email" />
+                                            <Label fx:id="emailLabel" styleClass="detail-value" text="ahmed@farm.ma" />
+                                        </children>
+                                    </VBox>
+                                </children>
+                            </HBox>
+                            <VBox spacing="5.0">
+                                <children>
+                                    <Label styleClass="section-subtitle" text="Adresse" />
+                                    <Label fx:id="addressLabel" styleClass="detail-value" text="123 Rue Farm, Rabat" wrapText="true" />
+                                </children>
+                            </VBox>
+                            <VBox spacing="5.0">
+                                <children>
+                                    <Label styleClass="section-subtitle" text="Contact Urgence" />
+                                    <Label fx:id="emergencyContactLabel" styleClass="detail-value" text="Fatima Hassan +212 6XX XXX XXX" />
+                                </children>
+                            </VBox>
+                        </children>
+                    </VBox>
+
+                    <!-- Job Information Section -->
+                    <VBox spacing="15.0" styleClass="info-card">
+                        <padding>
+                            <Insets bottom="20.0" left="25.0" right="25.0" top="20.0" />
+                        </padding>
+                        <children>
+                            <Label styleClass="section-title" text="Informations Emploi" />
+                            <Separator />
+                            <HBox spacing="30.0">
+                                <children>
+                                    <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                                        <children>
+                                            <Label styleClass="section-subtitle" text="Titre du Poste" />
+                                            <Label fx:id="jobTitleLabel" styleClass="detail-value-bold" text="Superviseur" />
+                                        </children>
+                                    </VBox>
+                                    <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                                        <children>
+                                            <Label styleClass="section-subtitle" text="Date Embauche" />
+                                            <Label fx:id="hireDateLabel" styleClass="detail-value" text="2025-01-01" />
+                                        </children>
+                                    </VBox>
+                                    <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                                        <children>
+                                            <Label styleClass="section-subtitle" text="Annees Service" />
+                                            <Label fx:id="yearsOfServiceLabel" styleClass="detail-value" text="0 ans" />
+                                        </children>
+                                    </VBox>
+                                    <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                                        <children>
+                                            <Label styleClass="section-subtitle" text="Salaire Mensuel" />
+                                            <Label fx:id="salaryLabel" styleClass="detail-value" text="5000.00 MAD" />
+                                        </children>
+                                    </VBox>
+                                </children>
+                            </HBox>
+                            <Label fx:id="shiftLabel" managed="false" styleClass="detail-value" visible="false" />
+                        </children>
+                    </VBox>
+
+                    <!-- Positions Section (Optional) -->
+                    <VBox fx:id="positionsSection" managed="false" spacing="15.0" styleClass="info-card" visible="false">
+                        <padding>
+                            <Insets bottom="20.0" left="25.0" right="25.0" top="20.0" />
+                        </padding>
+                        <children>
+                            <Label styleClass="section-title" text="Positions Administratives" />
+                            <Separator />
+                            <FlowPane fx:id="positionsPane" hgap="10.0" vgap="10.0" />
+                        </children>
+                    </VBox>
+
+                    <!-- Supervisor Section (Optional) -->
+                    <VBox fx:id="supervisorSection" managed="false" spacing="15.0" styleClass="info-card" visible="false">
+                        <padding>
+                            <Insets bottom="20.0" left="25.0" right="25.0" top="20.0" />
+                        </padding>
+                        <children>
+                            <Label styleClass="section-title" text="Superviseur" />
+                            <Separator />
+                            <HBox alignment="CENTER_LEFT" spacing="15.0">
+                                <children>
+                                    <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                                        <children>
+                                            <Label styleClass="section-subtitle" text="Rapporte a" />
+                                            <Label fx:id="supervisorNameLabel" styleClass="detail-value-bold" text="Mohammed Al-Rashid" />
+                                        </children>
+                                    </VBox>
+                                    <Button fx:id="viewSupervisorButton" text="Voir Profil">
+                                        <styleClass>
+                                            <String fx:value="btn" />
+                                            <String fx:value="btn-save" />
+                                        </styleClass>
+                                    </Button>
+                                </children>
+                            </HBox>
+                        </children>
+                    </VBox>
+
+                    <!-- Subordinates Section (Optional) -->
+                    <VBox fx:id="subordinatesSection" managed="false" spacing="15.0" styleClass="info-card" visible="false">
+                        <padding>
+                            <Insets bottom="20.0" left="25.0" right="25.0" top="20.0" />
+                        </padding>
+                        <children>
+                            <HBox alignment="CENTER_LEFT" spacing="10.0">
+                                <children>
+                                    <Label styleClass="section-title" text="Subordonnes" />
+                                    <Label fx:id="subordinateCountLabel" styleClass="count-badge" text="0 subordonne(s)" />
+                                </children>
+                            </HBox>
+                            <Separator />
+                            <Label styleClass="hint" text="Double-cliquez sur un nom pour voir les details" />
+                            <ListView fx:id="subordinatesListView" prefHeight="150.0" />
+                        </children>
+                    </VBox>
+                </children>
+            </VBox>
+        </content>
+    </ScrollPane>
+
+    <Separator />
+
+    <!-- Footer Buttons -->
+    <HBox alignment="CENTER_RIGHT" spacing="15.0">
+        <children>
+            <Button fx:id="closeButton" onAction="#handleClose" text="Fermer">
+                <styleClass>
+                    <String fx:value="btn" />
+                    <String fx:value="btn-cancel" />
+                </styleClass>
+            </Button>
+            <Button fx:id="editButton" onAction="#handleEdit" text="Modifier">
+                <styleClass>
+                    <String fx:value="btn" />
+                    <String fx:value="btn-sell" />
+                </styleClass>
+            </Button>
+        </children>
+    </HBox>
+</VBox>

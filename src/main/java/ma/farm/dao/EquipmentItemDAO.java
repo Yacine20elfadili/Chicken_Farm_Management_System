@@ -80,9 +80,11 @@ public class EquipmentItemDAO {
             }
         }
 
+        int supplierId = rs.getInt("supplierId");
+
         // Use full constructor
         return new EquipmentItem(id, categoryId, status, purchaseDate, purchasePrice,
-                lastMaintenanceDate, nextMaintenanceDate, createdAt, updatedAt);
+                lastMaintenanceDate, nextMaintenanceDate, supplierId, createdAt, updatedAt);
     }
 
     /**
@@ -90,7 +92,7 @@ public class EquipmentItemDAO {
      */
     public boolean addItem(EquipmentItem item) {
         String sql = "INSERT INTO equipment_items (categoryId, status, purchaseDate, purchasePrice, " +
-                    "lastMaintenanceDate, nextMaintenanceDate) VALUES (?, ?, ?, ?, ?, ?)";
+                "lastMaintenanceDate, nextMaintenanceDate, supplierId) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
         try (PreparedStatement stmt = dbConnection.getConnection().prepareStatement(sql)) {
             stmt.setInt(1, item.getCategoryId());
@@ -99,6 +101,11 @@ public class EquipmentItemDAO {
             stmt.setDouble(4, item.getPurchasePrice());
             stmt.setString(5, item.getLastMaintenanceDate() != null ? item.getLastMaintenanceDate().toString() : null);
             stmt.setString(6, item.getNextMaintenanceDate() != null ? item.getNextMaintenanceDate().toString() : null);
+            if (item.getSupplierId() > 0) {
+                stmt.setInt(7, item.getSupplierId());
+            } else {
+                stmt.setNull(7, java.sql.Types.INTEGER);
+            }
 
             int rowsAffected = stmt.executeUpdate();
             System.out.println("Equipment item insert: " + rowsAffected + " rows affected");
@@ -118,7 +125,7 @@ public class EquipmentItemDAO {
         String sql = "SELECT * FROM equipment_items ORDER BY id";
 
         try (Statement stmt = dbConnection.getConnection().createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
+                ResultSet rs = stmt.executeQuery(sql)) {
 
             while (rs.next()) {
                 items.add(mapResultSetToItem(rs));
@@ -212,12 +219,12 @@ public class EquipmentItemDAO {
     public List<EquipmentItem> getItemsDueForMaintenance() {
         List<EquipmentItem> items = new ArrayList<>();
         String sql = "SELECT * FROM equipment_items " +
-                    "WHERE nextMaintenanceDate IS NOT NULL " +
-                    "AND nextMaintenanceDate <= date('now') " +
-                    "ORDER BY nextMaintenanceDate";
+                "WHERE nextMaintenanceDate IS NOT NULL " +
+                "AND nextMaintenanceDate <= date('now') " +
+                "ORDER BY nextMaintenanceDate";
 
         try (Statement stmt = dbConnection.getConnection().createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
+                ResultSet rs = stmt.executeQuery(sql)) {
 
             while (rs.next()) {
                 items.add(mapResultSetToItem(rs));
@@ -235,7 +242,7 @@ public class EquipmentItemDAO {
      */
     public boolean updateItem(EquipmentItem item) {
         String sql = "UPDATE equipment_items SET categoryId = ?, status = ?, purchaseDate = ?, " +
-                    "purchasePrice = ?, lastMaintenanceDate = ?, nextMaintenanceDate = ? WHERE id = ?";
+                "purchasePrice = ?, lastMaintenanceDate = ?, nextMaintenanceDate = ?, supplierId = ? WHERE id = ?";
 
         try (PreparedStatement stmt = dbConnection.getConnection().prepareStatement(sql)) {
             stmt.setInt(1, item.getCategoryId());
@@ -244,7 +251,12 @@ public class EquipmentItemDAO {
             stmt.setDouble(4, item.getPurchasePrice());
             stmt.setString(5, item.getLastMaintenanceDate() != null ? item.getLastMaintenanceDate().toString() : null);
             stmt.setString(6, item.getNextMaintenanceDate() != null ? item.getNextMaintenanceDate().toString() : null);
-            stmt.setInt(7, item.getId());
+            if (item.getSupplierId() > 0) {
+                stmt.setInt(7, item.getSupplierId());
+            } else {
+                stmt.setNull(7, java.sql.Types.INTEGER);
+            }
+            stmt.setInt(8, item.getId());
 
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {

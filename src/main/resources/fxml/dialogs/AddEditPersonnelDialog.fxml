@@ -1,174 +1,197 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.String?>
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
 
-<AnchorPane prefHeight="650.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ma.farm.controller.dialogs.AddEditPersonnelDialogController" style="-fx-background-color: #f8f9fa;">
+<VBox prefHeight="650.0" prefWidth="600.0" spacing="15.0" styleClass="root" stylesheets="@../../css/dialogs.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ma.farm.controller.dialogs.AddEditPersonnelDialogController">
 
-    <children>
-        <VBox prefHeight="80.0" prefWidth="600.0" style="-fx-background-color: #007bff;" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-            <padding><Insets bottom="15.0" left="20.0" right="20.0" top="15.0" /></padding>
-            <children>
-                <Label fx:id="dialogTitle" text="Ajouter Personnel" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: white;" />
-                <Label text="Remplissez tous les champs obligatoires (*)" style="-fx-font-size: 13px; -fx-text-fill: #e3f2fd;" />
-            </children>
-        </VBox>
+    <padding>
+        <Insets bottom="20.0" left="25.0" right="25.0" top="20.0" />
+    </padding>
 
-        <HBox fx:id="noSupervisorWarningLabel" spacing="10.0" style="-fx-background-color: #fff3cd; -fx-border-color: #ffc107; -fx-border-width: 2px; -fx-padding: 15px; -fx-background-radius: 5px; -fx-border-radius: 5px;"
-              AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="90.0" visible="false" managed="false">
-            <children>
-                <Label text="!" style="-fx-font-size: 20px;" />
-                <Label text="Aucun superviseur disponible. Veuillez creer un superviseur avant." style="-fx-font-size: 13px; -fx-text-fill: #856404; -fx-font-weight: bold;" wrapText="true" />
-            </children>
-        </HBox>
+    <!-- Header -->
+    <VBox spacing="5.0">
+        <Label fx:id="dialogTitle" styleClass="title" text="👤 Ajouter Personnel" />
+        <Label styleClass="subtitle" text="Ajouter un nouvel employé à l'équipe" />
+    </VBox>
 
-        <ScrollPane fitToWidth="true" AnchorPane.bottomAnchor="70.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="90.0" style="-fx-background: transparent; -fx-background-color: transparent;">
-            <content>
-                <VBox spacing="20.0" style="-fx-background-color: transparent;">
-                    <padding><Insets bottom="20.0" left="30.0" right="30.0" top="20.0" /></padding>
-                    <children>
-                        <VBox spacing="15.0" style="-fx-background-color: white; -fx-background-radius: 8px; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);">
-                            <padding><Insets bottom="20.0" left="20.0" right="20.0" top="20.0" /></padding>
-                            <children>
-                                <Label text="Departement" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #343a40;" />
-                                <HBox fx:id="departmentToggleBox" spacing="30.0" alignment="CENTER_LEFT">
-                                    <children>
-                                        <RadioButton fx:id="adminRadio" text="🏢 Administration (Bureau)" style="-fx-font-size: 14px; -fx-text-fill: #343a40; -fx-font-weight: bold;">
-                                            <toggleGroup><ToggleGroup fx:id="departmentToggle" /></toggleGroup>
-                                        </RadioButton>
-                                        <RadioButton fx:id="farmRadio" text="🌾 Ferme (Terrain)" toggleGroup="$departmentToggle" style="-fx-font-size: 14px; -fx-text-fill: #343a40; -fx-font-weight: bold;" />
-                                    </children>
-                                </HBox>
-                            </children>
-                        </VBox>
+    <Separator />
 
-                        <VBox spacing="15.0" style="-fx-background-color: white; -fx-background-radius: 8px; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);">
-                            <padding><Insets bottom="20.0" left="20.0" right="20.0" top="20.0" /></padding>
-                            <children>
-                                <Label text="Informations Personnelles" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #343a40;" />
-                                <VBox spacing="5.0">
-                                    <children>
-                                        <Label text="Nom Complet *" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #495057;" />
-                                        <TextField fx:id="fullNameField" promptText="Ex: Ahmed Hassan" style="-fx-font-size: 13px; -fx-padding: 10px;" />
-                                        <Label fx:id="fullNameErrorLabel" text="Le nom complet est requis" style="-fx-text-fill: #dc3545; -fx-font-size: 12px;" visible="false" managed="false"/>
-                                    </children>
-                                </VBox>
-                                <HBox spacing="15.0">
-                                    <children>
-                                        <VBox spacing="5.0" HBox.hgrow="ALWAYS">
-                                            <children>
-                                                <Label text="Age *" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #495057;" />
-                                                <TextField fx:id="ageField" promptText="Ex: 30" style="-fx-font-size: 13px; -fx-padding: 10px;" />
-                                                <Label fx:id="ageErrorLabel" text="Age invalide" style="-fx-text-fill: #dc3545; -fx-font-size: 12px;" visible="false" managed="false"/>
-                                            </children>
-                                        </VBox>
-                                        <VBox spacing="5.0" HBox.hgrow="ALWAYS">
-                                            <children>
-                                                <Label text="Telephone *" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #495057;" />
-                                                <TextField fx:id="phoneField" promptText="Ex: +212 6XX XXX XXX" style="-fx-font-size: 13px; -fx-padding: 10px;" />
-                                                <Label fx:id="phoneErrorLabel" text="Telephone requis" style="-fx-text-fill: #dc3545; -fx-font-size: 12px;" visible="false" managed="false"/>
-                                            </children>
-                                        </VBox>
-                                    </children>
-                                </HBox>
-                                <VBox spacing="5.0">
-                                    <children>
-                                        <Label text="Email *" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #495057;" />
-                                        <TextField fx:id="emailField" promptText="Ex: ahmed@farm.ma" style="-fx-font-size: 13px; -fx-padding: 10px;" />
-                                        <Label fx:id="emailErrorLabel" text="Email invalide" style="-fx-text-fill: #dc3545; -fx-font-size: 12px;" visible="false" managed="false"/>
-                                    </children>
-                                </VBox>
-                                <VBox spacing="5.0">
-                                    <children>
-                                        <Label text="Adresse" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #495057;" />
-                                        <TextArea fx:id="addressTextArea" promptText="Ex: 123 Rue Farm, Rabat" prefRowCount="2" style="-fx-font-size: 13px;" wrapText="true" />
-                                    </children>
-                                </VBox>
-                                <VBox spacing="5.0">
-                                    <children>
-                                        <Label text="Contact Urgence" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #495057;" />
-                                        <TextField fx:id="emergencyContactField" promptText="Ex: Fatima Hassan +212 6XX XXX XXX" style="-fx-font-size: 13px; -fx-padding: 10px;" />
-                                    </children>
-                                </VBox>
-                            </children>
-                        </VBox>
-                        <VBox fx:id="jobTitleSection" spacing="15.0" style="-fx-background-color: white; -fx-background-radius: 8px; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);">
-                            <padding><Insets bottom="20.0" left="20.0" right="20.0" top="20.0" /></padding>
-                            <children>
-                                <Label text="Informations Emploi" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #343a40;" />
-                                <VBox spacing="5.0">
-                                    <children>
-                                        <Label text="Titre du Poste *" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #495057;" />
-                                        <ComboBox fx:id="jobTitleComboBox" promptText="Selectionnez un titre" prefWidth="540.0" style="-fx-font-size: 13px;" />
-                                        <Label fx:id="jobTitleErrorLabel" text="Le titre du poste est requis" style="-fx-text-fill: #dc3545; -fx-font-size: 12px;" visible="false" managed="false"/>
-                                    </children>
-                                </VBox>
-                                <VBox fx:id="positionsSection" spacing="10.0" visible="false" managed="false">
-                                    <children>
-                                        <Label text="Choisissez UNE position à déléguer *" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #495057;" />
-                                        <Label text="Cette position sera retirée du premier admin staff" style="-fx-font-size: 11px; -fx-text-fill: #6c757d; -fx-font-style: italic;" />
-                                        <FlowPane fx:id="positionsPane" hgap="15.0" vgap="10.0">
-                                            <children>
-                                                <CheckBox fx:id="accountingCheckBox" text="Comptabilité" style="-fx-font-size: 13px; -fx-text-fill: #343a40;" />
-                                                <CheckBox fx:id="hrCheckBox" text="Ressources Humaines" style="-fx-font-size: 13px; -fx-text-fill: #343a40;" />
-                                                <CheckBox fx:id="legalCheckBox" text="Juridique" style="-fx-font-size: 13px; -fx-text-fill: #343a40;" />
-                                                <CheckBox fx:id="salesCheckBox" text="Ventes" style="-fx-font-size: 13px; -fx-text-fill: #343a40;" />
-                                            </children>
-                                        </FlowPane>
-                                        <Label fx:id="positionsErrorLabel" text="Vous devez choisir une position" style="-fx-text-fill: #dc3545; -fx-font-size: 12px;" visible="false" managed="false"/>
-                                    </children>
-                                </VBox>
-                                <VBox fx:id="supervisorSection" spacing="8.0" visible="false" managed="false">
-                                    <children>
-                                        <Label text="Affectation" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #495057;" />
-                                        <HBox spacing="10.0" alignment="CENTER_LEFT" style="-fx-background-color: #e8f5e9; -fx-padding: 12; -fx-background-radius: 5; -fx-border-radius: 5; -fx-border-color: #4caf50;">
-                                            <children>
-                                                <Label text="👤" style="-fx-font-size: 18px;" />
-                                                <VBox spacing="2.0">
-                                                    <children>
-                                                        <Label text="Vous serez subordonné(e) de :" style="-fx-font-size: 12px; -fx-text-fill: #6c757d;" />
-                                                        <Label fx:id="supervisorInfoLabel" text="Nom du superviseur" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #2e7d32;" />
-                                                    </children>
-                                                </VBox>
-                                            </children>
-                                        </HBox>
-                                        <Label fx:id="supervisorErrorLabel" text="Aucun superviseur disponible" style="-fx-text-fill: #dc3545; -fx-font-size: 12px;" visible="false" managed="false" />
-                                    </children>
-                                </VBox>
-                                <HBox spacing="15.0">
-                                    <children>
-                                        <VBox spacing="5.0" HBox.hgrow="ALWAYS">
-                                            <children>
-                                                <Label text="Date Embauche" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #495057;" />
-                                                <DatePicker fx:id="hireDatePicker" promptText="JJ/MM/AAAA" prefWidth="250.0" style="-fx-font-size: 13px;" />
-                                            </children>
-                                        </VBox>
-                                        <VBox spacing="5.0" HBox.hgrow="ALWAYS">
-                                            <children>
-                                                <Label text="Salaire (MAD)" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #495057;" />
-                                                <TextField fx:id="salaryField" promptText="Ex: 5000.00" style="-fx-font-size: 13px; -fx-padding: 10px;" />
-                                                <Label fx:id="salaryErrorLabel" text="Le salaire doit etre un nombre valide" style="-fx-text-fill: #dc3545; -fx-font-size: 12px;" visible="false" managed="false"/>
-                                            </children>
-                                        </VBox>
-                                    </children>
-                                </HBox>
-                            </children>
-                        </VBox>
-                    </children>
-                </VBox>
-            </content>
-        </ScrollPane>
+    <!-- Warning Section -->
+    <HBox fx:id="noSupervisorWarningLabel" managed="false" spacing="10.0" style="-fx-background-color: #fff3cd; -fx-border-color: #ffc107; -fx-border-width: 2px; -fx-padding: 15px; -fx-background-radius: 5px; -fx-border-radius: 5px;" visible="false">
+        <children>
+            <Label style="-fx-font-size: 20px;" text="!" />
+            <Label style="-fx-font-size: 13px; -fx-text-fill: #856404; -fx-font-weight: bold;" text="Aucun superviseur disponible. Veuillez creer un superviseur avant." wrapText="true" />
+        </children>
+    </HBox>
 
-        <HBox spacing="15.0" alignment="CENTER_RIGHT" style="-fx-background-color: #f8f9fa; -fx-border-color: #dee2e6; -fx-border-width: 1px 0 0 0;"
-              AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" prefHeight="70.0">
-            <padding><Insets bottom="15.0" left="25.0" right="25.0" top="15.0" /></padding>
-            <children>
-                <Button fx:id="saveButton" text="Enregistrer" onAction="#handleSave" prefWidth="130.0" prefHeight="40.0"
-                        style="-fx-background-color: #28a745; -fx-text-fill: white; -fx-font-size: 14px; -fx-background-radius: 5px; -fx-cursor: hand;" />
-                <Button fx:id="cancelButton" text="Annuler" onAction="#handleCancel" prefWidth="130.0" prefHeight="40.0"
-                        style="-fx-background-color: #6c757d; -fx-text-fill: white; -fx-font-size: 14px; -fx-background-radius: 5px; -fx-cursor: hand;" />
-            </children>
-        </HBox>
-    </children>
-</AnchorPane>
+    <!-- Form Content -->
+    <ScrollPane fitToWidth="true" style="-fx-background: transparent; -fx-background-color: transparent;" VBox.vgrow="ALWAYS">
+        <content>
+            <VBox spacing="20.0" style="-fx-background-color: transparent;">
+                <children>
+                    <VBox spacing="15.0" style="-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);" styleClass="result-card">
+                        <padding><Insets bottom="20.0" left="20.0" right="20.0" top="20.0" /></padding>
+                        <children>
+                            <Label styleClass="section-title" text="Departement" />
+                            <HBox fx:id="departmentToggleBox" alignment="CENTER_LEFT" spacing="30.0">
+                                <children>
+                                    <RadioButton fx:id="adminRadio" styleClass="section-subtitle" text="🏢 Administration (Bureau)">
+                                        <toggleGroup><ToggleGroup fx:id="departmentToggle" /></toggleGroup>
+                                    </RadioButton>
+                                    <RadioButton fx:id="farmRadio" styleClass="section-subtitle" text="🌾 Ferme (Terrain)" toggleGroup="$departmentToggle" />
+                                </children>
+                            </HBox>
+                        </children>
+                    </VBox>
+
+                    <VBox spacing="15.0" style="-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);" styleClass="result-card">
+                        <padding><Insets bottom="20.0" left="20.0" right="20.0" top="20.0" /></padding>
+                        <children>
+                            <Label styleClass="section-title" text="Informations Personnelles" />
+                            <VBox spacing="5.0">
+                                <children>
+                                    <Label styleClass="section-subtitle" text="Nom Complet *" />
+                                    <TextField fx:id="fullNameField" promptText="Ex: Ahmed Hassan" />
+                                    <Label fx:id="fullNameErrorLabel" managed="false" styleClass="error-label" text="Le nom complet est requis" visible="false" />
+                                </children>
+                            </VBox>
+                            <HBox spacing="15.0">
+                                <children>
+                                    <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                                        <children>
+                                            <Label styleClass="section-subtitle" text="Age *" />
+                                            <TextField fx:id="ageField" promptText="Ex: 30" />
+                                            <Label fx:id="ageErrorLabel" managed="false" styleClass="error-label" text="Age invalide" visible="false" />
+                                        </children>
+                                    </VBox>
+                                    <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                                        <children>
+                                            <Label styleClass="section-subtitle" text="Telephone *" />
+                                            <TextField fx:id="phoneField" promptText="Ex: +212 6XX XXX XXX" />
+                                            <Label fx:id="phoneErrorLabel" managed="false" styleClass="error-label" text="Telephone requis" visible="false" />
+                                        </children>
+                                    </VBox>
+                                </children>
+                            </HBox>
+                            <VBox spacing="5.0">
+                                <children>
+                                    <Label styleClass="section-subtitle" text="Email *" />
+                                    <TextField fx:id="emailField" promptText="Ex: ahmed@farm.ma" />
+                                    <Label fx:id="emailErrorLabel" managed="false" styleClass="error-label" text="Email invalide" visible="false" />
+                                </children>
+                            </VBox>
+                            <VBox spacing="5.0">
+                                <children>
+                                    <Label styleClass="section-subtitle" text="Adresse" />
+                                    <TextArea fx:id="addressTextArea" prefRowCount="2" promptText="Ex: 123 Rue Farm, Rabat" wrapText="true" />
+                                </children>
+                            </VBox>
+                            <VBox spacing="5.0">
+                                <children>
+                                    <Label styleClass="section-subtitle" text="Contact Urgence" />
+                                    <TextField fx:id="emergencyContactField" promptText="Ex: Fatima Hassan +212 6XX XXX XXX" />
+                                </children>
+                            </VBox>
+                        </children>
+                    </VBox>
+                    <VBox fx:id="jobTitleSection" spacing="15.0" style="-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);" styleClass="result-card">
+                        <padding><Insets bottom="20.0" left="20.0" right="20.0" top="20.0" /></padding>
+                        <children>
+                            <Label styleClass="section-title" text="Informations Emploi" />
+                            <VBox spacing="5.0">
+                                <children>
+                                    <Label styleClass="section-subtitle" text="Titre du Poste *" />
+                                    <ComboBox fx:id="jobTitleComboBox" promptText="Selectionnez un titre" />
+                                    <Label fx:id="jobTitleErrorLabel" managed="false" styleClass="error-label" text="Le titre du poste est requis" visible="false" />
+                                </children>
+                            </VBox>
+                            <VBox fx:id="positionsSection" managed="false" spacing="10.0" visible="false">
+                                <children>
+                                    <Label styleClass="section-title" text="Choisissez UNE position à déléguer *" />
+                                    <Label styleClass="section-subtitle" text="Cette position sera retirée du premier admin staff" />
+                                    <FlowPane fx:id="positionsPane" hgap="15.0" prefHeight="107.0" prefWidth="243.0" vgap="10.0">
+                                        <children>
+                                            <CheckBox fx:id="accountingCheckBox" style="-fx-font-size: 13px; -fx-text-fill: #343a40;" text="Comptabilité" />
+                                            <CheckBox fx:id="hrCheckBox" style="-fx-font-size: 13px; -fx-text-fill: #343a40;" text="Ressources Humaines" />
+                                            <CheckBox fx:id="legalCheckBox" style="-fx-font-size: 13px; -fx-text-fill: #343a40;" text="Juridique" />
+                                            <CheckBox fx:id="salesCheckBox" style="-fx-font-size: 13px; -fx-text-fill: #343a40;" text="Ventes" />
+                                        </children>
+                                    </FlowPane>
+                                    <Label fx:id="positionsErrorLabel" managed="false" styleClass="error-label" text="Vous devez choisir une position" visible="false" />
+                                </children>
+                            </VBox>
+                            <VBox fx:id="supervisorSection" managed="false" spacing="8.0" visible="false">
+                                <children>
+                                    <Label styleClass="section-title" text="Affectation" />
+                                    <HBox alignment="CENTER_LEFT" spacing="10.0" style="-fx-background-color: #e8f5e9; -fx-padding: 12; -fx-background-radius: 5; -fx-border-radius: 5; -fx-border-color: #4caf50;">
+                                        <children>
+                                            <Label styleClass="section-title" text="👤" />
+                                            <VBox spacing="2.0">
+                                                <children>
+                                                    <Label styleClass="section-title" text="Vous serez subordonné(e) de :" />
+                                                    <Label fx:id="supervisorInfoLabel" styleClass="section-subtitle" text="Nom du superviseur" />
+                                                </children>
+                                            </VBox>
+                                        </children>
+                                    </HBox>
+                                    <Label fx:id="supervisorErrorLabel" managed="false" styleClass="error-label" text="Aucun superviseur disponible" visible="false" />
+                                </children>
+                            </VBox>
+                            <HBox spacing="15.0">
+                                <children>
+                                    <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                                        <children>
+                                            <Label styleClass="section-subtitle" text="Date Embauche" />
+                                            <DatePicker fx:id="hireDatePicker" promptText="JJ/MM/AAAA" VBox.vgrow="ALWAYS" />
+                                        </children>
+                                    </VBox>
+                                    <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                                        <children>
+                                            <Label styleClass="section-subtitle" text="Salaire (MAD)" />
+                                            <TextField fx:id="salaryField" promptText="Ex: 5000.00" />
+                                            <Label fx:id="salaryErrorLabel" managed="false" styleClass="error-label" text="Le salaire doit etre un nombre valide" visible="false" />
+                                        </children>
+                                    </VBox>
+                                </children>
+                            </HBox>
+                        </children>
+                    </VBox>
+                </children>
+            </VBox>
+        </content>
+    </ScrollPane>
+
+    <Separator />
+
+    <!-- Footer Buttons -->
+    <HBox alignment="CENTER_RIGHT" spacing="15.0">
+        <children>
+            <Button fx:id="cancelButton" onAction="#handleCancel" text="Annuler">
+            <styleClass>
+               <String fx:value="btn" />
+               <String fx:value="btn-cancel" />
+            </styleClass></Button>
+            <Button fx:id="saveButton" onAction="#handleSave" text="Enregistrer">
+            <styleClass>
+               <String fx:value="btn" />
+               <String fx:value="btn-save" />
+            </styleClass></Button>
+        </children>
+    </HBox>
+
+</VBox>

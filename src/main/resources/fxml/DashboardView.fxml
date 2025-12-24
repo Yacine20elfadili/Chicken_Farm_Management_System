@@ -15,39 +15,40 @@
 
 <AnchorPane prefHeight="700.0" prefWidth="1000.0" styleClass="main-content" stylesheets="@../css/style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ma.farm.controller.DashboardController">
     <children>
-        <VBox prefHeight="75.0" prefWidth="1000.0" styleClass="header" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <VBox styleClass="header" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <padding>
+                <Insets bottom="15.0" left="30.0" right="30.0" top="15.0" />
+            </padding>
             <children>
-                <HBox prefHeight="33.0" prefWidth="999.0">
+                <HBox alignment="CENTER_LEFT" spacing="10.0">
                     <children>
-                        <Label styleClass="header-title" text="Tableau de bord" textAlignment="CENTER" />
-                    </children>
-                    <VBox.margin>
-                        <Insets top="10.0" />
-                    </VBox.margin>
-                </HBox>
-                <HBox prefHeight="100.0" prefWidth="200.0">
-                    <children>
-                        <Label prefHeight="30.0" prefWidth="273.0" styleClass="header-subtitle" text="Bienvenue ! Voici un aperçu de votre ferme." textAlignment="CENTER" />
+                        <VBox spacing="2.0">
+                            <children>
+                                <Label styleClass="header-title" text="Tableau de bord" textAlignment="LEFT" />
+                                <Label styleClass="header-subtitle" text="Bienvenue ! Voici un aperçu de votre ferme." textAlignment="LEFT" />
+                            </children>
+                        </VBox>
+                        <Region HBox.hgrow="ALWAYS" />
                     </children>
                 </HBox>
             </children>
         </VBox>
 
-        <VBox prefHeight="200.0" prefWidth="100.0" spacing="20.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="80.0">
+        <VBox spacing="20.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="60.0">
             <children>
                 <ScrollPane fitToHeight="true" fitToWidth="true" styleClass="main-content" VBox.vgrow="ALWAYS">
                     <content>
                         <VBox spacing="35.0" styleClass="main-content">
                             <children>
                                 <!-- TOP HALF: Three Cards in a Row -->
-                                <HBox prefHeight="150.0" spacing="40.0" VBox.vgrow="NEVER">
+                                <HBox spacing="40.0" VBox.vgrow="NEVER">
                                     <children>
                                         <!-- Card 1: Total Chickens -->
                                         <VBox prefHeight="150.0" styleClass="metric-card" HBox.hgrow="ALWAYS">
                                             <children>
                                                 <HBox alignment="CENTER_LEFT" VBox.vgrow="ALWAYS">
                                                     <children>
-                                                        <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                                                        <VBox alignment="CENTER_LEFT" spacing="5.0" HBox.hgrow="ALWAYS">
                                                             <children>
                                                                 <Label styleClass="label-cards" text="Effectif total" />
                                                                 <Label fx:id="totalChickensLabel" styleClass="label-cards-stats" text="0" />
@@ -72,7 +73,7 @@
                                             <children>
                                                 <HBox alignment="CENTER_LEFT" VBox.vgrow="ALWAYS">
                                                     <children>
-                                                        <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                                                        <VBox alignment="CENTER_LEFT" spacing="5.0" HBox.hgrow="ALWAYS">
                                                             <children>
                                                                 <Label styleClass="label-cards" text="Œufs du jour" />
                                                                 <Label fx:id="eggsTodayLabel" styleClass="label-cards-stats" text="0" />
@@ -92,21 +93,22 @@
                                             </children>
                                         </VBox>
 
-                                        <!-- Card 3: Alerts -->
+                                        <!-- Card 3: Finances -->
                                         <VBox prefHeight="150.0" styleClass="metric-card" HBox.hgrow="ALWAYS">
                                             <children>
                                                 <HBox alignment="CENTER_LEFT" VBox.vgrow="ALWAYS">
                                                     <children>
-                                                        <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                                                        <VBox alignment="CENTER_LEFT" spacing="5.0" HBox.hgrow="ALWAYS">
                                                             <children>
-                                                                <Label styleClass="label-cards" text="Alertes en cours" />
-                                                                <Label fx:id="alertsCountLabel" styleClass="label-cards-stats" text="0" />
+                                                                <Label styleClass="label-cards" text="Finances (Global)" />
+                                                                <Label fx:id="totalIncomeLabel" style="-fx-text-fill: #27ae60;" styleClass="label-cards" text="Rec: 0 DH" />
+                                                                <Label fx:id="totalExpenseLabel" style="-fx-text-fill: #c0392b;" styleClass="label-cards" text="Dép: 0 DH" />
                                                             </children>
                                                         </VBox>
                                                         <Region HBox.hgrow="ALWAYS" />
                                                         <ImageView fitHeight="60.0" fitWidth="60.0" pickOnBounds="true" preserveRatio="true" styleClass="card-icon">
                                                             <image>
-                                                                <Image url="@../images/icons/alerts.png" />
+                                                                <Image url="@../images/icons/trackers.png" />
                                                             </image>
                                                         </ImageView>
                                                     </children>
@@ -117,13 +119,10 @@
                                             </children>
                                         </VBox>
                                     </children>
-                           <VBox.margin>
-                              <Insets />
-                           </VBox.margin>
                                 </HBox>
 
                                 <!-- BOTTOM HALF: Chart -->
-                                <VBox minHeight="450.0" prefHeight="500.0" prefWidth="957.0" spacing="10.0" styleClass="metric-card" VBox.vgrow="ALWAYS">
+                                <VBox minHeight="450.0" prefHeight="500.0" spacing="10.0" styleClass="metric-card" VBox.vgrow="ALWAYS">
                                     <padding>
                                         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
                                     </padding>

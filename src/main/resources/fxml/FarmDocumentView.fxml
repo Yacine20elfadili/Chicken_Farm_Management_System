@@ -1,0 +1,503 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.String?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Accordion?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="800.0" prefWidth="1000.0" styleClass="main-content" stylesheets="@../css/style.css,@../css/farmdoc-improve.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ma.farm.controller.FarmDocumentController">
+    <children>
+        <!-- Header -->
+        <VBox prefHeight="75.0" prefWidth="1000.0" styleClass="header" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <children>
+                <HBox alignment="CENTER_LEFT" prefHeight="33.0">
+                    <children>
+                        <Label styleClass="header-title" text="Documents de la Ferme" />
+                    </children>
+                </HBox>
+                <HBox>
+                    <children>
+                        <Label styleClass="header-subtitle" text="Générez et gérez vos documents commerciaux et RH" />
+                    </children>
+                </HBox>
+            </children>
+        </VBox>
+
+        <!-- Main Content - Scrollable with Accordion -->
+        <ScrollPane fitToWidth="true" styleClass="form-scroll" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="80.0">
+            <content>
+                <VBox spacing="15.0">
+                    <children>
+                        <!-- Section: Commercial Documents -->
+                        <Label styleClass="card-title" text="Documents Commerciaux" />
+                        <Separator />
+
+                        <Accordion fx:id="commercialAccordion">
+                            <!-- 1. BON DE COMMANDE -->
+                            <panes>
+                                <TitledPane fx:id="bonCommandePane" text="📋 Bon de Commande">
+                                    <content>
+                                        <VBox spacing="15.0" style="-fx-background-color: white; -fx-padding: 15;">
+                                            <!-- Type Toggle -->
+                                            <HBox spacing="10.0">
+                                                <ToggleButton fx:id="bcInitialBtn" selected="true" text="Initial">
+                                                    <toggleGroup>
+                                                        <ToggleGroup fx:id="bcTypeGroup" />
+                                                    </toggleGroup>
+                                       <styleClass>
+                                          <String fx:value="btn" />
+                                          <String fx:value="btn-sell" />
+                                       </styleClass>
+                                                </ToggleButton>
+                                                <ToggleButton fx:id="bcFinalBtn" text="Final" toggleGroup="$bcTypeGroup">
+                                       <styleClass>
+                                          <String fx:value="btn" />
+                                          <String fx:value="btn-primary" />
+                                       </styleClass></ToggleButton>
+                                            </HBox>
+
+                                            <!-- Supplier Selection -->
+                                            <HBox alignment="CENTER_LEFT" spacing="10.0">
+                                                <Label prefWidth="100.0" styleClass="cards-title" text="Fournisseur:" />
+                                                <ComboBox fx:id="bcSupplierCombo" prefWidth="300.0" promptText="Sélectionner un fournisseur" styleClass="farmdoc-combo-box" stylesheets="@../css/dialogs.css" />
+                                            </HBox>
+
+                                            <!-- Items Table -->
+                                            <Label style="-fx-font-weight: bold;" styleClass="cards-title" text="Articles commandés:" />
+                                            <TableView fx:id="bcItemsTable" prefHeight="150.0" VBox.vgrow="ALWAYS">
+                                                <columns>
+                                                    <TableColumn fx:id="bcColRef" prefWidth="80.0" text="Réf" />
+                                                    <TableColumn fx:id="bcColDesc" prefWidth="250.0" text="Description" />
+                                                    <TableColumn fx:id="bcColQty" prefWidth="80.0" text="Quantité" />
+                                                    <TableColumn fx:id="bcColUnit" prefWidth="80.0" text="Unité" />
+                                                </columns>
+                                            </TableView>
+                                            <HBox spacing="10.0">
+                                                <Button fx:id="bcAddItemBtn" text="+ Ajouter">
+                                       <styleClass>
+                                          <String fx:value="btn" />
+                                          <String fx:value="btn-save" />
+                                       </styleClass></Button>
+                                                <Button fx:id="bcRemoveItemBtn" text="- Supprimer">
+                                       <styleClass>
+                                          <String fx:value="btn" />
+                                          <String fx:value="btn-death" />
+                                       </styleClass></Button>
+                                            </HBox>
+
+                                            <!-- Dates and Notes -->
+                                            <HBox spacing="20.0">
+                                                <VBox spacing="5.0">
+                                                    <Label styleClass="cards-title" text="Date de livraison souhaitée:" />
+                                                    <DatePicker fx:id="bcDeliveryDate" prefWidth="155.0" stylesheets="@../css/dialogs.css" VBox.vgrow="ALWAYS" />
+                                                </VBox>
+                                            </HBox>
+                                            <VBox spacing="5.0">
+                                                <Label styleClass="cards-title" text="Notes / Conditions:" />
+                                                <TextArea fx:id="bcNotes" prefHeight="60.0" promptText="Conditions particulières..." styleClass="farmdoc-text-area" stylesheets="@../css/dialogs.css" />
+                                            </VBox>
+
+                                            <!-- Generate Button -->
+                                            <HBox alignment="CENTER_RIGHT" spacing="10.0">
+                                                <Button fx:id="bcGenerateBtn" text="📄 Générer PDF">
+                                                    <font><Font size="14.0" /></font>
+                                       <styleClass>
+                                          <String fx:value="btn" />
+                                          <String fx:value="btn-cancel" />
+                                       </styleClass>
+                                                </Button>
+                                            </HBox>
+                                        </VBox>
+                                    </content>
+                                </TitledPane>
+
+                                <!-- 2. DEVIS (To Customers Only - Supplier devis goes to Administration) -->
+                                <TitledPane fx:id="devisPane" text="💰 Devis">
+                                    <content>
+                                        <VBox spacing="15.0" style="-fx-background-color: white; -fx-padding: 15;">
+                                            <!-- Customer Selection (Devis is only FROM us TO customers) -->
+                                            <HBox alignment="CENTER_LEFT" spacing="10.0">
+                                                <Label prefWidth="100.0" styleClass="cards-title" text="Client:" />
+                                                <ComboBox fx:id="devisPartyCombo" prefWidth="300.0" promptText="Sélectionner un client" styleClass="farmdoc-combo-box" stylesheets="@../css/dialogs.css" />
+                                            </HBox>
+
+                                            <!-- Validity -->
+                                            <HBox alignment="CENTER_LEFT" spacing="20.0">
+                                                <Label styleClass="cards-title" text="Valide jusqu'au:" />
+                                                <DatePicker fx:id="devisValidityDate" prefWidth="172.0" styleClass="farmdoc-combo-box" stylesheets="@../css/dialogs.css" />
+                                            </HBox>
+
+                                            <!-- Items Table -->
+                                            <Label style="-fx-font-weight: bold;" text="Produits / Services:" />
+                                            <TableView fx:id="devisItemsTable" prefHeight="150.0">
+                                                <columns>
+                                                    <TableColumn fx:id="devisColRef" prefWidth="60.0" text="Réf" />
+                                                    <TableColumn fx:id="devisColDesc" prefWidth="200.0" text="Description" />
+                                                    <TableColumn fx:id="devisColQty" prefWidth="60.0" text="Qté" />
+                                                    <TableColumn fx:id="devisColPrice" prefWidth="80.0" text="Prix HT" />
+                                                    <TableColumn fx:id="devisColTotal" prefWidth="80.0" text="Total HT" />
+                                                </columns>
+                                            </TableView>
+                                            <HBox spacing="10.0">
+                                                <Button fx:id="devisAddItemBtn" text="+ Ajouter">
+                                       <styleClass>
+                                          <String fx:value="btn" />
+                                          <String fx:value="btn-save" />
+                                       </styleClass></Button>
+                                                <Button fx:id="devisRemoveItemBtn" text="- Supprimer">
+                                       <styleClass>
+                                          <String fx:value="btn" />
+                                          <String fx:value="btn-death" />
+                                       </styleClass></Button>
+                                            </HBox>
+
+                                            <!-- Financial Summary -->
+                                            <HBox alignment="CENTER_RIGHT" spacing="20.0">
+                                                <VBox alignment="CENTER_RIGHT" spacing="5.0">
+                                                    <Label fx:id="devisTotalHT" text="Total HT: 0.00 DH" />
+                                                    <Label fx:id="devisTVA" text="TVA (20%): 0.00 DH" />
+                                                    <Label fx:id="devisTotalTTC" style="-fx-font-weight: bold; -fx-font-size: 14px;" text="Total TTC: 0.00 DH" />
+                                                </VBox>
+                                            </HBox>
+
+                                            <!-- Generate Button -->
+                                            <HBox alignment="CENTER_RIGHT" spacing="10.0">
+                                                <Button fx:id="devisGenerateBtn" text="📄 Générer PDF">
+                                                    <font><Font size="14.0" /></font>
+                                       <styleClass>
+                                          <String fx:value="btn" />
+                                          <String fx:value="btn-cancel" />
+                                       </styleClass>
+                                                </Button>
+                                            </HBox>
+                                        </VBox>
+                                    </content>
+                                </TitledPane>
+
+                                <!-- 3. BON DE LIVRAISON -->
+                                <TitledPane fx:id="livraisonPane" text="🚚 Bon de Livraison">
+                                    <content>
+                                        <VBox spacing="15.0" style="-fx-background-color: white; -fx-padding: 15;">
+                                            <!-- Customer Selection -->
+                                            <HBox alignment="CENTER_LEFT" spacing="10.0">
+                                                <Label prefWidth="100.0" styleClass="farmdoc-label" text="Client:" />
+                                                <ComboBox fx:id="blPartyCombo" prefWidth="300.0" promptText="Sélectionner un client" styleClass="farmdoc-combo-box" />
+                                            </HBox>
+
+                                            <!-- Reference to Order -->
+                                            <HBox alignment="CENTER_LEFT" spacing="10.0">
+                                                <Label prefWidth="100.0" styleClass="farmdoc-label" text="Ref. Commande:" />
+                                                <TextField fx:id="blOrderRef" prefWidth="200.0" promptText="BC-XXXX" styleClass="farmdoc-text-field" />
+                                                <Label styleClass="farmdoc-label" text="Date Livraison:" />
+                                                <DatePicker fx:id="blDate" styleClass="farmdoc-combo-box" />
+                                            </HBox>
+
+                                            <!-- Items Table (No Prices on Delivery Note) -->
+                                            <Label style="-fx-font-weight: bold;" text="Articles à livrer:" />
+                                            <TableView fx:id="blItemsTable" prefHeight="150.0">
+                                                <columns>
+                                                    <TableColumn fx:id="blColRef" prefWidth="80.0" text="Réf" />
+                                                    <TableColumn fx:id="blColDesc" prefWidth="250.0" text="Description" />
+                                                    <TableColumn fx:id="blColQty" prefWidth="80.0" text="Quantité" />
+                                                    <TableColumn fx:id="blColUnit" prefWidth="80.0" text="Unité" />
+                                                </columns>
+                                            </TableView>
+                                            <HBox spacing="10.0">
+                                                <Button fx:id="blAddItemBtn" style="-fx-background-color: #27ae60; -fx-text-fill: white;" text="+ Ajouter" />
+                                                <Button fx:id="blRemoveItemBtn" style="-fx-background-color: #e74c3c; -fx-text-fill: white;" text="- Supprimer" />
+                                            </HBox>
+
+                                            <!-- Generate Button -->
+                                            <HBox alignment="CENTER_RIGHT" spacing="10.0">
+                                                <Button fx:id="blGenerateBtn" style="-fx-background-color: #f1c40f; -fx-text-fill: black; -fx-font-weight: bold;" text="📄 Générer BL">
+                                                    <font><Font size="14.0" /></font>
+                                                </Button>
+                                            </HBox>
+                                        </VBox>
+                                    </content>
+                                </TitledPane>
+
+                                <!-- 4. FACTURE -->
+                                <TitledPane fx:id="facturePane" text="🧾 Facture">
+                                    <content>
+                                        <VBox spacing="15.0" style="-fx-background-color: white; -fx-padding: 15;">
+                                            <!-- Customer Selection -->
+                                            <HBox alignment="CENTER_LEFT" spacing="10.0">
+                                                <Label prefWidth="100.0" styleClass="farmdoc-label" text="Client:" />
+                                                <ComboBox fx:id="factureCustomerCombo" prefWidth="300.0" promptText="Sélectionner un client" styleClass="farmdoc-combo-box" />
+                                                <Button fx:id="factureImportBtn" style="-fx-background-color: #3498db; -fx-text-fill: white;" text="📥 Importer Transaction" />
+                                            </HBox>
+
+                                            <!-- Reference Documents -->
+                                            <HBox spacing="20.0">
+                                                <VBox spacing="5.0">
+                                                    <Label text="Réf. Devis:" />
+                                                    <TextField fx:id="factureDevisRef" prefWidth="150.0" promptText="DEV-XXXX" styleClass="farmdoc-text-field" />
+                                                </VBox>
+                                                <VBox spacing="5.0">
+                                                    <Label text="Réf. Bon de Livraison:" />
+                                                    <TextField fx:id="factureBLRef" prefWidth="150.0" promptText="BL-XXXX" styleClass="farmdoc-text-field" />
+                                                </VBox>
+                                            </HBox>
+
+                                            <!-- Items Table -->
+                                            <Label style="-fx-font-weight: bold;" text="Produits / Services facturés:" />
+                                            <TableView fx:id="factureItemsTable" prefHeight="150.0">
+                                                <columns>
+                                                    <TableColumn fx:id="factureColRef" prefWidth="60.0" text="Réf" />
+                                                    <TableColumn fx:id="factureColDesc" prefWidth="180.0" text="Description" />
+                                                    <TableColumn fx:id="factureColQty" prefWidth="50.0" text="Qté" />
+                                                    <TableColumn fx:id="factureColPrice" prefWidth="70.0" text="Prix HT" />
+                                                    <TableColumn fx:id="factureColTVA" prefWidth="50.0" text="TVA%" />
+                                                    <TableColumn fx:id="factureColTotal" prefWidth="80.0" text="Total HT" />
+                                                </columns>
+                                            </TableView>
+                                            <HBox spacing="10.0">
+                                                <Button fx:id="factureAddItemBtn" style="-fx-background-color: #27ae60; -fx-text-fill: white;" text="+ Ajouter" />
+                                                <Button fx:id="factureRemoveItemBtn" style="-fx-background-color: #e74c3c; -fx-text-fill: white;" text="- Supprimer" />
+                                            </HBox>
+
+                                            <!-- Financial Summary -->
+                                            <HBox alignment="CENTER_RIGHT" spacing="20.0">
+                                                <VBox alignment="CENTER_RIGHT" spacing="5.0">
+                                                    <Label fx:id="factureTotalHT" text="Total HT: 0.00 DH" />
+                                                    <Label fx:id="factureTVA" text="TVA: 0.00 DH" />
+                                                    <Label fx:id="factureTotalTTC" style="-fx-font-weight: bold; -fx-font-size: 16px; -fx-text-fill: #27ae60;" text="Total TTC: 0.00 DH" />
+                                                </VBox>
+                                            </HBox>
+
+                                            <!-- Generate Button -->
+                                            <HBox alignment="CENTER_RIGHT" spacing="10.0">
+                                                <Button fx:id="factureGenerateBtn" style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold;" text="📄 Générer Facture">
+                                                    <font><Font size="14.0" /></font>
+                                                </Button>
+                                            </HBox>
+                                        </VBox>
+                                    </content>
+                                </TitledPane>
+
+                                <!-- 5. AVOIR -->
+                                <TitledPane fx:id="avoirPane" text="↩️ Avoir (Note de Crédit)">
+                                    <content>
+                                        <VBox spacing="15.0" style="-fx-background-color: white; -fx-padding: 15;">
+                                            <!-- Customer Selection -->
+                                            <HBox alignment="CENTER_LEFT" spacing="10.0">
+                                                <Label prefWidth="100.0" styleClass="farmdoc-label" text="Client:" />
+                                                <ComboBox fx:id="avoirPartyCombo" prefWidth="300.0" promptText="Sélectionner un client" styleClass="farmdoc-combo-box" />
+                                                <Button fx:id="avoirImportBtn" style="-fx-background-color: #3498db; -fx-text-fill: white;" text="📥 Importer Facture" />
+                                            </HBox>
+
+                                            <!-- Reference to Invoice -->
+                                            <HBox alignment="CENTER_LEFT" spacing="10.0">
+                                                <Label prefWidth="100.0" styleClass="farmdoc-label" text="Réf. Facture:" />
+                                                <TextField fx:id="avoirInvoiceRef" prefWidth="200.0" promptText="FXXX-2024-XXX" styleClass="farmdoc-text-field" />
+                                            </HBox>
+
+                                            <!-- Reason -->
+                                            <VBox spacing="5.0">
+                                                <Label text="Motif de l'avoir:" />
+                                                <TextField fx:id="avoirReason" promptText="Ex: Retour marchandise, Erreur de facturation..." styleClass="farmdoc-text-field" />
+                                            </VBox>
+
+                                            <!-- Items Table -->
+                                            <Label style="-fx-font-weight: bold;" text="Articles concernés:" />
+                                            <TableView fx:id="avoirItemsTable" prefHeight="150.0">
+                                                <columns>
+                                                    <TableColumn fx:id="avoirColRef" prefWidth="60.0" text="Réf" />
+                                                    <TableColumn fx:id="avoirColDesc" prefWidth="200.0" text="Description" />
+                                                    <TableColumn fx:id="avoirColQty" prefWidth="60.0" text="Qté" />
+                                                    <TableColumn fx:id="avoirColPrice" prefWidth="80.0" text="Prix Unit." />
+                                                    <TableColumn fx:id="avoirColTotal" prefWidth="80.0" text="Total" />
+                                                </columns>
+                                            </TableView>
+                                            <HBox spacing="10.0">
+                                                <Button fx:id="avoirAddItemBtn" style="-fx-background-color: #27ae60; -fx-text-fill: white;" text="+ Ajouter" />
+                                                <Button fx:id="avoirRemoveItemBtn" style="-fx-background-color: #e74c3c; -fx-text-fill: white;" text="- Supprimer" />
+                                            </HBox>
+
+                                            <!-- Financial Summary -->
+                                            <HBox alignment="CENTER_RIGHT" spacing="20.0">
+                                                <VBox alignment="CENTER_RIGHT" spacing="5.0">
+                                                    <Label fx:id="avoirTotalHT" text="Total HT: 0.00 DH" />
+                                                    <Label fx:id="avoirTVA" text="TVA: 0.00 DH" />
+                                                    <Label fx:id="avoirTotalTTC" style="-fx-font-weight: bold; -fx-font-size: 16px; -fx-text-fill: #e74c3c;" text="Total TTC: 0.00 DH" />
+                                                </VBox>
+                                            </HBox>
+
+                                            <!-- Generate Button -->
+                                            <HBox alignment="CENTER_RIGHT" spacing="10.0">
+                                                <Button fx:id="avoirGenerateBtn" style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold;" text="📄 Générer Avoir">
+                                                    <font><Font size="14.0" /></font>
+                                                </Button>
+                                            </HBox>
+                                        </VBox>
+                                    </content>
+                                </TitledPane>
+
+                                <!-- 6. REÇU -->
+                                <TitledPane fx:id="recuPane" text="🧾 Reçu (Particuliers)">
+                                    <content>
+                                        <VBox spacing="15.0" style="-fx-background-color: white; -fx-padding: 15;">
+                                            <!-- Customer Info (Individual) -->
+                                            <HBox spacing="20.0">
+                                                <VBox spacing="5.0">
+                                                    <Label styleClass="farmdoc-label" text="Nom du client:" />
+                                                    <TextField fx:id="recuCustomerName" prefWidth="200.0" promptText="Nom complet" styleClass="farmdoc-text-field" />
+                                                </VBox>
+                                                <VBox spacing="5.0">
+                                                    <Label styleClass="farmdoc-label" text="Téléphone:" />
+                                                    <TextField fx:id="recuCustomerPhone" prefWidth="150.0" promptText="06XXXXXXXX" styleClass="farmdoc-text-field" />
+                                                </VBox>
+                                            </HBox>
+
+                                            <!-- Items Purchased -->
+                                            <Label style="-fx-font-weight: bold;" text="Produits achetés:" />
+                                            <TableView fx:id="recuItemsTable" prefHeight="120.0">
+                                                <columns>
+                                                    <TableColumn fx:id="recuColDesc" prefWidth="250.0" text="Description" />
+                                                    <TableColumn fx:id="recuColQty" prefWidth="60.0" text="Qté" />
+                                                    <TableColumn fx:id="recuColPrice" prefWidth="80.0" text="Prix Unit." />
+                                                    <TableColumn fx:id="recuColTotal" prefWidth="80.0" text="Total" />
+                                                </columns>
+                                            </TableView>
+                                            <HBox spacing="10.0">
+                                                <Button fx:id="recuAddItemBtn" style="-fx-background-color: #27ae60; -fx-text-fill: white;" text="+ Ajouter" />
+                                                <Button fx:id="recuRemoveItemBtn" style="-fx-background-color: #e74c3c; -fx-text-fill: white;" text="- Supprimer" />
+                                            </HBox>
+
+                                            <!-- Payment -->
+                                            <HBox alignment="CENTER_LEFT" spacing="20.0">
+                                                <VBox spacing="5.0">
+                                                    <Label styleClass="farmdoc-label" text="Méthode de paiement:" />
+                                                    <ComboBox fx:id="recuPaymentMethod" prefWidth="150.0" styleClass="farmdoc-combo-box" />
+                                                </VBox>
+                                                <VBox alignment="CENTER_RIGHT" spacing="5.0">
+                                                    <Label fx:id="recuTotalTTC" style="-fx-font-weight: bold; -fx-font-size: 16px;" text="Total TTC: 0.00 DH" />
+                                                </VBox>
+                                            </HBox>
+
+                                            <!-- Generate Button -->
+                                            <HBox alignment="CENTER_RIGHT" spacing="10.0">
+                                                <Button fx:id="recuGenerateBtn" style="-fx-background-color: #9b59b6; -fx-text-fill: white; -fx-font-weight: bold;" text="🖨️ Imprimer Reçu">
+                                                    <font><Font size="14.0" /></font>
+                                                </Button>
+                                            </HBox>
+                                        </VBox>
+                                    </content>
+                                </TitledPane>
+                            </panes>
+                        </Accordion>
+
+                        <!-- Section: HR Documents -->
+                        <Label styleClass="card-title" text="Documents RH" />
+                        <Separator />
+
+                        <Accordion fx:id="hrAccordion">
+                            <panes>
+                                <!-- 7. BULLETIN DE PAIE -->
+                                <TitledPane fx:id="bulletinPane" text="💵 Bulletin de Paie">
+                                    <content>
+                                        <VBox spacing="15.0" style="-fx-background-color: white; -fx-padding: 15;">
+                                            <HBox spacing="20.0">
+                                                <VBox spacing="5.0">
+                                                    <Label styleClass="farmdoc-label" text="Employé:" />
+                                                    <ComboBox fx:id="bulletinEmployeeCombo" prefWidth="250.0" promptText="Sélectionner un employé" styleClass="farmdoc-combo-box" />
+                                                </VBox>
+                                                <VBox spacing="5.0">
+                                                    <Label styleClass="farmdoc-label" text="Mois:" />
+                                                    <ComboBox fx:id="bulletinMonthCombo" prefWidth="150.0" styleClass="farmdoc-combo-box" />
+                                                </VBox>
+                                                <VBox spacing="5.0">
+                                                    <Label styleClass="farmdoc-label" text="Année:" />
+                                                    <TextField fx:id="bulletinYear" prefWidth="80.0" styleClass="farmdoc-text-field" text="2024" />
+                                                </VBox>
+                                            </HBox>
+
+                                            <!-- Salary Details (Read from Personnel data) -->
+                                            <Label style="-fx-text-fill: #7f8c8d; -fx-font-style: italic;" text="Détails calculés automatiquement depuis les données RH" />
+
+                                            <HBox alignment="CENTER_RIGHT" spacing="10.0">
+                                                <Button fx:id="bulletinGenerateBtn" style="-fx-background-color: #f39c12; -fx-text-fill: white; -fx-font-weight: bold;" text="📄 Générer Bulletin">
+                                                    <font><Font size="14.0" /></font>
+                                                </Button>
+                                            </HBox>
+                                        </VBox>
+                                    </content>
+                                </TitledPane>
+
+                                <!-- 8. CONTRAT DE TRAVAIL -->
+                                <TitledPane fx:id="contratPane" text="📝 Contrat de Travail">
+                                    <content>
+                                        <VBox spacing="15.0" style="-fx-background-color: white; -fx-padding: 15;">
+                                            <HBox spacing="20.0">
+                                                <VBox spacing="5.0">
+                                                    <Label styleClass="farmdoc-label" text="Employé:" />
+                                                    <ComboBox fx:id="contratEmployeeCombo" prefWidth="250.0" promptText="Sélectionner un employé" styleClass="farmdoc-combo-box" />
+                                                </VBox>
+                                                <VBox spacing="5.0">
+                                                    <Label styleClass="farmdoc-label" text="Type de contrat:" />
+                                                    <ComboBox fx:id="contratTypeCombo" prefWidth="150.0" styleClass="farmdoc-combo-box" />
+                                                </VBox>
+                                            </HBox>
+
+                                            <Label style="-fx-text-fill: #7f8c8d; -fx-font-style: italic;" text="Les données de l'employé seront récupérées automatiquement" />
+
+                                            <HBox alignment="CENTER_RIGHT" spacing="10.0">
+                                                <Button fx:id="contratGenerateBtn" style="-fx-background-color: #2ecc71; -fx-text-fill: white; -fx-font-weight: bold;" text="📄 Générer Contrat">
+                                                    <font><Font size="14.0" /></font>
+                                                </Button>
+                                            </HBox>
+                                        </VBox>
+                                    </content>
+                                </TitledPane>
+
+                                <!-- 9. ATTESTATION DE TRAVAIL -->
+                                <TitledPane fx:id="attestationPane" text="📋 Attestation de Travail">
+                                    <content>
+                                        <VBox spacing="15.0" style="-fx-background-color: white; -fx-padding: 15;">
+                                            <HBox spacing="20.0">
+                                                <VBox spacing="5.0">
+                                                    <Label styleClass="farmdoc-label" text="Employé:" />
+                                                    <ComboBox fx:id="attestationEmployeeCombo" prefWidth="250.0" promptText="Sélectionner un employé" styleClass="farmdoc-combo-box" />
+                                                </VBox>
+                                                <VBox spacing="5.0">
+                                                    <Label styleClass="farmdoc-label" text="Motif de départ:" />
+                                                    <ComboBox fx:id="attestationReasonCombo" prefWidth="150.0" styleClass="farmdoc-combo-box" />
+                                                </VBox>
+                                            </HBox>
+
+                                            <HBox alignment="CENTER_RIGHT" spacing="10.0">
+                                                <Button fx:id="attestationGenerateBtn" style="-fx-background-color: #1abc9c; -fx-text-fill: white; -fx-font-weight: bold;" text="📄 Générer Attestation">
+                                                    <font><Font size="14.0" /></font>
+                                                </Button>
+                                            </HBox>
+                                        </VBox>
+                                    </content>
+                                </TitledPane>
+                            </panes>
+                        </Accordion>
+                    </children>
+               <padding>
+                  <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+               </padding>
+                </VBox>
+            </content>
+        </ScrollPane>
+    </children>
+</AnchorPane>

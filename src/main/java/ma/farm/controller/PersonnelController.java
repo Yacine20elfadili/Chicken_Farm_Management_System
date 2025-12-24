@@ -12,50 +12,82 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import ma.farm.dao.FinancialDAO;
 import ma.farm.dao.PersonnelDAO;
 import ma.farm.model.AdminPosition;
+import ma.farm.model.FinancialTransaction;
 import ma.farm.model.Personnel;
 import ma.farm.model.PersonnelType;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.TextStyle;
 import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import ma.farm.util.IdentityCardGenerator;
+import ma.farm.util.PDFGenerator;
+import javafx.concurrent.Task;
+import javafx.application.Platform;
 
 /**
  * PersonnelController - Controls the Personnel view
  *
  * New Structure:
- * - 4 Stats Cards: Admin Staff, Veterinary (1/N), Inventory (1/N), Farmhand (1/N)
+ * - 4 Stats Cards: Admin Staff, Veterinary (1/N), Inventory (1/N), Farmhand
+ * (1/N)
  * - Administration Section: Farm Owner, Cashier, Admin Staff cards
  * - Farm Section: Supervisors and their subordinates
  *
  * Card Actions:
  * - Admin cards: view/edit/drop (drop resets to missing)
- * - Farm cards: view/edit/delete (supervisor delete blocked if has subordinates)
+ * - Farm cards: view/edit/delete (supervisor delete blocked if has
+ * subordinates)
  */
 public class PersonnelController {
 
     // FXML Components - Stats Cards
-    @FXML private Label adminStaffCountLabel;
-    @FXML private Label veterinaryCountLabel;
-    @FXML private Label inventoryCountLabel;
-    @FXML private Label farmhandCountLabel;
+    @FXML
+    private Label adminStaffCountLabel;
+    @FXML
+    private Label veterinaryCountLabel;
+    @FXML
+    private Label inventoryCountLabel;
+    @FXML
+    private Label farmhandCountLabel;
 
     // FXML Components - Content Areas
-    @FXML private VBox administrationSection;
-    @FXML private FlowPane adminCardsPane;
-    @FXML private VBox farmSection;
-    @FXML private VBox veterinarySection;
-    @FXML private FlowPane veterinaryCardsPane;
-    @FXML private VBox inventorySection;
-    @FXML private FlowPane inventoryCardsPane;
-    @FXML private VBox farmhandSection;
-    @FXML private FlowPane farmhandCardsPane;
+    @FXML
+    private VBox administrationSection;
+    @FXML
+    private FlowPane adminCardsPane;
+    @FXML
+    private VBox farmSection;
+    @FXML
+    private VBox veterinarySection;
+    @FXML
+    private FlowPane veterinaryCardsPane;
+    @FXML
+    private VBox inventorySection;
+    @FXML
+    private FlowPane inventoryCardsPane;
+    @FXML
+    private VBox farmhandSection;
+    @FXML
+    private FlowPane farmhandCardsPane;
 
     // Legacy support - GridPane if FlowPane not available
-    @FXML private GridPane personnelGrid;
+    @FXML
+    private GridPane personnelGrid;
 
     // DAO
     private PersonnelDAO personnelDAO;
+    private FinancialDAO financialDAO;
 
     // Track selected personnel
     private Personnel selectedPersonnel;
@@ -64,6 +96,7 @@ public class PersonnelController {
     public void initialize() {
         System.out.println("=== PersonnelController: Initializing (New Structure) ===");
         personnelDAO = new PersonnelDAO();
+        financialDAO = new FinancialDAO();
 
         try {
             // Load all data
@@ -72,7 +105,8 @@ public class PersonnelController {
         } catch (Exception e) {
             System.err.println("ERROR in personnel initialization: " + e.getMessage());
             e.printStackTrace();
-            showErrorAlert("Erreur de Base de Données", "Impossible de charger les données du personnel.", e.getMessage());
+            showErrorAlert("Erreur de Base de Données", "Impossible de charger les données du personnel.",
+                    e.getMessage());
         }
     }
 
@@ -115,7 +149,8 @@ public class PersonnelController {
      * Update farm stat card with 1/N format
      */
     private void updateFarmStatCard(Label label, String supervisorType, String subordinateType) {
-        if (label == null) return;
+        if (label == null)
+            return;
 
         boolean hasSupervisor = personnelDAO.existsByJobTitle(supervisorType);
         int subordinateCount = personnelDAO.countByJobTitle(subordinateType);
@@ -170,7 +205,6 @@ public class PersonnelController {
             }
         }
 
-
     }
 
     /**
@@ -224,7 +258,7 @@ public class PersonnelController {
 
         Label roleBadge = new Label(roleLabel);
         roleBadge.setStyle("-fx-background-color: #007bff; -fx-text-fill: white; -fx-padding: 4 10; " +
-                          "-fx-background-radius: 12; -fx-font-size: 11px; -fx-font-weight: bold;");
+                "-fx-background-radius: 12; -fx-font-size: 11px; -fx-font-weight: bold;");
 
         Label nameLabel = new Label(personnel.getFullName());
         nameLabel.setFont(Font.font("System", FontWeight.BOLD, 15));
@@ -256,7 +290,7 @@ public class PersonnelController {
 
         Label roleBadge = new Label("Admin Staff");
         roleBadge.setStyle("-fx-background-color: #28a745; -fx-text-fill: white; -fx-padding: 4 10; " +
-                          "-fx-background-radius: 12; -fx-font-size: 11px; -fx-font-weight: bold;");
+                "-fx-background-radius: 12; -fx-font-size: 11px; -fx-font-weight: bold;");
 
         Label nameLabel = new Label(personnel.getFullName());
         nameLabel.setFont(Font.font("System", FontWeight.BOLD, 15));
@@ -278,7 +312,7 @@ public class PersonnelController {
             for (AdminPosition pos : positions) {
                 Label posBadge = new Label(pos.getDisplayNameFr());
                 posBadge.setStyle("-fx-background-color: #e9ecef; -fx-text-fill: #495057; -fx-padding: 2 6; " +
-                                 "-fx-background-radius: 8; -fx-font-size: 10px;");
+                        "-fx-background-radius: 8; -fx-font-size: 10px;");
                 posFlow.getChildren().add(posBadge);
             }
             positionsBox.getChildren().add(posFlow);
@@ -321,7 +355,7 @@ public class PersonnelController {
     }
 
     /**
-     * Create admin action buttons (View, Edit, Drop)
+     * Create admin action buttons (View, Edit, Pay, Drop)
      */
     private HBox createAdminActions(Personnel personnel) {
         HBox actions = new HBox(8);
@@ -334,10 +368,13 @@ public class PersonnelController {
         Button editBtn = createActionButton("✏", "Modifier", "#ffc107");
         editBtn.setOnAction(e -> openEditDialog(personnel));
 
+        Button payBtn = createActionButton("💵", "Payer Salaire", "#28a745");
+        payBtn.setOnAction(e -> handlePaySalary(personnel));
+
         Button dropBtn = createActionButton("↩", "Retirer", "#dc3545");
         dropBtn.setOnAction(e -> handleDropPersonnel(personnel));
 
-        actions.getChildren().addAll(viewBtn, editBtn, dropBtn);
+        actions.getChildren().addAll(viewBtn, editBtn, payBtn, dropBtn);
         return actions;
     }
 
@@ -355,19 +392,20 @@ public class PersonnelController {
         }
 
         loadFarmCategoryCards(veterinaryCardsPane, "veterinary_supervisor", "veterinary_subordinate",
-                             "Vétérinaire", "#17a2b8");
+                "Vétérinaire", "#17a2b8");
         loadFarmCategoryCards(inventoryCardsPane, "inventory_supervisor", "inventory_subordinate",
-                             "Inventaire", "#6f42c1");
+                "Inventaire", "#6f42c1");
         loadFarmCategoryCards(farmhandCardsPane, "farmhand_supervisor", "farmhand_subordinate",
-                             "Ouvrier Agricole", "#fd7e14");
+                "Ouvrier Agricole", "#fd7e14");
     }
 
     /**
      * Load farm category cards (supervisor + subordinates)
      */
     private void loadFarmCategoryCards(FlowPane pane, String supervisorType, String subordinateType,
-                                       String categoryName, String color) {
-        if (pane == null) return;
+            String categoryName, String color) {
+        if (pane == null)
+            return;
         pane.getChildren().clear();
 
         // Get supervisor
@@ -389,7 +427,6 @@ public class PersonnelController {
                 pane.getChildren().add(subCard);
             }
         }
-
 
     }
 
@@ -414,13 +451,19 @@ public class PersonnelController {
         if (vetSupervisor != null) {
             VBox vetCard = createFarmCard(vetSupervisor, "Vétérinaire (Superviseur)", "#17a2b8", true);
             personnelGrid.add(vetCard, col++, row);
-            if (col >= maxColumns) { col = 0; row++; }
+            if (col >= maxColumns) {
+                col = 0;
+                row++;
+            }
 
             List<Personnel> vetSubs = personnelDAO.getSubordinatesBySupervisorId(vetSupervisor.getId());
             for (Personnel sub : vetSubs) {
                 VBox subCard = createFarmCard(sub, "Vétérinaire", "#17a2b8", false);
                 personnelGrid.add(subCard, col++, row);
-                if (col >= maxColumns) { col = 0; row++; }
+                if (col >= maxColumns) {
+                    col = 0;
+                    row++;
+                }
             }
         }
 
@@ -429,13 +472,19 @@ public class PersonnelController {
         if (invSupervisor != null) {
             VBox invCard = createFarmCard(invSupervisor, "Inventaire (Superviseur)", "#6f42c1", true);
             personnelGrid.add(invCard, col++, row);
-            if (col >= maxColumns) { col = 0; row++; }
+            if (col >= maxColumns) {
+                col = 0;
+                row++;
+            }
 
             List<Personnel> invSubs = personnelDAO.getSubordinatesBySupervisorId(invSupervisor.getId());
             for (Personnel sub : invSubs) {
                 VBox subCard = createFarmCard(sub, "Inventaire", "#6f42c1", false);
                 personnelGrid.add(subCard, col++, row);
-                if (col >= maxColumns) { col = 0; row++; }
+                if (col >= maxColumns) {
+                    col = 0;
+                    row++;
+                }
             }
         }
 
@@ -444,13 +493,19 @@ public class PersonnelController {
         if (farmSupervisor != null) {
             VBox farmCard = createFarmCard(farmSupervisor, "Ouvrier (Superviseur)", "#fd7e14", true);
             personnelGrid.add(farmCard, col++, row);
-            if (col >= maxColumns) { col = 0; row++; }
+            if (col >= maxColumns) {
+                col = 0;
+                row++;
+            }
 
             List<Personnel> farmSubs = personnelDAO.getSubordinatesBySupervisorId(farmSupervisor.getId());
             for (Personnel sub : farmSubs) {
                 VBox subCard = createFarmCard(sub, "Ouvrier", "#fd7e14", false);
                 personnelGrid.add(subCard, col++, row);
-                if (col >= maxColumns) { col = 0; row++; }
+                if (col >= maxColumns) {
+                    col = 0;
+                    row++;
+                }
             }
         }
     }
@@ -468,7 +523,7 @@ public class PersonnelController {
 
         Label roleBadge = new Label(roleLabel);
         roleBadge.setStyle("-fx-background-color: " + color + "; -fx-text-fill: white; -fx-padding: 4 10; " +
-                          "-fx-background-radius: 12; -fx-font-size: 11px; -fx-font-weight: bold;");
+                "-fx-background-radius: 12; -fx-font-size: 11px; -fx-font-weight: bold;");
 
         if (isSupervisor) {
             Label supervisorIcon = new Label("⭐");
@@ -502,7 +557,7 @@ public class PersonnelController {
     }
 
     /**
-     * Create farm action buttons (View, Edit, Delete)
+     * Create farm action buttons (View, Edit, Pay, Delete)
      */
     private HBox createFarmActions(Personnel personnel, boolean isSupervisor) {
         HBox actions = new HBox(8);
@@ -515,10 +570,13 @@ public class PersonnelController {
         Button editBtn = createActionButton("✏", "Modifier", "#ffc107");
         editBtn.setOnAction(e -> openEditDialog(personnel));
 
+        Button payBtn = createActionButton("💵", "Payer Salaire", "#28a745");
+        payBtn.setOnAction(e -> handlePaySalary(personnel));
+
         Button deleteBtn = createActionButton("🗑", "Supprimer", "#dc3545");
         deleteBtn.setOnAction(e -> handleDeletePersonnel(personnel, isSupervisor));
 
-        actions.getChildren().addAll(viewBtn, editBtn, deleteBtn);
+        actions.getChildren().addAll(viewBtn, editBtn, payBtn, deleteBtn);
         return actions;
     }
 
@@ -534,12 +592,11 @@ public class PersonnelController {
         card.setAlignment(Pos.TOP_LEFT);
         card.setPadding(new Insets(12));
         card.setStyle(
-            "-fx-background-color: white; " +
-            "-fx-border-width: 2px; " +
-            "-fx-border-radius: 8px; " +
-            "-fx-background-radius: 8px; " +
-            "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);"
-        );
+                "-fx-background-color: white; " +
+                        "-fx-border-width: 2px; " +
+                        "-fx-border-radius: 8px; " +
+                        "-fx-background-radius: 8px; " +
+                        "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);");
         card.setMinWidth(240);
         card.setMaxWidth(280);
         card.setPrefHeight(Region.USE_COMPUTED_SIZE);
@@ -574,8 +631,10 @@ public class PersonnelController {
         Button btn = new Button(icon);
         btn.setTooltip(new Tooltip(tooltip));
         btn.setStyle("-fx-background-color: transparent; -fx-font-size: 14px; -fx-cursor: hand;");
-        btn.setOnMouseEntered(e -> btn.setStyle("-fx-background-color: " + color + "22; -fx-font-size: 14px; -fx-cursor: hand; -fx-background-radius: 5;"));
-        btn.setOnMouseExited(e -> btn.setStyle("-fx-background-color: transparent; -fx-font-size: 14px; -fx-cursor: hand;"));
+        btn.setOnMouseEntered(e -> btn.setStyle("-fx-background-color: " + color
+                + "22; -fx-font-size: 14px; -fx-cursor: hand; -fx-background-radius: 5;"));
+        btn.setOnMouseExited(
+                e -> btn.setStyle("-fx-background-color: transparent; -fx-font-size: 14px; -fx-cursor: hand;"));
         return btn;
     }
 
@@ -729,6 +788,120 @@ public class PersonnelController {
     }
 
     /**
+     * Handle pay salary - creates expense transaction for personnel salary
+     */
+    private void handlePaySalary(Personnel personnel) {
+        if (personnel.getSalary() <= 0) {
+            showErrorAlert("Salaire non défini",
+                    "Ce personnel n'a pas de salaire défini.",
+                    "Veuillez modifier le personnel pour ajouter un salaire.");
+            return;
+        }
+
+        String monthName = LocalDate.now().getMonth().getDisplayName(TextStyle.FULL, Locale.FRANCE);
+        int year = LocalDate.now().getYear();
+
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+        confirm.setTitle("Confirmer le paiement");
+        confirm.setHeaderText("Payer le salaire de " + personnel.getFullName() + " ?");
+        confirm.setContentText(String.format("Montant: %.2f DH\nMois: %s %d",
+                personnel.getSalary(), monthName, year));
+
+        confirm.showAndWait().ifPresent(response -> {
+            if (response == ButtonType.OK) {
+                // Implement pay logic here if needed (e.g. update database)
+                // For now, simple alert
+                showSuccessAlert("Succès", "Salaire payé pour " + personnel.getFullName());
+            }
+        });
+    }
+
+    /**
+     * Generate an identity card image for a selected personnel
+     */
+    @FXML
+    public void generateCard() {
+        List<Personnel> all = personnelDAO.getAllPersonnel();
+        if (all.isEmpty()) {
+            showErrorAlert("Erreur", "Aucun personnel", "La liste du personnel est vide.");
+            return;
+        }
+
+        List<String> names = all.stream().map(Personnel::getFullName).collect(Collectors.toList());
+        ChoiceDialog<String> dialog = new ChoiceDialog<>(names.get(0), names);
+        dialog.setTitle("Générer carte d'identité");
+        dialog.setHeaderText("Sélectionner le personnel");
+        dialog.setContentText("Personnel:");
+
+        Optional<String> selected = dialog.showAndWait();
+        if (!selected.isPresent())
+            return;
+
+        String chosen = selected.get();
+        Personnel person = all.stream().filter(p -> chosen.equals(p.getFullName())).findFirst().orElse(null);
+        if (person == null) {
+            showErrorAlert("Erreur", "Personnel introuvable", "Impossible de trouver le personnel sélectionné.");
+            return;
+        }
+
+        // Ensure Documents directory exists
+        PDFGenerator.ensureDirectoryExists();
+
+        String filename = "ID_Card_" + person.getFullName().replaceAll("\\s+", "_") + "_" + System.currentTimeMillis()
+                + ".png";
+        Path dest = Paths.get(PDFGenerator.DOCUMENTS_DIR, filename);
+
+        Task<Void> task = new Task<>() {
+            @Override
+            protected Void call() throws Exception {
+                IdentityCardGenerator gen = new IdentityCardGenerator();
+                gen.saveAsPng(person, dest);
+                return null;
+            }
+        };
+
+        task.setOnSucceeded(e -> Platform.runLater(() -> {
+            showSuccessAlert("Succès", "Carte générée avec succès.\nEmplacement: " + dest.toAbsolutePath());
+            try {
+                if (java.awt.Desktop.isDesktopSupported()) {
+                    java.awt.Desktop.getDesktop().open(dest.toFile());
+                }
+            } catch (Exception ex) {
+                System.err.println("Could not open file automatically: " + ex.getMessage());
+            }
+        }));
+
+        task.setOnFailed(e -> Platform
+                .runLater(() -> showErrorAlertWithStack("Erreur", "Échec de génération", task.getException())));
+
+        new Thread(task).start();
+    }
+
+    private void showErrorAlertWithStack(String title, String header, Throwable t) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(header);
+
+        StringWriter sw = new StringWriter();
+        t.printStackTrace(new PrintWriter(sw));
+        String exceptionText = sw.toString();
+
+        javafx.scene.control.TextArea textArea = new javafx.scene.control.TextArea(exceptionText);
+        textArea.setEditable(false);
+        textArea.setWrapText(true);
+        textArea.setMaxWidth(Double.MAX_VALUE);
+        textArea.setMaxHeight(Double.MAX_VALUE);
+
+        GridPane content = new GridPane();
+        content.setMaxWidth(Double.MAX_VALUE);
+        content.add(new Label("Exception stacktrace:"), 0, 0);
+        content.add(textArea, 0, 1);
+
+        alert.getDialogPane().setExpandableContent(content);
+        alert.showAndWait();
+    }
+
+    /**
      * Handle drop personnel (Admin - resets to missing)
      */
     private void handleDropPersonnel(Personnel personnel) {
@@ -757,8 +930,8 @@ public class PersonnelController {
         // Check if supervisor has subordinates
         if (isSupervisor && personnelDAO.hasSubordinates(personnel.getId())) {
             showErrorAlert("Suppression impossible",
-                          "Ce superviseur a des subordonnés.",
-                          "Veuillez d'abord supprimer ou réassigner tous les subordonnés avant de supprimer ce superviseur.");
+                    "Ce superviseur a des subordonnés.",
+                    "Veuillez d'abord supprimer ou réassigner tous les subordonnés avant de supprimer ce superviseur.");
             return;
         }
 

@@ -1,104 +1,99 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.String?>
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
 
-<VBox xmlns="http://javafx.com/javafx"
-      xmlns:fx="http://javafx.com/fxml"
-      fx:controller="ma.farm.controller.dialogs.SellChickensDialogController"
-      prefWidth="500.0"
-      prefHeight="550.0"
-      spacing="15"
-      style="-fx-background-color: #ffffff;">
+<VBox prefHeight="550.0" prefWidth="500.0" spacing="10.0" styleClass="root" stylesheets="@../../css/dialogs.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ma.farm.controller.dialogs.SellChickensDialogController">
 
     <padding>
-        <Insets bottom="20.0" left="25.0" right="25.0" top="20.0"/>
+        <Insets bottom="20.0" left="25.0" right="25.0" top="20.0" />
     </padding>
 
     <!-- Dialog Title -->
     <VBox spacing="5.0">
-        <Label text="💰 Sell Chickens"
-               style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #1e2939;"/>
-        <Label fx:id="sourceHouseLabel" text="Selling from: FemaleMeat-House-1"
-               style="-fx-font-size: 13px; -fx-text-fill: #666666;"/>
+        <Label styleClass="title" text="💰 Sell Chickens" />
+        <Label fx:id="sourceHouseLabel" styleClass="subtitle" text="Selling from: FemaleMeat-House-1" />
     </VBox>
 
-    <Separator/>
+    <Separator />
 
     <!-- Available Chickens Info -->
-    <HBox alignment="CENTER_LEFT" spacing="12.0"
-          style="-fx-background-color: #fff8e1; -fx-padding: 12; -fx-background-radius: 5;">
-        <Label text="Available chickens:" style="-fx-font-weight: bold; -fx-text-fill: #f57c00;"/>
-        <Label fx:id="availableChickensLabel" text="0"
-               style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #e65100;"/>
+    <HBox alignment="CENTER_LEFT" spacing="12.0" style="-fx-background-color: #fff8e1;" styleClass="transfer-info-box">
+        <Label style="-fx-text-fill: #f57c00;" styleClass="label-small-bold" text="Available chickens:" />
+        <Label fx:id="availableChickensLabel" style="-fx-text-fill: #e65100;" styleClass="footer-value" text="0" />
     </HBox>
 
-    <Separator/>
+    <Separator />
 
     <!-- Form Content -->
     <VBox spacing="15.0">
         <!-- Quantity to Sell -->
         <VBox spacing="8.0">
-            <Label text="Quantity to Sell" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #333333;"/>
-            <HBox spacing="12.0" alignment="CENTER_LEFT">
-                <TextField fx:id="quantityField" promptText="Enter quantity..." prefWidth="200"
-                           style="-fx-background-color: #ffffff; -fx-border-color: #ced4da; -fx-border-radius: 5; -fx-background-radius: 5; -fx-padding: 8 12;"/>
-                <Button text="Sell All" onAction="#handleSellAll"
-                        style="-fx-background-color: #ff9800; -fx-text-fill: white; -fx-font-size: 12px; -fx-padding: 8 16; -fx-background-radius: 5; -fx-cursor: hand;"
-                        prefWidth="90"/>
+            <Label styleClass="section-title" text="Quantity to Sell" />
+            <HBox alignment="CENTER_LEFT" spacing="12.0" VBox.vgrow="ALWAYS">
+                <TextField fx:id="quantityField" prefWidth="200" promptText="Ex: 100" HBox.hgrow="ALWAYS" />
+                <Button onAction="#handleSellAll" prefHeight="41.0" prefWidth="113.0" text="Sell All">
+               <styleClass>
+                  <String fx:value="btn" />
+                  <String fx:value="btn-sell" />
+               </styleClass></Button>
             </HBox>
-            <Label fx:id="quantityErrorLabel" text="" style="-fx-text-fill: #dc3545; -fx-font-size: 11px;" visible="false"/>
+            <Label fx:id="quantityErrorLabel" style="-fx-text-fill: #dc3545; -fx-font-size: 11px;" text="" visible="false" />
         </VBox>
 
         <!-- Date of Sale -->
         <VBox spacing="8.0">
-            <Label text="Date of Sale" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #333333;"/>
-            <DatePicker fx:id="saleDatePicker" prefWidth="220"/>
+            <Label styleClass="section-title" text="Date of Sale" />
+            <DatePicker fx:id="saleDatePicker" prefWidth="220" />
         </VBox>
     </VBox>
 
-    <Separator/>
+    <Separator />
 
-    <!-- Optional Fields Section -->
-    <VBox spacing="12.0"
-          style="-fx-background-color: #f8f9fa; -fx-padding: 15; -fx-background-radius: 8;">
-        <Label text="📋 Optional Fields (for record keeping)"
-               style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #666666;"/>
+    <!-- Transaction Details Section -->
+    <VBox spacing="12.0" style="-fx-background-color: #f8f9fa; -fx-padding: 15; -fx-background-radius: 8;">
+        <Label style="-fx-text-fill: #666666;" styleClass="section-title" text="📋 Transaction Details" />
 
         <!-- Price per Piece -->
         <VBox spacing="5.0">
-            <Label text="Price per Piece" style="-fx-text-fill: #555555; -fx-font-size: 12px;"/>
-            <HBox spacing="8.0" alignment="CENTER_LEFT">
-                <TextField fx:id="priceField" promptText="(Optional) Price..." prefWidth="180"
-                           style="-fx-background-color: #ffffff; -fx-border-color: #ced4da; -fx-border-radius: 5; -fx-background-radius: 5; -fx-padding: 8 12;"/>
-                <Label text="MAD" style="-fx-text-fill: #888888; -fx-font-weight: bold;"/>
+            <Label style="-fx-text-fill: #555555;" styleClass="section-subtitle" text="Price per Piece *" />
+            <HBox alignment="CENTER_LEFT" spacing="8.0">
+                <TextField fx:id="priceField" prefWidth="180" promptText="Ex: 15.00" />
+                <Label styleClass="label-small-bold" text="MAD" />
             </HBox>
         </VBox>
 
         <!-- Customer Name -->
         <VBox spacing="5.0">
-            <Label text="Customer Name" style="-fx-text-fill: #555555; -fx-font-size: 12px;"/>
-            <TextField fx:id="customerField" promptText="(Optional) Customer name..."
-                       style="-fx-background-color: #ffffff; -fx-border-color: #ced4da; -fx-border-radius: 5; -fx-background-radius: 5; -fx-padding: 8 12;"/>
+            <Label style="-fx-text-fill: #555555;" styleClass="section-subtitle" text="Client *" />
+            <ComboBox fx:id="customerCombo" prefWidth="300.0" promptText="Sélectionner un client" />
         </VBox>
     </VBox>
 
     <!-- Error Label -->
-    <Label fx:id="errorLabel" style="-fx-text-fill: #dc3545;" wrapText="true" visible="false" managed="false"/>
+    <Label fx:id="errorLabel" managed="false" style="-fx-text-fill: #dc3545;" visible="false" wrapText="true" />
 
-    <Separator/>
+    <Separator />
 
     <!-- Button Bar -->
-    <HBox spacing="12.0" alignment="CENTER_RIGHT">
-        <padding>
-            <Insets top="10.0"/>
-        </padding>
-        <Button text="Cancel" onAction="#handleCancel"
-                style="-fx-background-color: #6c757d; -fx-text-fill: white; -fx-font-size: 13px; -fx-padding: 10 24; -fx-background-radius: 6; -fx-cursor: hand;"
-                prefWidth="100"/>
-        <Button fx:id="confirmButton" text="Confirm Sale" onAction="#handleConfirm"
-                style="-fx-background-color: #28a745; -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold; -fx-padding: 10 24; -fx-background-radius: 6; -fx-cursor: hand;"
-                prefWidth="140"/>
+    <HBox alignment="CENTER_RIGHT" spacing="12.0">
+        <Button onAction="#handleCancel" prefWidth="100" text="Cancel">
+         <styleClass>
+            <String fx:value="btn" />
+            <String fx:value="btn-cancel" />
+         </styleClass></Button>
+        <Button fx:id="confirmButton" onAction="#handleConfirm" prefWidth="140" text="Confirm Sale">
+         <styleClass>
+            <String fx:value="btn" />
+            <String fx:value="btn-save" />
+         </styleClass></Button>
     </HBox>
 </VBox>

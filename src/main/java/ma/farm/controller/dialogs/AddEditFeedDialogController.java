@@ -1,10 +1,15 @@
 package ma.farm.controller.dialogs;
 
+import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 import ma.farm.dao.FeedDAO;
+import ma.farm.dao.FinancialDAO;
+import ma.farm.dao.SupplierDAO;
 import ma.farm.model.Feed;
+import ma.farm.model.FinancialTransaction;
+import ma.farm.model.Supplier;
 
 import java.time.LocalDate;
 
@@ -16,219 +21,209 @@ public class AddEditFeedDialogController {
 
     @FXML
     private Label dialogTitle;
-
     @FXML
     private TextField nameField;
-
     @FXML
     private Label nameErrorLabel;
-
     @FXML
     private ComboBox<String> typeComboBox;
-
     @FXML
     private Label typeErrorLabel;
-
     @FXML
     private TextField quantityField;
-
     @FXML
     private Label quantityErrorLabel;
-
     @FXML
     private TextField pricePerKgField;
-
     @FXML
     private Label priceErrorLabel;
 
     @FXML
-    private TextField supplierField;
+    private ComboBox<Supplier> supplierCombo;
 
     @FXML
     private DatePicker expiryDatePicker;
-
     @FXML
     private TextField minStockField;
-
     @FXML
     private Label minStockErrorLabel;
 
     private FeedDAO feedDAO;
+    private SupplierDAO supplierDAO;
+    private FinancialDAO financialDAO;
     private Feed currentFeed;
     private boolean isEditMode = false;
     private Stage dialogStage;
 
-    /**
-     * Initialize method called after FXML loads
-     */
     @FXML
     public void initialize() {
         feedDAO = new FeedDAO();
+        supplierDAO = new SupplierDAO();
+        financialDAO = new FinancialDAO();
 
-        // Populate type ComboBox with feed types
-        typeComboBox.getItems().addAll(
-                "Day-old",
-                "Layer",
-                "Meat Growth"
-        );
+        typeComboBox.getItems().addAll("Day-old", "Layer", "Meat Growth");
+
+        // Load Suppliers
+        supplierCombo.setItems(FXCollections.observableArrayList(supplierDAO.getActiveSuppliersByCategory("Feed")));
     }
 
-    /**
-     * Set dialog stage (for closing)
-     */
     public void setDialogStage(Stage dialogStage) {
         this.dialogStage = dialogStage;
     }
 
-    /**
-     * Set feed for editing
-     */
     public void setFeed(Feed feed) {
         this.currentFeed = feed;
         this.isEditMode = true;
 
-        // Update dialog title
         dialogTitle.setText("Modifier Aliment");
 
-        // Populate form with existing feed data
         nameField.setText(feed.getName());
         typeComboBox.setValue(feed.getType());
         quantityField.setText(String.valueOf(feed.getQuantityKg()));
         pricePerKgField.setText(String.valueOf(feed.getPricePerKg()));
-        supplierField.setText(feed.getSupplier() != null ? feed.getSupplier() : "");
+
+        // Set Supplier in ComboBox
+        if (feed.getSupplier() != null) {
+            for (Supplier s : supplierCombo.getItems()) {
+                if (s.getName().equals(feed.getSupplier())) {
+                    supplierCombo.setValue(s);
+                    break;
+                }
+            }
+        }
+
         if (feed.getExpiryDate() != null) {
             expiryDatePicker.setValue(feed.getExpiryDate());
         }
         minStockField.setText(String.valueOf(feed.getMinStockLevel()));
     }
 
-    /**
-     * Handle save button click
-     */
     @FXML
     public void handleSave() {
-        // Clear previous error messages
         clearErrorLabels();
 
-        // Validate inputs
         if (!validateInputs()) {
             return;
         }
 
         try {
-            // Create or update feed object
             if (!isEditMode) {
                 currentFeed = new Feed();
             }
 
-            // Set values from form
             currentFeed.setName(nameField.getText().trim());
             currentFeed.setType(typeComboBox.getValue());
             currentFeed.setQuantityKg(Double.parseDouble(quantityField.getText().trim()));
             currentFeed.setPricePerKg(Double.parseDouble(pricePerKgField.getText().trim()));
-            currentFeed.setSupplier(supplierField.getText().trim().isEmpty() ? null : supplierField.getText().trim());
+
+            Supplier selectedSupplier = supplierCombo.getValue();
+            currentFeed.setSupplier(selectedSupplier != null ? selectedSupplier.getName() : null);
+
             currentFeed.setExpiryDate(expiryDatePicker.getValue());
             currentFeed.setMinStockLevel(Double.parseDouble(minStockField.getText().trim()));
 
-            // If adding new feed, set restock date to today
             if (!isEditMode) {
                 currentFeed.setLastRestockDate(LocalDate.now());
             }
 
-            // Save to database
             boolean success;
             if (isEditMode) {
                 success = feedDAO.updateFeed(currentFeed);
-                if (success) {
-                    showSuccessMessage("Aliment mis à jour avec succès!");
-                } else {
-                    showErrorMessage("Erreur lors de la mise à jour de l'aliment.");
-                    return;
-                }
             } else {
                 success = feedDAO.addFeed(currentFeed);
-                if (success) {
-                    showSuccessMessage("Aliment ajouté avec succès!");
-                } else {
-                    showErrorMessage("Erreur lors de l'ajout de l'aliment.");
-                    return;
-                }
             }
 
-            // Close dialog
-            if (dialogStage != null) {
-                dialogStage.close();
+            if (success) {
+                // Log financial transaction for new feed purchases (not edits)
+                if (!isEditMode) {
+                    try {
+                        FinancialTransaction tx = new FinancialTransaction();
+                        tx.setTransactionDate(LocalDate.now());
+                        tx.setType("Expense");
+                        tx.setCategory("Achat Aliments");
+
+                        double qty = currentFeed.getQuantityKg();
+                        double price = currentFeed.getPricePerKg();
+                        double total = qty * price;
+
+                        tx.setAmount(total);
+                        tx.setPaymentMethod("Cash");
+                        tx.setDescription("Achat Aliments: " + currentFeed.getName() + " (" + qty + " kg)");
+
+                        if (selectedSupplier != null) {
+                            tx.setRelatedEntityType("Supplier");
+                            tx.setRelatedEntityId(selectedSupplier.getId());
+                        }
+
+                        financialDAO.addTransaction(tx);
+                        System.out.println("Logged expense for feed: " + total + " DH");
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        System.err.println("Failed to log financial transaction for feed");
+                    }
+                }
+
+                showSuccessMessage(isEditMode ? "Aliment mis à jour avec succès!" : "Aliment ajouté avec succès!");
+                if (dialogStage != null)
+                    dialogStage.close();
+            } else {
+                showErrorMessage("Erreur lors de l'enregistrement.");
             }
 
         } catch (NumberFormatException e) {
             showErrorMessage("Erreur: Vérifiez les valeurs numériques.");
         } catch (Exception e) {
-            System.err.println("Error saving feed: " + e.getMessage());
             e.printStackTrace();
             showErrorMessage("Erreur: " + e.getMessage());
         }
     }
 
-    /**
-     * Validate all input fields
-     */
     private boolean validateInputs() {
         boolean isValid = true;
 
-        // Validate name
         if (nameField.getText().trim().isEmpty()) {
             nameErrorLabel.setText("Le nom est requis");
             isValid = false;
         }
 
-        // Validate type
         if (typeComboBox.getValue() == null || typeComboBox.getValue().isEmpty()) {
             typeErrorLabel.setText("Le type est requis");
             isValid = false;
         }
 
-        // Validate quantity
         try {
-            double quantity = Double.parseDouble(quantityField.getText().trim());
-            if (quantity <= 0) {
-                quantityErrorLabel.setText("La quantité doit être supérieure à 0");
+            if (Double.parseDouble(quantityField.getText().trim()) <= 0) {
+                quantityErrorLabel.setText("La quantité doit être positive");
                 isValid = false;
             }
         } catch (NumberFormatException e) {
-            quantityErrorLabel.setText("Veuillez entrer un nombre valide");
+            quantityErrorLabel.setText("Nombre invalide");
             isValid = false;
         }
 
-        // Validate price per kg
         try {
-            double price = Double.parseDouble(pricePerKgField.getText().trim());
-            if (price < 0) {
+            if (Double.parseDouble(pricePerKgField.getText().trim()) < 0) {
                 priceErrorLabel.setText("Le prix ne peut pas être négatif");
                 isValid = false;
             }
         } catch (NumberFormatException e) {
-            priceErrorLabel.setText("Veuillez entrer un nombre valide");
+            priceErrorLabel.setText("Nombre invalide");
             isValid = false;
         }
 
-        // Validate min stock level
         try {
-            double minStock = Double.parseDouble(minStockField.getText().trim());
-            if (minStock < 0) {
-                minStockErrorLabel.setText("Le stock minimum ne peut pas être négatif");
+            if (Double.parseDouble(minStockField.getText().trim()) < 0) {
+                minStockErrorLabel.setText("Stock min invalide");
                 isValid = false;
             }
         } catch (NumberFormatException e) {
-            minStockErrorLabel.setText("Veuillez entrer un nombre valide");
+            minStockErrorLabel.setText("Nombre invalide");
             isValid = false;
         }
 
         return isValid;
     }
 
-    /**
-     * Clear all error labels
-     */
     private void clearErrorLabels() {
         nameErrorLabel.setText("");
         typeErrorLabel.setText("");
@@ -237,31 +232,22 @@ public class AddEditFeedDialogController {
         minStockErrorLabel.setText("");
     }
 
-    /**
-     * Show success message
-     */
     private void showSuccessMessage(String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Succès");
-        alert.setHeaderText("Opération Réussie");
+        alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
     }
 
-    /**
-     * Show error message
-     */
     private void showErrorMessage(String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Erreur");
-        alert.setHeaderText("Une erreur s'est produite");
+        alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
     }
 
-    /**
-     * Handle cancel button click
-     */
     @FXML
     public void handleCancel() {
         if (dialogStage != null) {

@@ -1,114 +1,127 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.String?>
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
 
-<VBox xmlns="http://javafx.com/javafx"
-      xmlns:fx="http://javafx.com/fxml"
-      fx:controller="ma.farm.controller.dialogs.DistributeChicksDialogController"
-      prefWidth="600.0"
-      prefHeight="750.0"
-      spacing="15"
-      style="-fx-background-color: #ffffff;">
+<VBox prefHeight="700.0" prefWidth="600.0" spacing="10.0" styleClass="root" stylesheets="@../../css/dialogs.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ma.farm.controller.dialogs.DistributeChicksDialogController">
 
     <padding>
-        <Insets bottom="20.0" left="25.0" right="25.0" top="20.0"/>
+        <Insets bottom="20.0" left="25.0" right="25.0" top="20.0" />
     </padding>
 
-    <!-- Dialog Title -->
-    <VBox spacing="5.0">
-        <Label text="📦 Distribute Chicks"
-               style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #1e2939;"/>
-        <Label fx:id="sourceHouseLabel" text="Distributing from: DayOld-House-1"
-               style="-fx-font-size: 13px; -fx-text-fill: #666666;"/>
-    </VBox>
+       <!-- Dialog Title -->
+       <VBox spacing="5.0">
+           <Label styleClass="title" text="📦 Distribute Chicks" />
+           <Label fx:id="sourceHouseLabel" styleClass="subtitle" text="Distributing from: DayOld-House-1" />
+       </VBox>
 
-    <Separator/>
+       <Separator />
 
-    <!-- Total Chickens Info -->
-    <HBox alignment="CENTER_LEFT" spacing="12.0"
-          style="-fx-background-color: #e3f2fd; -fx-padding: 12; -fx-background-radius: 5;">
-        <Label text="Total chickens to distribute:" style="-fx-font-weight: bold; -fx-text-fill: #1565c0;"/>
-        <Label fx:id="totalChickensLabel" text="0"
-               style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #1976D2;"/>
+    <!-- ================= SCROLLABLE CONTENT ================= -->
+    <ScrollPane fitToWidth="true" styleClass="transparent-scroll" VBox.vgrow="ALWAYS">
+
+        <content>
+            <VBox spacing="10.0" styleClass="scroll-content">
+
+                <!-- Total Chickens Info -->
+                <HBox alignment="CENTER_LEFT" spacing="12.0" style="-fx-background-color: #e3f2fd;;" styleClass="transfer-info-box">
+                    <Label style="-fx-text-fill: #1976d2;;" styleClass="label-small-bold" text="Total chickens to distribute:" />
+                    <Label fx:id="totalChickensLabel" style="-fx-text-fill: #1976d2;;" styleClass="footer-value" text="0" />
+                </HBox>
+
+                <!-- Gender Distribution -->
+                <VBox spacing="12.0" styleClass="result-card">
+                    <Label styleClass="section-title" text="Gender Distribution" />
+
+                    <HBox spacing="20.0">
+                        <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                            <Label styleClass="section-subtitle" text="Female Count" />
+                            <TextField fx:id="femaleCountField" promptText="Ex: 5000" />
+                        </VBox>
+
+                        <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                            <Label styleClass="section-subtitle" text="Male Count" />
+                            <TextField fx:id="maleCountField" promptText="Ex: 200" />
+                        </VBox>
+
+                        <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                            <Label styleClass="section-subtitle" text="Sum" />
+                            <Label fx:id="sumLabel" styleClass="sum-label" text="0" />
+                        </VBox>
+                    </HBox>
+
+                    <Label fx:id="genderErrorLabel" styleClass="error-label" visible="false" />
+                </VBox>
+
+                <Separator />
+
+                <!-- Female Assignment Section -->
+                <VBox spacing="10.0" VBox.vgrow="ALWAYS">
+                    <Label styleClass="result-title" text="🥚 Assign Females to Egg Layer Houses" />
+
+                    <Label fx:id="femaleCapacityLabel" styleClass="result-total" text="Total available capacity: 0">
+                        <VBox.margin>
+                            <Insets left="20" />
+                        </VBox.margin>
+                    </Label>
+
+                    <VBox fx:id="femaleHousesContainer" spacing="8.0" styleClass="scroll-content" />
+
+                    <styleClass>
+                        <String fx:value="result-card" />
+                        <String fx:value="egg" />
+                    </styleClass>
+                </VBox>
+
+                <!-- Male Assignment Section -->
+                <VBox spacing="10.0" VBox.vgrow="ALWAYS">
+                    <Label styleClass="result-title" text="🍗 Assign Males to Male Meat Houses" />
+
+                    <Label fx:id="maleCapacityLabel" styleClass="result-total" text="Total available capacity: 0">
+                        <VBox.margin>
+                            <Insets left="20" />
+                        </VBox.margin>
+                    </Label>
+
+                    <VBox fx:id="maleHousesContainer" spacing="8.0" styleClass="scroll-content" />
+
+                    <styleClass>
+                        <String fx:value="result-card" />
+                        <String fx:value="male" />
+                    </styleClass>
+                </VBox>
+
+                <!-- Error Label -->
+                <Label fx:id="errorLabel" managed="false" styleClass="error-label" visible="false" wrapText="true" />
+
+            </VBox>
+        </content>
+    </ScrollPane>
+
+    <!-- ================= FIXED BUTTON BAR ================= -->
+    <Separator />
+
+    <HBox alignment="CENTER_RIGHT" spacing="12.0">
+        <Button onAction="#handleCancel" prefWidth="100" text="Cancel">
+            <styleClass>
+                <String fx:value="btn" />
+                <String fx:value="btn-cancel" />
+            </styleClass>
+        </Button>
+
+        <Button fx:id="confirmButton" onAction="#handleConfirm" prefWidth="180" text="Confirm Distribution">
+            <styleClass>
+                <String fx:value="btn" />
+                <String fx:value="btn-save" />
+            </styleClass>
+        </Button>
     </HBox>
 
-    <!-- Gender Distribution -->
-    <VBox spacing="12.0" style="-fx-background-color: #f5f5f5; -fx-padding: 15; -fx-background-radius: 8;">
-        <Label text="Gender Distribution" style="-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #333333;"/>
-        <HBox spacing="20.0" alignment="CENTER_LEFT">
-            <VBox spacing="6.0">
-                <Label text="Female Count" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #333333;"/>
-                <TextField fx:id="femaleCountField" promptText="Number of females..." prefWidth="160"
-                           style="-fx-background-color: #ffffff; -fx-border-color: #ced4da; -fx-border-radius: 5; -fx-background-radius: 5; -fx-padding: 8 12;"/>
-            </VBox>
-            <VBox spacing="6.0">
-                <Label text="Male Count" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #333333;"/>
-                <TextField fx:id="maleCountField" promptText="Number of males..." prefWidth="160"
-                           style="-fx-background-color: #ffffff; -fx-border-color: #ced4da; -fx-border-radius: 5; -fx-background-radius: 5; -fx-padding: 8 12;"/>
-            </VBox>
-            <VBox spacing="6.0" alignment="CENTER">
-                <Label text="Sum" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #333333;"/>
-                <Label fx:id="sumLabel" text="0"
-                       style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #333333;
-                              -fx-background-color: #e0e0e0; -fx-padding: 8 20; -fx-background-radius: 5;"/>
-            </VBox>
-        </HBox>
-        <Label fx:id="genderErrorLabel" text="" style="-fx-text-fill: #dc3545; -fx-font-size: 11px;" visible="false"/>
-    </VBox>
-
-    <Separator/>
-
-    <!-- Female Assignment Section -->
-    <VBox spacing="10.0" VBox.vgrow="ALWAYS"
-          style="-fx-background-color: #fce4ec; -fx-padding: 15; -fx-background-radius: 8;">
-        <HBox alignment="CENTER_LEFT" spacing="10.0">
-            <Label text="🥚 Assign Females to Egg Layer Houses"
-                   style="-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #c2185b;"/>
-        </HBox>
-        <Label fx:id="femaleCapacityLabel" text="Total available capacity: 0"
-               style="-fx-font-size: 11px; -fx-text-fill: #666666;"/>
-        <ScrollPane fitToWidth="true" prefHeight="120" VBox.vgrow="ALWAYS"
-                    style="-fx-background-color: transparent; -fx-background: transparent; -fx-border-color: transparent;">
-            <VBox fx:id="femaleHousesContainer" spacing="8.0" style="-fx-padding: 5;">
-                <!-- Female house assignment rows will be added dynamically -->
-            </VBox>
-        </ScrollPane>
-    </VBox>
-
-    <!-- Male Assignment Section -->
-    <VBox spacing="10.0" VBox.vgrow="ALWAYS"
-          style="-fx-background-color: #fff3e0; -fx-padding: 15; -fx-background-radius: 8;">
-        <HBox alignment="CENTER_LEFT" spacing="10.0">
-            <Label text="🐔 Assign Males to Male Meat Houses"
-                   style="-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #e65100;"/>
-        </HBox>
-        <Label fx:id="maleCapacityLabel" text="Total available capacity: 0"
-               style="-fx-font-size: 11px; -fx-text-fill: #666666;"/>
-        <ScrollPane fitToWidth="true" prefHeight="120" VBox.vgrow="ALWAYS"
-                    style="-fx-background-color: transparent; -fx-background: transparent; -fx-border-color: transparent;">
-            <VBox fx:id="maleHousesContainer" spacing="8.0" style="-fx-padding: 5;">
-                <!-- Male house assignment rows will be added dynamically -->
-            </VBox>
-        </ScrollPane>
-    </VBox>
-
-    <!-- Error Label -->
-    <Label fx:id="errorLabel" style="-fx-text-fill: #dc3545;" wrapText="true" visible="false" managed="false"/>
-
-    <Separator/>
-
-    <!-- Button Bar -->
-    <HBox spacing="12.0" alignment="CENTER_RIGHT">
-        <padding>
-            <Insets top="10.0"/>
-        </padding>
-        <Button text="Cancel" onAction="#handleCancel"
-                style="-fx-background-color: #6c757d; -fx-text-fill: white; -fx-font-size: 13px; -fx-padding: 10 24; -fx-background-radius: 6; -fx-cursor: hand;"
-                prefWidth="100"/>
-        <Button fx:id="confirmButton" text="Confirm Distribution" onAction="#handleConfirm"
-                style="-fx-background-color: #28a745; -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold; -fx-padding: 10 24; -fx-background-radius: 6; -fx-cursor: hand;"
-                prefWidth="180"/>
-    </HBox>
 </VBox>
