@@ -9,195 +9,235 @@
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.layout.ColumnConstraints?>
 
-<VBox prefHeight="700.0" prefWidth="800.0" style="-fx-background-color: #f8f9fa;" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ma.farm.controller.dialogs.SupplierDialogController">
+<VBox prefHeight="700.0" prefWidth="650.0" spacing="15.0" styleClass="root" stylesheets="@../../css/dialogs.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ma.farm.controller.dialogs.SupplierDialogController">
+    <padding>
+        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+    </padding>
     <children>
-        <!-- Header -->
-        <HBox alignment="CENTER_LEFT" style="-fx-background-color: white; -fx-padding: 15; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 5, 0, 0, 2);">
+        <!-- Dialog Title -->
+        <VBox styleClass="dialog-header">
             <children>
-                <Label fx:id="dialogTitle" text="Nouveau Fournisseur" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+                <Label fx:id="dialogTitle" styleClass="title" text="🏭 Nouveau Fournisseur" />
+                <Label styleClass="subtitle" text="Ajouter un nouveau fournisseur ou partenaire commercial" />
             </children>
-        </HBox>
+        </VBox>
 
-        <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-padding: 10;" VBox.vgrow="ALWAYS">
+        <Separator />
+
+        <ScrollPane fitToHeight="true" fitToWidth="true" styleClass="transparent-scroll" VBox.vgrow="ALWAYS">
             <content>
-                <VBox spacing="20.0" style="-fx-padding: 10;">
-                    
-                    <!-- Company Info Section -->
-                    <VBox spacing="10.0" style="-fx-background-color: white; -fx-padding: 15; -fx-background-radius: 5; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 3, 0, 0, 1);">
-                        <Label text="Informations Entreprise" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #2980b9;"/>
-                        <GridPane hgap="15" vgap="10">
-                            <columnConstraints>
-                                <ColumnConstraints percentWidth="33"/>
-                                <ColumnConstraints percentWidth="33"/>
-                                <ColumnConstraints percentWidth="33"/>
-                            </columnConstraints>
-                            
-                            <VBox spacing="5" GridPane.columnIndex="0" GridPane.rowIndex="0">
-                                <Label text="Nom (Requis) *" style="-fx-font-weight: bold;"/>
-                                <TextField fx:id="nameField" promptText="Ex: Agrisouss"/>
-                            </VBox>
-                            
-                            <VBox spacing="5" GridPane.columnIndex="1" GridPane.rowIndex="0">
-                                <Label text="Nom de l'entreprise"/>
-                                <TextField fx:id="companyNameField" promptText="Ex: Agrisouss SARL"/>
-                            </VBox>
-                            
-                            <VBox spacing="5" GridPane.columnIndex="2" GridPane.rowIndex="0">
-                                <Label text="Forme Juridique"/>
-                                <ComboBox fx:id="legalFormCombo" promptText="Choisir..." prefWidth="Infinity"/>
-                            </VBox>
-                            
-                            <VBox spacing="5" GridPane.columnIndex="0" GridPane.rowIndex="1">
-                                <Label text="ICE (15 chiffres)"/>
-                                <TextField fx:id="iceField" promptText="15 chiffres - Ex: 002532678000045"/>
-                            </VBox>
-                            
-                            <VBox spacing="5" GridPane.columnIndex="1" GridPane.rowIndex="1">
-                                <Label text="RC"/>
-                                <TextField fx:id="rcField" promptText="Ex: RC 12345 Agadir"/>
-                            </VBox>
-                            
-                            <VBox spacing="5" GridPane.columnIndex="2" GridPane.rowIndex="1">
-                                <Label text="Site Web"/>
-                                <TextField fx:id="websiteField" promptText="Ex: www.agrisouss.ma"/>
-                            </VBox>
+                <VBox spacing="15.0">
+                    <padding>
+                        <Insets bottom="10.0" right="10.0" />
+                    </padding>
+                    <children>
 
-                            <VBox spacing="5" GridPane.columnIndex="0" GridPane.rowIndex="2" GridPane.columnSpan="3">
-                                <Label text="Adresse Complète"/>
-                                <TextArea fx:id="addressArea" prefRowCount="2" promptText="Ex: km 12 Route de Taroudant, Agadir"/>
-                            </VBox>
-                        </GridPane>
-                    </VBox>
+                        <!-- Company Info Section -->
+                        <VBox spacing="10.0" styleClass="form-section">
+                            <Label styleClass="section-title" text="Informations Entreprise" />
+                            <GridPane hgap="15" vgap="10">
+                                <columnConstraints>
+                                    <ColumnConstraints percentWidth="33" />
+                                    <ColumnConstraints percentWidth="33" />
+                                    <ColumnConstraints percentWidth="33" />
+                                </columnConstraints>
 
-                    <!-- Contact Section -->
-                    <VBox spacing="10.0" style="-fx-background-color: white; -fx-padding: 15; -fx-background-radius: 5; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 3, 0, 0, 1);">
-                        <Label text="Contact Principal" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #2980b9;"/>
-                        <GridPane hgap="15" vgap="10">
-                            <columnConstraints>
-                                <ColumnConstraints percentWidth="33"/>
-                                <ColumnConstraints percentWidth="33"/>
-                                <ColumnConstraints percentWidth="33"/>
-                            </columnConstraints>
-                            
-                            <VBox spacing="5" GridPane.columnIndex="0">
-                                <Label text="Nom Complet"/>
-                                <TextField fx:id="contactPersonField" promptText="Ex: Ahmed Benali"/>
-                            </VBox>
-                             <VBox spacing="5" GridPane.columnIndex="1">
-                                <Label text="Email"/>
-                                <TextField fx:id="emailField" promptText="exemple@fournisseur.ma"/>
-                            </VBox>
-                             <VBox spacing="5" GridPane.columnIndex="2">
-                                <Label text="Téléphone"/>
-                                <TextField fx:id="phoneField" promptText="Ex: 0661123456"/>
-                            </VBox>
-                        </GridPane>
-                        
-                        <CheckBox fx:id="secondContactCheck" text="Ajouter un contact secondaire"/>
-                        
-                        <GridPane hgap="15" vgap="10">
-                            <columnConstraints>
-                                <ColumnConstraints percentWidth="33"/>
-                                <ColumnConstraints percentWidth="33"/>
-                                <ColumnConstraints percentWidth="33"/>
-                            </columnConstraints>
-                            
-                            <VBox spacing="5" GridPane.columnIndex="0">
-                                <Label text="Nom Secondaire"/>
-                                <TextField fx:id="secondNameField" promptText="Ex: Fatima Alami"/>
-                            </VBox>
-                             <VBox spacing="5" GridPane.columnIndex="1">
-                                <Label text="Email Secondaire"/>
-                                <TextField fx:id="secondEmailField" promptText="Ex: comptabilite@agrisouss.ma"/>
-                            </VBox>
-                             <VBox spacing="5" GridPane.columnIndex="2">
-                                <Label text="Tél Secondaire"/>
-                                <TextField fx:id="secondPhoneField" promptText="Ex: 0528..."/>
-                            </VBox>
-                        </GridPane>
-                    </VBox>
+                                <VBox spacing="5" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                                    <Label styleClass="section-subtitle" text="Nom (Requis) *" />
+                                    <TextField fx:id="nameField" promptText="Ex: Agrisouss" styleClass="form-input" />
+                                </VBox>
 
-                    <!-- Category & Products -->
-                    <VBox spacing="10.0" style="-fx-background-color: white; -fx-padding: 15; -fx-background-radius: 5; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 3, 0, 0, 1);">
-                        <Label text="Type de Fournisseur" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #2980b9;"/>
-                        <HBox spacing="15">
-                            <VBox spacing="5" HBox.hgrow="ALWAYS">
-                                <Label text="Catégorie Principale (Requis) *" style="-fx-font-weight: bold;"/>
-                                <ComboBox fx:id="categoryCombo" promptText="Sélectionner..." prefWidth="Infinity"/>
-                            </VBox>
-                        </HBox>
-                         <VBox spacing="5">
-                            <Label text="Produits Fournis / Sous-catégories"/>
-                            <TextArea fx:id="subCategoriesArea" prefRowCount="2" promptText="Ex: Aliment Démarrage, Vaccin ND, Mangeoires..."/>
+                                <VBox spacing="5" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                                    <Label styleClass="section-subtitle" text="Nom de l'entreprise" />
+                                    <TextField fx:id="companyNameField" promptText="Ex: Agrisouss SARL" styleClass="form-input" />
+                                </VBox>
+
+                                <VBox spacing="5" GridPane.columnIndex="2" GridPane.rowIndex="0">
+                                    <Label styleClass="section-subtitle" text="Forme Juridique" />
+                                    <ComboBox fx:id="legalFormCombo" prefWidth="200.0" promptText="Choisir..." styleClass="form-input" />
+                                </VBox>
+
+                                <VBox spacing="5" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                                    <Label styleClass="section-subtitle" text="ICE (15 chiffres)" />
+                                    <TextField fx:id="iceField" promptText="15 chiffres - Ex: 002532678000045" styleClass="form-input" />
+                                </VBox>
+
+                                <VBox spacing="5" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                    <Label styleClass="section-subtitle" text="RC" />
+                                    <TextField fx:id="rcField" promptText="Ex: RC 12345 Agadir" styleClass="form-input" />
+                                </VBox>
+
+                                <VBox spacing="5" GridPane.columnIndex="2" GridPane.rowIndex="1">
+                                    <Label styleClass="section-subtitle" text="Site Web" />
+                                    <TextField fx:id="websiteField" promptText="Ex: www.agrisouss.ma" styleClass="form-input" />
+                                </VBox>
+
+                                <VBox spacing="5" GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="2">
+                                    <Label styleClass="section-subtitle" text="Adresse Complète" />
+                                    <TextArea fx:id="addressArea" prefRowCount="2" promptText="Ex: km 12 Route de Taroudant, Agadir" styleClass="form-input" />
+                                </VBox>
+                                <rowConstraints>
+                                    <RowConstraints />
+                                    <RowConstraints />
+                                    <RowConstraints />
+                                </rowConstraints>
+                            </GridPane>
                         </VBox>
-                    </VBox>
 
-                    <!-- Banking & Terms -->
-                    <VBox spacing="10.0" style="-fx-background-color: white; -fx-padding: 15; -fx-background-radius: 5; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 3, 0, 0, 1);">
-                        <Label text="Informations Financières (Optionnel)" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #2980b9;"/>
-                        <GridPane hgap="15" vgap="10">
-                            <columnConstraints>
-                                <ColumnConstraints percentWidth="33"/>
-                                <ColumnConstraints percentWidth="33"/>
-                                <ColumnConstraints percentWidth="33"/>
-                            </columnConstraints>
-                            
-                            <VBox spacing="5" GridPane.columnIndex="0" GridPane.rowIndex="0">
-                                <Label text="Banque"/>
-                                <TextField fx:id="bankNameField" promptText="Ex: Banque Populaire"/>
-                            </VBox>
-                            <VBox spacing="5" GridPane.columnIndex="1" GridPane.rowIndex="0">
-                                <Label text="RIB (24 chiffres)"/>
-                                <TextField fx:id="ribField" promptText="24 chiffres - Ex: 123..."/>
-                            </VBox>
-                            <VBox spacing="5" GridPane.columnIndex="2" GridPane.rowIndex="0">
-                                <Label text="SWIFT / BIC"/>
-                                <TextField fx:id="swiftField" promptText="Code SWIFT / BIC"/>
-                            </VBox>
+                        <Separator />
 
-                            <VBox spacing="5" GridPane.columnIndex="0" GridPane.rowIndex="1">
-                                <Label text="Conditions Paiement"/>
-                                <ComboBox fx:id="paymentTermsCombo" prefWidth="Infinity"/>
-                            </VBox>
-                            <VBox spacing="5" GridPane.columnIndex="1" GridPane.rowIndex="1">
-                                <Label text="Mode de Paiement"/>
-                                <ComboBox fx:id="paymentMethodCombo" prefWidth="Infinity"/>
-                            </VBox>
-                             <VBox spacing="5" GridPane.columnIndex="2" GridPane.rowIndex="1">
-                                <Label text="Délai Livraison (jours)"/>
-                                <TextField fx:id="deliveryTimeField" promptText="Ex: 3"/>
-                            </VBox>
-                            
-                            <VBox spacing="5" GridPane.columnIndex="0" GridPane.rowIndex="2">
-                                <Label text="Montant Min (MAD)"/>
-                                <TextField fx:id="minOrderField" promptText="Ex: 1000.00"/>
-                            </VBox>
-                        </GridPane>
-                    </VBox>
+                        <!-- Contact Section -->
+                        <VBox spacing="10.0" styleClass="form-section">
+                            <Label styleClass="section-title" text="Contact Principal" />
+                            <GridPane hgap="15" vgap="10">
+                                <columnConstraints>
+                                    <ColumnConstraints percentWidth="33" />
+                                    <ColumnConstraints percentWidth="33" />
+                                    <ColumnConstraints percentWidth="33" />
+                                </columnConstraints>
 
-                    <!-- Notes -->
-                    <VBox spacing="10.0" style="-fx-background-color: white; -fx-padding: 15; -fx-background-radius: 5; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 3, 0, 0, 1);">
-                        <Label text="Notes Internes" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #7f8c8d;"/>
-                        <TextArea fx:id="notesArea" prefRowCount="3" promptText="Notes sur la fiabilité, qualité, etc."/>
-                    </VBox>
-                    
+                                <VBox spacing="5" GridPane.columnIndex="0">
+                                    <Label styleClass="section-subtitle" text="Nom Complet" />
+                                    <TextField fx:id="contactPersonField" promptText="Ex: Ahmed Benali" styleClass="form-input" />
+                                </VBox>
+                                <VBox spacing="5" GridPane.columnIndex="1">
+                                    <Label styleClass="section-subtitle" text="Email" />
+                                    <TextField fx:id="emailField" promptText="exemple@fournisseur.ma" styleClass="form-input" />
+                                </VBox>
+                                <VBox spacing="5" GridPane.columnIndex="2">
+                                    <Label styleClass="section-subtitle" text="Téléphone" />
+                                    <TextField fx:id="phoneField" promptText="Ex: 0661123456" styleClass="form-input" />
+                                </VBox>
+                                <rowConstraints>
+                                    <RowConstraints />
+                                </rowConstraints>
+                            </GridPane>
+
+                            <CheckBox fx:id="secondContactCheck" text="➕ Ajouter un contact secondaire" />
+
+                            <GridPane hgap="15" vgap="10">
+                                <columnConstraints>
+                                    <ColumnConstraints percentWidth="33" />
+                                    <ColumnConstraints percentWidth="33" />
+                                    <ColumnConstraints percentWidth="33" />
+                                </columnConstraints>
+
+                                <VBox spacing="5" GridPane.columnIndex="0">
+                                    <Label styleClass="section-subtitle" text="Nom Secondaire" />
+                                    <TextField fx:id="secondNameField" promptText="Ex: Fatima Alami" styleClass="form-input" />
+                                </VBox>
+                                <VBox spacing="5" GridPane.columnIndex="1">
+                                    <Label styleClass="section-subtitle" text="Email Secondaire" />
+                                    <TextField fx:id="secondEmailField" promptText="Ex: comptabilite@agrisouss.ma" styleClass="form-input" />
+                                </VBox>
+                                <VBox spacing="5" GridPane.columnIndex="2">
+                                    <Label styleClass="section-subtitle" text="Tél Secondaire" />
+                                    <TextField fx:id="secondPhoneField" promptText="Ex: 0528..." styleClass="form-input" />
+                                </VBox>
+                                <rowConstraints>
+                                    <RowConstraints />
+                                </rowConstraints>
+                            </GridPane>
+                        </VBox>
+
+                        <Separator />
+
+                        <!-- Category & Products -->
+                        <VBox spacing="10.0" styleClass="form-section">
+                            <Label styleClass="section-title" text="Type de Fournisseur" />
+                            <HBox spacing="15">
+                                <VBox spacing="5" HBox.hgrow="ALWAYS">
+                                    <Label styleClass="section-subtitle" text="Catégorie Principale (Requis) *" />
+                                    <ComboBox fx:id="categoryCombo" prefWidth="200.0" promptText="Sélectionner..." styleClass="form-input" />
+                                </VBox>
+                            </HBox>
+                            <VBox spacing="5">
+                                <Label styleClass="section-subtitle" text="Produits Fournis / Sous-catégories" />
+                                <TextArea fx:id="subCategoriesArea" prefRowCount="2" promptText="Ex: Aliment Démarrage, Vaccin ND, Mangeoires..." styleClass="form-input" />
+                            </VBox>
+                        </VBox>
+
+                        <Separator />
+
+                        <!-- Banking & Terms -->
+                        <VBox spacing="10.0" styleClass="form-section">
+                            <Label styleClass="section-title" text="Informations Financières (Optionnel)" />
+                            <GridPane hgap="15" vgap="10">
+                                <columnConstraints>
+                                    <ColumnConstraints percentWidth="33" />
+                                    <ColumnConstraints percentWidth="33" />
+                                    <ColumnConstraints percentWidth="33" />
+                                </columnConstraints>
+
+                                <VBox spacing="5" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                                    <Label styleClass="section-subtitle" text="Banque" />
+                                    <TextField fx:id="bankNameField" promptText="Ex: Banque Populaire" styleClass="form-input" />
+                                </VBox>
+                                <VBox spacing="5" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                                    <Label styleClass="section-subtitle" text="RIB (24 chiffres)" />
+                                    <TextField fx:id="ribField" promptText="24 chiffres - Ex: 123..." styleClass="form-input" />
+                                </VBox>
+                                <VBox spacing="5" GridPane.columnIndex="2" GridPane.rowIndex="0">
+                                    <Label styleClass="section-subtitle" text="SWIFT / BIC" />
+                                    <TextField fx:id="swiftField" promptText="Code SWIFT / BIC" styleClass="form-input" />
+                                </VBox>
+
+                                <VBox spacing="5" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                                    <Label styleClass="section-subtitle" text="Conditions Paiement" />
+                                    <ComboBox fx:id="paymentTermsCombo" prefWidth="200.0" styleClass="form-input" />
+                                </VBox>
+                                <VBox spacing="5" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                    <Label styleClass="section-subtitle" text="Mode de Paiement" />
+                                    <ComboBox fx:id="paymentMethodCombo" prefWidth="200.0" styleClass="form-input" />
+                                </VBox>
+                                <VBox spacing="5" GridPane.columnIndex="2" GridPane.rowIndex="1">
+                                    <Label styleClass="section-subtitle" text="Délai Livraison (jours)" />
+                                    <TextField fx:id="deliveryTimeField" promptText="Ex: 3" styleClass="form-input" />
+                                </VBox>
+
+                                <VBox spacing="5" GridPane.columnIndex="0" GridPane.rowIndex="2">
+                                    <Label styleClass="section-subtitle" text="Montant Min (MAD)" />
+                                    <TextField fx:id="minOrderField" promptText="Ex: 1000.00" styleClass="form-input" />
+                                </VBox>
+                                <rowConstraints>
+                                    <RowConstraints />
+                                    <RowConstraints />
+                                    <RowConstraints />
+                                </rowConstraints>
+                            </GridPane>
+                        </VBox>
+
+                        <Separator />
+
+                        <!-- Notes -->
+                        <VBox spacing="10.0" styleClass="form-section">
+                            <Label styleClass="section-title" text="Notes Internes" />
+                            <TextArea fx:id="notesArea" prefRowCount="3" promptText="Notes sur la fiabilité, qualité, etc." styleClass="form-input" />
+                        </VBox>
+
+                    </children>
                 </VBox>
             </content>
         </ScrollPane>
 
+        <Separator />
+
         <!-- Footer / Buttons -->
-        <VBox style="-fx-background-color: white; -fx-padding: 15; -fx-border-color: #eee; -fx-border-width: 1 0 0 0;">
-            <Label fx:id="errorLabel" text="Error Message" textFill="RED" visible="false" style="-fx-font-weight: bold;"/>
-            <HBox alignment="CENTER_RIGHT" spacing="10">
-                <Button text="Annuler" onAction="#handleCancel" style="-fx-background-color: #bdc3c7; -fx-text-fill: white; -fx-cursor: hand;"/>
-                <Button text="Enregistrer" onAction="#handleSave" style="-fx-background-color: #2ecc71; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand; -fx-padding: 8 20;"/>
-            </HBox>
+        <VBox styleClass="dialog-footer">
+            <children>
+                <Label fx:id="errorLabel" styleClass="error-label" text="Error Message" visible="false" />
+                <HBox alignment="CENTER_RIGHT" spacing="10">
+                    <Button onAction="#handleCancel" styleClass="btn, btn-cancel" text="Annuler" />
+                    <Button onAction="#handleSave" styleClass="btn, btn-save" text="Enregistrer" />
+                </HBox>
+            </children>
         </VBox>
-        
+
     </children>
 </VBox>

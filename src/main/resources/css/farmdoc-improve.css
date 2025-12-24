@@ -33,3 +33,291 @@
     -fx-border-radius: 12px;
     -fx-spacing: 12px;
 }
+
+/* ============================================
+   FARM DOCUMENTS - ACCORDION STYLES
+   ============================================ */
+
+/* Base Accordion styling */
+.accordion {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+}
+
+/* Individual TitledPane base styling */
+.accordion .titled-pane {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
+    -fx-border-color: #e0e0e0;
+    -fx-border-width: 1;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.08), 6, 0, 0, 2);
+    -fx-padding: 0;
+    -fx-margin: 0 0 10 0;
+}
+
+/* TitledPane header area */
+.accordion .titled-pane > .title {
+    -fx-background-color: linear-gradient(to bottom, #f8f9fa, #f1f3f5);
+    -fx-background-radius: 8 8 0 0;
+    -fx-border-color: transparent;
+    -fx-padding: 14 18;
+    -fx-font-family: "Segoe UI", "Roboto", sans-serif;
+    -fx-cursor: hand;
+}
+
+/* TitledPane header when hovered */
+.accordion .titled-pane > .title:hover {
+    -fx-background-color: linear-gradient(to bottom, #f0f4f8, #e9edf1);
+}
+
+/* TitledPane header when expanded */
+.accordion .titled-pane:expanded > .title {
+    -fx-font-weight: bold;
+}
+
+/* Title text in header (emoji support) */
+.accordion .titled-pane > .title > .text {
+    -fx-font-size: 15px;
+    -fx-font-weight: 600;
+    -fx-fill: #2c3e50;
+    -fx-text-fill: #2c3e50;
+    -fx-font-family: "Segoe UI Emoji", "Apple Color Emoji", "Segoe UI", sans-serif;
+}
+
+/* Arrow icon */
+.accordion .titled-pane > .title > .arrow-button > .arrow {
+    -fx-background-color: #5a6c7d;
+    -fx-shape: "M 0 0 L 4 4 L 8 0 Z";
+    -fx-scale-shape: false;
+    -fx-padding: 3 7;
+    -fx-translate-y: 1;
+}
+
+/* Arrow icon (expanded state) */
+.accordion .titled-pane:expanded > .title > .arrow-button > .arrow {
+    -fx-rotate: 90;
+    -fx-translate-y: 1;
+}
+
+/* Content area */
+.accordion .titled-pane > *.content {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
+    -fx-background-radius: 0 0 8 8;
+    -fx-padding: 18;
+}
+
+/* ============================================
+   DOCUMENT TYPE SPECIFIC STYLES
+   ============================================ */
+
+/* 1. BON DE COMMANDE (Already styled - Blue theme) */
+.accordion .titled-pane.styleClass:contains("bon-commande"),
+.accordion .titled-pane:focused:styleClass:contains("bon-commande") {
+    -fx-border-color: #3498db;
+}
+.accordion .titled-pane.styleClass:contains("bon-commande"):expanded > .title {
+    -fx-background-color: linear-gradient(to bottom, #ebf5fb, #d6eaf8);
+}
+.accordion .titled-pane.styleClass:contains("bon-commande"):expanded > .title > .text {
+    -fx-fill: #2980b9;
+    -fx-text-fill: #2980b9;
+}
+.accordion .titled-pane.styleClass:contains("bon-commande"):expanded > .title > .arrow-button > .arrow {
+    -fx-background-color: #2980b9;
+}
+
+/* 2. DEVIS (Gold/Orange theme) */
+.farmdoc-devis {
+    -fx-border-color: #f1c40f;
+}
+.farmdoc-devis:expanded {
+    -fx-border-color: #f39c12;
+    -fx-border-width: 1.5;
+}
+.farmdoc-devis:expanded > .title {
+    -fx-background-color: linear-gradient(to bottom, #fef9e7, #fcf3cf);
+}
+.farmdoc-devis:expanded > .title > .text {
+    -fx-fill: #d68910;
+    -fx-text-fill: #d68910;
+}
+.farmdoc-devis:expanded > .title > .arrow-button > .arrow {
+    -fx-background-color: #d68910;
+}
+
+/* 3. BON DE LIVRAISON (Green theme) */
+.farmdoc-livraison {
+    -fx-border-color: #27ae60;
+}
+.farmdoc-livraison:expanded {
+    -fx-border-color: #229954;
+    -fx-border-width: 1.5;
+}
+.farmdoc-livraison:expanded > .title {
+    -fx-background-color: linear-gradient(to bottom, #eafaf1, #d5f5e3);
+}
+.farmdoc-livraison:expanded > .title > .text {
+    -fx-fill: #1e8449;
+    -fx-text-fill: #1e8449;
+}
+.farmdoc-livraison:expanded > .title > .arrow-button > .arrow {
+    -fx-background-color: #1e8449;
+}
+
+/* 4. FACTURE (Red theme) */
+.farmdoc-facture {
+    -fx-border-color: #e74c3c;
+}
+.farmdoc-facture:expanded {
+    -fx-border-color: #c0392b;
+    -fx-border-width: 1.5;
+}
+.farmdoc-facture:expanded > .title {
+    -fx-background-color: linear-gradient(to bottom, #fdedec, #fadbd8);
+}
+.farmdoc-facture:expanded > .title > .text {
+    -fx-fill: #b03a2e;
+    -fx-text-fill: #b03a2e;
+}
+.farmdoc-facture:expanded > .title > .arrow-button > .arrow {
+    -fx-background-color: #b03a2e;
+}
+
+/* 5. AVOIR (Purple theme - Credit Note) */
+.farmdoc-avoir {
+    -fx-border-color: #9b59b6;
+}
+.farmdoc-avoir:expanded {
+    -fx-border-color: #8e44ad;
+    -fx-border-width: 1.5;
+}
+.farmdoc-avoir:expanded > .title {
+    -fx-background-color: linear-gradient(to bottom, #f4ecf7, #ebdef0);
+}
+.farmdoc-avoir:expanded > .title > .text {
+    -fx-fill: #7d3c98;
+    -fx-text-fill: #7d3c98;
+}
+.farmdoc-avoir:expanded > .title > .arrow-button > .arrow {
+    -fx-background-color: #7d3c98;
+}
+
+/* 6. REÇU (Teal theme - Receipt) */
+.farmdoc-recu {
+    -fx-border-color: #1abc9c;
+}
+.farmdoc-recu:expanded {
+    -fx-border-color: #17a589;
+    -fx-border-width: 1.5;
+}
+.farmdoc-recu:expanded > .title {
+    -fx-background-color: linear-gradient(to bottom, #e8f6f3, #d1f2eb);
+}
+.farmdoc-recu:expanded > .title > .text {
+    -fx-fill: #148f77;
+    -fx-text-fill: #148f77;
+}
+.farmdoc-recu:expanded > .title > .arrow-button > .arrow {
+    -fx-background-color: #148f77;
+}
+
+/* 7. BULLETIN DE PAIE (Orange theme - Pay Slip) */
+.farmdoc-bulletin {
+    -fx-border-color: #f39c12;
+}
+.farmdoc-bulletin:expanded {
+    -fx-border-color: #d68910;
+    -fx-border-width: 1.5;
+}
+.farmdoc-bulletin:expanded > .title {
+    -fx-background-color: linear-gradient(to bottom, #fdebd0, #fad7a0);
+}
+.farmdoc-bulletin:expanded > .title > .text {
+    -fx-fill: #ba4a00;
+    -fx-text-fill: #ba4a00;
+}
+.farmdoc-bulletin:expanded > .title > .arrow-button > .arrow {
+    -fx-background-color: #ba4a00;
+}
+
+/* 8. CONTRAT DE TRAVAIL (Green theme - Work Contract) */
+.farmdoc-contrat {
+    -fx-border-color: #2ecc71;
+}
+.farmdoc-contrat:expanded {
+    -fx-border-color: #27ae60;
+    -fx-border-width: 1.5;
+}
+.farmdoc-contrat:expanded > .title {
+    -fx-background-color: linear-gradient(to bottom, #d5f5e3, #abebc6);
+}
+.farmdoc-contrat:expanded > .title > .text {
+    -fx-fill: #1e8449;
+    -fx-text-fill: #1e8449;
+}
+.farmdoc-contrat:expanded > .title > .arrow-button > .arrow {
+    -fx-background-color: #1e8449;
+}
+
+/* 9. ATTESTATION DE TRAVAIL (Blue theme - Work Certificate) */
+.farmdoc-attestation {
+    -fx-border-color: #3498db;
+}
+.farmdoc-attestation:expanded {
+    -fx-border-color: #2980b9;
+    -fx-border-width: 1.5;
+}
+.farmdoc-attestation:expanded > .title {
+    -fx-background-color: linear-gradient(to bottom, #d6eaf8, #aed6f1);
+}
+.farmdoc-attestation:expanded > .title > .text {
+    -fx-fill: #1b4f72;
+    -fx-text-fill: #1b4f72;
+}
+.farmdoc-attestation:expanded > .title > .arrow-button > .arrow {
+    -fx-background-color: #1b4f72;
+}
+
+/* ============================================
+   EMOJI SUPPORT IN TITLES
+   ============================================ */
+
+/* Ensure emojis display properly */
+.accordion .titled-pane > .title > .text {
+    -fx-font-family: "Segoe UI Emoji", "Apple Color Emoji", "Segoe UI Symbol", "Noto Color Emoji", "Segoe UI", sans-serif;
+}
+
+/* Larger emoji size if needed */
+.accordion .titled-pane > .title > .text .emoji {
+    -fx-font-size: 18px;
+}
+
+/* ============================================
+   ACCORDION SECTIONS STYLING
+   ============================================ */
+
+/* Commercial Documents Accordion */
+#commercialAccordion .titled-pane {
+    -fx-margin: 0 0 12 0;
+}
+
+/* HR Documents Accordion */
+#hrAccordion .titled-pane {
+    -fx-margin: 0 0 12 0;
+}
+
+/* Section Labels */
+.card-title {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #2c3e50;
+    -fx-padding: 5 0 5 0;
+}
+
+/* Separator styling */
+.separator {
+    -fx-padding: 5 0 10 0;
+}

@@ -14,7 +14,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox prefHeight="700.0" prefWidth="650.0" spacing="15.0" styleClass="root" stylesheets="@../../css/dialogs.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ma.farm.controller.dialogs.CustomerDialogController">
+<VBox prefHeight="700.0" prefWidth="650.0" spacing="15.0" styleClass="root" stylesheets="@../../css/dialogs.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ma.farm.controller.dialogs.CustomerDialogController">
     <padding>
         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
     </padding>
@@ -41,8 +41,11 @@
                                 <fx:define>
                                     <ToggleGroup fx:id="typeGroup" />
                                 </fx:define>
-                                <RadioButton fx:id="companyRadio" text="Entreprise" toggleGroup="$typeGroup" selected="true" />
-                                <RadioButton fx:id="individualRadio" text="Particulier" toggleGroup="$typeGroup" />
+                                <RadioButton fx:id="companyRadio" selected="true" styleClass="section-subtitle" text="Entreprise">
+                           <toggleGroup>
+                              <ToggleGroup fx:id="typeGroup" />
+                           </toggleGroup></RadioButton>
+                                <RadioButton fx:id="individualRadio" styleClass="section-subtitle" text="Particulier" toggleGroup="$typeGroup" />
                             </HBox>
                         </VBox>
 
@@ -53,26 +56,26 @@
                             <Label styleClass="section-title" text="📋 Informations Entreprise" />
                             <HBox spacing="15.0">
                                 <VBox spacing="5.0" HBox.hgrow="ALWAYS">
-                                    <Label text="Nom de la Société *" />
+                                    <Label styleClass="section-subtitle" text="Nom de la Société *" />
                                     <TextField fx:id="companyNameField" promptText="Ex: SARL Atlas Foods" styleClass="form-input" />
                                 </VBox>
-                                <VBox spacing="5.0" prefWidth="200.0">
-                                    <Label text="Forme Juridique" />
+                                <VBox prefWidth="200.0" spacing="5.0">
+                                    <Label styleClass="section-subtitle" text="Forme Juridique" />
                                     <ComboBox fx:id="legalFormCombo" prefWidth="200.0" promptText="Sélectionner" styleClass="form-input" />
                                 </VBox>
                             </HBox>
                             <HBox spacing="15.0">
                                 <VBox spacing="5.0" HBox.hgrow="ALWAYS">
-                                    <Label text="ICE (15 chiffres) *" />
+                                    <Label styleClass="section-subtitle" text="ICE (15 chiffres) *" />
                                     <TextField fx:id="iceField" promptText="Ex: 001234567891234" styleClass="form-input" />
                                 </VBox>
                                 <VBox spacing="5.0" HBox.hgrow="ALWAYS">
-                                    <Label text="RC (Registre de Commerce)" />
+                                    <Label styleClass="section-subtitle" text="RC (Registre de Commerce)" />
                                     <TextField fx:id="rcField" promptText="Ex: 12345" styleClass="form-input" />
                                 </VBox>
                             </HBox>
                             <VBox spacing="5.0">
-                                <Label text="Site Web" />
+                                <Label styleClass="section-subtitle" text="Site Web" />
                                 <TextField fx:id="websiteField" promptText="Ex: www.atlasfoods.ma" styleClass="form-input" />
                             </VBox>
                         </VBox>
@@ -84,21 +87,21 @@
                             <Label styleClass="section-title" text="📞 Contact Principal" />
                             <HBox spacing="15.0">
                                 <VBox spacing="5.0" HBox.hgrow="ALWAYS">
-                                    <Label text="Nom du Contact *" />
+                                    <Label styleClass="section-subtitle" text="Nom du Contact *" />
                                     <TextField fx:id="nameField" promptText="Ex: Mohammed Alami" styleClass="form-input" />
                                 </VBox>
                                 <VBox spacing="5.0" HBox.hgrow="ALWAYS">
-                                    <Label text="Téléphone *" />
+                                    <Label styleClass="section-subtitle" text="Téléphone *" />
                                     <TextField fx:id="phoneField" promptText="Ex: 0612345678" styleClass="form-input" />
                                 </VBox>
                             </HBox>
                             <HBox spacing="15.0">
                                 <VBox spacing="5.0" HBox.hgrow="ALWAYS">
-                                    <Label text="Email" />
+                                    <Label styleClass="section-subtitle" text="Email" />
                                     <TextField fx:id="emailField" promptText="Ex: contact@atlasfoods.ma" styleClass="form-input" />
                                 </VBox>
                                 <VBox spacing="5.0" HBox.hgrow="ALWAYS">
-                                    <Label text="Adresse" />
+                                    <Label styleClass="section-subtitle" text="Adresse" />
                                     <TextField fx:id="addressField" promptText="Ex: Rue 12, Zone Ind., Casablanca" styleClass="form-input" />
                                 </VBox>
                             </HBox>
@@ -111,11 +114,11 @@
                             <Label styleClass="section-title" text="📞 Contact Secondaire (Optionnel)" />
                             <HBox spacing="15.0">
                                 <VBox spacing="5.0" HBox.hgrow="ALWAYS">
-                                    <Label text="Nom" />
+                                    <Label styleClass="section-subtitle" text="Nom" />
                                     <TextField fx:id="secondaryNameField" promptText="Ex: Fatima Idrissi" styleClass="form-input" />
                                 </VBox>
                                 <VBox spacing="5.0" HBox.hgrow="ALWAYS">
-                                    <Label text="Téléphone" />
+                                    <Label styleClass="section-subtitle" text="Téléphone" />
                                     <TextField fx:id="secondaryPhoneField" promptText="Ex: 0698765432" styleClass="form-input" />
                                 </VBox>
                             </HBox>
@@ -128,16 +131,16 @@
                             <Label styleClass="section-title" text="💼 Conditions Commerciales" />
                             <HBox spacing="15.0">
                                 <VBox spacing="5.0" HBox.hgrow="ALWAYS">
-                                    <Label text="Conditions de Paiement *" />
+                                    <Label styleClass="section-subtitle" text="Conditions de Paiement *" />
                                     <ComboBox fx:id="paymentTermsCombo" prefWidth="200.0" styleClass="form-input" />
                                 </VBox>
                                 <VBox spacing="5.0" HBox.hgrow="ALWAYS">
-                                    <Label text="Calendrier de Livraison" />
+                                    <Label styleClass="section-subtitle" text="Calendrier de Livraison" />
                                     <TextField fx:id="deliveryScheduleField" promptText="Ex: Chaque Mardi, Jeudi" styleClass="form-input" />
                                 </VBox>
                             </HBox>
                             <VBox spacing="5.0">
-                                <Label text="Achats Habituels" />
+                                <Label styleClass="section-subtitle" text="Achats Habituels" />
                                 <TextField fx:id="usualPurchasesField" promptText="Ex: Œufs, Poulets" styleClass="form-input" />
                             </VBox>
                         </VBox>
