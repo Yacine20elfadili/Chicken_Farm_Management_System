@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.String?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="700.0" prefWidth="900.0" styleClass="main-content" stylesheets="@../css/style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ma.farm.controller.SettingsController">
+    <children>
+        <VBox spacing="20.0" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="20.0">
+            <children>
+                <Label styleClass="brand-subtitle" text="Paramètres de la Ferme">
+                    <font>
+                        <Font name="System Bold" size="24.0" />
+                    </font>
+                </Label>
+
+                <VBox spacing="15.0" styleClass="metric-card">
+                    <padding>
+                        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                    </padding>
+                    <children>
+                        <Label styleClass="card-title" text="Informations Générales" textFill="#2c3e50">
+                            <font>
+                                <Font name="System Bold" size="16.0" />
+                            </font>
+                        </Label>
+
+                        <HBox spacing="10.0">
+                            <VBox HBox.hgrow="ALWAYS">
+                                <Label styleClass="cards-title" text="Nom de la Société" />
+                                <TextField fx:id="companyNameField" promptText="Nom de la société" />
+                            </VBox>
+                            <VBox HBox.hgrow="ALWAYS">
+                                <Label styleClass="cards-title" text="Téléphone" />
+                                <TextField fx:id="phoneField" promptText="+212..." />
+                            </VBox>
+                        </HBox>
+
+                        <HBox spacing="10.0">
+                            <VBox HBox.hgrow="ALWAYS">
+                                <Label styleClass="cards-title" text="Adresse" />
+                                <TextField fx:id="addressField" promptText="Adresse complète" />
+                            </VBox>
+                            <VBox HBox.hgrow="ALWAYS">
+                                <Label styleClass="cards-title" text="Ville" />
+                                <TextField fx:id="cityField" promptText="Ville" />
+                            </VBox>
+                        </HBox>
+
+                        <VBox>
+                            <Label styleClass="cards-title" text="Email" />
+                            <TextField fx:id="emailField" promptText="Email" />
+                        </VBox>
+
+                        <Button fx:id="saveButton" mnemonicParsing="false" styleClass="btn-primary" text="Enregistrer les modifications" />
+                    </children>
+                </VBox>
+
+                <Label text="Zone de Danger" textFill="#e74c3c">
+                    <font>
+                        <Font name="System Bold" size="18.0" />
+                    </font>
+                </Label>
+                <Separator prefWidth="200.0" />
+
+                <VBox spacing="10.0" style="-fx-background-color: #fff0f0;" styleClass="metric-card">
+                    <padding>
+                        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                    </padding>
+                    <children>
+                        <Label style="-fx-text-fill: #c0392b;" styleClass="card-title" text="Suppression du Compte" textFill="#c0392b">
+                            <font>
+                                <Font name="System Bold" size="16.0" />
+                            </font>
+                        </Label>
+                        <Label styleClass="header-subtitle" text="Cette action supprimera toutes les données de la base de données (animaux, finances, fournisseurs, etc.). Cette action est irréversible." wrapText="true" />
+                        <Button fx:id="deleteAccountButton" mnemonicParsing="false" text="Supprimer mon compte et toutes les données">
+                     <styleClass>
+                        <String fx:value="btn" />
+                        <String fx:value="btn-death" />
+                     </styleClass></Button>
+                    </children>
+                </VBox>
+
+            </children>
+        </VBox>
+    </children>
+</AnchorPane>

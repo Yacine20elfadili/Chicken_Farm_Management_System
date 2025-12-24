@@ -8,6 +8,7 @@
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
@@ -70,14 +71,14 @@
 
             <!-- Price -->
             <VBox spacing="6">
-                <Label style="-fx-text-fill: #666;" styleClass="section-subtitle" text="Prix par Œuf (MAD)" />
-                <TextField fx:id="priceField" promptText="Optionnel..." />
+                <Label style="-fx-text-fill: #666;" styleClass="section-subtitle" text="Prix par Œuf (MAD) *" />
+                <TextField fx:id="priceField" promptText="Ex: 1.20" />
             </VBox>
 
             <!-- Customer -->
             <VBox spacing="6">
-                <Label style="-fx-text-fill: #666;" styleClass="section-subtitle" text="Nom du Client" />
-                <TextField fx:id="customerField" promptText="Optionnel..." />
+                <Label style="-fx-text-fill: #666;" styleClass="section-subtitle" text="Client *" />
+                <ComboBox fx:id="customerCombo" maxWidth="Infinity" promptText="Sélectionner un client" />
             </VBox>
         </VBox>
 

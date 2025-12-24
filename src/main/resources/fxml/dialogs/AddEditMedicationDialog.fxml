@@ -33,7 +33,7 @@
                 <!-- Name -->
                 <VBox spacing="5">
                     <Label styleClass="section-title" text="Nom du Médicament *" />
-                    <TextField fx:id="nameField" promptText="Ex: Vitamine Complexe" />
+                    <TextField fx:id="nameField" promptText="Ex: Bio-Vita Plus" />
                     <Label fx:id="nameErrorLabel" styleClass="error-label" />
                 </VBox>
 
@@ -47,7 +47,7 @@
                 <!-- Quantity -->
                 <VBox spacing="5">
                     <Label styleClass="section-title" text="Quantité *" />
-                    <TextField fx:id="quantityField" promptText="Ex: 100" />
+                    <TextField fx:id="quantityField" promptText="Ex: 50" />
                     <Label fx:id="quantityErrorLabel" styleClass="error-label" />
                 </VBox>
 
@@ -61,14 +61,14 @@
                 <!-- Price -->
                 <VBox spacing="5">
                     <Label styleClass="section-title" text="Prix par Unité (DH) *" />
-                    <TextField fx:id="pricePerUnitField" promptText="Ex: 5.50" />
+                    <TextField fx:id="pricePerUnitField" promptText="Ex: 150.00" />
                     <Label fx:id="priceErrorLabel" styleClass="error-label" />
                 </VBox>
 
                 <!-- Supplier -->
                 <VBox spacing="5">
                     <Label styleClass="section-title" text="Fournisseur" />
-                    <TextField fx:id="supplierField" promptText="Nom du fournisseur" styleClass="error-label" />
+                    <ComboBox fx:id="supplierCombo" promptText="Sélectionner un fournisseur" prefWidth="250.0" />
                 </VBox>
 
                 <!-- Purchase Date -->
@@ -86,14 +86,14 @@
                 <!-- Min Stock -->
                 <VBox spacing="5">
                     <Label styleClass="section-title" text="Stock Minimum" />
-                    <TextField fx:id="minStockField" promptText="Ex: 20" />
+                    <TextField fx:id="minStockField" promptText="Ex: 10" />
                     <Label fx:id="minStockErrorLabel" styleClass="error-label" />
                 </VBox>
 
                 <!-- Usage -->
                 <VBox spacing="5">
                     <Label styleClass="section-title" text="Instructions d'Utilisation" />
-                    <TextArea fx:id="usageTextArea" prefRowCount="3" promptText="Ex: 1 comprimé par 10 oiseaux par jour" styleClass="error-label" wrapText="true" />
+                    <TextArea fx:id="usageTextArea" prefRowCount="3" promptText="Ex: 1ml par litre d'eau pendant 3 jours" styleClass="error-label" wrapText="true" />
                 </VBox>
 
             </VBox>

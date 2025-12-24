@@ -1825,3 +1825,103 @@
     -fx-opacity: 0.5;
     -fx-effect: none;
 }
+
+/* ===============================
+   GLOBAL TABPANE STYLE
+   =============================== */
+
+/* Make TabPane background transparent */
+.tab-pane {
+    -fx-background-color: transparent;
+}
+
+/* Remove default header background */
+.tab-pane > .tab-header-area {
+    -fx-background-color: transparent;
+    -fx-padding: 5 0 5 0;
+}
+
+/* Header background */
+.tab-pane > .tab-header-area > .tab-header-background {
+    -fx-background-color: transparent;
+}
+
+/* ===============================
+   TAB BUTTONS
+   =============================== */
+
+.tab {
+    -fx-background-color: #e9ecef;
+    -fx-background-radius: 8 8 0 0;
+    -fx-border-radius: 8 8 0 0;
+    -fx-padding: 8 16;
+    -fx-font-family: "Comic Sans MS";
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #495057;
+    -fx-border-color: transparent;
+}
+
+/* Hover effect */
+.tab:hover {
+    -fx-background-color: #dee2e6;
+}
+
+/* ===============================
+   SELECTED TAB
+   =============================== */
+
+.tab:selected {
+    -fx-background-color: #ffffff;
+    -fx-text-fill: #2f855a; /* farm green */
+    -fx-border-color: #cfe8dc;
+    -fx-border-width: 0 0 3 0;
+}
+
+/* ===============================
+   TAB CONTENT AREA
+   =============================== */
+
+.tab-pane > .tab-content-area {
+    -fx-background-color: transparent;
+    -fx-padding: 15;
+}
+/* Remove blue focus border on tabs */
+.tab:focused {
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+}
+
+/* Also remove focus ring from TabPane itself */
+.tab-pane:focused {
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+}
+
+/* Prevent inner focus outline */
+.tab:selected:focused {
+    -fx-background-insets: 0;
+}
+
+/* SplitPane base */
+.split-pane {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+}
+
+/* Divider (the separator) */
+.split-pane-divider {
+    -fx-background-color: #d1d5db; /* soft neutral gray */
+    -fx-padding: 0 1 0 1;          /* thin divider */
+}
+
+/* Divider hover effect */
+.split-pane-divider:hover {
+    -fx-background-color: #9ca3af;
+}
+
+/* Remove ugly focus outline */
+.split-pane:focused {
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+}

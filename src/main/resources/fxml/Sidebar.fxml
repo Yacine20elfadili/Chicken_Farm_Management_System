@@ -104,6 +104,48 @@
                                     </VBox.margin>
                                 </AnchorPane>
 
+                                <AnchorPane fx:id="suppliersBtn" prefHeight="35.0" styleClass="sidebar-item">
+                                    <children>
+                                        <Label layoutX="54.0" layoutY="10.0" prefHeight="17.0" prefWidth="89.0" text="Fournisseurs" textAlignment="CENTER" textFill="WHITE">
+                                            <font>
+                                                <Font name="Microsoft Sans Serif" size="14.0" />
+                                            </font>
+                                        </Label>
+                                        <ImageView fitHeight="24.0" fitWidth="24.0" layoutX="12.0" layoutY="7.0" pickOnBounds="true" preserveRatio="true">
+                                            <image>
+                                                <Image url="@../images/icons/workers.png" />
+                                            </image>
+                                        </ImageView>
+                                    </children>
+                                    <cursor>
+                                        <Cursor fx:constant="HAND" />
+                                    </cursor>
+                                    <VBox.margin>
+                                        <Insets top="10.0" />
+                                    </VBox.margin>
+                                </AnchorPane>
+
+                                <AnchorPane fx:id="customersBtn" prefHeight="35.0" styleClass="sidebar-item">
+                                    <children>
+                                        <Label layoutX="54.0" layoutY="10.0" prefHeight="17.0" prefWidth="89.0" text="Clients" textAlignment="CENTER" textFill="WHITE">
+                                            <font>
+                                                <Font name="Microsoft Sans Serif" size="14.0" />
+                                            </font>
+                                        </Label>
+                                        <ImageView fitHeight="24.0" fitWidth="24.0" layoutX="12.0" layoutY="7.0" pickOnBounds="true" preserveRatio="true">
+                                            <image>
+                                                <Image url="@../images/icons/personnel.png" />
+                                            </image>
+                                        </ImageView>
+                                    </children>
+                                    <cursor>
+                                        <Cursor fx:constant="HAND" />
+                                    </cursor>
+                                    <VBox.margin>
+                                        <Insets top="10.0" />
+                                    </VBox.margin>
+                                </AnchorPane>
+
                                 <AnchorPane fx:id="storageBtn" prefHeight="35.0" styleClass="sidebar-item">
                                     <children>
                                         <Label layoutX="54.0" layoutY="10.0" prefHeight="17.0" prefWidth="89.0" text="Réserve" textAlignment="CENTER" textFill="WHITE">
@@ -114,6 +156,71 @@
                                         <ImageView fitHeight="24.0" fitWidth="24.0" layoutX="12.0" layoutY="7.0" pickOnBounds="true" preserveRatio="true">
                                             <image>
                                                 <Image url="@../images/icons/box.png" />
+                                            </image>
+                                        </ImageView>
+                                    </children>
+                                    <cursor>
+                                        <Cursor fx:constant="HAND" />
+                                    </cursor>
+                                    <VBox.margin>
+                                        <Insets top="10.0" />
+                                    </VBox.margin>
+                                </AnchorPane>
+
+                                <AnchorPane fx:id="farmDocumentBtn" prefHeight="35.0" styleClass="sidebar-item">
+                                    <children>
+                                        <Label layoutX="54.0" layoutY="10.0" prefHeight="17.0" prefWidth="120.0" text="Documents" textAlignment="CENTER" textFill="WHITE">
+                                            <font>
+                                                <Font name="Microsoft Sans Serif" size="14.0" />
+                                            </font>
+                                        </Label>
+                                        <ImageView fitHeight="24.0" fitWidth="24.0" layoutX="12.0" layoutY="7.0" pickOnBounds="true" preserveRatio="true">
+                                            <image>
+                                                <Image url="@../images/icons/tasks.png" />
+                                            </image>
+                                        </ImageView>
+                                    </children>
+                                    <cursor>
+                                        <Cursor fx:constant="HAND" />
+                                    </cursor>
+                                    <VBox.margin>
+                                        <Insets top="10.0" />
+                                    </VBox.margin>
+                                </AnchorPane>
+
+                                <AnchorPane fx:id="financialTrackingBtn" prefHeight="35.0" styleClass="sidebar-item">
+                                    <children>
+                                        <Label layoutX="54.0" layoutY="10.0" prefHeight="17.0" prefWidth="110.0" text="Suivi Financier" textAlignment="CENTER" textFill="WHITE">
+                                            <font>
+                                                <Font name="Microsoft Sans Serif" size="14.0" />
+                                            </font>
+                                        </Label>
+                                        <ImageView fitHeight="24.0" fitWidth="24.0" layoutX="12.0" layoutY="7.0" pickOnBounds="true" preserveRatio="true">
+                                            <image>
+                                                <Image url="@../images/icons/trackers.png" />
+                                            </image>
+                                        </ImageView>
+                                    </children>
+                                    <cursor>
+                                        <Cursor fx:constant="HAND" />
+                                    </cursor>
+                                    <VBox.margin>
+                                        <Insets top="10.0" />
+                                    </VBox.margin>
+                                </AnchorPane>
+
+
+
+                                <AnchorPane fx:id="reportsBtn" prefHeight="35.0" styleClass="sidebar-item">
+                                    <children>
+                                        <Label layoutX="54.0" layoutY="10.0" prefHeight="17.0" prefWidth="89.0" text="Rapports" textAlignment="CENTER" textFill="WHITE">
+                                            <font>
+                                                <Font name="Microsoft Sans Serif" size="14.0" />
+                                            </font>
+                                        </Label>
+                                        <ImageView fitHeight="24.0" fitWidth="24.0" layoutX="12.0" layoutY="7.0" pickOnBounds="true" preserveRatio="true">
+                                            <image>
+                                                <Image url="@../images/icons/alerts.png" />
                                             </image>
                                         </ImageView>
                                     </children>
@@ -182,6 +289,28 @@
                         <Font name="Verdana" size="1.0" />
                     </font>
                 </Button>
+
+                <AnchorPane fx:id="settingsBtn" prefHeight="35.0" styleClass="sidebar-item">
+                    <children>
+                        <Label layoutX="54.0" layoutY="9.0" prefHeight="17.0" prefWidth="110.0" text="Paramètres" textAlignment="CENTER" textFill="WHITE">
+                            <font>
+                                <Font name="Microsoft Sans Serif" size="14.0" />
+                            </font>
+                        </Label>
+                        <!-- Using a gear/cog icon if available, or fallback to generic. Assuming dashboard/settings icon exists or reusing one. -->
+                        <ImageView fitHeight="22.0" fitWidth="22.0" layoutX="12.0" layoutY="7.0" pickOnBounds="true" preserveRatio="true">
+                            <image>
+                                <Image url="@../images/icons/dashboard.png" />
+                            </image>
+                        </ImageView>
+                    </children>
+                    <cursor>
+                        <Cursor fx:constant="HAND" />
+                    </cursor>
+                    <VBox.margin>
+                        <Insets top="10.0" />
+                    </VBox.margin>
+                </AnchorPane>
                 <AnchorPane fx:id="logoutBtn" prefHeight="35.0" styleClass="logout-button">
                     <children>
                         <Label layoutX="54.0" layoutY="9.0" prefHeight="17.0" prefWidth="110.0" text="Déconnexion" textAlignment="CENTER" textFill="WHITE">
