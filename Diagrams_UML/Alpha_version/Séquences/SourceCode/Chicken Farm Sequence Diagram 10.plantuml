@@ -1,0 +1,160 @@
+@startuml Sequence_Diagram_10_House_Optimization
+
+title Sequence Diagram 10: House Allocation Optimization (MILP) - Alpha v2.0
+
+actor "Cashier" as Cashier
+participant "ChickenBayView" as UI
+participant "ChickenBayController" as Controller
+participant "ConfigHousesDialog" as Dialog
+participant "ChickenBayOptimization" as Optimizer
+participant "HouseDAO" as DAO
+participant "DatabaseConnection" as DB
+
+== Configure House Allocation with MILP Optimization ==
+
+Cashier -> UI: Click "Configure Houses" button
+
+UI -> Controller: handleConfigureHouses()
+activate Controller
+
+' Check if chickens exist
+Controller -> DAO: getTotalChickenCount()
+activate DAO
+DAO -> DB: executeQuery(\n"SELECT SUM(quantity) FROM chickens")
+activate DB
+DB --> DAO: count = 0
+deactivate DB
+DAO --> Controller: 0 chickens
+deactivate DAO
+
+alt Chickens Exist (count > 0)
+    Controller -> UI: Show warning\n"Cannot reconfigure while\nchickens exist in houses"
+    UI -> Cashier: Display warning
+    
+else No Chickens (can configure)
+    Controller -> Dialog: Open ConfigHousesDialog
+    activate Dialog
+    
+    Dialog -> Cashier: Display configuration form:\n• Number of houses: [4-20]\n• Capacity per house
+    
+    Cashier -> Dialog: Set number of houses: 8
+    
+    Dialog -> Dialog: Generate capacity input fields\nfor houses H1-H8
+    
+    Cashier -> Dialog: Enter capacities:\n• H1: 15,000\n• H2: 12,000\n• H3: 20,000\n• H4: 18,000\n• H5: 10,000\n• H6: 8,000\n• H7: 25,000\n• H8: 22,000
+    
+    Cashier -> Dialog: Click "Optimize" button
+    
+    ' Run MILP Optimization
+    Dialog -> Optimizer: optimizeAllocation(houses)
+    activate Optimizer
+    
+    note right of Optimizer
+        <b>MILP Problem:</b>
+        Maximize X (import capacity)
+        
+        <b>Decision Variables:</b>
+        d[i], e[i], m[i], f[i] ∈ {0,1}
+        (assign house i to category)
+        
+        <b>Constraints:</b>
+        1. Each house in one category
+        2. At least 1 house per category
+        3. E_total ≤ F_total
+        4. D_total ≤ E_total + M_total
+    end note
+    
+    ' Step 1: Sort houses by capacity
+    Optimizer -> Optimizer: sortByCapacity(houses)
+    note right: [H7:25k, H8:22k, H3:20k,\n H4:18k, H1:15k, H2:12k,\n H5:10k, H6:8k]
+    
+    ' Step 2: Initial Greedy Allocation
+    Optimizer -> Optimizer: initialAllocation()
+    note right
+        <b>Greedy Assignment:</b>
+        MaleMeat ← H6 (8k) - smallest
+        EggLayer ← H7, H8, H3 (67k)
+        FemaleMeat ← H4, H1 (33k) - to satisfy E≤F
+        DayOld ← H2, H5 (22k)
+        
+        Wait... E(67k) > F(33k) ❌
+        Need to rebalance!
+    end note
+    
+    ' Step 3: Balance Constraints
+    Optimizer -> Optimizer: balanceConstraints()
+    note right
+        <b>Rebalancing for E ≤ F:</b>
+        Move H3 from EggLayer to FemaleMeat
+        
+        Now:
+        EggLayer: H7, H8 (47k)
+        FemaleMeat: H4, H1, H3 (53k)
+        
+        E(47k) ≤ F(53k) ✓
+    end note
+    
+    ' Step 4: Hill Climbing Optimization
+    Optimizer -> Optimizer: runHillClimbing()
+    
+    loop Optimization Iterations
+        Optimizer -> Optimizer: calculateX(current)
+        Optimizer -> Optimizer: identifyBottleneck()
+        Optimizer -> Optimizer: tryMoveHouseToBottleneck()
+        
+        alt X Improved & Constraints Valid
+            Optimizer -> Optimizer: keepChange()
+        else No Improvement
+            Optimizer -> Optimizer: revertChange()
+        end
+    end
+    
+    ' Calculate final X
+    Optimizer -> Optimizer: calculateX(finalAllocation)
+    note right
+        <b>Throughput Calculation:</b>
+        D_total = 22,000 → X ≤ 19,800 (×0.9)
+        E_total = 47,000 → X ≤ 8,394 (×0.1786)
+        M_total = 8,000 → X ≤ 21,360 (×2.67)
+        F_total = 53,000 → X ≤ 805,600 (×15.2)
+        
+        <b>X_max = 8,394</b>
+        (Bottleneck: EggLayer)
+    end note
+    
+    Optimizer --> Dialog: OptimizationResult {\n  allocation: {...},\n  maxX: 8394,\n  bottleneck: "EggLayer"\n}
+    deactivate Optimizer
+    
+    ' Display results
+    Dialog -> Dialog: showResults()
+    Dialog -> Cashier: Display optimization results:\n┌─────────────────────────────┐\n│ 🎯 Max Import: 8,394/cycle │\n│ ⚠️ Bottleneck: EggLayer     │\n│                             │\n│ DayOld: H2, H5 (22k)        │\n│ EggLayer: H7, H8 (47k)      │\n│ MaleMeat: H6 (8k)           │\n│ FemaleMeat: H4, H1, H3 (53k)│\n└─────────────────────────────┘
+    
+    Cashier -> Dialog: Click "Save Configuration"
+    
+    ' Save to database
+    Dialog -> DAO: saveHouseConfiguration(houses)
+    activate DAO
+    
+    loop For each house
+        DAO -> DB: executeUpdate(\n"INSERT INTO houses\n(name, type, capacity, chickenCount)\nVALUES (?, ?, ?, 0)")
+        activate DB
+        DB --> DAO: success
+        deactivate DB
+    end
+    
+    DAO --> Dialog: true (all saved)
+    deactivate DAO
+    
+    Dialog -> UI: Close dialog
+    deactivate Dialog
+    
+    Controller -> Controller: refreshView()
+    Controller -> UI: Load house cards
+    UI -> Cashier: Display 8 configured houses\nwith optimal allocation
+end
+
+deactivate Controller
+
+
+
+@enduml

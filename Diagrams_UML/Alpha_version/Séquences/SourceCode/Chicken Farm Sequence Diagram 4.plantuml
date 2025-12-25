@@ -1,0 +1,133 @@
+@startuml Sequence_Diagram_4_Record_Egg_Collection
+
+title Sequence Diagram 4: Record Egg Collection - Alpha v2.0
+
+actor "Cashier" as Cashier
+participant "EggsBayView" as UI
+participant "EggsBayController" as Controller
+participant "ValidationUtil" as Validator
+participant "EggProductionDAO" as EggDAO
+participant "MortalityDAO" as MortDAO
+participant "HouseDAO" as HouseDAO
+participant "DateUtil" as DateUtil
+participant "DatabaseConnection" as DB
+
+== Record Daily Egg Collection ==
+
+Cashier -> UI: Click "Record Collection" on EGG_LAYER house
+
+UI -> Controller: handleRecordCollection(houseId)
+activate Controller
+
+Controller -> UI: Show "Record Collection" dialog
+UI -> Cashier: Display egg collection form
+
+Cashier -> UI: Enter collection details:\n• Eggs Collected: 450\n• Cracked Eggs: 12\n• Dead Chickens: 2\n• Collected By: "Ahmed"\n• Notes: "Normal collection"
+
+Cashier -> UI: Click "Save" button
+
+UI -> Controller: submitCollection(collectionData)
+
+' Validate inputs
+Controller -> Validator: isEmpty(eggsCollected)
+activate Validator
+Validator --> Controller: false (valid)
+deactivate Validator
+
+alt Invalid Input
+    Controller -> UI: Show validation error
+    UI -> Cashier: Display error
+    
+else Valid Input
+    ' Get current date
+    Controller -> DateUtil: getCurrentDate()
+    activate DateUtil
+    DateUtil --> Controller: 2025-12-25
+    deactivate DateUtil
+    
+    ' Check for existing record
+    Controller -> EggDAO: getProductionByHouseAndDate(houseId, date)
+    activate EggDAO
+    EggDAO -> DB: executeQuery(\n"SELECT * FROM egg_production\nWHERE houseId = ? AND productionDate = ?")
+    activate DB
+    DB --> EggDAO: null (no existing record)
+    deactivate DB
+    EggDAO --> Controller: null
+    deactivate EggDAO
+    
+    ' Create EggProduction object
+    Controller -> Controller: createEggProductionObject()
+    note right
+        <b>EggProduction Object:</b>
+        houseId = 3
+        productionDate = 2025-12-25
+        eggsCollected = 450
+        crackedEggs = 12
+        goodEggs = 450 - 12 = 438
+        deadChickens = 2
+        collectedBy = "Ahmed"
+        notes = "Normal collection"
+    end note
+    
+    ' Save egg production
+    Controller -> EggDAO: recordProduction(eggProduction)
+    activate EggDAO
+    EggDAO -> DB: executeUpdate(\n"INSERT INTO egg_production\n(houseId, productionDate, eggsCollected,\ncrackedEggs, goodEggs, deadChickens,\ncollectedBy, notes)\nVALUES (?, ?, ?, ?, ?, ?, ?, ?)")
+    activate DB
+    DB --> EggDAO: success
+    deactivate DB
+    EggDAO --> Controller: true
+    deactivate EggDAO
+    
+    ' Record mortality if any
+    alt Dead Chickens > 0
+        Controller -> MortDAO: recordMortality(mortality)
+        activate MortDAO
+        note right
+            <b>Mortality Object:</b>
+            houseId = 3
+            deathDate = 2025-12-25
+            count = 2
+            cause = "During collection"
+            recordedBy = "Ahmed"
+        end note
+        MortDAO -> DB: executeUpdate(\n"INSERT INTO mortality\n(houseId, deathDate, count, cause, recordedBy)\nVALUES (?, ?, ?, ?, ?)")
+        activate DB
+        DB --> MortDAO: success
+        deactivate DB
+        MortDAO --> Controller: true
+        deactivate MortDAO
+        
+        ' Update house chicken count
+        Controller -> HouseDAO: updateChickenCount(houseId, newCount)
+        activate HouseDAO
+        note right: count = oldCount - deadChickens
+        HouseDAO -> DB: executeUpdate(\n"UPDATE houses SET chickenCount = chickenCount - ?\nWHERE id = ?")
+        activate DB
+        DB --> HouseDAO: success
+        deactivate DB
+        HouseDAO --> Controller: true
+        deactivate HouseDAO
+    end
+    
+    ' Update total egg storage
+    Controller -> EggDAO: updateTotalStorage(goodEggs)
+    activate EggDAO
+    EggDAO --> Controller: Updated
+    deactivate EggDAO
+    
+    ' Refresh view
+    Controller -> Controller: refreshView()
+    Controller -> UI: Update egg cards
+    UI -> UI: Update house card:\n• Today's Collection: 438
+    UI -> UI: Update total storage
+    
+    Controller -> UI: Show success message
+    UI -> Cashier: Display:\n"✅ Collection recorded!\n• Good Eggs: 438 (12 cracked)\n• Mortality: 2\n• Total Storage: 15,420 eggs"
+end
+
+deactivate Controller
+
+
+
+@enduml

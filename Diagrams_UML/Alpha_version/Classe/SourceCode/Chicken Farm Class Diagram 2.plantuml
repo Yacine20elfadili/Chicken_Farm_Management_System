@@ -1,0 +1,155 @@
+@startuml Class_Diagram_2_Storage_Inventory
+
+title Class Diagram 2: Domain Model - Storage & Inventory Management - Alpha v2.0
+
+skinparam classAttributeIconSize 0
+skinparam class {
+    BackgroundColor<<Entity>> LightYellow
+    BorderColor<<Entity>> Orange
+}
+
+' --- Feed Management ---
+
+class Feed <<Entity>> {
+    - id: int
+    - name: String
+    - type: String
+    - quantityKg: double
+    - pricePerKg: double
+    - supplier: String
+    - lastRestockDate: LocalDate
+    - expiryDate: LocalDate
+    - minStockLevel: double
+    __Constructors__
+    + Feed()
+    + Feed(name: String, type: String, quantityKg: double, 
+           pricePerKg: double, supplier: String)
+    + Feed(id: int, name: String, type: String, quantityKg: double,
+           pricePerKg: double, supplier: String, 
+           lastRestockDate: LocalDate, expiryDate: LocalDate, 
+           minStockLevel: double)
+    __Utility Methods__
+    + isLowStock(): boolean
+    + isExpiredOrNearExpiry(): boolean
+    + getTotalValue(): double
+    + equals(o: Object): boolean
+    + hashCode(): int
+    + toString(): String
+}
+
+' --- Medication Management ---
+
+class Medication <<Entity>> {
+    - id: int
+    - name: String
+    - type: String
+    - quantity: int
+    - unit: String
+    - pricePerUnit: double
+    - supplier: String
+    - purchaseDate: LocalDate
+    - expiryDate: LocalDate
+    - minStockLevel: int
+    - usage: String
+    __Constructors__
+    + Medication()
+    + Medication(name: String, type: String, quantity: int, 
+                 unit: String, pricePerUnit: double)
+    + Medication(id: int, name: String, type: String, quantity: int,
+                 unit: String, pricePerUnit: double, supplier: String,
+                 purchaseDate: LocalDate, expiryDate: LocalDate,
+                 minStockLevel: int, usage: String)
+    __Utility Methods__
+    + isLowStock(): boolean
+    + isExpired(): boolean
+    + getTotalValue(): double
+    + equals(o: Object): boolean
+    + hashCode(): int
+    + toString(): String
+}
+
+' --- Equipment Management (Enhanced in Alpha) ---
+
+class EquipmentCategory <<Entity>> {
+    - id: int
+    - name: String
+    - description: String
+    - iconPath: String
+    - createdAt: LocalDateTime
+    __Constructors__
+    + EquipmentCategory()
+    + EquipmentCategory(name: String, description: String)
+    + EquipmentCategory(id: int, name: String, 
+                        description: String, iconPath: String)
+    __Utility Methods__
+    + toString(): String
+}
+
+class EquipmentItem <<Entity>> {
+    - id: int
+    - categoryId: int
+    - name: String
+    - quantity: int
+    - status: String
+    - purchaseDate: LocalDate
+    - purchasePrice: double
+    - lastMaintenanceDate: LocalDate
+    - nextMaintenanceDate: LocalDate
+    - location: String
+    - notes: String
+    - createdAt: LocalDateTime
+    __Constructors__
+    + EquipmentItem()
+    + EquipmentItem(categoryId: int, name: String, 
+                    quantity: int, status: String)
+    + EquipmentItem(id: int, categoryId: int, name: String, 
+                    quantity: int, status: String, 
+                    purchaseDate: LocalDate, purchasePrice: double,
+                    lastMaintenanceDate: LocalDate, 
+                    nextMaintenanceDate: LocalDate,
+                    location: String, notes: String)
+    __Utility Methods__
+    + needsMaintenance(): boolean
+    + isBroken(): boolean
+    + isOperational(): boolean
+    + equals(o: Object): boolean
+    + hashCode(): int
+    + toString(): String
+}
+
+' --- Relationships ---
+EquipmentItem "0..*" -- "1" EquipmentCategory : belongs to >
+
+note right of EquipmentCategory
+    <b>Alpha v2.0 Enhancement:</b>
+    Equipment is now organized
+    by categories for better
+    inventory management.
+    
+    <b>Default Categories:</b>
+    • Feeding Equipment
+    • Watering Systems
+    • Heating/Cooling
+    • Egg Collection
+    • Cleaning Tools
+    • Safety Equipment
+end note
+
+note bottom of Feed
+    <b>Feed Types:</b>
+    • Starter (Day-old)
+    • Grower
+    • Layer
+    • Finisher
+end note
+
+note bottom of Medication
+    <b>Medication Types:</b>
+    • Vaccine
+    • Antibiotic
+    • Vitamin
+    • Supplement
+    • Disinfectant
+end note
+
+@enduml

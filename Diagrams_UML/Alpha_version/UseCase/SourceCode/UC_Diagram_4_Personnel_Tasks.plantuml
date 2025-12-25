@@ -1,0 +1,121 @@
+@startuml UC_Diagram_4_Personnel_Tasks
+
+title Use Case Diagram 4: Personnel & Task Management - Alpha v2.0
+
+left to right direction
+
+actor "Cashier" as Cashier <<Primary Actor>>
+actor "Worker" as Worker <<Secondary Actor>>
+
+' ============================================
+' PERSONNEL MANAGEMENT
+' ============================================
+rectangle "Personnel Management" {
+  usecase "Manage Personnel" as UC_P
+  usecase "View Personnel\nList" as UC_P1
+  usecase "Add Worker" as UC_P2
+  usecase "Update Worker" as UC_P3
+  usecase "Delete Worker" as UC_P4
+  usecase "View Worker\nDetails" as UC_P5
+  usecase "Generate ID Card" as UC_P6
+  usecase "Generate QR Code" as UC_P7
+  usecase "Filter by Type" as UC_P8
+  
+  note right of UC_P6
+    <b>Alpha Enhancement:</b>
+    Professional ID card generation
+    with QR code containing:
+    • Employee ID
+    • Name
+    • Position
+    • Contact Info
+    
+    Uses ZXing library for
+    QR code generation.
+  end note
+  
+  note right of UC_P
+    <b>Personnel Types:</b>
+    • Tracker (Suiveur)
+    • Worker (Ouvrier)
+    • Admin
+    • Veterinarian
+  end note
+}
+
+' ============================================
+' TASK MANAGEMENT
+' ============================================
+rectangle "Task Management" {
+  usecase "Manage Tasks" as UC_T
+  usecase "View Task List" as UC_T1
+  usecase "Create Task" as UC_T2
+  usecase "Edit Task" as UC_T3
+  usecase "Delete Task" as UC_T4
+  usecase "Mark Task Done" as UC_T5
+  usecase "Assign Task" as UC_T6
+  usecase "Filter by Status" as UC_T7
+  usecase "Filter by Worker" as UC_T8
+  usecase "View Overdue\nTasks" as UC_T9
+  
+  note right of UC_T
+    <b>Task Status:</b>
+    • Pending (Yellow)
+    • Done (Green)
+    • Missed (Red)
+    
+    <b>Task Categories:</b>
+    • Cleaning
+    • Feeding
+    • Collection
+    • Maintenance
+    • Health Check
+    • Other
+    
+    <b>Priorities:</b>
+    • High (🔴)
+    • Medium (🟡)
+    • Low (🟢)
+  end note
+}
+
+' ============================================
+' ACTOR RELATIONSHIPS
+' ============================================
+Cashier --> UC_P
+Cashier --> UC_T
+
+' Worker receives assignments
+Worker <.. UC_T6 : <<receives assignment>>
+Worker <.. UC_T5 : <<can complete>>
+Worker .up.> Cashier : <<provides feedback>>
+
+' ============================================
+' PERSONNEL RELATIONSHIPS
+' ============================================
+UC_P ..> UC_P1 : <<include>>
+UC_P <.. UC_P2 : <<extend>>
+UC_P <.. UC_P3 : <<extend>>
+UC_P <.. UC_P4 : <<extend>>
+UC_P1 ..> UC_P5 : <<include>>
+UC_P <.. UC_P6 : <<extend>>
+UC_P6 ..> UC_P7 : <<include>>
+UC_P1 ..> UC_P8 : <<include>>
+
+' ============================================
+' TASK RELATIONSHIPS
+' ============================================
+UC_T ..> UC_T1 : <<include>>
+UC_T <.. UC_T2 : <<extend>>
+UC_T <.. UC_T3 : <<extend>>
+UC_T <.. UC_T4 : <<extend>>
+UC_T <.. UC_T5 : <<extend>>
+UC_T2 ..> UC_T6 : <<include>>
+UC_T1 ..> UC_T7 : <<include>>
+UC_T1 ..> UC_T8 : <<include>>
+UC_T1 ..> UC_T9 : <<include>>
+
+' Cross-module use
+UC_T6 ..> UC_P1 : <<uses>>
+
+@enduml

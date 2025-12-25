@@ -1,0 +1,139 @@
+@startuml Sequence_Diagram_2_Dashboard
+
+title Sequence Diagram 2: Dashboard Initialization - Alpha v2.0
+
+actor "Cashier" as Cashier
+participant "DashboardView" as UI
+participant "DashboardController" as Controller
+participant "ChickenDAO" as ChickenDAO
+participant "EggProductionDAO" as EggDAO
+participant "MortalityDAO" as MortDAO
+participant "TaskDAO" as TaskDAO
+participant "FinancialDAO" as FinDAO
+participant "DatabaseConnection" as DB
+participant "DateUtil" as DateUtil
+
+== Dashboard Loading ==
+
+Cashier -> UI: Navigate to Dashboard
+UI -> Controller: initialize()
+activate Controller
+
+note right of Controller
+    <b>Alpha v2.0 Dashboard:</b>
+    Now includes:
+    • Financial summary
+    • Task alerts
+    • Enhanced charts
+end note
+
+par Load Stats in Parallel
+    ' Chicken Statistics
+    Controller -> ChickenDAO: getTotalChickenCount()
+    activate ChickenDAO
+    ChickenDAO -> DB: executeQuery(\n"SELECT SUM(quantity) FROM chickens")
+    activate DB
+    DB --> ChickenDAO: count = 12,500
+    deactivate DB
+    ChickenDAO --> Controller: 12,500 chickens
+    deactivate ChickenDAO
+    
+    ' Today's Egg Production
+    Controller -> DateUtil: getCurrentDate()
+    activate DateUtil
+    DateUtil --> Controller: 2025-12-25
+    deactivate DateUtil
+    
+    Controller -> EggDAO: getTodayTotalProduction()
+    activate EggDAO
+    EggDAO -> DB: executeQuery(\n"SELECT SUM(goodEggs) FROM egg_production\nWHERE productionDate = ?")
+    activate DB
+    DB --> EggDAO: eggs = 3,420
+    deactivate DB
+    EggDAO --> Controller: 3,420 eggs today
+    deactivate EggDAO
+    
+    ' Active Alerts (Mortality Rate)
+    Controller -> MortDAO: getTodayMortalityCount()
+    activate MortDAO
+    MortDAO -> DB: executeQuery(\n"SELECT SUM(count) FROM mortality\nWHERE deathDate = ?")
+    activate DB
+    DB --> MortDAO: deaths = 5
+    deactivate DB
+    MortDAO --> Controller: 5 deaths today
+    deactivate MortDAO
+    
+    ' Pending Tasks (Alpha enhancement)
+    Controller -> TaskDAO: getTasksDueToday()
+    activate TaskDAO
+    TaskDAO -> DB: executeQuery(\n"SELECT COUNT(*) FROM tasks\nWHERE dueDate <= ? AND status = 'Pending'")
+    activate DB
+    DB --> TaskDAO: count = 3
+    deactivate DB
+    TaskDAO --> Controller: 3 pending tasks
+    deactivate TaskDAO
+    
+    ' Financial Summary (Alpha new)
+    Controller -> FinDAO: getBalance()
+    activate FinDAO
+    FinDAO -> DB: executeQuery(\n"SELECT SUM(CASE WHEN type='Income' THEN amount ELSE -amount END)\nFROM financial_transactions")
+    activate DB
+    DB --> FinDAO: balance = 45,230.00
+    deactivate DB
+    FinDAO --> Controller: balance = 45,230.00 MAD
+    deactivate FinDAO
+end
+
+' Calculate Mortality Rate
+Controller -> Controller: calculateMortalityRate()
+note right: rate = 5 / 12,500 × 100 = 0.04%
+
+' Get 7-Day Production Chart Data
+Controller -> DateUtil: getLast7Days()
+activate DateUtil
+DateUtil --> Controller: [Dec 19-25]
+deactivate DateUtil
+
+Controller -> EggDAO: getLast7DaysProduction()
+activate EggDAO
+EggDAO -> DB: executeQuery(\n"SELECT productionDate, SUM(goodEggs)\nFROM egg_production\nWHERE productionDate >= ?\nGROUP BY productionDate")
+activate DB
+DB --> EggDAO: Map<Date, Integer>
+deactivate DB
+EggDAO --> Controller: {Dec19: 3200, Dec20: 3150, ..., Dec25: 3420}
+deactivate EggDAO
+
+Controller -> UI: updateDashboard(stats)
+activate UI
+
+' Update KPI Cards
+UI -> UI: setTotalChickens(12,500)
+UI -> UI: setTodayEggs(3,420)
+UI -> UI: setMortalityAlert("5 deaths (0.04%)")
+UI -> UI: setPendingTasks(3)
+UI -> UI: setBalance("45,230.00 MAD")
+
+' Build Production Chart
+UI -> UI: buildBarChart(productionData)
+note right
+    ┌─────────────────────────────┐
+    │ 📊 7-Day Egg Production     │
+    │ █████████ 3200 Dec 19       │
+    │ ████████▌ 3150 Dec 20       │
+    │ ██████████ 3350 Dec 21      │
+    │ █████████▌ 3280 Dec 22      │
+    │ █████████ 3190 Dec 23       │
+    │ █████████▌ 3310 Dec 24      │
+    │ ██████████▌ 3420 Dec 25     │
+    └─────────────────────────────┘
+end note
+
+UI --> Controller: Dashboard updated
+deactivate UI
+
+Controller --> Cashier: Display complete dashboard
+deactivate Controller
+
+
+
+@enduml

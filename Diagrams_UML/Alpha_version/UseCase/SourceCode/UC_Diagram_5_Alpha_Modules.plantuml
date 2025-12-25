@@ -1,0 +1,254 @@
+@startuml UC_Diagram_5_Alpha_Modules
+
+title Use Case Diagram 5: Alpha v2.0 New Modules (CRM, SCM, Financial, Documents, Reports)
+
+left to right direction
+
+' ============================================
+' ACTORS
+' ============================================
+actor "Cashier" as Cashier <<Primary Actor>>
+
+' ============================================
+' CRM MODULE - Customer Relationship Management
+' ============================================
+rectangle "Customer Management (CRM)" {
+  usecase "Manage Customers" as UC_CRM
+  usecase "View Customer List" as UC_CRM1
+  usecase "Add Customer" as UC_CRM2
+  usecase "Edit Customer" as UC_CRM3
+  usecase "Delete Customer" as UC_CRM4
+  usecase "View Customer Details" as UC_CRM5
+  usecase "Search Customers" as UC_CRM6
+  usecase "Track Outstanding\nBalance" as UC_CRM7
+  
+  note right of UC_CRM
+    <b>Customer Types:</b>
+    • Company (Entreprise)
+    • Individual (Particulier)
+    
+    <b>Key Fields:</b>
+    • ICE (Company)
+    • Payment Terms
+    • Loyalty Tracking
+  end note
+}
+
+' ============================================
+' SCM MODULE - Supply Chain Management
+' ============================================
+rectangle "Supplier Management (SCM)" {
+  usecase "Manage Suppliers" as UC_SCM
+  usecase "View Supplier List" as UC_SCM1
+  usecase "Add Supplier" as UC_SCM2
+  usecase "Edit Supplier" as UC_SCM3
+  usecase "Delete Supplier" as UC_SCM4
+  usecase "Filter by Category" as UC_SCM5
+  usecase "View Supplier Details" as UC_SCM6
+  
+  note right of UC_SCM
+    <b>Supplier Categories:</b>
+    • Feed
+    • Medication
+    • Equipment
+    • Chicks
+    • Mixed
+    • Other
+  end note
+}
+
+' ============================================
+' FINANCIAL MODULE
+' ============================================
+rectangle "Financial Tracking" {
+  usecase "Manage Transactions" as UC_FIN
+  usecase "View Transactions" as UC_FIN1
+  usecase "Record Income" as UC_FIN2
+  usecase "Record Expense" as UC_FIN3
+  usecase "Edit Transaction" as UC_FIN4
+  usecase "Delete Transaction" as UC_FIN5
+  usecase "View Balance\nSummary" as UC_FIN6
+  usecase "Filter by\nDate Range" as UC_FIN7
+  usecase "Filter by Type" as UC_FIN8
+  usecase "Attach Receipt" as UC_FIN9
+  
+  note right of UC_FIN
+    <b>Transaction Types:</b>
+    • Income
+    • Expense
+    
+    <b>Categories (Income):</b>
+    • Egg Sales
+    • Chicken Sales
+    • Other Sales
+    
+    <b>Categories (Expense):</b>
+    • Feed Purchase
+    • Medication
+    • Equipment
+    • Utilities
+    • Salaries
+    • Other
+  end note
+}
+
+' ============================================
+' DOCUMENTS MODULE
+' ============================================
+rectangle "Farm Documents" {
+  usecase "Manage Documents" as UC_DOC
+  usecase "View Document List" as UC_DOC1
+  usecase "Generate Facture" as UC_DOC2
+  usecase "Generate Bon\nde Commande" as UC_DOC3
+  usecase "Generate Bon\nde Livraison" as UC_DOC4
+  usecase "Generate Devis" as UC_DOC5
+  usecase "Preview Document" as UC_DOC6
+  usecase "Export to PDF" as UC_DOC7
+  usecase "Print Document" as UC_DOC8
+  usecase "Send by Email" as UC_DOC9
+  
+  note right of UC_DOC
+    <b>Document Types:</b>
+    • Facture (Invoice)
+    • Bon de Commande (Purchase Order)
+    • Bon de Livraison (Delivery Note)
+    • Devis (Quote)
+    • Avoir (Credit Note)
+    
+    <b>Document Status:</b>
+    • Draft
+    • Generated
+    • Sent
+    • Paid
+    • Cancelled
+  end note
+}
+
+' ============================================
+' REPORTS MODULE
+' ============================================
+rectangle "Reports Center" {
+  usecase "Manage Reports" as UC_REP
+  usecase "View Report List" as UC_REP1
+  usecase "Generate Financial\nReport" as UC_REP2
+  usecase "Generate Production\nReport" as UC_REP3
+  usecase "Generate Inventory\nReport" as UC_REP4
+  usecase "Generate Consumption\nReport" as UC_REP5
+  usecase "View Report\nin App" as UC_REP6
+  usecase "Export to PDF" as UC_REP7
+  usecase "Export to Excel" as UC_REP8
+  
+  note right of UC_REP
+    <b>Report Types:</b>
+    • Financial (Revenus/Dépenses)
+    • Production (Eggs/Chickens)
+    • Inventory (Feed/Medication)
+    • Consumption (Feed Usage)
+    • Summary (All combined)
+    
+    <b>Export Formats:</b>
+    • View (in-app)
+    • PDF
+    • Excel
+  end note
+}
+
+' ============================================
+' SETTINGS MODULE
+' ============================================
+rectangle "User Settings" {
+  usecase "Manage Settings" as UC_SET
+  usecase "Update Profile" as UC_SET1
+  usecase "Change Password" as UC_SET2
+  usecase "Upload Avatar" as UC_SET3
+  usecase "View Account Info" as UC_SET4
+}
+
+' ============================================
+' ACTOR RELATIONSHIPS
+' ============================================
+Cashier --> UC_CRM
+Cashier --> UC_SCM
+Cashier --> UC_FIN
+Cashier --> UC_DOC
+Cashier --> UC_REP
+Cashier --> UC_SET
+
+' ============================================
+' CRM RELATIONSHIPS
+' ============================================
+UC_CRM ..> UC_CRM1 : <<include>>
+UC_CRM <.. UC_CRM2 : <<extend>>
+UC_CRM <.. UC_CRM3 : <<extend>>
+UC_CRM <.. UC_CRM4 : <<extend>>
+UC_CRM1 ..> UC_CRM5 : <<include>>
+UC_CRM1 ..> UC_CRM6 : <<include>>
+UC_CRM5 ..> UC_CRM7 : <<include>>
+
+' ============================================
+' SCM RELATIONSHIPS
+' ============================================
+UC_SCM ..> UC_SCM1 : <<include>>
+UC_SCM <.. UC_SCM2 : <<extend>>
+UC_SCM <.. UC_SCM3 : <<extend>>
+UC_SCM <.. UC_SCM4 : <<extend>>
+UC_SCM1 ..> UC_SCM5 : <<include>>
+UC_SCM1 ..> UC_SCM6 : <<include>>
+
+' ============================================
+' FINANCIAL RELATIONSHIPS
+' ============================================
+UC_FIN ..> UC_FIN1 : <<include>>
+UC_FIN <.. UC_FIN2 : <<extend>>
+UC_FIN <.. UC_FIN3 : <<extend>>
+UC_FIN <.. UC_FIN4 : <<extend>>
+UC_FIN <.. UC_FIN5 : <<extend>>
+UC_FIN1 ..> UC_FIN6 : <<include>>
+UC_FIN1 ..> UC_FIN7 : <<include>>
+UC_FIN1 ..> UC_FIN8 : <<include>>
+UC_FIN2 ..> UC_FIN9 : <<include>>
+UC_FIN3 ..> UC_FIN9 : <<include>>
+
+' ============================================
+' DOCUMENTS RELATIONSHIPS
+' ============================================
+UC_DOC ..> UC_DOC1 : <<include>>
+UC_DOC <.. UC_DOC2 : <<extend>>
+UC_DOC <.. UC_DOC3 : <<extend>>
+UC_DOC <.. UC_DOC4 : <<extend>>
+UC_DOC <.. UC_DOC5 : <<extend>>
+UC_DOC1 ..> UC_DOC6 : <<include>>
+UC_DOC6 ..> UC_DOC7 : <<include>>
+UC_DOC6 ..> UC_DOC8 : <<include>>
+UC_DOC6 ..> UC_DOC9 : <<include>>
+
+' Cross-module use
+UC_DOC2 ..> UC_CRM1 : <<uses>>
+UC_DOC3 ..> UC_SCM1 : <<uses>>
+UC_DOC4 ..> UC_CRM1 : <<uses>>
+UC_DOC5 ..> UC_CRM1 : <<uses>>
+
+' ============================================
+' REPORTS RELATIONSHIPS
+' ============================================
+UC_REP ..> UC_REP1 : <<include>>
+UC_REP <.. UC_REP2 : <<extend>>
+UC_REP <.. UC_REP3 : <<extend>>
+UC_REP <.. UC_REP4 : <<extend>>
+UC_REP <.. UC_REP5 : <<extend>>
+UC_REP1 ..> UC_REP6 : <<include>>
+UC_REP1 ..> UC_REP7 : <<include>>
+UC_REP1 ..> UC_REP8 : <<include>>
+
+' Cross-module use
+UC_REP2 ..> UC_FIN1 : <<uses>>
+
+' ============================================
+' SETTINGS RELATIONSHIPS
+' ============================================
+UC_SET ..> UC_SET4 : <<include>>
+UC_SET <.. UC_SET1 : <<extend>>
+UC_SET <.. UC_SET2 : <<extend>>
+UC_SET <.. UC_SET3 : <<extend>>
+
+@enduml

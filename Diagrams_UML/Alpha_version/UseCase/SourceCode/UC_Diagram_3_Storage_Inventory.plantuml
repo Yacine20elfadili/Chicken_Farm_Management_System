@@ -1,0 +1,124 @@
+@startuml UC_Diagram_3_Storage_Inventory
+
+title Use Case Diagram 3: Storage & Inventory Management - Alpha v2.0
+
+left to right direction
+
+actor "Cashier" as Cashier <<Primary Actor>>
+
+' ============================================
+' FEED MANAGEMENT
+' ============================================
+rectangle "Feed Management" {
+  usecase "Manage Feed" as UC_F
+  usecase "View Feed List" as UC_F1
+  usecase "Add Feed" as UC_F2
+  usecase "Update Feed" as UC_F3
+  usecase "Delete Feed" as UC_F4
+  usecase "Use Feed" as UC_F5
+  usecase "Restock Feed" as UC_F6
+  usecase "Low Stock Alert" as UC_F7
+  usecase "Expiry Alert" as UC_F8
+  
+  note right of UC_F
+    <b>Feed Types:</b>
+    • Starter (Day-old)
+    • Grower
+    • Layer
+    • Finisher
+  end note
+}
+
+' ============================================
+' MEDICATION MANAGEMENT
+' ============================================
+rectangle "Medication Management" {
+  usecase "Manage Medications" as UC_Med
+  usecase "View Medication\nList" as UC_Med1
+  usecase "Add Medication" as UC_Med2
+  usecase "Update Medication" as UC_Med3
+  usecase "Delete Medication" as UC_Med4
+  usecase "Use Medication" as UC_Med5
+  usecase "Low Stock Alert" as UC_Med6
+  usecase "Expiry Alert" as UC_Med7
+  
+  note right of UC_Med
+    <b>Medication Types:</b>
+    • Vaccine
+    • Antibiotic
+    • Vitamin
+    • Supplement
+    • Disinfectant
+  end note
+}
+
+' ============================================
+' EQUIPMENT MANAGEMENT (Enhanced in Alpha)
+' ============================================
+rectangle "Equipment Management" {
+  usecase "Manage Equipment" as UC_Eq
+  usecase "View Equipment\nList" as UC_Eq1
+  usecase "Add Equipment" as UC_Eq2
+  usecase "Update Equipment" as UC_Eq3
+  usecase "Update Status" as UC_Eq4
+  usecase "Delete Equipment" as UC_Eq5
+  usecase "Manage Categories" as UC_Eq6
+  usecase "Add Category" as UC_Eq7
+  usecase "Maintenance Alert" as UC_Eq8
+  
+  note right of UC_Eq6
+    <b>Alpha Enhancement:</b>
+    Equipment now organized
+    by categories:
+    • Feeding Equipment
+    • Watering Systems
+    • Heating/Cooling
+    • Egg Collection
+    • Cleaning Tools
+    • Safety Equipment
+  end note
+}
+
+' ============================================
+' ACTOR RELATIONSHIPS
+' ============================================
+Cashier --> UC_F
+Cashier --> UC_Med
+Cashier --> UC_Eq
+
+' ============================================
+' FEED RELATIONSHIPS
+' ============================================
+UC_F ..> UC_F1 : <<include>>
+UC_F <.. UC_F2 : <<extend>>
+UC_F <.. UC_F3 : <<extend>>
+UC_F <.. UC_F4 : <<extend>>
+UC_F <.. UC_F5 : <<extend>>
+UC_F <.. UC_F6 : <<extend>>
+UC_F1 ..> UC_F7 : <<include>>
+UC_F1 ..> UC_F8 : <<include>>
+
+' ============================================
+' MEDICATION RELATIONSHIPS
+' ============================================
+UC_Med ..> UC_Med1 : <<include>>
+UC_Med <.. UC_Med2 : <<extend>>
+UC_Med <.. UC_Med3 : <<extend>>
+UC_Med <.. UC_Med4 : <<extend>>
+UC_Med <.. UC_Med5 : <<extend>>
+UC_Med1 ..> UC_Med6 : <<include>>
+UC_Med1 ..> UC_Med7 : <<include>>
+
+' ============================================
+' EQUIPMENT RELATIONSHIPS
+' ============================================
+UC_Eq ..> UC_Eq1 : <<include>>
+UC_Eq <.. UC_Eq2 : <<extend>>
+UC_Eq <.. UC_Eq3 : <<extend>>
+UC_Eq <.. UC_Eq4 : <<extend>>
+UC_Eq <.. UC_Eq5 : <<extend>>
+UC_Eq <.. UC_Eq6 : <<extend>>
+UC_Eq6 ..> UC_Eq7 : <<include>>
+UC_Eq1 ..> UC_Eq8 : <<include>>
+
+@enduml

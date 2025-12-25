@@ -1,0 +1,374 @@
+@startuml Class_Diagram_4_Controllers
+
+title Class Diagram 4: Controller Layer - All Controllers - Alpha v2.0
+
+skinparam classAttributeIconSize 0
+skinparam class {
+    BackgroundColor<<Controller>> LightSalmon
+    BorderColor<<Controller>> Red
+    BackgroundColor<<App>> Gold
+    BorderColor<<App>> DarkOrange
+    BackgroundColor<<Utility>> LightGreen
+    BorderColor<<Utility>> DarkGreen
+}
+
+' ============================================
+' APPLICATION ENTRY POINT
+' ============================================
+
+class App <<App>> {
+    - {static} primaryStage: Stage
+    __
+    + start(stage: Stage): void
+    + {static} main(args: String[]): void
+    + {static} getPrimaryStage(): Stage
+}
+
+' ============================================
+' AUTHENTICATION CONTROLLERS
+' ============================================
+
+class LoginController <<Controller>> {
+    - userDAO: UserDAO
+    - emailField: TextField
+    - passwordField: PasswordField
+    - errorLabel: Label
+    __
+    + initialize(): void
+    + handleLogin(event: ActionEvent): void
+    + handleSignUp(event: ActionEvent): void
+    - validateCredentials(): boolean
+    - showError(message: String): void
+}
+
+class SignUpController <<Controller>> {
+    - userDAO: UserDAO
+    - fullNameField: TextField
+    - emailField: TextField
+    - passwordField: PasswordField
+    - confirmPasswordField: PasswordField
+    __
+    + initialize(): void
+    + handleSignUp(event: ActionEvent): void
+    + handleBackToLogin(event: ActionEvent): void
+    - validateInputs(): boolean
+}
+
+' ============================================
+' NAVIGATION CONTROLLERS
+' ============================================
+
+class MainWindowController <<Controller>> {
+    - contentArea: StackPane
+    - currentView: String
+    __
+    + initialize(): void
+    + loadView(viewName: String): void
+    + handleLogout(): void
+    + setCurrentUser(user: User): void
+}
+
+class SidebarController <<Controller>> {
+    - mainWindowController: MainWindowController
+    __
+    + initialize(): void
+    + setMainWindowController(controller: MainWindowController): void
+    + handleDashboardClick(): void
+    + handleChickenBayClick(): void
+    + handleEggsBayClick(): void
+    + handleStorageClick(): void
+    + handleTasksClick(): void
+    + handlePersonnelClick(): void
+    + handleCustomersClick(): void
+    + handleSuppliersClick(): void
+    + handleFinancialClick(): void
+    + handleReportsClick(): void
+    + handleDocumentsClick(): void
+    + handleSettingsClick(): void
+}
+
+' ============================================
+' CORE FEATURE CONTROLLERS
+' ============================================
+
+class DashboardController <<Controller>> {
+    - chickenDAO: ChickenDAO
+    - eggProductionDAO: EggProductionDAO
+    - mortalityDAO: MortalityDAO
+    - totalChickensLabel: Label
+    - todayEggsLabel: Label
+    - alertsLabel: Label
+    - productionChart: BarChart
+    __
+    + initialize(): void
+    + loadDashboardData(): void
+    + refreshDashboard(): void
+    - loadChickenStats(): void
+    - loadEggStats(): void
+    - loadAlerts(): void
+    - load7DayChart(): void
+}
+
+class ChickenBayController <<Controller>> {
+    - houseDAO: HouseDAO
+    - chickenDAO: ChickenDAO
+    - mortalityDAO: MortalityDAO
+    - houseCardsContainer: FlowPane
+    __
+    + initialize(): void
+    + loadHouseCards(): void
+    + loadMortalityStats(): void
+    + handleAddChickens(): void
+    + handleRecordMortality(): void
+    + handleTransferChickens(): void
+    + handleSellChickens(): void
+    + handleOptimization(): void
+    + handleConfigureHouses(): void
+    + refreshView(): void
+}
+
+class EggsBayController <<Controller>> {
+    - eggProductionDAO: EggProductionDAO
+    - houseDAO: HouseDAO
+    - productionCardsContainer: FlowPane
+    - totalStorageLabel: Label
+    __
+    + initialize(): void
+    + loadProductionCards(): void
+    + loadTotalStorage(): void
+    + handleRecordCollection(): void
+    + handleRemoveEggs(): void
+    + refreshView(): void
+}
+
+class StorageController <<Controller>> {
+    - feedDAO: FeedDAO
+    - medicationDAO: MedicationDAO
+    - equipmentCategoryDAO: EquipmentCategoryDAO
+    - equipmentItemDAO: EquipmentItemDAO
+    - feedTable: TableView
+    - medicationTable: TableView
+    - equipmentTable: TableView
+    __
+    + initialize(): void
+    + loadFeedData(): void
+    + loadMedicationData(): void
+    + loadEquipmentData(): void
+    + handleAddFeed(): void
+    + handleAddMedication(): void
+    + handleAddEquipment(): void
+    + handleEditItem(): void
+    + handleDeleteItem(): void
+    + refreshView(): void
+}
+
+class TasksController <<Controller>> {
+    - taskDAO: TaskDAO
+    - personnelDAO: PersonnelDAO
+    - tasksTable: TableView
+    - filterComboBox: ComboBox
+    __
+    + initialize(): void
+    + loadTasks(): void
+    + handleCreateTask(): void
+    + handleEditTask(): void
+    + handleDeleteTask(): void
+    + handleMarkAsDone(): void
+    + handleFilterByStatus(): void
+    + handleFilterByAssignee(): void
+    + refreshView(): void
+}
+
+class PersonnelController <<Controller>> {
+    - personnelDAO: PersonnelDAO
+    - personnelTable: TableView
+    - personnelCardsContainer: FlowPane
+    __
+    + initialize(): void
+    + loadPersonnelData(): void
+    + handleAddPersonnel(): void
+    + handleEditPersonnel(): void
+    + handleDeletePersonnel(): void
+    + handleGenerateIdCard(): void
+    + handleViewDetails(): void
+    + refreshView(): void
+}
+
+' ============================================
+' ALPHA v2.0 NEW CONTROLLERS
+' ============================================
+
+class CustomersController <<Controller>> {
+    - customerDAO: CustomerDAO
+    - customersTable: TableView
+    - searchField: TextField
+    __
+    + initialize(): void
+    + loadCustomers(): void
+    + handleAddCustomer(): void
+    + handleEditCustomer(): void
+    + handleDeleteCustomer(): void
+    + handleSearchCustomer(): void
+    + handleViewDetails(): void
+    + refreshView(): void
+}
+
+class SuppliersController <<Controller>> {
+    - supplierDAO: SupplierDAO
+    - suppliersTable: TableView
+    - categoryFilter: ComboBox
+    __
+    + initialize(): void
+    + loadSuppliers(): void
+    + handleAddSupplier(): void
+    + handleEditSupplier(): void
+    + handleDeleteSupplier(): void
+    + handleFilterByCategory(): void
+    + refreshView(): void
+}
+
+class FinancialTrackingController <<Controller>> {
+    - financialDAO: FinancialDAO
+    - transactionsTable: TableView
+    - balanceLabel: Label
+    - incomeLabel: Label
+    - expenseLabel: Label
+    __
+    + initialize(): void
+    + loadTransactions(): void
+    + handleAddIncome(): void
+    + handleAddExpense(): void
+    + handleEditTransaction(): void
+    + handleDeleteTransaction(): void
+    + calculateBalance(): double
+    + filterByType(type: String): void
+    + filterByDateRange(start: LocalDate, end: LocalDate): void
+    + refreshView(): void
+}
+
+class FarmDocumentController <<Controller>> {
+    - documentDAO: DocumentDAO
+    - customerDAO: CustomerDAO
+    - supplierDAO: SupplierDAO
+    - documentsTable: TableView
+    __
+    + initialize(): void
+    + loadDocuments(): void
+    + handleGenerateInvoice(): void
+    + handleGenerateBonCommande(): void
+    + handleGenerateBonLivraison(): void
+    + handleGenerateDevis(): void
+    + handlePreviewDocument(): void
+    + handleExportPDF(): void
+    + handlePrintDocument(): void
+    + handleDeleteDocument(): void
+    + refreshView(): void
+}
+
+class ReportsController <<Controller>> {
+    - reportDAO: ReportDAO
+    - reportsTable: TableView
+    - reportTypeComboBox: ComboBox
+    __
+    + initialize(): void
+    + loadReports(): void
+    + handleGenerateFinancialReport(): void
+    + handleGenerateProductionReport(): void
+    + handleGenerateInventoryReport(): void
+    + handleGenerateConsumptionReport(): void
+    + handleExportToPDF(): void
+    + handleViewReport(): void
+    + refreshView(): void
+}
+
+class SettingsController <<Controller>> {
+    - userDAO: UserDAO
+    - currentUser: User
+    - avatarImageView: ImageView
+    - nameField: TextField
+    - emailField: TextField
+    __
+    + initialize(): void
+    + loadUserData(): void
+    + handleUpdateProfile(): void
+    + handleChangePassword(): void
+    + handleUploadAvatar(): void
+    + handleLogout(): void
+}
+
+' ============================================
+' UTILITY CLASSES
+' ============================================
+
+class ValidationUtil <<Utility>> {
+    + {static} isValidEmail(email: String): boolean
+    + {static} isEmpty(str: String): boolean
+    + {static} isValidPassword(password: String): boolean
+    + {static} sanitize(input: String): String
+    + {static} isValidPhone(phone: String): boolean
+    + {static} isValidICE(ice: String): boolean
+}
+
+class NavigationUtil <<Utility>> {
+    + {static} navigateTo(event: ActionEvent, fxmlPath: String, title: String): void
+    + {static} loadFXML(fxmlPath: String): Parent
+    + {static} openDialog(fxmlPath: String, title: String, owner: Stage): void
+    + {static} showAlert(type: AlertType, title: String, content: String): void
+    + {static} showConfirmation(title: String, content: String): boolean
+}
+
+class PDFGenerator <<Utility>> {
+    + {static} generateInvoicePDF(document: FarmDocument, customer: Customer): byte[]
+    + {static} generateBonCommandePDF(document: FarmDocument, supplier: Supplier): byte[]
+    + {static} savePDFToFile(content: byte[], path: String): boolean
+}
+
+class IdentityCardGenerator <<Utility>> {
+    + {static} generateIdCard(personnel: Personnel): BufferedImage
+    + {static} generateQRCode(data: String): BufferedImage
+}
+
+class ChickenBayOptimization <<Utility>> {
+    + calculateX(houses: List<House>): int
+    + validateConstraints(E: int, F: int, D: int, M: int): boolean
+    + optimizeHillClimbing(houses: List<House>): void
+}
+
+' ============================================
+' RELATIONSHIPS
+' ============================================
+
+App ..> LoginController
+
+MainWindowController ..> SidebarController
+SidebarController --> MainWindowController
+
+LoginController ..> ValidationUtil
+LoginController ..> NavigationUtil
+SignUpController ..> ValidationUtil
+
+DashboardController ..> DateUtil
+ChickenBayController ..> ChickenBayOptimization
+ChickenBayController ..> NavigationUtil
+PersonnelController ..> IdentityCardGenerator
+FarmDocumentController ..> PDFGenerator
+ReportsController ..> PDFGenerator
+
+CustomersController ..> ValidationUtil
+SuppliersController ..> ValidationUtil
+FinancialTrackingController ..> DateUtil
+
+note bottom of App
+    <b>Alpha v2.0: 16 Controllers</b>
+    (vs 10 in MVP)
+    
+    New Controllers:
+    • CustomersController
+    • SuppliersController
+    • FinancialTrackingController
+    • FarmDocumentController
+    • ReportsController
+    • SettingsController
+end note
+
+@enduml

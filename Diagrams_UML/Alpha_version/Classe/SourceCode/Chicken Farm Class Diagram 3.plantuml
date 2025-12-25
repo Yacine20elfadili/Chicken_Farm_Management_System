@@ -1,0 +1,296 @@
+@startuml Class_Diagram_3_DAOs
+
+title Class Diagram 3: Data Access Layer - All DAOs - Alpha v2.0
+
+skinparam classAttributeIconSize 0
+skinparam class {
+    BackgroundColor<<DAO>> LightBlue
+    BorderColor<<DAO>> DarkBlue
+    BackgroundColor<<Singleton>> Wheat
+    BorderColor<<Singleton>> Brown
+}
+
+' ============================================
+' DATABASE CONNECTION (Singleton)
+' ============================================
+
+class DatabaseConnection <<Singleton>> {
+    - {static} instance: DatabaseConnection
+    - connection: Connection
+    - {static} URL: String = "jdbc:sqlite:chicken_farm.db"
+    - {static} DRIVER: String = "org.sqlite.JDBC"
+    __
+    - DatabaseConnection()
+    + {static} getInstance(): DatabaseConnection
+    + getConnection(): Connection
+    + closeConnection(): void
+    + initializeDatabase(): void
+    + createTablesIfNotExist(): void
+}
+
+' ============================================
+' CORE DAOs
+' ============================================
+
+class UserDAO <<DAO>> {
+    - dbConnection: DatabaseConnection
+    __
+    + createUser(user: User): boolean
+    + getUserById(id: int): User
+    + getUserByEmail(email: String): User
+    + getAllUsers(): List<User>
+    + updateUser(user: User): boolean
+    + deleteUser(id: int): boolean
+    + validate(email: String, password: String): boolean
+    + authenticate(email: String, password: String): User
+    + updateAvatar(userId: int, avatarBase64: String): boolean
+    + changePassword(userId: int, newPassword: String): boolean
+}
+
+class HouseDAO <<DAO>> {
+    - dbConnection: DatabaseConnection
+    __
+    + addHouse(house: House): boolean
+    + getHouseById(id: int): House
+    + getAllHouses(): List<House>
+    + updateHouse(house: House): boolean
+    + deleteHouse(id: int): boolean
+    + getHousesByType(type: HouseType): List<House>
+    + updateChickenCount(houseId: int, count: int): boolean
+    + getHouseCapacityStats(): Map<HouseType, Integer>
+    + getTotalCapacity(): int
+    + getTotalChickens(): int
+}
+
+class ChickenDAO <<DAO>> {
+    - dbConnection: DatabaseConnection
+    __
+    + createChickenBatch(chicken: Chicken): boolean
+    + getChickenById(id: int): Chicken
+    + getAllChickens(): List<Chicken>
+    + updateChickenBatch(chicken: Chicken): boolean
+    + deleteChickenBatch(id: int): boolean
+    + getChickensByHouse(houseId: int): List<Chicken>
+    + transferChickens(chickenId: int, targetHouseId: int): boolean
+    + sellChickens(chickenId: int, quantity: int): boolean
+    + getTotalChickenCount(): int
+    + updateAgeInDays(): void
+}
+
+class MortalityDAO <<DAO>> {
+    - dbConnection: DatabaseConnection
+    __
+    + recordMortality(mortality: Mortality): boolean
+    + getMortalityById(id: int): Mortality
+    + getAllMortalities(): List<Mortality>
+    + updateMortality(mortality: Mortality): boolean
+    + deleteMortality(id: int): boolean
+    + getMortalityByHouse(houseId: int): List<Mortality>
+    + getMortalityByDateRange(start: LocalDate, end: LocalDate): List<Mortality>
+    + getTodayMortalityCount(): int
+    + getMortalityRate(houseId: int): double
+}
+
+class EggProductionDAO <<DAO>> {
+    - dbConnection: DatabaseConnection
+    __
+    + recordProduction(production: EggProduction): boolean
+    + getProductionById(id: int): EggProduction
+    + getAllProductions(): List<EggProduction>
+    + updateProduction(production: EggProduction): boolean
+    + deleteProduction(id: int): boolean
+    + getProductionByHouse(houseId: int): List<EggProduction>
+    + getProductionByDate(date: LocalDate): List<EggProduction>
+    + getTodayTotalProduction(): int
+    + getLast7DaysProduction(): Map<LocalDate, Integer>
+    + getTotalEggsInStorage(): int
+}
+
+' ============================================
+' STORAGE DAOs
+' ============================================
+
+class FeedDAO <<DAO>> {
+    - dbConnection: DatabaseConnection
+    __
+    + addFeed(feed: Feed): boolean
+    + getFeedById(id: int): Feed
+    + getAllFeed(): List<Feed>
+    + updateFeed(feed: Feed): boolean
+    + deleteFeed(id: int): boolean
+    + useFeed(feedId: int, quantityKg: double): boolean
+    + restockFeed(feedId: int, quantityKg: double): boolean
+    + getLowStockFeed(): List<Feed>
+    + getExpiringFeed(daysUntilExpiry: int): List<Feed>
+}
+
+class MedicationDAO <<DAO>> {
+    - dbConnection: DatabaseConnection
+    __
+    + addMedication(medication: Medication): boolean
+    + getMedicationById(id: int): Medication
+    + getAllMedications(): List<Medication>
+    + updateMedication(medication: Medication): boolean
+    + deleteMedication(id: int): boolean
+    + useMedication(medicationId: int, quantity: int): boolean
+    + getLowStockMedications(): List<Medication>
+    + getExpiredMedications(): List<Medication>
+}
+
+class EquipmentCategoryDAO <<DAO>> {
+    - dbConnection: DatabaseConnection
+    __
+    + addCategory(category: EquipmentCategory): boolean
+    + getCategoryById(id: int): EquipmentCategory
+    + getAllCategories(): List<EquipmentCategory>
+    + updateCategory(category: EquipmentCategory): boolean
+    + deleteCategory(id: int): boolean
+    + getCategoryItemCount(categoryId: int): int
+}
+
+class EquipmentItemDAO <<DAO>> {
+    - dbConnection: DatabaseConnection
+    __
+    + addItem(item: EquipmentItem): boolean
+    + getItemById(id: int): EquipmentItem
+    + getAllItems(): List<EquipmentItem>
+    + getItemsByCategory(categoryId: int): List<EquipmentItem>
+    + updateItem(item: EquipmentItem): boolean
+    + deleteItem(id: int): boolean
+    + getItemsNeedingMaintenance(): List<EquipmentItem>
+    + getBrokenItems(): List<EquipmentItem>
+}
+
+' ============================================
+' PERSONNEL & TASK DAOs
+' ============================================
+
+class PersonnelDAO <<DAO>> {
+    - dbConnection: DatabaseConnection
+    __
+    + addPersonnel(personnel: Personnel): boolean
+    + getPersonnelById(id: int): Personnel
+    + getPersonnelByName(name: String): Personnel
+    + getAllPersonnel(): List<Personnel>
+    + getActivePersonnel(): List<Personnel>
+    + updatePersonnel(personnel: Personnel): boolean
+    + deletePersonnel(id: int): boolean
+    + getPersonnelByType(type: PersonnelType): List<Personnel>
+    + getTrackers(): List<Personnel>
+    + getWorkers(): List<Personnel>
+}
+
+class TaskDAO <<DAO>> {
+    - dbConnection: DatabaseConnection
+    __
+    + createTask(task: Task): boolean
+    + getTaskById(id: int): Task
+    + getAllTasks(): List<Task>
+    + updateTask(task: Task): boolean
+    + deleteTask(id: int): boolean
+    + getTasksByStatus(status: String): List<Task>
+    + getTasksByAssignee(assignedTo: String): List<Task>
+    + getOverdueTasks(): List<Task>
+    + markTaskAsDone(taskId: int): boolean
+    + getTasksDueToday(): List<Task>
+}
+
+' ============================================
+' ALPHA v2.0 NEW DAOs
+' ============================================
+
+class CustomerDAO <<DAO>> {
+    - dbConnection: DatabaseConnection
+    __
+    + addCustomer(customer: Customer): boolean
+    + getCustomerById(id: int): Customer
+    + getCustomerByName(name: String): Customer
+    + getAllCustomers(): List<Customer>
+    + getActiveCustomers(): List<Customer>
+    + updateCustomer(customer: Customer): boolean
+    + deleteCustomer(id: int): boolean
+    + searchCustomers(query: String): List<Customer>
+    + updateOutstandingBalance(customerId: int, amount: double): boolean
+}
+
+class SupplierDAO <<DAO>> {
+    - dbConnection: DatabaseConnection
+    __
+    + addSupplier(supplier: Supplier): boolean
+    + getSupplierById(id: int): Supplier
+    + getSupplierByName(name: String): Supplier
+    + getAllSuppliers(): List<Supplier>
+    + getSuppliersByCategory(category: String): List<Supplier>
+    + updateSupplier(supplier: Supplier): boolean
+    + deleteSupplier(id: int): boolean
+}
+
+class FinancialDAO <<DAO>> {
+    - dbConnection: DatabaseConnection
+    __
+    + addTransaction(transaction: FinancialTransaction): boolean
+    + getTransactionById(id: int): FinancialTransaction
+    + getAllTransactions(): List<FinancialTransaction>
+    + getTransactionsByType(type: String): List<FinancialTransaction>
+    + getTransactionsByDateRange(start: LocalDate, end: LocalDate): List<FinancialTransaction>
+    + updateTransaction(transaction: FinancialTransaction): boolean
+    + deleteTransaction(id: int): boolean
+    + getTotalIncome(): double
+    + getTotalExpenses(): double
+    + getBalance(): double
+}
+
+class DocumentDAO <<DAO>> {
+    - dbConnection: DatabaseConnection
+    __
+    + saveDocument(document: FarmDocument): boolean
+    + getDocumentById(id: int): FarmDocument
+    + getAllDocuments(): List<FarmDocument>
+    + getDocumentsByType(type: String): List<FarmDocument>
+    + getDocumentsByEntity(entityType: String, entityId: int): List<FarmDocument>
+    + updateDocument(document: FarmDocument): boolean
+    + deleteDocument(id: int): boolean
+    + getNextReferenceNumber(type: String): String
+}
+
+class ReportDAO <<DAO>> {
+    - dbConnection: DatabaseConnection
+    __
+    + saveReport(report: Report): boolean
+    + getReportById(id: int): Report
+    + getAllReports(): List<Report>
+    + getReportsByType(type: ReportType): List<Report>
+    + deleteReport(id: int): boolean
+}
+
+' ============================================
+' RELATIONSHIPS
+' ============================================
+
+UserDAO --> DatabaseConnection
+HouseDAO --> DatabaseConnection
+ChickenDAO --> DatabaseConnection
+MortalityDAO --> DatabaseConnection
+EggProductionDAO --> DatabaseConnection
+FeedDAO --> DatabaseConnection
+MedicationDAO --> DatabaseConnection
+EquipmentCategoryDAO --> DatabaseConnection
+EquipmentItemDAO --> DatabaseConnection
+PersonnelDAO --> DatabaseConnection
+TaskDAO --> DatabaseConnection
+CustomerDAO --> DatabaseConnection
+SupplierDAO --> DatabaseConnection
+FinancialDAO --> DatabaseConnection
+DocumentDAO --> DatabaseConnection
+ReportDAO --> DatabaseConnection
+
+note bottom of DatabaseConnection
+    <b>SQLite Database</b>
+    Uses JDBC Singleton pattern
+    for connection management.
+    
+    Alpha v2.0: 17 DAOs total
+    (vs 11 in MVP)
+end note
+
+@enduml

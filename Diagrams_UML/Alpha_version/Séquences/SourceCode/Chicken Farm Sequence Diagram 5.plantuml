@@ -1,0 +1,134 @@
+@startuml Sequence_Diagram_5_Add_Feed
+
+title Sequence Diagram 5: Add Feed to Storage - Alpha v2.0
+
+actor "Cashier" as Cashier
+participant "StorageView" as UI
+participant "StorageController" as Controller
+participant "ValidationUtil" as Validator
+participant "FeedDAO" as FeedDAO
+participant "SupplierDAO" as SupplierDAO
+participant "DateUtil" as DateUtil
+participant "DatabaseConnection" as DB
+
+== Add Feed to Inventory ==
+
+Cashier -> UI: Navigate to Storage > Feed tab
+Cashier -> UI: Click "Add Feed" button
+
+UI -> Controller: handleAddFeed()
+activate Controller
+
+' Load suppliers for dropdown (Alpha enhancement)
+Controller -> SupplierDAO: getSuppliersByCategory("Feed")
+activate SupplierDAO
+SupplierDAO -> DB: executeQuery(\n"SELECT * FROM suppliers\nWHERE category IN ('Feed', 'Mixed')\nAND isActive = 1")
+activate DB
+DB --> SupplierDAO: List<Supplier>
+deactivate DB
+SupplierDAO --> Controller: suppliers
+deactivate SupplierDAO
+
+Controller -> UI: Show "Add Feed" dialog\nwith supplier dropdown
+UI -> Cashier: Display feed input form
+
+Cashier -> UI: Enter feed details:\n• Name: Layer Mix Premium\n• Type: Layer\n• Quantity: 500 kg\n• Price/kg: 4.50 MAD\n• Supplier: Fournisseur ABC\n• Expiry Date: 2026-06-25\n• Min Stock Level: 100 kg
+
+Cashier -> UI: Click "Save" button
+
+UI -> Controller: submitAddFeed(feedData)
+
+' Validate inputs
+Controller -> Validator: isEmpty(name)
+activate Validator
+Validator --> Controller: false (valid)
+deactivate Validator
+
+Controller -> Controller: validateQuantity(500)
+Controller -> Controller: validatePrice(4.50)
+
+' Validate expiry date
+Controller -> DateUtil: getCurrentDate()
+activate DateUtil
+DateUtil --> Controller: 2025-12-25
+deactivate DateUtil
+
+Controller -> DateUtil: isPast(expiryDate)
+activate DateUtil
+note right: 2026-06-25 is NOT past
+DateUtil --> Controller: false (valid)
+deactivate DateUtil
+
+alt Validation Failed
+    Controller -> UI: Show validation error
+    UI -> Cashier: Display error message
+    
+else Valid Input
+    ' Create Feed object
+    Controller -> Controller: createFeedObject()
+    note right
+        <b>Feed Object:</b>
+        name = "Layer Mix Premium"
+        type = "Layer"
+        quantityKg = 500.0
+        pricePerKg = 4.50
+        supplier = "Fournisseur ABC"
+        lastRestockDate = 2025-12-25
+        expiryDate = 2026-06-25
+        minStockLevel = 100.0
+    end note
+    
+    ' Save to database
+    Controller -> FeedDAO: addFeed(feed)
+    activate FeedDAO
+    FeedDAO -> DB: getConnection()
+    activate DB
+    DB --> FeedDAO: Connection
+    deactivate DB
+    
+    FeedDAO -> DB: executeUpdate(\n"INSERT INTO feed\n(name, type, quantityKg, pricePerKg,\nsupplier, lastRestockDate, expiryDate,\nminStockLevel)\nVALUES (?, ?, ?, ?, ?, ?, ?, ?)")
+    activate DB
+    DB --> FeedDAO: success
+    deactivate DB
+    FeedDAO --> Controller: true
+    deactivate FeedDAO
+    
+    ' Refresh view
+    Controller -> Controller: loadFeedData()
+    Controller -> FeedDAO: getAllFeed()
+    activate FeedDAO
+    FeedDAO -> DB: executeQuery("SELECT * FROM feed")
+    activate DB
+    DB --> FeedDAO: List<Feed>
+    deactivate DB
+    FeedDAO --> Controller: feed list
+    deactivate FeedDAO
+    
+    ' Check for alerts
+    Controller -> Controller: checkFeedAlerts()
+    note right
+        <b>Feed Alerts Check:</b>
+        • Low Stock (qty < minStock)
+        • Expiring Soon (< 30 days)
+        • Expired
+    end note
+    
+    Controller -> UI: Update feed table
+    UI -> UI: Add new row:\n[Layer Mix Premium | Layer | 500kg | 4.50 MAD]
+    
+    ' Calculate total value
+    Controller -> Controller: calculateTotalValue()
+    note right: 500 × 4.50 = 2,250.00 MAD
+    
+    Controller -> UI: Update summary
+    UI -> UI: Update total value display
+    
+    Controller -> UI: Show success message
+    UI -> Cashier: Display:\n"✅ Feed added successfully!\n• Name: Layer Mix Premium\n• Quantity: 500 kg\n• Total Value: 2,250.00 MAD"
+end
+
+deactivate Controller
+
+
+
+@enduml

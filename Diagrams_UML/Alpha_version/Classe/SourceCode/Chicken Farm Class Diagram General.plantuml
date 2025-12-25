@@ -1,0 +1,843 @@
+@startuml Class_Diagram_General
+
+title Chicken Farm Management System - Complete Class Diagram (Alpha v2.0)
+
+skinparam classAttributeIconSize 0
+skinparam class {
+    BackgroundColor<<Entity>> LightYellow
+    BorderColor<<Entity>> Orange
+    BackgroundColor<<DAO>> LightBlue
+    BorderColor<<DAO>> DarkBlue
+    BackgroundColor<<Singleton>> Wheat
+    BorderColor<<Singleton>> Brown
+    BackgroundColor<<Controller>> LightSalmon
+    BorderColor<<Controller>> Red
+    BackgroundColor<<Utility>> LightGreen
+    BorderColor<<Utility>> DarkGreen
+    BackgroundColor<<App>> Gold
+    BorderColor<<App>> DarkOrange
+    BackgroundColor<<Enum>> LightCyan
+    BorderColor<<Enum>> Teal
+}
+
+' ============================================
+' MODEL LAYER - Core Entities
+' ============================================
+
+package "Model Layer" <<Rectangle>> {
+
+    ' --- Core Livestock ---
+    class House <<Entity>> {
+        - id: int
+        - name: String
+        - type: HouseType
+        - chickenCount: int
+        - capacity: int
+        - healthStatus: HealthStatus
+        - lastCleaningDate: LocalDate
+        - creationDate: LocalDate
+        __
+        + getOccupancyRate(): double
+        + isFull(): boolean
+    }
+
+    class Chicken <<Entity>> {
+        - id: int
+        - houseId: int
+        - batchNumber: String
+        - quantity: int
+        - arrivalDate: LocalDate
+        - ageInDays: int
+        - gender: String
+        - healthStatus: String
+        - averageWeight: double
+        - nextTransferDate: LocalDate
+        __
+        + getDaysUntilTransfer(): int
+        + isReadyForTransfer(): boolean
+    }
+
+    class Mortality <<Entity>> {
+        - id: int
+        - houseId: int
+        - deathDate: LocalDate
+        - count: int
+        - cause: String
+        - symptoms: String
+        - isOutbreak: boolean
+        - recordedBy: String
+        - notes: String
+        __
+        + isConcerningRate(totalChickens: int): boolean
+    }
+
+    class EggProduction <<Entity>> {
+        - id: int
+        - houseId: int
+        - productionDate: LocalDate
+        - eggsCollected: int
+        - crackedEggs: int
+        - goodEggs: int
+        - deadChickens: int
+        - collectedBy: String
+        - notes: String
+        __
+        + calculateGoodEggs(): void
+        + getEfficiencyRate(): double
+    }
+
+    ' --- Enums ---
+    enum HouseType <<Enum>> {
+        DAY_OLD
+        EGG_LAYER
+        MALE_MEAT
+        FEMALE_MEAT
+    }
+
+    enum HealthStatus <<Enum>> {
+        GOOD
+        MODERATE
+        AT_RISK
+        CRITICAL
+    }
+
+    ' --- Authentication ---
+    class User <<Entity>> {
+        - id: int
+        - fullName: String
+        - email: String
+        - password: String
+        - avatarBase64: String
+        - isAdmin: boolean
+        - creationDate: LocalDateTime
+    }
+
+    ' --- Storage/Inventory ---
+    class Feed <<Entity>> {
+        - id: int
+        - name: String
+        - type: String
+        - quantityKg: double
+        - pricePerKg: double
+        - supplier: String
+        - lastRestockDate: LocalDate
+        - expiryDate: LocalDate
+        - minStockLevel: double
+        __
+        + isLowStock(): boolean
+        + isExpiredOrNearExpiry(): boolean
+        + getTotalValue(): double
+    }
+
+    class Medication <<Entity>> {
+        - id: int
+        - name: String
+        - type: String
+        - quantity: int
+        - unit: String
+        - pricePerUnit: double
+        - supplier: String
+        - purchaseDate: LocalDate
+        - expiryDate: LocalDate
+        - minStockLevel: int
+        - usage: String
+        __
+        + isLowStock(): boolean
+        + isExpired(): boolean
+        + getTotalValue(): double
+    }
+
+    class EquipmentCategory <<Entity>> {
+        - id: int
+        - name: String
+        - description: String
+        - iconPath: String
+    }
+
+    class EquipmentItem <<Entity>> {
+        - id: int
+        - categoryId: int
+        - name: String
+        - quantity: int
+        - status: String
+        - purchaseDate: LocalDate
+        - purchasePrice: double
+        - lastMaintenanceDate: LocalDate
+        - nextMaintenanceDate: LocalDate
+        - location: String
+        - notes: String
+        __
+        + needsMaintenance(): boolean
+        + isBroken(): boolean
+        + isOperational(): boolean
+    }
+
+    ' --- Personnel & Tasks ---
+    class Personnel <<Entity>> {
+        - id: int
+        - fullName: String
+        - age: int
+        - phone: String
+        - email: String
+        - type: PersonnelType
+        - hireDate: LocalDate
+        - salary: double
+        - shift: String
+        - isActive: boolean
+        - address: String
+        - photoBase64: String
+        __
+        + getYearsOfService(): int
+    }
+
+    enum PersonnelType <<Enum>> {
+        TRACKER
+        WORKER
+        ADMIN
+        VETERINARIAN
+    }
+
+    class Task <<Entity>> {
+        - id: int
+        - description: String
+        - status: String
+        - dueDate: LocalDate
+        - completedAt: LocalDateTime
+        - assignedTo: String
+        - houseId: int
+        - category: String
+        - priority: String
+        __
+        + isOverdue(): boolean
+        + isCompleted(): boolean
+        + markAsComplete(): void
+    }
+
+    ' --- CRM (NEW in Alpha) ---
+    class Customer <<Entity>> {
+        - id: int
+        - name: String
+        - companyName: String
+        - type: String
+        - legalForm: String
+        - contactPerson: String
+        - email: String
+        - phone: String
+        - address: String
+        - ice: String
+        - paymentTerms: String
+        - outstandingBalance: double
+        - totalPurchases: double
+        - visitCount: int
+        - isActive: boolean
+        __
+        + isCompany(): boolean
+        + isRepeatCustomer(): boolean
+    }
+
+    ' --- SCM (NEW in Alpha) ---
+    class Supplier <<Entity>> {
+        - id: int
+        - name: String
+        - companyName: String
+        - legalForm: String
+        - category: String
+        - contactPerson: String
+        - email: String
+        - phone: String
+        - address: String
+        - ice: String
+        - paymentTerms: String
+        - minOrderAmount: double
+        - avgDeliveryTime: int
+        - isActive: boolean
+    }
+
+    ' --- Financial (NEW in Alpha) ---
+    class FinancialTransaction <<Entity>> {
+        - id: int
+        - transactionDate: LocalDate
+        - type: String
+        - category: String
+        - amount: double
+        - paymentMethod: String
+        - description: String
+        - relatedEntityType: String
+        - relatedEntityId: int
+        - receiptImage: String
+        - createdAt: LocalDateTime
+    }
+
+    ' --- Documents (NEW in Alpha) ---
+    class FarmDocument <<Entity>> {
+        - id: int
+        - type: String
+        - referenceNumber: String
+        - generatedDate: LocalDate
+        - relatedEntityType: String
+        - relatedEntityId: int
+        - totalAmount: double
+        - status: String
+        - pdfContent: String
+        - metadata: String
+    }
+
+    ' --- Reports (NEW in Alpha) ---
+    class Report <<Entity>> {
+        - id: int
+        - title: String
+        - type: ReportType
+        - periodStart: LocalDate
+        - periodEnd: LocalDate
+        - generatedDate: LocalDate
+        - format: ReportFormat
+        - filePath: String
+        - createdBy: Integer
+    }
+
+    enum ReportType <<Enum>> {
+        Financial
+        Production
+        Inventory
+        Consumption
+        Summary
+    }
+
+    enum ReportFormat <<Enum>> {
+        View
+        PDF
+        Excel
+    }
+}
+
+' ============================================
+' DAO LAYER - Data Access Objects
+' ============================================
+
+package "DAO Layer" <<Rectangle>> {
+
+    class DatabaseConnection <<Singleton>> {
+        - {static} instance: DatabaseConnection
+        - connection: Connection
+        - {static} URL: String
+        - {static} DRIVER: String
+        __
+        + {static} getInstance(): DatabaseConnection
+        + getConnection(): Connection
+        + closeConnection(): void
+    }
+
+    class UserDAO <<DAO>> {
+        - dbConnection: DatabaseConnection
+        __
+        + createUser(user: User): boolean
+        + getUserById(id: int): User
+        + getUserByEmail(email: String): User
+        + getAllUsers(): List<User>
+        + updateUser(user: User): boolean
+        + deleteUser(id: int): boolean
+        + authenticate(email: String, password: String): User
+    }
+
+    class HouseDAO <<DAO>> {
+        - dbConnection: DatabaseConnection
+        __
+        + addHouse(house: House): boolean
+        + getHouseById(id: int): House
+        + getAllHouses(): List<House>
+        + updateHouse(house: House): boolean
+        + deleteHouse(id: int): boolean
+        + getHousesByType(type: HouseType): List<House>
+    }
+
+    class ChickenDAO <<DAO>> {
+        - dbConnection: DatabaseConnection
+        __
+        + createChickenBatch(chicken: Chicken): boolean
+        + getChickenById(id: int): Chicken
+        + getAllChickens(): List<Chicken>
+        + updateChickenBatch(chicken: Chicken): boolean
+        + deleteChickenBatch(id: int): boolean
+        + getChickensByHouse(houseId: int): List<Chicken>
+    }
+
+    class MortalityDAO <<DAO>> {
+        - dbConnection: DatabaseConnection
+        __
+        + recordMortality(mortality: Mortality): boolean
+        + getMortalityById(id: int): Mortality
+        + getAllMortalities(): List<Mortality>
+        + getMortalityByHouse(houseId: int): List<Mortality>
+    }
+
+    class EggProductionDAO <<DAO>> {
+        - dbConnection: DatabaseConnection
+        __
+        + recordProduction(production: EggProduction): boolean
+        + getProductionById(id: int): EggProduction
+        + getAllProductions(): List<EggProduction>
+        + getProductionByHouse(houseId: int): List<EggProduction>
+    }
+
+    class FeedDAO <<DAO>> {
+        - dbConnection: DatabaseConnection
+        __
+        + addFeed(feed: Feed): boolean
+        + getFeedById(id: int): Feed
+        + getAllFeed(): List<Feed>
+        + updateFeed(feed: Feed): boolean
+        + deleteFeed(id: int): boolean
+    }
+
+    class MedicationDAO <<DAO>> {
+        - dbConnection: DatabaseConnection
+        __
+        + addMedication(medication: Medication): boolean
+        + getMedicationById(id: int): Medication
+        + getAllMedications(): List<Medication>
+        + updateMedication(medication: Medication): boolean
+        + deleteMedication(id: int): boolean
+    }
+
+    class EquipmentCategoryDAO <<DAO>> {
+        - dbConnection: DatabaseConnection
+        __
+        + addCategory(category: EquipmentCategory): boolean
+        + getAllCategories(): List<EquipmentCategory>
+        + getCategoryById(id: int): EquipmentCategory
+    }
+
+    class EquipmentItemDAO <<DAO>> {
+        - dbConnection: DatabaseConnection
+        __
+        + addItem(item: EquipmentItem): boolean
+        + getItemById(id: int): EquipmentItem
+        + getAllItems(): List<EquipmentItem>
+        + getItemsByCategory(categoryId: int): List<EquipmentItem>
+        + updateItem(item: EquipmentItem): boolean
+        + deleteItem(id: int): boolean
+    }
+
+    class TaskDAO <<DAO>> {
+        - dbConnection: DatabaseConnection
+        __
+        + createTask(task: Task): boolean
+        + getTaskById(id: int): Task
+        + getAllTasks(): List<Task>
+        + updateTask(task: Task): boolean
+        + deleteTask(id: int): boolean
+        + getOverdueTasks(): List<Task>
+        + markTaskAsDone(taskId: int): boolean
+    }
+
+    class PersonnelDAO <<DAO>> {
+        - dbConnection: DatabaseConnection
+        __
+        + addPersonnel(personnel: Personnel): boolean
+        + getPersonnelById(id: int): Personnel
+        + getAllPersonnel(): List<Personnel>
+        + updatePersonnel(personnel: Personnel): boolean
+        + deletePersonnel(id: int): boolean
+        + getActivePersonnel(): List<Personnel>
+    }
+
+    ' --- NEW DAOs for Alpha ---
+    class CustomerDAO <<DAO>> {
+        - dbConnection: DatabaseConnection
+        __
+        + addCustomer(customer: Customer): boolean
+        + getCustomerById(id: int): Customer
+        + getAllCustomers(): List<Customer>
+        + updateCustomer(customer: Customer): boolean
+        + deleteCustomer(id: int): boolean
+        + getActiveCustomers(): List<Customer>
+    }
+
+    class SupplierDAO <<DAO>> {
+        - dbConnection: DatabaseConnection
+        __
+        + addSupplier(supplier: Supplier): boolean
+        + getSupplierById(id: int): Supplier
+        + getAllSuppliers(): List<Supplier>
+        + updateSupplier(supplier: Supplier): boolean
+        + deleteSupplier(id: int): boolean
+    }
+
+    class FinancialDAO <<DAO>> {
+        - dbConnection: DatabaseConnection
+        __
+        + addTransaction(transaction: FinancialTransaction): boolean
+        + getTransactionById(id: int): FinancialTransaction
+        + getAllTransactions(): List<FinancialTransaction>
+        + getTransactionsByType(type: String): List<FinancialTransaction>
+        + getTransactionsByDateRange(start: LocalDate, end: LocalDate): List<FinancialTransaction>
+    }
+
+    class DocumentDAO <<DAO>> {
+        - dbConnection: DatabaseConnection
+        __
+        + saveDocument(document: FarmDocument): boolean
+        + getDocumentById(id: int): FarmDocument
+        + getAllDocuments(): List<FarmDocument>
+        + getDocumentsByType(type: String): List<FarmDocument>
+    }
+
+    class ReportDAO <<DAO>> {
+        - dbConnection: DatabaseConnection
+        __
+        + saveReport(report: Report): boolean
+        + getReportById(id: int): Report
+        + getAllReports(): List<Report>
+        + getReportsByType(type: ReportType): List<Report>
+    }
+}
+
+' ============================================
+' APPLICATION LAYER - Controllers
+' ============================================
+
+package "Controller Layer" <<Rectangle>> {
+
+    class App <<App>> {
+        + start(stage: Stage): void
+        + {static} main(args: String[]): void
+    }
+
+    class LoginController <<Controller>> {
+        - userDAO: UserDAO
+        __
+        + initialize(): void
+        + handleLogin(event: ActionEvent): void
+    }
+
+    class SignUpController <<Controller>> {
+        - userDAO: UserDAO
+        __
+        + initialize(): void
+        + handleSignUp(event: ActionEvent): void
+    }
+
+    class MainWindowController <<Controller>> {
+        + initialize(): void
+        + loadView(viewName: String): void
+        + handleLogout(): void
+    }
+
+    class SidebarController <<Controller>> {
+        - mainWindowController: MainWindowController
+        __
+        + initialize(): void
+        + handleDashboardClick(): void
+        + handleChickenBayClick(): void
+        + handleEggsBayClick(): void
+        + handleStorageClick(): void
+        + handleTasksClick(): void
+        + handlePersonnelClick(): void
+        + handleCustomersClick(): void
+        + handleSuppliersClick(): void
+        + handleFinancialClick(): void
+        + handleReportsClick(): void
+        + handleDocumentsClick(): void
+        + handleSettingsClick(): void
+    }
+
+    class DashboardController <<Controller>> {
+        - chickenDAO: ChickenDAO
+        - eggProductionDAO: EggProductionDAO
+        - mortalityDAO: MortalityDAO
+        __
+        + initialize(): void
+        + loadDashboardData(): void
+        + refreshDashboard(): void
+    }
+
+    class ChickenBayController <<Controller>> {
+        - houseDAO: HouseDAO
+        - chickenDAO: ChickenDAO
+        - mortalityDAO: MortalityDAO
+        __
+        + initialize(): void
+        + loadHouseCards(): void
+        + handleAddChickens(): void
+        + handleRecordMortality(): void
+        + handleOptimization(): void
+        + refreshView(): void
+    }
+
+    class EggsBayController <<Controller>> {
+        - eggProductionDAO: EggProductionDAO
+        - houseDAO: HouseDAO
+        __
+        + initialize(): void
+        + loadProductionCards(): void
+        + handleRecordCollection(): void
+        + refreshView(): void
+    }
+
+    class StorageController <<Controller>> {
+        - feedDAO: FeedDAO
+        - medicationDAO: MedicationDAO
+        - equipmentCategoryDAO: EquipmentCategoryDAO
+        - equipmentItemDAO: EquipmentItemDAO
+        __
+        + initialize(): void
+        + loadFeedData(): void
+        + loadMedicationData(): void
+        + loadEquipmentData(): void
+        + refreshView(): void
+    }
+
+    class TasksController <<Controller>> {
+        - taskDAO: TaskDAO
+        - personnelDAO: PersonnelDAO
+        __
+        + initialize(): void
+        + loadTasks(): void
+        + handleCreateTask(): void
+        + handleMarkAsDone(): void
+        + refreshView(): void
+    }
+
+    class PersonnelController <<Controller>> {
+        - personnelDAO: PersonnelDAO
+        __
+        + initialize(): void
+        + loadPersonnelData(): void
+        + handleAddPersonnel(): void
+        + handleGenerateIdCard(): void
+        + refreshView(): void
+    }
+
+    ' --- NEW Controllers for Alpha ---
+    class CustomersController <<Controller>> {
+        - customerDAO: CustomerDAO
+        __
+        + initialize(): void
+        + loadCustomers(): void
+        + handleAddCustomer(): void
+        + handleEditCustomer(): void
+        + handleDeleteCustomer(): void
+        + refreshView(): void
+    }
+
+    class SuppliersController <<Controller>> {
+        - supplierDAO: SupplierDAO
+        __
+        + initialize(): void
+        + loadSuppliers(): void
+        + handleAddSupplier(): void
+        + handleEditSupplier(): void
+        + handleDeleteSupplier(): void
+        + refreshView(): void
+    }
+
+    class FinancialTrackingController <<Controller>> {
+        - financialDAO: FinancialDAO
+        __
+        + initialize(): void
+        + loadTransactions(): void
+        + handleAddIncome(): void
+        + handleAddExpense(): void
+        + calculateBalance(): double
+        + refreshView(): void
+    }
+
+    class FarmDocumentController <<Controller>> {
+        - documentDAO: DocumentDAO
+        - customerDAO: CustomerDAO
+        - supplierDAO: SupplierDAO
+        __
+        + initialize(): void
+        + loadDocuments(): void
+        + handleGenerateInvoice(): void
+        + handleGenerateBonCommande(): void
+        + handleExportPDF(): void
+        + refreshView(): void
+    }
+
+    class ReportsController <<Controller>> {
+        - reportDAO: ReportDAO
+        __
+        + initialize(): void
+        + loadReports(): void
+        + handleGenerateReport(): void
+        + handleExportReport(): void
+        + refreshView(): void
+    }
+
+    class SettingsController <<Controller>> {
+        - userDAO: UserDAO
+        __
+        + initialize(): void
+        + handleUpdateProfile(): void
+        + handleChangePassword(): void
+    }
+}
+
+' ============================================
+' UTILITY LAYER
+' ============================================
+
+package "Utility Layer" <<Rectangle>> {
+
+    class ValidationUtil <<Utility>> {
+        - {static} EMAIL_REGEX: String
+        - {static} EMAIL_PATTERN: Pattern
+        __
+        + {static} isValidEmail(email: String): boolean
+        + {static} isEmpty(str: String): boolean
+        + {static} isValidPassword(password: String): boolean
+        + {static} sanitize(input: String): String
+        + {static} isValidPhone(phone: String): boolean
+        + {static} isValidICE(ice: String): boolean
+    }
+
+    class DateUtil <<Utility>> {
+        - {static} DATE_FORMATTER: DateTimeFormatter
+        - {static} DATETIME_FORMATTER: DateTimeFormatter
+        __
+        + {static} formatDate(date: LocalDate): String
+        + {static} formatDateTime(dateTime: LocalDateTime): String
+        + {static} parseDate(dateString: String): LocalDate
+        + {static} getCurrentDate(): LocalDate
+        + {static} daysBetween(start: LocalDate, end: LocalDate): long
+        + {static} isToday(date: LocalDate): boolean
+        + {static} isPast(date: LocalDate): boolean
+        + {static} getLast7Days(): LocalDate[]
+    }
+
+    class NavigationUtil <<Utility>> {
+        + {static} navigateTo(event: ActionEvent, fxmlPath: String, title: String): void
+        + {static} loadFXML(fxmlPath: String): Parent
+        + {static} openDialog(fxmlPath: String, title: String, owner: Stage): void
+        + {static} closeWindow(event: ActionEvent): void
+        + {static} showAlert(title: String, header: String, content: String): void
+        + {static} showError(title: String, header: String, content: String): void
+        + {static} showConfirmation(title: String, header: String, content: String): boolean
+    }
+
+    class PDFGenerator <<Utility>> {
+        __
+        + {static} generateInvoicePDF(document: FarmDocument): byte[]
+        + {static} generateBonCommandePDF(document: FarmDocument): byte[]
+        + {static} generateReportPDF(report: Report): byte[]
+        + {static} savePDFToFile(content: byte[], path: String): void
+    }
+
+    class IdentityCardGenerator <<Utility>> {
+        __
+        + {static} generateIdCard(personnel: Personnel): BufferedImage
+        + {static} generateQRCode(data: String): BufferedImage
+        + {static} saveIdCardToFile(image: BufferedImage, path: String): void
+    }
+
+    class ChickenBayOptimization <<Utility>> {
+        __
+        + calculateX(houses: List<House>): int
+        + validateConstraints(E: int, F: int, D: int, M: int): boolean
+        + optimizeHillClimbing(houses: List<House>): void
+    }
+}
+
+' ============================================
+' RELATIONSHIPS - Model Layer
+' ============================================
+
+House "1" -- "0..*" Chicken : contains >
+House "1" -- "0..*" EggProduction : produces >
+House "1" -- "0..*" Mortality : records >
+House --> HouseType : type
+House --> HealthStatus : status
+Task "0..*" -- "0..1" Personnel : assigned to >
+Personnel --> PersonnelType : type
+EquipmentItem "0..*" -- "1" EquipmentCategory : belongs to >
+Report --> ReportType : type
+Report --> ReportFormat : format
+
+' ============================================
+' RELATIONSHIPS - DAO Layer
+' ============================================
+
+UserDAO --> DatabaseConnection
+HouseDAO --> DatabaseConnection
+ChickenDAO --> DatabaseConnection
+MortalityDAO --> DatabaseConnection
+EggProductionDAO --> DatabaseConnection
+FeedDAO --> DatabaseConnection
+MedicationDAO --> DatabaseConnection
+EquipmentCategoryDAO --> DatabaseConnection
+EquipmentItemDAO --> DatabaseConnection
+TaskDAO --> DatabaseConnection
+PersonnelDAO --> DatabaseConnection
+CustomerDAO --> DatabaseConnection
+SupplierDAO --> DatabaseConnection
+FinancialDAO --> DatabaseConnection
+DocumentDAO --> DatabaseConnection
+ReportDAO --> DatabaseConnection
+
+' ============================================
+' RELATIONSHIPS - Controller to DAO
+' ============================================
+
+App ..> LoginController
+
+LoginController --> UserDAO
+SignUpController --> UserDAO
+DashboardController --> ChickenDAO
+DashboardController --> EggProductionDAO
+DashboardController --> MortalityDAO
+ChickenBayController --> HouseDAO
+ChickenBayController --> ChickenDAO
+ChickenBayController --> MortalityDAO
+EggsBayController --> EggProductionDAO
+EggsBayController --> HouseDAO
+StorageController --> FeedDAO
+StorageController --> MedicationDAO
+StorageController --> EquipmentCategoryDAO
+StorageController --> EquipmentItemDAO
+TasksController --> TaskDAO
+TasksController --> PersonnelDAO
+PersonnelController --> PersonnelDAO
+CustomersController --> CustomerDAO
+SuppliersController --> SupplierDAO
+FinancialTrackingController --> FinancialDAO
+FarmDocumentController --> DocumentDAO
+FarmDocumentController --> CustomerDAO
+FarmDocumentController --> SupplierDAO
+ReportsController --> ReportDAO
+SettingsController --> UserDAO
+
+MainWindowController ..> SidebarController
+SidebarController --> MainWindowController
+
+' ============================================
+' RELATIONSHIPS - Controller to Utility
+' ============================================
+
+LoginController ..> ValidationUtil
+LoginController ..> NavigationUtil
+SignUpController ..> ValidationUtil
+DashboardController ..> DateUtil
+ChickenBayController ..> DateUtil
+ChickenBayController ..> NavigationUtil
+ChickenBayController ..> ChickenBayOptimization
+EggsBayController ..> DateUtil
+EggsBayController ..> NavigationUtil
+StorageController ..> NavigationUtil
+TasksController ..> DateUtil
+TasksController ..> NavigationUtil
+PersonnelController ..> NavigationUtil
+PersonnelController ..> IdentityCardGenerator
+CustomersController ..> ValidationUtil
+CustomersController ..> NavigationUtil
+SuppliersController ..> ValidationUtil
+SuppliersController ..> NavigationUtil
+FinancialTrackingController ..> DateUtil
+FinancialTrackingController ..> NavigationUtil
+FarmDocumentController ..> PDFGenerator
+FarmDocumentController ..> NavigationUtil
+ReportsController ..> PDFGenerator
+ReportsController ..> DateUtil
+MainWindowController ..> NavigationUtil
+
+@enduml
