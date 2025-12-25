@@ -137,15 +137,15 @@ We follow a modern, robust architecture to ensure reliability:
 Complete architecture including CRM, SCM, Financial Tracking, Documents, Reports, and MILP Optimization.
 
 #### 📊 Class Diagram
-![Alpha Class Diagram](Diagrams_UML/Alpha_version/Classe/images/Class_Diagram_General.png)
+![Alpha Class Diagram](Diagrams_UML/Alpha_version/Classe/Images/Class_Diagram_General.png)
 
 #### 📋 Use Case Diagram
-![Alpha Use Case Diagram](Diagrams_UML/Alpha_version/UseCase/images/UC_Diagram_General.png)
+![Alpha Use Case Diagram](Diagrams_UML/Alpha_version/UseCase/Images/UC_Diagram_General.png)
 
 #### 🔄 Sequence Diagrams
 10 sequence diagrams covering: Login, Dashboard, Add Batch, Egg Collection, Add Feed, Create Task, Add Personnel, Add Customer (CRM), Generate Invoice (PDF), House Optimization (MILP).
 
-📂 **Path:** `Diagrams_UML/Alpha_version/Séquences/images/`
+📂 **Path:** `Diagrams_UML/Alpha_version/Séquences/Images/`
 
 ---
 
