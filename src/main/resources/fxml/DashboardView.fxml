@@ -108,7 +108,7 @@
                                                         <Region HBox.hgrow="ALWAYS" />
                                                         <ImageView fitHeight="60.0" fitWidth="60.0" pickOnBounds="true" preserveRatio="true" styleClass="card-icon">
                                                             <image>
-                                                                <Image url="@../images/icons/trackers.png" />
+                                                                <Image url="@../images/icons/dollar.png" />
                                                             </image>
                                                         </ImageView>
                                                     </children>
