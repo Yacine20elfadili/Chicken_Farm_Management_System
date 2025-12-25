@@ -134,7 +134,7 @@
                                         </Label>
                                         <ImageView fitHeight="24.0" fitWidth="24.0" layoutX="12.0" layoutY="7.0" pickOnBounds="true" preserveRatio="true" translateY="-3.0">
                                             <image>
-                                                <Image url="@../images/icons/clients.png" />
+                                                <Image url="@../images/icons/client.png" />
                                             </image>
                                         </ImageView>
                                     </children>
