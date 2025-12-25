@@ -123,16 +123,46 @@ We follow a modern, robust architecture to ensure reliability:
 
 ---
 
-## 🎨 UML Diagrams (Alpha Architecture)
+## 🎨 UML Diagrams
 
-### 📥 Download Diagrams
-[Download ZIP file here (Mega link)](https://mega.nz/file/5i0xQSaD#5nWTCpLmXBYek9CQGhTECigcV6bra0bZX3PW9EZYgUw)
+**Location:** `Diagrams_UML/`
 
-### 📊 Class Diagram
-![General Class Diagram](Diagram_Uml_MVP/Classe/Images/Class_Diagram_General.png)
-*(Note: Diagrams reflect core architecture; expanded Alpha models are implemented in code)*
+### 📥 Download All Diagrams
+[Download ZIP file here (Mega link)](https://mega.nz/file/J3MRWDjD#5JkfUPJrHXu_MnDXxbx8sFcwtL4D76Rcml9F7zDLfUY)
 
 ---
+
+### 🆕 Alpha v2.0 Diagrams
+
+Complete architecture including CRM, SCM, Financial Tracking, Documents, Reports, and MILP Optimization.
+
+#### 📊 Class Diagram
+![Alpha Class Diagram](Diagrams_UML/Alpha_version/Classe/images/Class_Diagram_General.png)
+
+#### 📋 Use Case Diagram
+![Alpha Use Case Diagram](Diagrams_UML/Alpha_version/UseCase/images/UC_Diagram_General.png)
+
+#### 🔄 Sequence Diagrams
+10 sequence diagrams covering: Login, Dashboard, Add Batch, Egg Collection, Add Feed, Create Task, Add Personnel, Add Customer (CRM), Generate Invoice (PDF), House Optimization (MILP).
+
+📂 **Path:** `Diagrams_UML/Alpha_version/Séquences/images/`
+
+---
+
+### 📦 MVP Diagrams
+
+Original minimal viable product design with core entities.
+
+#### � Class Diagram
+![MVP Class Diagram](Diagrams_UML/MVP_version/Classe/Images/Class_Diagram_General.png)
+
+#### � Use Case Diagram
+![MVP Use Case Diagram](Diagrams_UML/MVP_version/UseCase/Images/UC_Diagram_General.png)
+
+#### 🔄 Sequence Diagrams
+7 sequence diagrams covering core operations.
+
+📂 **Path:** `Diagrams_UML/MVP_version/Séquences/Images/`
 
 ## � Project Folder Structure
 
@@ -312,7 +342,7 @@ Chicken_Farm_Management_System/
 │       ├── UserDAOTest.java
 │       └── ValidationUtilTest.java
 │
-├── Diagram_Uml_MVP/
+├── Diagrams_UML/               # Contains Alpha_version & MVP_version diagrams
 ├── pom.xml
 └── README.md
 ```

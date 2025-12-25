@@ -1,0 +1,135 @@
+@startuml Sequence_Diagram_6_Create_Task
+
+title Sequence Diagram 6: Create and Assign Task - Alpha v2.0
+
+actor "Cashier" as Cashier
+participant "TasksView" as UI
+participant "TasksController" as Controller
+participant "ValidationUtil" as Validator
+participant "PersonnelDAO" as PersonnelDAO
+participant "TaskDAO" as TaskDAO
+participant "DateUtil" as DateUtil
+participant "DatabaseConnection" as DB
+
+== Create New Task ==
+
+Cashier -> UI: Navigate to Tasks module
+Cashier -> UI: Click "Create Task" button
+
+UI -> Controller: handleCreateTask()
+activate Controller
+
+' Load active personnel for assignment
+Controller -> PersonnelDAO: getActivePersonnel()
+activate PersonnelDAO
+PersonnelDAO -> DB: executeQuery(\n"SELECT * FROM personnel\nWHERE isActive = 1\nORDER BY fullName")
+activate DB
+DB --> PersonnelDAO: List<Personnel>
+deactivate DB
+PersonnelDAO --> Controller: personnel list
+deactivate PersonnelDAO
+
+Controller -> UI: Show "Create Task" dialog\nwith personnel dropdown
+UI -> Cashier: Display task creation form
+
+Cashier -> UI: Enter task details:\n• Description: Clean House H3\n• Category: Cleaning\n• Priority: High\n• Due Date: 2025-12-26\n• Assign To: Ahmed Ben Ali\n• House: H3 (optional)\n• Notes: "Deep cleaning required"
+
+Cashier -> UI: Click "Create" button
+
+UI -> Controller: submitCreateTask(taskData)
+
+' Validate inputs
+Controller -> Validator: isEmpty(description)
+activate Validator
+Validator --> Controller: false (valid)
+deactivate Validator
+
+Controller -> Validator: isEmpty(assignedTo)
+activate Validator
+Validator --> Controller: false (valid)
+deactivate Validator
+
+' Validate due date
+Controller -> DateUtil: getCurrentDate()
+activate DateUtil
+DateUtil --> Controller: 2025-12-25
+deactivate DateUtil
+
+Controller -> DateUtil: isPast(dueDate)
+activate DateUtil
+note right: 2025-12-26 is tomorrow\nnot past → valid
+DateUtil --> Controller: false (valid)
+deactivate DateUtil
+
+alt Validation Failed
+    Controller -> UI: Show validation error
+    UI -> Cashier: Display error
+    
+else Valid Input
+    ' Determine initial status
+    Controller -> Controller: determineStatus()
+    note right
+        <b>Status Logic:</b>
+        If dueDate < today → "Missed"
+        If dueDate = today → "Pending" (urgent)
+        If dueDate > today → "Pending"
+        
+        Result: "Pending"
+    end note
+    
+    ' Create Task object
+    Controller -> Controller: createTaskObject()
+    note right
+        <b>Task Object:</b>
+        description = "Clean House H3"
+        status = "Pending"
+        dueDate = 2025-12-26
+        assignedTo = "Ahmed Ben Ali"
+        houseId = 3 (H3)
+        category = "Cleaning"
+        priority = "High"
+        createdAt = 2025-12-25 12:30:00
+    end note
+    
+    ' Save to database
+    Controller -> TaskDAO: createTask(task)
+    activate TaskDAO
+    TaskDAO -> DB: getConnection()
+    activate DB
+    DB --> TaskDAO: Connection
+    deactivate DB
+    
+    TaskDAO -> DB: executeUpdate(\n"INSERT INTO tasks\n(description, status, dueDate,\nassignedTo, houseId, category,\npriority, createdAt)\nVALUES (?, ?, ?, ?, ?, ?, ?, ?)")
+    activate DB
+    DB --> TaskDAO: success
+    deactivate DB
+    TaskDAO --> Controller: true
+    deactivate TaskDAO
+    
+    ' Refresh task list
+    Controller -> Controller: loadTasks()
+    Controller -> TaskDAO: getAllTasks()
+    activate TaskDAO
+    TaskDAO -> DB: executeQuery(\n"SELECT * FROM tasks\nORDER BY dueDate ASC")
+    activate DB
+    DB --> TaskDAO: List<Task>
+    deactivate DB
+    TaskDAO --> Controller: task list
+    deactivate TaskDAO
+    
+    Controller -> UI: Update tasks table
+    UI -> UI: Add new row with color coding:\n🔴 [Clean House H3 | Ahmed | 26/12 | Pending]
+    
+    ' Update statistics
+    Controller -> Controller: updateStats()
+    Controller -> UI: Update pending count
+    
+    Controller -> UI: Show success message
+    UI -> Cashier: Display:\n"✅ Task created successfully!\n• Task: Clean House H3\n• Assigned To: Ahmed Ben Ali\n• Due: 26/12/2025\n• Priority: High 🔴"
+end
+
+deactivate Controller
+
+
+
+@enduml

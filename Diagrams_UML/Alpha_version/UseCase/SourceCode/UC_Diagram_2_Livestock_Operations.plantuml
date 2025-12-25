@@ -1,0 +1,129 @@
+@startuml UC_Diagram_2_Livestock_Operations
+
+title Use Case Diagram 2: Livestock Operations - Alpha v2.0
+
+left to right direction
+
+actor "Cashier" as Cashier <<Primary Actor>>
+
+' ============================================
+' HOUSE MANAGEMENT
+' ============================================
+rectangle "House Management" {
+  usecase "Manage Houses" as UC_H
+  usecase "View House List" as UC_H1
+  usecase "Add House" as UC_H2
+  usecase "Update House" as UC_H3
+  usecase "Delete House" as UC_H4
+  usecase "Configure House\nAllocation" as UC_H5
+  usecase "Run MILP\nOptimization" as UC_H6
+  usecase "View Capacity\nStats" as UC_H7
+  
+  note right of UC_H6
+    <b>Alpha Enhancement:</b>
+    Linear Programming algorithm
+    optimizes house allocation
+    for maximum import capacity.
+    
+    Applies:
+    • Hill Climbing
+    • Constraint validation
+    • Throughput calculation
+  end note
+}
+
+' ============================================
+' CHICKEN BATCH MANAGEMENT
+' ============================================
+rectangle "Chicken Batch Management" {
+  usecase "Manage Chicken\nBatches" as UC_C
+  usecase "View Batches" as UC_C1
+  usecase "Add Batch" as UC_C2
+  usecase "Update Batch" as UC_C3
+  usecase "Delete Batch" as UC_C4
+  usecase "Transfer Chickens" as UC_C5
+  usecase "Sell Chickens" as UC_C6
+  usecase "View Transfer\nSchedule" as UC_C7
+}
+
+' ============================================
+' MORTALITY MANAGEMENT
+' ============================================
+rectangle "Mortality Management" {
+  usecase "Manage Mortality" as UC_M
+  usecase "View Mortality\nRecords" as UC_M1
+  usecase "Record Mortality" as UC_M2
+  usecase "Update Mortality" as UC_M3
+  usecase "Delete Mortality" as UC_M4
+  usecase "View Mortality\nStats" as UC_M5
+  usecase "Outbreak Alert" as UC_M6
+}
+
+' ============================================
+' EGG PRODUCTION
+' ============================================
+rectangle "Egg Production" {
+  usecase "Manage Egg\nProduction" as UC_E
+  usecase "View Egg Inventory" as UC_E1
+  usecase "Record Egg\nCollection" as UC_E2
+  usecase "Update Production" as UC_E3
+  usecase "Delete Production" as UC_E4
+  usecase "Remove Eggs\n(Sales)" as UC_E5
+  usecase "Record Cracked\nEggs" as UC_E6
+  usecase "View 7-Day\nChart" as UC_E7
+}
+
+' ============================================
+' ACTOR RELATIONSHIPS
+' ============================================
+Cashier --> UC_H
+Cashier --> UC_C
+Cashier --> UC_M
+Cashier --> UC_E
+
+' ============================================
+' HOUSE RELATIONSHIPS
+' ============================================
+UC_H ..> UC_H1 : <<include>>
+UC_H <.. UC_H2 : <<extend>>
+UC_H <.. UC_H3 : <<extend>>
+UC_H <.. UC_H4 : <<extend>>
+UC_H <.. UC_H5 : <<extend>>
+UC_H5 ..> UC_H6 : <<include>>
+UC_H1 ..> UC_H7 : <<include>>
+
+' ============================================
+' CHICKEN RELATIONSHIPS
+' ============================================
+UC_C ..> UC_C1 : <<include>>
+UC_C <.. UC_C2 : <<extend>>
+UC_C <.. UC_C3 : <<extend>>
+UC_C <.. UC_C4 : <<extend>>
+UC_C <.. UC_C5 : <<extend>>
+UC_C <.. UC_C6 : <<extend>>
+UC_C1 ..> UC_C7 : <<include>>
+UC_C2 ..> UC_H1 : <<uses>>
+UC_C5 ..> UC_H1 : <<uses>>
+
+' ============================================
+' MORTALITY RELATIONSHIPS
+' ============================================
+UC_M ..> UC_M1 : <<include>>
+UC_M ..> UC_M5 : <<include>>
+UC_M <.. UC_M2 : <<extend>>
+UC_M <.. UC_M3 : <<extend>>
+UC_M <.. UC_M4 : <<extend>>
+UC_M5 ..> UC_M6 : <<include>>
+
+' ============================================
+' EGG RELATIONSHIPS
+' ============================================
+UC_E ..> UC_E1 : <<include>>
+UC_E <.. UC_E2 : <<extend>>
+UC_E <.. UC_E3 : <<extend>>
+UC_E <.. UC_E4 : <<extend>>
+UC_E <.. UC_E5 : <<extend>>
+UC_E2 ..> UC_E6 : <<include>>
+UC_E1 ..> UC_E7 : <<include>>
+
+@enduml

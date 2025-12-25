@@ -1,0 +1,134 @@
+@startuml Sequence_Diagram_3_Add_Chicken_Batch
+
+title Sequence Diagram 3: Add Chicken Batch - Alpha v2.0
+
+actor "Cashier" as Cashier
+participant "ChickenBayView" as UI
+participant "ChickenBayController" as Controller
+participant "ValidationUtil" as Validator
+participant "HouseDAO" as HouseDAO
+participant "ChickenDAO" as ChickenDAO
+participant "DateUtil" as DateUtil
+participant "DatabaseConnection" as DB
+
+== Add Chicken Batch ==
+
+Cashier -> UI: Click "Add Batch" on house card
+
+UI -> Controller: handleAddChickens(houseId)
+activate Controller
+
+' Load house info
+Controller -> HouseDAO: getHouseById(houseId)
+activate HouseDAO
+HouseDAO -> DB: executeQuery(\n"SELECT * FROM houses WHERE id = ?")
+activate DB
+DB --> HouseDAO: House(id=1, name="H1",\ntype=EGG_LAYER, capacity=15000, count=0)
+deactivate DB
+HouseDAO --> Controller: house
+deactivate HouseDAO
+
+Controller -> UI: Show "Add Batch" dialog\nwith house info (H1, capacity: 15,000)
+UI -> Cashier: Display batch input form
+
+Cashier -> UI: Enter batch details:\n• Quantity: 5,000\n• Gender: Female\n• Health Status: Healthy\n• Average Weight: 40g
+
+Cashier -> UI: Click "Add" button
+
+UI -> Controller: submitAddBatch(batchData)
+
+' Validate inputs
+Controller -> Validator: isEmpty(quantity)
+activate Validator
+Validator --> Controller: false (valid)
+deactivate Validator
+
+Controller -> Controller: validateQuantity()
+note right
+    <b>Validation:</b>
+    Available: 15,000 - 0 = 15,000
+    Requested: 5,000
+    5,000 ≤ 15,000 ✓
+end note
+
+alt Quantity Exceeds Capacity
+    Controller -> UI: Show error\n"Quantity exceeds capacity"
+    UI -> Cashier: Display error message
+    
+else Valid Quantity
+    ' Calculate dates
+    Controller -> DateUtil: getCurrentDate()
+    activate DateUtil
+    DateUtil --> Controller: 2025-12-25
+    deactivate DateUtil
+    
+    Controller -> Controller: calculateTransferDate(houseType)
+    note right
+        <b>Alpha Enhancement:</b>
+        Transfer date calculated based
+        on HouseType duration:
+        
+        EGG_LAYER: 64 weeks
+        Transfer: 2025-12-25 + 64 weeks
+                = 2027-03-25
+    end note
+    
+    ' Generate batch number
+    Controller -> Controller: generateBatchNumber()
+    note right: Format: BATCH-YYYY-NNNNN\nResult: BATCH-2025-00023
+    
+    ' Create Chicken object
+    Controller -> Controller: createChickenObject()
+    note right
+        <b>Chicken Object:</b>
+        houseId = 1
+        batchNumber = "BATCH-2025-00023"
+        quantity = 5000
+        arrivalDate = 2025-12-25
+        ageInDays = 1
+        gender = "Female"
+        healthStatus = "Healthy"
+        averageWeight = 40.0
+        nextTransferDate = 2027-03-25
+    end note
+    
+    ' Save batch
+    Controller -> ChickenDAO: createChickenBatch(chicken)
+    activate ChickenDAO
+    ChickenDAO -> DB: getConnection()
+    activate DB
+    DB --> ChickenDAO: Connection
+    deactivate DB
+    
+    ChickenDAO -> DB: executeUpdate(\n"INSERT INTO chickens\n(houseId, batchNumber, quantity,\narrivalDate, ageInDays, gender,\nhealthStatus, averageWeight, nextTransferDate)\nVALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)")
+    activate DB
+    DB --> ChickenDAO: success
+    deactivate DB
+    ChickenDAO --> Controller: true
+    deactivate ChickenDAO
+    
+    ' Update house count
+    Controller -> HouseDAO: updateChickenCount(houseId, newCount)
+    activate HouseDAO
+    HouseDAO -> DB: executeUpdate(\n"UPDATE houses SET chickenCount = ?\nWHERE id = ?")
+    activate DB
+    DB --> HouseDAO: success
+    deactivate DB
+    HouseDAO --> Controller: true
+    deactivate HouseDAO
+    
+    ' Refresh view
+    Controller -> Controller: refreshView()
+    Controller -> UI: Update house card
+    UI -> UI: Update count: 0 → 5,000
+    UI -> UI: Update health status
+    
+    Controller -> UI: Show success message
+    UI -> Cashier: Display:\n"✅ Batch added successfully!\n• Batch: BATCH-2025-00023\n• Quantity: 5,000\n• House: H1\n• Transfer Date: 25/03/2027"
+end
+
+deactivate Controller
+
+
+
+@enduml

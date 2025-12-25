@@ -1,0 +1,129 @@
+@startuml UC_Diagram_1_System_Overview
+
+title Use Case Diagram 1: System Overview - Alpha v2.0
+
+left to right direction
+
+' ============================================
+' ACTORS
+' ============================================
+actor "Cashier" as Cashier <<Primary Actor>>
+actor "Worker" as Worker <<Secondary Actor>>
+actor "Administration" as Admin <<Secondary Actor>>
+
+' ============================================
+' MAIN MODULES (HIGH-LEVEL VIEW)
+' ============================================
+rectangle "Chicken Farm Management System - Alpha v2.0" {
+  
+  ' Core Authentication
+  usecase "Authentication" as UC_Auth
+  
+  ' Dashboard
+  usecase "Dashboard" as UC_Dash
+  
+  ' Livestock Management
+  package "Livestock Management" {
+    usecase "House Management" as UC_Houses
+    usecase "Chicken Batches" as UC_Chickens
+    usecase "Mortality Tracking" as UC_Mortality
+    usecase "Egg Production" as UC_Eggs
+    usecase "House Optimization" as UC_Optimize
+  }
+  
+  ' Storage & Inventory
+  package "Storage & Inventory" {
+    usecase "Feed Management" as UC_Feed
+    usecase "Medication Stock" as UC_Med
+    usecase "Equipment Tracking" as UC_Equip
+  }
+  
+  ' Operations
+  package "Operations" {
+    usecase "Personnel Management" as UC_Personnel
+    usecase "Task Management" as UC_Tasks
+  }
+  
+  ' Alpha v2.0 Modules
+  package "Business Operations (Alpha v2.0)" <<Alpha>> {
+    usecase "CRM - Customers" as UC_CRM
+    usecase "SCM - Suppliers" as UC_SCM
+    usecase "Financial Tracking" as UC_Finance
+    usecase "Documents" as UC_Docs
+    usecase "Reports" as UC_Reports
+  }
+  
+  ' Settings
+  usecase "User Settings" as UC_Settings
+}
+
+' ============================================
+' ACTOR RELATIONSHIPS
+' ============================================
+
+' Cashier has full access
+Cashier --> UC_Auth
+Cashier --> UC_Dash
+Cashier --> UC_Houses
+Cashier --> UC_Chickens
+Cashier --> UC_Mortality
+Cashier --> UC_Eggs
+Cashier --> UC_Optimize
+Cashier --> UC_Feed
+Cashier --> UC_Med
+Cashier --> UC_Equip
+Cashier --> UC_Personnel
+Cashier --> UC_Tasks
+Cashier --> UC_CRM
+Cashier --> UC_SCM
+Cashier --> UC_Finance
+Cashier --> UC_Docs
+Cashier --> UC_Reports
+Cashier --> UC_Settings
+
+' Worker receives tasks
+Worker <.. UC_Tasks : <<receives tasks>>
+Worker .up.> Cashier : <<provides feedback>>
+
+' Admin requests reports
+Admin .down.> Cashier : <<requests reports>>
+Admin <.. UC_Reports : <<receives>>
+
+' ============================================
+' MODULE DEPENDENCIES
+' ============================================
+
+' Livestock depends on Houses
+UC_Chickens ..> UC_Houses : <<uses>>
+UC_Mortality ..> UC_Houses : <<uses>>
+UC_Eggs ..> UC_Houses : <<uses>>
+UC_Optimize ..> UC_Houses : <<uses>>
+
+' Tasks depend on Personnel
+UC_Tasks ..> UC_Personnel : <<uses>>
+
+' Documents depend on CRM/SCM
+UC_Docs ..> UC_CRM : <<uses>>
+UC_Docs ..> UC_SCM : <<uses>>
+
+' Reports depend on multiple modules
+UC_Reports ..> UC_Finance : <<uses>>
+UC_Reports ..> UC_Eggs : <<uses>>
+UC_Reports ..> UC_Feed : <<uses>>
+
+note right of UC_Optimize
+  <b>Alpha Enhancement:</b>
+  MILP Optimization Algorithm
+  for optimal house allocation
+  (Recherche Opérationnelle)
+end note
+
+note bottom of UC_CRM
+  <b>New in Alpha v2.0:</b>
+  Business modules added for
+  complete farm management
+  with PDF generation and
+  financial tracking.
+end note
+
+@enduml

@@ -1,0 +1,407 @@
+@startuml Class_Diagram_5_Alpha_Modules
+
+title Class Diagram 5: Alpha v2.0 New Modules (CRM, SCM, Financial, Documents, Reports)
+
+skinparam classAttributeIconSize 0
+skinparam class {
+    BackgroundColor<<Entity>> LightYellow
+    BorderColor<<Entity>> Orange
+    BackgroundColor<<DAO>> LightBlue
+    BorderColor<<DAO>> DarkBlue
+    BackgroundColor<<Controller>> LightSalmon
+    BorderColor<<Controller>> Red
+    BackgroundColor<<Utility>> LightGreen
+    BorderColor<<Utility>> DarkGreen
+    BackgroundColor<<Enum>> LightCyan
+    BorderColor<<Enum>> Teal
+}
+
+' ============================================
+' CRM MODULE - Customer Relationship Management
+' ============================================
+
+package "CRM Module" <<Rectangle>> {
+
+    class Customer <<Entity>> {
+        - id: int
+        - name: String
+        - companyName: String
+        - type: String
+        - legalForm: String
+        - contactPerson: String
+        - email: String
+        - phone: String
+        - address: String
+        - ice: String
+        - rc: String
+        - website: String
+        __Secondary Contact__
+        - secondaryContactName: String
+        - secondaryContactPhone: String
+        __Banking Info__
+        - bankName: String
+        - rib: String
+        __Commercial Terms__
+        - paymentTerms: String
+        - usualPurchases: String
+        - deliverySchedule: String
+        __Financial__
+        - outstandingBalance: double
+        - totalPurchases: double
+        - visitCount: int
+        - lastVisitDate: LocalDate
+        __Status__
+        - isActive: boolean
+        - notes: String
+        - createdAt: LocalDateTime
+        - updatedAt: LocalDateTime
+        __
+        + isCompany(): boolean
+        + isRepeatCustomer(): boolean
+        + toString(): String
+    }
+
+    class CustomerDAO <<DAO>> {
+        - dbConnection: DatabaseConnection
+        __
+        + addCustomer(customer: Customer): boolean
+        + getCustomerById(id: int): Customer
+        + getCustomerByName(name: String): Customer
+        + getAllCustomers(): List<Customer>
+        + getActiveCustomers(): List<Customer>
+        + updateCustomer(customer: Customer): boolean
+        + deleteCustomer(id: int): boolean
+        + searchCustomers(query: String): List<Customer>
+    }
+
+    class CustomersController <<Controller>> {
+        - customerDAO: CustomerDAO
+        __
+        + initialize(): void
+        + loadCustomers(): void
+        + handleAddCustomer(): void
+        + handleEditCustomer(): void
+        + handleDeleteCustomer(): void
+        + handleSearchCustomer(): void
+        + refreshView(): void
+    }
+}
+
+' ============================================
+' SCM MODULE - Supply Chain Management
+' ============================================
+
+package "SCM Module" <<Rectangle>> {
+
+    class Supplier <<Entity>> {
+        - id: int
+        - name: String
+        - companyName: String
+        - legalForm: String
+        - category: String
+        - subCategories: String
+        - contactPerson: String
+        - email: String
+        - phone: String
+        - address: String
+        - ice: String
+        - rc: String
+        - website: String
+        __Secondary Contact__
+        - secondaryContactName: String
+        - secondaryContactPhone: String
+        - secondaryContactEmail: String
+        __Banking Info__
+        - bankName: String
+        - rib: String
+        - swift: String
+        __Commercial Terms__
+        - paymentTerms: String
+        - preferredPaymentMethod: String
+        - minOrderAmount: double
+        - avgDeliveryTime: int
+        __Status__
+        - notes: String
+        - isActive: boolean
+        - createdAt: LocalDateTime
+        - updatedAt: LocalDateTime
+        __
+        + toString(): String
+    }
+
+    class SupplierDAO <<DAO>> {
+        - dbConnection: DatabaseConnection
+        __
+        + addSupplier(supplier: Supplier): boolean
+        + getSupplierById(id: int): Supplier
+        + getSupplierByName(name: String): Supplier
+        + getAllSuppliers(): List<Supplier>
+        + getSuppliersByCategory(category: String): List<Supplier>
+        + updateSupplier(supplier: Supplier): boolean
+        + deleteSupplier(id: int): boolean
+    }
+
+    class SuppliersController <<Controller>> {
+        - supplierDAO: SupplierDAO
+        __
+        + initialize(): void
+        + loadSuppliers(): void
+        + handleAddSupplier(): void
+        + handleEditSupplier(): void
+        + handleDeleteSupplier(): void
+        + handleFilterByCategory(): void
+        + refreshView(): void
+    }
+}
+
+' ============================================
+' FINANCIAL MODULE
+' ============================================
+
+package "Financial Module" <<Rectangle>> {
+
+    class FinancialTransaction <<Entity>> {
+        - id: int
+        - transactionDate: LocalDate
+        - type: String
+        - category: String
+        - amount: double
+        - paymentMethod: String
+        - description: String
+        - relatedEntityType: String
+        - relatedEntityId: int
+        - receiptImage: String
+        - createdAt: LocalDateTime
+        - updatedAt: LocalDateTime
+    }
+
+    class FinancialDAO <<DAO>> {
+        - dbConnection: DatabaseConnection
+        __
+        + addTransaction(transaction: FinancialTransaction): boolean
+        + getTransactionById(id: int): FinancialTransaction
+        + getAllTransactions(): List<FinancialTransaction>
+        + getTransactionsByType(type: String): List<FinancialTransaction>
+        + getTransactionsByCategory(category: String): List<FinancialTransaction>
+        + getTransactionsByDateRange(start: LocalDate, end: LocalDate): List<FinancialTransaction>
+        + updateTransaction(transaction: FinancialTransaction): boolean
+        + deleteTransaction(id: int): boolean
+        + getTotalIncome(): double
+        + getTotalExpenses(): double
+    }
+
+    class FinancialTrackingController <<Controller>> {
+        - financialDAO: FinancialDAO
+        __
+        + initialize(): void
+        + loadTransactions(): void
+        + handleAddIncome(): void
+        + handleAddExpense(): void
+        + handleEditTransaction(): void
+        + handleDeleteTransaction(): void
+        + calculateBalance(): double
+        + filterByType(type: String): void
+        + filterByDateRange(start: LocalDate, end: LocalDate): void
+        + refreshView(): void
+    }
+
+    note right of FinancialTransaction
+        <b>Transaction Types:</b>
+        • Income
+        • Expense
+
+        <b>Categories (Income):</b>
+        • Egg Sales
+        • Chicken Sales
+        • Other Sales
+
+        <b>Categories (Expense):</b>
+        • Feed Purchase
+        • Medication
+        • Equipment
+        • Utilities
+        • Salaries
+        • Other
+    end note
+}
+
+' ============================================
+' DOCUMENTS MODULE
+' ============================================
+
+package "Documents Module" <<Rectangle>> {
+
+    class FarmDocument <<Entity>> {
+        - id: int
+        - type: String
+        - referenceNumber: String
+        - generatedDate: LocalDate
+        - relatedEntityType: String
+        - relatedEntityId: int
+        - totalAmount: double
+        - status: String
+        - pdfContent: String
+        - metadata: String
+        - createdAt: LocalDateTime
+        - updatedAt: LocalDateTime
+    }
+
+    class DocumentDAO <<DAO>> {
+        - dbConnection: DatabaseConnection
+        __
+        + saveDocument(document: FarmDocument): boolean
+        + getDocumentById(id: int): FarmDocument
+        + getAllDocuments(): List<FarmDocument>
+        + getDocumentsByType(type: String): List<FarmDocument>
+        + getDocumentsByEntity(entityType: String, entityId: int): List<FarmDocument>
+        + updateDocument(document: FarmDocument): boolean
+        + deleteDocument(id: int): boolean
+        + getNextReferenceNumber(type: String): String
+    }
+
+    class FarmDocumentController <<Controller>> {
+        - documentDAO: DocumentDAO
+        - customerDAO: CustomerDAO
+        - supplierDAO: SupplierDAO
+        __
+        + initialize(): void
+        + loadDocuments(): void
+        + handleGenerateInvoice(): void
+        + handleGenerateBonCommande(): void
+        + handleGenerateBonLivraison(): void
+        + handleGenerateDevis(): void
+        + handlePreviewDocument(): void
+        + handleExportPDF(): void
+        + handlePrintDocument(): void
+        + refreshView(): void
+    }
+
+    class PDFGenerator <<Utility>> {
+        __
+        + {static} generateInvoicePDF(document: FarmDocument, customer: Customer): byte[]
+        + {static} generateBonCommandePDF(document: FarmDocument, supplier: Supplier): byte[]
+        + {static} generateBonLivraisonPDF(document: FarmDocument, customer: Customer): byte[]
+        + {static} generateDevisPDF(document: FarmDocument, customer: Customer): byte[]
+        + {static} savePDFToFile(content: byte[], path: String): boolean
+        + {static} openPDF(path: String): void
+    }
+
+    note right of FarmDocument
+        <b>Document Types:</b>
+        • Facture (Invoice)
+        • Bon de Commande
+        • Bon de Livraison
+        • Devis (Quote)
+        • Avoir (Credit Note)
+
+        <b>Status:</b>
+        • Draft
+        • Generated
+        • Sent
+        • Paid
+        • Cancelled
+    end note
+}
+
+' ============================================
+' REPORTS MODULE
+' ============================================
+
+package "Reports Module" <<Rectangle>> {
+
+    class Report <<Entity>> {
+        - id: int
+        - title: String
+        - type: ReportType
+        - periodStart: LocalDate
+        - periodEnd: LocalDate
+        - generatedDate: LocalDate
+        - format: ReportFormat
+        - filePath: String
+        - createdBy: Integer
+        - notes: String
+        - createdAt: String
+    }
+
+    enum ReportType <<Enum>> {
+        Financial
+        Production
+        Inventory
+        Consumption
+        Summary
+    }
+
+    enum ReportFormat <<Enum>> {
+        View
+        PDF
+        Excel
+    }
+
+    class ReportDAO <<DAO>> {
+        - dbConnection: DatabaseConnection
+        __
+        + saveReport(report: Report): boolean
+        + getReportById(id: int): Report
+        + getAllReports(): List<Report>
+        + getReportsByType(type: ReportType): List<Report>
+        + getReportsByDateRange(start: LocalDate, end: LocalDate): List<Report>
+        + deleteReport(id: int): boolean
+    }
+
+    class ReportsController <<Controller>> {
+        - reportDAO: ReportDAO
+        - financialDAO: FinancialDAO
+        - eggProductionDAO: EggProductionDAO
+        - feedDAO: FeedDAO
+        __
+        + initialize(): void
+        + loadReports(): void
+        + handleGenerateFinancialReport(): void
+        + handleGenerateProductionReport(): void
+        + handleGenerateInventoryReport(): void
+        + handleExportToPDF(): void
+        + handleExportToExcel(): void
+        + handleViewReport(): void
+        + refreshView(): void
+    }
+
+    Report --> ReportType : type
+    Report --> ReportFormat : format
+}
+
+' ============================================
+' RELATIONSHIPS
+' ============================================
+
+' CRM
+CustomersController --> CustomerDAO
+CustomerDAO --> DatabaseConnection
+
+' SCM
+SuppliersController --> SupplierDAO
+SupplierDAO --> DatabaseConnection
+
+' Financial
+FinancialTrackingController --> FinancialDAO
+FinancialDAO --> DatabaseConnection
+
+' Documents
+FarmDocumentController --> DocumentDAO
+FarmDocumentController --> CustomerDAO
+FarmDocumentController --> SupplierDAO
+FarmDocumentController ..> PDFGenerator
+DocumentDAO --> DatabaseConnection
+
+' Reports
+ReportsController --> ReportDAO
+ReportsController --> FinancialDAO
+ReportsController ..> PDFGenerator
+ReportDAO --> DatabaseConnection
+
+' Cross-module relationships
+FarmDocument ..> Customer : references
+FarmDocument ..> Supplier : references
+FinancialTransaction ..> Customer : related to
+FinancialTransaction ..> Supplier : related to
+
+@enduml

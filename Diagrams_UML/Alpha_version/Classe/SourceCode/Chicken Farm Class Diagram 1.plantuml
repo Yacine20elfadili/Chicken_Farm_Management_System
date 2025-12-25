@@ -1,0 +1,191 @@
+@startuml Class_Diagram_1_Core_Entities
+
+title Class Diagram 1: Domain Model - Core Entities (Livestock & Production) - Alpha v2.0
+
+skinparam classAttributeIconSize 0
+skinparam class {
+    BackgroundColor<<Entity>> LightYellow
+    BorderColor<<Entity>> Orange
+    BackgroundColor<<Enum>> LightCyan
+    BorderColor<<Enum>> Teal
+}
+
+' --- Core Livestock Entities ---
+
+class House <<Entity>> {
+    - id: int
+    - name: String
+    - type: HouseType
+    - chickenCount: int
+    - capacity: int
+    - healthStatus: HealthStatus
+    - lastCleaningDate: LocalDate
+    - creationDate: LocalDate
+    __Constructors__
+    + House()
+    + House(name: String, type: HouseType, capacity: int)
+    + House(id: int, name: String, type: HouseType, 
+            chickenCount: int, capacity: int, 
+            healthStatus: HealthStatus, 
+            lastCleaningDate: LocalDate, 
+            creationDate: LocalDate)
+    __Getters/Setters__
+    + getId(): int
+    + setId(id: int): void
+    + getName(): String
+    + setName(name: String): void
+    + getType(): HouseType
+    + setType(type: HouseType): void
+    + getChickenCount(): int
+    + setChickenCount(chickenCount: int): void
+    + getCapacity(): int
+    + setCapacity(capacity: int): void
+    + getHealthStatus(): HealthStatus
+    + setHealthStatus(healthStatus: HealthStatus): void
+    + getLastCleaningDate(): LocalDate
+    + setLastCleaningDate(lastCleaningDate: LocalDate): void
+    + getCreationDate(): LocalDate
+    + setCreationDate(creationDate: LocalDate): void
+    __Utility Methods__
+    + getOccupancyRate(): double
+    + isFull(): boolean
+    + equals(o: Object): boolean
+    + hashCode(): int
+    + toString(): String
+}
+
+enum HouseType <<Enum>> {
+    DAY_OLD
+    EGG_LAYER
+    MALE_MEAT
+    FEMALE_MEAT
+    __
+    - label: String
+    - durationWeeks: int
+    - throughputCoefficient: double
+    __
+    + getLabel(): String
+    + getDurationWeeks(): int
+    + getThroughputCoefficient(): double
+}
+
+enum HealthStatus <<Enum>> {
+    GOOD
+    MODERATE
+    AT_RISK
+    CRITICAL
+    __
+    + getDisplayName(): String
+}
+
+class Chicken <<Entity>> {
+    - id: int
+    - houseId: int
+    - batchNumber: String
+    - quantity: int
+    - arrivalDate: LocalDate
+    - ageInDays: int
+    - gender: String
+    - healthStatus: String
+    - averageWeight: double
+    - nextTransferDate: LocalDate
+    __Constructors__
+    + Chicken()
+    + Chicken(houseId: int, batchNumber: String, 
+              quantity: int, arrivalDate: LocalDate, gender: String)
+    + Chicken(id: int, houseId: int, batchNumber: String, 
+              quantity: int, arrivalDate: LocalDate, ageInDays: int, 
+              gender: String, healthStatus: String, 
+              averageWeight: double, nextTransferDate: LocalDate)
+    __Utility Methods__
+    + getDaysUntilTransfer(): int
+    + isReadyForTransfer(): boolean
+    + equals(o: Object): boolean
+    + hashCode(): int
+    + toString(): String
+}
+
+class Mortality <<Entity>> {
+    - id: int
+    - houseId: int
+    - deathDate: LocalDate
+    - count: int
+    - cause: String
+    - symptoms: String
+    - isOutbreak: boolean
+    - recordedBy: String
+    - notes: String
+    __Constructors__
+    + Mortality()
+    + Mortality(houseId: int, deathDate: LocalDate, 
+                count: int, cause: String)
+    + Mortality(id: int, houseId: int, deathDate: LocalDate, 
+                count: int, cause: String, symptoms: String, 
+                isOutbreak: boolean, recordedBy: String, notes: String)
+    __Utility Methods__
+    + isConcerningRate(totalChickens: int): boolean
+    + equals(o: Object): boolean
+    + hashCode(): int
+    + toString(): String
+}
+
+class EggProduction <<Entity>> {
+    - id: int
+    - houseId: int
+    - productionDate: LocalDate
+    - eggsCollected: int
+    - crackedEggs: int
+    - goodEggs: int
+    - deadChickens: int
+    - collectedBy: String
+    - notes: String
+    __Constructors__
+    + EggProduction()
+    + EggProduction(houseId: int, productionDate: LocalDate, 
+                    eggsCollected: int, crackedEggs: int, deadChickens: int)
+    + EggProduction(id: int, houseId: int, productionDate: LocalDate,
+                    eggsCollected: int, crackedEggs: int, goodEggs: int,
+                    deadChickens: int, collectedBy: String, notes: String)
+    __Utility Methods__
+    + calculateGoodEggs(): void
+    + getEfficiencyRate(): double
+    + equals(o: Object): boolean
+    + hashCode(): int
+    + toString(): String
+}
+
+class User <<Entity>> {
+    - id: int
+    - fullName: String
+    - email: String
+    - password: String
+    - avatarBase64: String
+    - isAdmin: boolean
+    - creationDate: LocalDateTime
+    __Constructors__
+    + User()
+    + User(fullName: String, email: String, password: String)
+    + User(id: int, fullName: String, email: String, 
+          password: String, creationDate: LocalDateTime)
+    __Utility Methods__
+    + equals(o: Object): boolean
+    + hashCode(): int
+    + toString(): String
+}
+
+' --- Relationships ---
+House "1" -- "0..*" Chicken : contains >
+House "1" -- "0..*" EggProduction : produces >
+House "1" -- "0..*" Mortality : records >
+House --> HouseType : type
+House --> HealthStatus : healthStatus
+
+note right of HouseType
+    <b>Alpha v2.0 Enhancement:</b>
+    HouseType now includes throughput
+    coefficients used in the MILP
+    optimization algorithm for
+    house allocation.
+end note
+
+@enduml

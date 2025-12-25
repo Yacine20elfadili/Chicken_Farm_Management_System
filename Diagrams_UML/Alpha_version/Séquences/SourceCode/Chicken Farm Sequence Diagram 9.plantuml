@@ -1,0 +1,150 @@
+@startuml Sequence_Diagram_9_Generate_Invoice
+
+title Sequence Diagram 9: Generate Invoice (Facture) - Alpha v2.0
+
+actor "Cashier" as Cashier
+participant "FarmDocumentView" as UI
+participant "FarmDocumentController" as Controller
+participant "CustomerDAO" as CustomerDAO
+participant "DocumentDAO" as DocDAO
+participant "PDFGenerator" as PDF
+participant "DatabaseConnection" as DB
+
+== Generate Invoice for Customer ==
+
+Cashier -> UI: Click "Generate Invoice" button
+
+UI -> Controller: handleGenerateInvoice()
+activate Controller
+
+' Load customers for selection
+Controller -> CustomerDAO: getActiveCustomers()
+activate CustomerDAO
+CustomerDAO -> DB: executeQuery(\n"SELECT * FROM customers\nWHERE isActive = 1")
+activate DB
+DB --> CustomerDAO: List<Customer>
+deactivate DB
+CustomerDAO --> Controller: customer list
+deactivate CustomerDAO
+
+Controller -> UI: Show "Generate Invoice" dialog\nwith customer dropdown
+UI -> Cashier: Display invoice form
+
+Cashier -> UI: Select customer:\n• Ferme Azzam (Company)
+
+Cashier -> UI: Add invoice items:\n• Eggs (1000 units) - 1.20 MAD\n• Chickens (50 units) - 45.00 MAD
+
+Cashier -> UI: Set invoice details:\n• Date: 25/12/2025\n• Due Date: 24/01/2026\n• Notes: "Livraison effectuée"
+
+Cashier -> UI: Click "Generate" button
+
+UI -> Controller: generateInvoice(invoiceData)
+
+' Calculate totals
+Controller -> Controller: calculateTotals()
+note right
+    <b>Invoice Calculation:</b>
+    Eggs: 1000 × 1.20 = 1,200.00 MAD
+    Chickens: 50 × 45.00 = 2,250.00 MAD
+    ─────────────────────────
+    Subtotal: 3,450.00 MAD
+    TVA (20%): 690.00 MAD
+    ─────────────────────────
+    Total TTC: 4,140.00 MAD
+end note
+
+' Get next reference number
+Controller -> DocDAO: getNextReferenceNumber("Facture")
+activate DocDAO
+DocDAO -> DB: executeQuery(\n"SELECT MAX(id) FROM farm_documents\nWHERE type = 'Facture'")
+activate DB
+DB --> DocDAO: maxId = 45
+deactivate DB
+DocDAO --> Controller: "FAC-2025-0046"
+deactivate DocDAO
+
+' Create FarmDocument object
+Controller -> Controller: createDocumentObject()
+note right
+    <b>FarmDocument Object:</b>
+    type = "Facture"
+    referenceNumber = "FAC-2025-0046"
+    generatedDate = 2025-12-25
+    relatedEntityType = "Customer"
+    relatedEntityId = 12
+    totalAmount = 4140.00
+    status = "Generated"
+    metadata = {items, customer, dueDate}
+end note
+
+' Generate PDF
+Controller -> PDF: generateInvoicePDF(document, customer)
+activate PDF
+
+PDF -> PDF: Create HTML template
+note right
+    <b>Invoice PDF Content:</b>
+    ┌─────────────────────────────┐
+    │  🐔 CHICKEN FARM            │
+    │  FACTURE FAC-2025-0046      │
+    │  ─────────────────────────  │
+    │  Client: Ferme Azzam        │
+    │  ICE: 001234567000089       │
+    │  ─────────────────────────  │
+    │  Désignation | Qté | PU | PT│
+    │  Oeufs       |1000 |1.20|1200│
+    │  Poulets     | 50  | 45 |2250│
+    │  ─────────────────────────  │
+    │  Sous-total: 3,450.00 MAD   │
+    │  TVA (20%):    690.00 MAD   │
+    │  Total TTC:  4,140.00 MAD   │
+    │  ─────────────────────────  │
+    │  Échéance: 24/01/2026       │
+    └─────────────────────────────┘
+end note
+
+PDF -> PDF: Convert HTML to PDF (OpenHTMLToPDF)
+PDF -> PDF: Encode PDF to Base64
+PDF --> Controller: pdfContent (Base64)
+deactivate PDF
+
+' Save document to database
+Controller -> DocDAO: saveDocument(document)
+activate DocDAO
+DocDAO -> DB: executeUpdate(\n"INSERT INTO farm_documents\n(type, referenceNumber, generatedDate,\nrelatedEntityType, relatedEntityId,\ntotalAmount, status, pdfContent, metadata)\nVALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)")
+activate DB
+DB --> DocDAO: success
+deactivate DB
+DocDAO --> Controller: true
+deactivate DocDAO
+
+' Show preview
+Controller -> UI: showPDFPreview(pdfContent)
+UI -> Cashier: Display invoice preview
+
+alt User Clicks "Export PDF"
+    Cashier -> UI: Click "Export PDF"
+    UI -> Controller: handleExportPDF()
+    Controller -> PDF: savePDFToFile(pdfContent, path)
+    activate PDF
+    PDF --> Controller: File saved to exports/FAC-2025-0046.pdf
+    deactivate PDF
+    Controller -> UI: Show success message
+    UI -> Cashier: "PDF exported successfully!"
+    
+else User Clicks "Print"
+    Cashier -> UI: Click "Print"
+    UI -> Controller: handlePrint()
+    Controller -> Controller: openSystemPrintDialog()
+end
+
+' Refresh documents list
+Controller -> Controller: refreshView()
+Controller -> UI: Update documents table
+UI -> Cashier: Show updated list with new invoice
+
+deactivate Controller
+
+
+
+@enduml
