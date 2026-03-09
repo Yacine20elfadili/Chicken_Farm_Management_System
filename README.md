@@ -11,13 +11,17 @@
 
 ---
 
+🌐 **[See Live Web Demo](https://yacine20elfadili.github.io/Chicken_Farm_Management_System/)**
+
+---
+
 ## 👥 Team Members
 
 This project was architected and developed by the following team:
 
 | Name                     | Role                                  | GitHub |
 |--------------------------|---------------------------------------|--------|
-| ELFADILI MOHAMED YACINE  | Chef de Projet (Project Lead) & Full Stack  | [@Medfadili20Dev](https://github.com/Medfadili20Dev) |
+| ELFADILI MOHAMED YACINE  | Chef de Projet (Project Lead) & Full Stack  | [@Yacine20elfadili](https://github.com/Yacine20elfadili) |
 | HAMMOU MOHAMED           | Développeur Backend / Base de Données | [@Hmou05](https://github.com/Hmou05) |
 | ANSSEM HAFID             | Développeur Frontend / JavaFX         | [@ANSS77](https://github.com/ANSS77) |
 | HAIFI MOHAMED AMINE      | Testeur / Documentateur               | [@Mohamadaminehaifi](https://github.com/Mohamadaminehaifi) |
@@ -174,6 +178,27 @@ Chicken_Farm_Management_System/
 ├── database/                   # SQLite database file
 │   └── farm.db
 │
+├── docs/                       # this is a Live Web Demo of the desktop app in the browser 
+│   ├── public/
+│   │   └── logo.png
+│   ├── src/
+│   │   ├── components/
+│   │   │   ├── Sidebar.css
+│   │   │   └── Sidebar.jsx
+│   │   ├── pages/
+│   │   │   ├── Auth.css
+│   │   │   ├── ChickenBay.jsx
+│   │   │   ├── Customers.jsx
+│   │   │   ├── ....
+│   │   ├── App.jsx
+│   │   ├── index.css
+│   │   └── main.jsx
+│   ├── .gitignore
+│   ├── eslint.config.js
+│   ├── index.html
+│   ├── package-lock.json
+│   ├── package.json
+│   └── vite.config.js
 ├── src/
 │   ├── main/
 │   │   ├── java/ma/farm/
@@ -182,82 +207,23 @@ Chicken_Farm_Management_System/
 │   │   │   │   │   ├── AddEditEquipmentItemDialogController.java
 │   │   │   │   │   ├── AddEditFeedDialogController.java
 │   │   │   │   │   ├── AddEditMedicationDialogController.java
-│   │   │   │   │   ├── AddEditPersonnelDialogController.java
-│   │   │   │   │   ├── AddEditTaskDialogController.java
-│   │   │   │   │   ├── AddEquipmentCategoryDialogController.java
-│   │   │   │   │   ├── AddHouseDialogController.java
-│   │   │   │   │   ├── ConfigHousesDialogController.java
-│   │   │   │   │   ├── DistributeChicksDialogController.java
-│   │   │   │   │   ├── EditEggProductionDialogController.java
-│   │   │   │   │   ├── EditHouseDialogController.java
-│   │   │   │   │   ├── ImportChicksDialogController.java
-│   │   │   │   │   ├── ManageEquipmentItemsDialogController.java
-│   │   │   │   │   ├── PersonnelDetailDialogController.java
-│   │   │   │   │   ├── RecordEggCollectionDialogController.java
-│   │   │   │   │   ├── RecordMortalityDialogController.java
-│   │   │   │   │   ├── SellChickensDialogController.java
-│   │   │   │   │   ├── SellEggsDialogController.java
-│   │   │   │   │   ├── TransferChickensDialogController.java
-│   │   │   │   │   ├── UseFeedDialogController.java
-│   │   │   │   │   └── UseMedicationDialogController.java
+│   │   │   │   │   ├── ....
 │   │   │   │   ├── ChickenBayController.java
 │   │   │   │   ├── CustomersController.java
 │   │   │   │   ├── DashboardController.java
-│   │   │   │   ├── EggsBayController.java
-│   │   │   │   ├── FarmDocumentController.java
-│   │   │   │   ├── FinancialTrackingController.java
-│   │   │   │   ├── LoginController.java
-│   │   │   │   ├── MainWindowController.java
-│   │   │   │   ├── PersonnelController.java
-│   │   │   │   ├── ReportsController.java
-│   │   │   │   ├── SettingsController.java
-│   │   │   │   ├── SidebarController.java
-│   │   │   │   ├── SignUpController.java
-│   │   │   │   ├── StorageController.java
-│   │   │   │   ├── SuppliersController.java
-│   │   │   │   └── TasksController.java
+│   │   │   │   ├── ....
 │   │   │   │
 │   │   │   ├── dao/
 │   │   │   │   ├── ChickenDAO.java
 │   │   │   │   ├── CustomerDAO.java
 │   │   │   │   ├── DatabaseConnection.java
-│   │   │   │   ├── DocumentDAO.java
-│   │   │   │   ├── EggProductionDAO.java
-│   │   │   │   ├── EquipmentCategoryDAO.java
-│   │   │   │   ├── EquipmentItemDAO.java
-│   │   │   │   ├── FeedDAO.java
-│   │   │   │   ├── FinancialDAO.java
-│   │   │   │   ├── HouseDAO.java
-│   │   │   │   ├── MedicationDAO.java
-│   │   │   │   ├── MortalityDAO.java
-│   │   │   │   ├── PersonnelDAO.java
-│   │   │   │   ├── ReportDAO.java
-│   │   │   │   ├── SupplierDAO.java
-│   │   │   │   ├── TaskDAO.java
-│   │   │   │   └── UserDAO.java
+│   │   │   │   ├── ....
 │   │   │   │
 │   │   │   ├── model/
 │   │   │   │   ├── AdminPosition.java
 │   │   │   │   ├── Chicken.java
 │   │   │   │   ├── Customer.java
-│   │   │   │   ├── DocumentVersion.java
-│   │   │   │   ├── EggProduction.java
-│   │   │   │   ├── EquipmentCategory.java
-│   │   │   │   ├── EquipmentItem.java
-│   │   │   │   ├── FarmDocument.java
-│   │   │   │   ├── Feed.java
-│   │   │   │   ├── FinancialTransaction.java
-│   │   │   │   ├── HealthStatus.java
-│   │   │   │   ├── House.java
-│   │   │   │   ├── HouseType.java
-│   │   │   │   ├── Medication.java
-│   │   │   │   ├── Mortality.java
-│   │   │   │   ├── Personnel.java
-│   │   │   │   ├── PersonnelType.java
-│   │   │   │   ├── Report.java
-│   │   │   │   ├── Supplier.java
-│   │   │   │   ├── Task.java
-│   │   │   │   └── User.java
+│   │   │   │   ├── ....
 │   │   │   │
 │   │   │   ├── util/
 │   │   │   │   ├── ChickenBayOptimization.java
@@ -281,41 +247,11 @@ Chicken_Farm_Management_System/
 │   │       │   │   ├── AddEditEquipmentItemDialog.fxml
 │   │       │   │   ├── AddEditFeedDialog.fxml
 │   │       │   │   ├── AddEditMedicationDialog.fxml
-│   │       │   │   ├── AddEditPersonnelDialog.fxml
-│   │       │   │   ├── AddEditTaskDialog.fxml
-│   │       │   │   ├── AddEquipmentCategoryDialog.fxml
-│   │       │   │   ├── AddHouseDialog.fxml
-│   │       │   │   ├── ConfigHousesDialog.fxml
-│   │       │   │   ├── DistributeChicksDialog.fxml
-│   │       │   │   ├── EditEggProductionDialog.fxml
-│   │       │   │   ├── EditHouseDialog.fxml
-│   │       │   │   ├── ImportChicksDialog.fxml
-│   │       │   │   ├── ManageEquipmentItemsDialog.fxml
-│   │       │   │   ├── PersonnelDetailDialog.fxml
-│   │       │   │   ├── RecordEggCollectionDialog.fxml
-│   │       │   │   ├── RecordMortalityDialog.fxml
-│   │       │   │   ├── SellChickensDialog.fxml
-│   │       │   │   ├── SellEggsDialog.fxml
-│   │       │   │   ├── TransferChickensDialog.fxml
-│   │       │   │   ├── UseFeedDialog.fxml
-│   │       │   │   └── UseMedicationDialog.fxml
+│   │       │   │   ├── ....
 │   │       │   ├── ChickenBayView.fxml
 │   │       │   ├── CustomersView.fxml
 │   │       │   ├── DashboardView.fxml
-│   │       │   ├── EggsBayView.fxml
-│   │       │   ├── FarmDocumentView.fxml
-│   │       │   ├── FinancialTrackingView.fxml
-│   │       │   ├── LoginView.fxml
-│   │       │   ├── MainWindow.fxml
-│   │       │   ├── PersonnelView.fxml
-│   │       │   ├── ReportsView.fxml
-│   │       │   ├── SettingsView.fxml
-│   │       │   ├── Sidebar.fxml
-│   │       │   ├── SignUpView.fxml
-│   │       │   ├── StorageView.fxml
-│   │       │   ├── SuppliersView.fxml
-│   │       │   ├── TasksView.fxml
-│   │       │   └── id_card.fxml
+│   │       │   ├── ....
 │   │       ├── images/
 │   │       └── templates/
 │   │           ├── identity-card.css
@@ -323,28 +259,12 @@ Chicken_Farm_Management_System/
 │   │
 │   └── test/java/ma/farm/dao/
 │       ├── ChickenBayOptimizationTest.java
-│       ├── ChickenDAOTest.java
-│       ├── CustomerDAOTest.java
-│       ├── DatabaseConnectionTest.java
-│       ├── DocumentDAOTest.java
-│       ├── EggProductionDAOTest.java
-│       ├── EquipmentCategoryDAOTest.java
-│       ├── EquipmentItemDAOTest.java
-│       ├── FeedDAOTest.java
-│       ├── FinancialDAOTest.java
-│       ├── HouseDAOTest.java
-│       ├── MedicationDAOTest.java
-│       ├── MortalityDAOTest.java
-│       ├── PersonnelDAOTest.java
-│       ├── ReportDAOTest.java
-│       ├── SupplierDAOTest.java
-│       ├── TaskDAOTest.java
-│       ├── UserDAOTest.java
-│       └── ValidationUtilTest.java
+│       ├── ....
 │
 ├── Diagrams_UML/               # Contains Alpha_version & MVP_version diagrams
 ├── pom.xml
-└── README.md
+├── README.md
+└── LICENSE.txt
 ```
 
 ---
