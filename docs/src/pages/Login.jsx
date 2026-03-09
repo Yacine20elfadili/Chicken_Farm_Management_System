@@ -4,8 +4,8 @@ import './Auth.css'
 
 function Login() {
   const navigate = useNavigate()
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
+  const [email, setEmail] = useState('admin@farm.ma')
+  const [password, setPassword] = useState('admin123')
   const [error, setError] = useState('')
 
   const handleLogin = (e) => {
