@@ -1,0 +1,104 @@
+/* Global Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background-color: #f5f1e8;
+  color: #1e2939;
+}
+
+#root {
+  width: 100%;
+  height: 100%;
+}
+
+.app-container {
+  display: flex;
+  width: 100%;
+  height: 100%;
+}
+
+/* Main Content */
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background-color: #f5f1e8;
+}
+
+/* Header */
+.header {
+  padding: 20px 30px 15px 30px;
+  background-color: white;
+  border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header-left {
+  display: flex;
+  flex-direction: column;
+}
+
+.header-actions {
+  display: flex;
+  gap: 15px;
+}
+
+.header-title {
+  font-size: 26px;
+  font-weight: bold;
+  color: #1e2939;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.header-subtitle {
+  font-size: 14px;
+  color: gray;
+  font-style: italic;
+  margin-top: 2px;
+}
+
+/* Content Area */
+.content-area {
+  flex: 1;
+  overflow-y: auto;
+  padding: 30px 20px;
+}
+
+/* Buttons */
+.btn {
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  font-family: 'Segoe UI', sans-serif;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.btn-primary {
+  background-color: #ff781a;
+  color: white;
+  box-shadow: 0 2px 8px rgba(255,168,0,0.3);
+}
+
+.btn-primary:hover {
+  background-color: #ff6900;
+  box-shadow: 0 4px 12px rgba(255,168,0,0.4);
+}
